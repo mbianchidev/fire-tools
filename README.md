@@ -2,6 +2,10 @@
 
 A comprehensive FIRE (Financial Independence Retire Early) calculator application with Monte Carlo simulations.
 
+## 🌐 Live Demo
+
+The latest version is automatically deployed to: **[https://mbianchidev.github.io/fire-calculator/](https://mbianchidev.github.io/fire-calculator/)**
+
 ## Features
 
 - **Comprehensive Input Parameters**
@@ -56,6 +60,23 @@ npm run build
 ```
 
 The built files will be in the `dist` directory.
+
+### Deployment
+
+The project is automatically deployed to GitHub Pages on every push to the `main` branch using GitHub Actions.
+
+**Automatic Deployment:**
+- Pushes to the `main` branch trigger the deployment workflow
+- The workflow builds the project and deploys to GitHub Pages
+- The live site is available at: https://mbianchidev.github.io/fire-calculator/
+
+**Workflow Details:**
+- Build job: Installs dependencies, runs build, and uploads artifacts
+- Deploy job: Deploys the built files to GitHub Pages
+- The workflow configuration is in `.github/workflows/deploy.yml`
+
+**Manual Deployment:**
+If you need to deploy manually or to a different environment, build the project and serve the `dist` directory.
 
 ## Usage
 
