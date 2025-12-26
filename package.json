@@ -8,7 +8,12 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
-  "keywords": ["fire", "calculator", "financial-independence", "monte-carlo"],
+  "keywords": [
+    "fire",
+    "calculator",
+    "financial-independence",
+    "monte-carlo"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -21,6 +26,7 @@
   "dependencies": {
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "react-router-dom": "^7.11.0",
     "recharts": "^3.6.0"
   }
 }
