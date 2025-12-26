@@ -1,4 +1,3 @@
-import React from 'react';
 import { CalculatorInputs } from '../types/calculator';
 
 interface CalculatorInputsProps {

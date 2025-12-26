@@ -11,10 +11,7 @@ import {
 function generateRandomReturn(expectedReturn: number, volatility: number): number {
   // Box-Muller transform for normal distribution
   // Ensure u1 is never 0 to avoid Math.log(0)
-  let u1 = Math.random();
-  while (u1 === 0) {
-    u1 = Math.random();
-  }
+  const u1 = Math.random() || 1e-10;
   const u2 = Math.random();
   const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
   

@@ -1,4 +1,3 @@
-import React from 'react';
 import { CalculationResult } from '../types/calculator';
 
 interface FIREMetricsProps {
