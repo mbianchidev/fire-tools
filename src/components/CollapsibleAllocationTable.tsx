@@ -86,14 +86,14 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
       a.id === assetId ? { ...a, currentValue: editValues.currentValue } : a
     );
     
-    // If this is a percentage-based asset, use the proper redistribution logic
-    if (asset.targetMode === 'PERCENTAGE') {
+    // If this is a percentage-based asset and we have a valid target percent, use the proper redistribution logic
+    if (asset.targetMode === 'PERCENTAGE' && editValues.targetPercent !== undefined) {
       updatedAssets = redistributeAssetPercentagesInClass(
         updatedAssets,
         assetId,
         editValues.targetPercent
       );
-    } else {
+    } else if (editValues.targetPercent !== undefined) {
       // For non-percentage assets, just update the values
       updatedAssets = updatedAssets.map(a =>
         a.id === assetId ? { ...a, targetPercent: editValues.targetPercent } : a

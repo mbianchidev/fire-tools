@@ -423,6 +423,11 @@ export function formatAssetName(name: string): string {
 
 /**
  * Asset class target configuration
+ * @property targetMode - The allocation mode:
+ *   - 'PERCENTAGE': Target is a percentage of portfolio (requires targetPercent)
+ *   - 'SET': Fixed absolute amount (used for cash reserves)
+ *   - 'OFF': Excluded from allocation calculations
+ * @property targetPercent - The target percentage (0-100), required when targetMode is 'PERCENTAGE'
  */
 export interface AssetClassTarget {
   targetMode: AllocationMode;
@@ -438,7 +443,7 @@ export type AssetClassTargets = Record<AssetClass, AssetClassTarget>;
  * 
  * @param currentTargets - Current asset class targets
  * @param editedClass - The asset class that was edited
- * @param newPercent - The new percentage for the edited class
+ * @param newPercent - The new percentage for the edited class (0-100)
  * @returns Updated asset class targets with redistributed percentages
  */
 export function redistributeAssetClassPercentages(
@@ -446,12 +451,15 @@ export function redistributeAssetClassPercentages(
   editedClass: AssetClass,
   newPercent: number
 ): AssetClassTargets {
+  // Clamp newPercent to valid range
+  const clampedPercent = Math.max(0, Math.min(100, newPercent));
+  
   const updatedTargets = { ...currentTargets };
   
   // Update the edited class
   updatedTargets[editedClass] = {
     ...updatedTargets[editedClass],
-    targetPercent: newPercent,
+    targetPercent: clampedPercent,
   };
   
   // Get all percentage-based asset classes except the one being edited
@@ -463,7 +471,7 @@ export function redistributeAssetClassPercentages(
     return updatedTargets;
   }
   
-  const remainingPercent = 100 - newPercent;
+  const remainingPercent = Math.max(0, 100 - clampedPercent);
   
   // Get total of other classes' current percentages
   const otherClassesTotal = otherPercentageClasses.reduce(
@@ -530,7 +538,7 @@ export function redistributeAssetPercentagesInClass(
     );
   }
   
-  // Get total target percentage for all percentage-based assets in this class
+  // Get total target percentage for all percentage-based assets in this class (including the edited asset's old value)
   const allPercentageAssetsInClass = assets.filter(
     a => a.assetClass === assetClass && a.targetMode === 'PERCENTAGE'
   );
@@ -539,8 +547,11 @@ export function redistributeAssetPercentagesInClass(
     0
   );
   
-  // The remaining assets need to absorb the inverse of this change
-  const remainingPercent = totalClassTargetPercent - newTargetPercent;
+  // Calculate remaining percentage for other assets.
+  // Since totalClassTargetPercent includes the edited asset's OLD percentage,
+  // subtracting the new percentage gives us the correct remaining for others
+  // to maintain the same total class percentage.
+  const remainingPercent = Math.max(0, totalClassTargetPercent - newTargetPercent);
   
   // Get total of other assets' current percentages
   const otherAssetsTotal = otherAssetsInClass.reduce(
