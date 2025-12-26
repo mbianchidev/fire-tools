@@ -6,7 +6,9 @@ interface CollapsibleAllocationTableProps {
   assets: Asset[];
   deltas: AllocationDelta[];
   currency: string;
-  cashInvestAmount?: number; // Amount of cash marked as "Invest" to add to each class delta
+  cashDeltaAmount?: number; // Cash delta (positive = SAVE/subtract from other classes, negative = INVEST/add to other classes)
+  assetClassTargets?: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>;
+  portfolioValue?: number;
   onUpdateAsset: (assetId: string, updates: Partial<Asset>) => void;
   onDeleteAsset: (assetId: string) => void;
   onMassEdit?: (assetClass: AssetClass) => void; // Handler for opening mass edit dialog
@@ -16,7 +18,10 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   assets,
   deltas,
   currency,
-  cashInvestAmount = 0,
+  cashDeltaAmount = 0,
+  // These props are available for future use when we need class-level targeting in subtables
+  // assetClassTargets,
+  // portfolioValue,
   onUpdateAsset,
   onDeleteAsset,
   onMassEdit,
@@ -170,9 +175,12 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
         );
         const classDeltas = classAssets.map(asset => deltas.find(d => d.assetId === asset.id)!).filter(Boolean);
         const classTargetTotal = classDeltas.reduce((sum, delta) => sum + delta.targetValue, 0);
-        // Include cash invest amount in the delta for non-cash asset classes
-        const cashBonus = assetClass !== 'CASH' ? cashInvestAmount : 0;
-        const classDelta = classTargetTotal - classTotal + cashBonus;
+        
+        // Calculate class delta with cash adjustment for non-cash classes
+        // Cash delta: positive = SAVE (subtract from other classes), negative = INVEST (add to other classes)
+        // For non-cash classes: add -cashDeltaAmount (so INVEST adds, SAVE subtracts)
+        const cashAdjustment = assetClass !== 'CASH' ? -cashDeltaAmount : 0;
+        const classDelta = classTargetTotal - classTotal + cashAdjustment;
 
         return (
           <div key={assetClass} className="asset-class-group">

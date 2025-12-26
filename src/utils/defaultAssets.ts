@@ -1,16 +1,19 @@
 import { Asset } from '../types/assetAllocation';
 
+// Default portfolio value is 50000 EUR
+export const DEFAULT_PORTFOLIO_VALUE = 50000;
+
 export const DEFAULT_ASSETS: Asset[] = [
-  // Stocks - 60% of portfolio (~300k out of 500k total)
+  // Stocks - 60% of portfolio (~30k out of 50k total)
   {
     id: 'stock-1',
     name: 'S&P 500 Index ETF',
     ticker: 'SPY',
     assetClass: 'STOCKS',
     subAssetType: 'ETF',
-    currentValue: 120000,
+    currentValue: 12000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 24,
+    targetPercent: 40, // 40% of stocks
   },
   {
     id: 'stock-2',
@@ -18,9 +21,9 @@ export const DEFAULT_ASSETS: Asset[] = [
     ticker: 'VTI',
     assetClass: 'STOCKS',
     subAssetType: 'ETF',
-    currentValue: 80000,
+    currentValue: 8000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 16,
+    targetPercent: 27, // 27% of stocks
   },
   {
     id: 'stock-3',
@@ -28,9 +31,9 @@ export const DEFAULT_ASSETS: Asset[] = [
     ticker: 'VXUS',
     assetClass: 'STOCKS',
     subAssetType: 'ETF',
-    currentValue: 50000,
+    currentValue: 5000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 10,
+    targetPercent: 17, // 17% of stocks
   },
   {
     id: 'stock-4',
@@ -38,9 +41,9 @@ export const DEFAULT_ASSETS: Asset[] = [
     ticker: 'VWO',
     assetClass: 'STOCKS',
     subAssetType: 'ETF',
-    currentValue: 30000,
+    currentValue: 3000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 6,
+    targetPercent: 10, // 10% of stocks
   },
   {
     id: 'stock-5',
@@ -48,21 +51,21 @@ export const DEFAULT_ASSETS: Asset[] = [
     ticker: 'VBR',
     assetClass: 'STOCKS',
     subAssetType: 'ETF',
-    currentValue: 20000,
+    currentValue: 2000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 4,
+    targetPercent: 6, // 6% of stocks = 100% total
   },
   
-  // Bonds - 40% of portfolio (~200k out of 500k total)
+  // Bonds - 40% of portfolio (~20k out of 50k total)
   {
     id: 'bond-1',
     name: 'Total Bond Market',
     ticker: 'BND',
     assetClass: 'BONDS',
     subAssetType: 'ETF',
-    currentValue: 100000,
+    currentValue: 10000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 20,
+    targetPercent: 50, // 50% of bonds
   },
   {
     id: 'bond-2',
@@ -70,9 +73,9 @@ export const DEFAULT_ASSETS: Asset[] = [
     ticker: 'TIP',
     assetClass: 'BONDS',
     subAssetType: 'ETF',
-    currentValue: 60000,
+    currentValue: 6000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 12,
+    targetPercent: 30, // 30% of bonds
   },
   {
     id: 'bond-3',
@@ -80,30 +83,20 @@ export const DEFAULT_ASSETS: Asset[] = [
     ticker: 'BNDX',
     assetClass: 'BONDS',
     subAssetType: 'ETF',
-    currentValue: 40000,
+    currentValue: 4000,
     targetMode: 'PERCENTAGE',
-    targetPercent: 8,
+    targetPercent: 20, // 20% of bonds = 100% total
   },
   
-  // Cash - approximately 50k
+  // Cash - approximately 5k (SET to 5k target)
   {
     id: 'cash-1',
     name: 'Emergency Fund',
     ticker: 'CASH',
     assetClass: 'CASH',
     subAssetType: 'SAVINGS_ACCOUNT',
-    currentValue: 50000,
+    currentValue: 5000,
     targetMode: 'SET',
-    targetValue: 50000,
-  },
-  {
-    id: 'cash-2',
-    name: 'Broker Cash',
-    ticker: 'CASH',
-    assetClass: 'CASH',
-    subAssetType: 'CHECKING_ACCOUNT',
-    currentValue: 2500,
-    targetMode: 'PERCENTAGE',
-    targetPercent: 0,
+    targetValue: 5000,
   },
 ];
