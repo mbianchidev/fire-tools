@@ -1,7 +1,7 @@
 {
   "name": "fire-calculator",
   "version": "1.0.0",
-  "description": "Fire calculator with Montecarlo simulations included",
+  "description": "FIRE calculator with Monte Carlo simulations",
   "type": "module",
   "scripts": {
     "dev": "vite",

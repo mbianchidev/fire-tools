@@ -77,22 +77,25 @@ function runSingleSimulation(
     const currentLaborIncome = isWorking ? laborIncome : 0;
     const pensionIncome = age >= inputs.retirementAge ? 
       inputs.statePensionIncome + inputs.privatePensionIncome : 0;
-    const totalIncome = currentLaborIncome + investmentYield + pensionIncome + inputs.otherIncome;
+    const otherIncomeTotal = pensionIncome + inputs.otherIncome;
+    const totalIncome = currentLaborIncome + investmentYield + otherIncomeTotal;
     
     // Calculate expenses
     const expenses = isFIREAchieved ? inputs.fireAnnualExpenses : inputs.currentAnnualExpenses;
     
-    // Calculate net savings
-    const netSavings = isWorking ? 
-      (laborIncome * (inputs.savingsRate / 100)) : 
-      (totalIncome - expenses);
+    // Calculate net change in portfolio
+    let portfolioChange: number;
+    if (isWorking) {
+      // While working: save a percentage of labor income, plus all investment returns
+      const laborSavings = laborIncome * (inputs.savingsRate / 100);
+      portfolioChange = laborSavings + investmentYield;
+    } else {
+      // Not working: live off portfolio (income - expenses, including investment returns)
+      portfolioChange = totalIncome - expenses;
+    }
     
     // Update portfolio
-    // When working: add savings from labor income + investment yield
-    // When not working: netSavings already includes investment yield (via totalIncome)
-    portfolioValue = isWorking ? 
-      portfolioValue + netSavings + investmentYield : 
-      portfolioValue + netSavings;
+    portfolioValue = portfolioValue + portfolioChange;
     
     // Grow labor income
     if (isWorking) {
