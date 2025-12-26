@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AssetClassSummary, AllocationMode, AssetClass } from '../types/assetAllocation';
 import { formatCurrency, formatPercent, formatAssetName } from '../utils/allocationCalculator';
 
@@ -18,6 +18,24 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
   const [editingClass, setEditingClass] = useState<AssetClass | null>(null);
   const [editMode, setEditMode] = useState<AllocationMode>('PERCENTAGE');
   const [editPercent, setEditPercent] = useState<number>(0);
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  // Click outside to save
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (editingClass && tableRef.current && !tableRef.current.contains(event.target as Node)) {
+        console.log('[Asset Classes Table] Click outside detected, saving changes');
+        saveEditing();
+      }
+    };
+
+    if (editingClass) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [editingClass, editMode, editPercent]);
 
   const getActionColor = (action: string): string => {
     switch (action) {
@@ -37,6 +55,9 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
   };
 
   const startEditing = (ac: AssetClassSummary) => {
+    console.log('[Asset Classes Table] Starting to edit:', ac.assetClass);
+    console.log('[Asset Classes Table] Current target mode:', ac.targetMode);
+    console.log('[Asset Classes Table] Current target percent:', ac.targetPercent);
     setEditingClass(ac.assetClass);
     setEditMode(ac.targetMode);
     setEditPercent(ac.targetPercent || 0);
@@ -44,6 +65,9 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
 
   const saveEditing = () => {
     if (editingClass) {
+      console.log('[Asset Classes Table] Saving changes for:', editingClass);
+      console.log('[Asset Classes Table] New target mode:', editMode);
+      console.log('[Asset Classes Table] New target percent:', editPercent);
       onUpdateAssetClass(editingClass, {
         targetMode: editMode,
         targetPercent: editMode === 'PERCENTAGE' ? editPercent : undefined,
@@ -53,11 +77,12 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
   };
 
   const cancelEditing = () => {
+    console.log('[Asset Classes Table] Canceling edit for:', editingClass);
     setEditingClass(null);
   };
 
   return (
-    <div className="asset-class-table-container">
+    <div className="asset-class-table-container" ref={tableRef}>
       <table className="asset-class-table">
         <thead>
           <tr>
@@ -77,7 +102,11 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
             const isEditing = editingClass === ac.assetClass;
             
             return (
-              <tr key={ac.assetClass} className={ac.targetMode === 'OFF' ? 'excluded-row' : ''}>
+              <tr 
+                key={ac.assetClass} 
+                className={`${ac.targetMode === 'OFF' ? 'excluded-row' : ''} ${isEditing ? 'editing-row' : ''}`}
+                onClick={() => !isEditing && startEditing(ac)}
+              >
                 <td>
                   <span className={`asset-class-badge ${ac.assetClass.toLowerCase()}`}>
                     {formatAssetName(ac.assetClass)}
@@ -88,6 +117,7 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
                     <select
                       value={editMode}
                       onChange={(e) => setEditMode(e.target.value as AllocationMode)}
+                      onClick={(e) => e.stopPropagation()}
                       className="edit-select-small"
                     >
                       <option value="PERCENTAGE">%</option>
@@ -110,6 +140,7 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
                       type="number"
                       value={editPercent}
                       onChange={(e) => setEditPercent(parseFloat(e.target.value) || 0)}
+                      onClick={(e) => e.stopPropagation()}
                       className="edit-input"
                       step="0.1"
                       min="0"

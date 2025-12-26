@@ -881,3 +881,16 @@
 .class-delta.negative {
   color: #ef9a9a;
 }
+
+/* White text for specific headings */
+.allocation-section > h3 {
+  color: white;
+}
+
+.class-selector label {
+  color: white;
+}
+
+.section-header-with-actions h3 {
+  color: white;
+}

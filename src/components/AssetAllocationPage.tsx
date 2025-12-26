@@ -45,14 +45,71 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleUpdateAssetClass = (assetClass: AssetClass, updates: { targetMode?: AllocationMode; targetPercent?: number }) => {
+    console.log('[handleUpdateAssetClass] Updating asset class:', assetClass);
+    console.log('[handleUpdateAssetClass] Updates:', updates);
+    
     // Update the asset class level target independently
-    setAssetClassTargets(prev => ({
-      ...prev,
+    const updatedTargets = {
+      ...assetClassTargets,
       [assetClass]: {
-        targetMode: updates.targetMode || prev[assetClass]?.targetMode || 'PERCENTAGE',
+        targetMode: updates.targetMode || assetClassTargets[assetClass]?.targetMode || 'PERCENTAGE',
         targetPercent: updates.targetPercent,
       }
-    }));
+    };
+    
+    // If updating a percentage-based asset class, redistribute other percentage-based classes
+    if (updates.targetMode === 'PERCENTAGE' || (!updates.targetMode && assetClassTargets[assetClass]?.targetMode === 'PERCENTAGE')) {
+      if (updates.targetPercent !== undefined) {
+        console.log('[handleUpdateAssetClass] Redistributing percentages, new percent for', assetClass, ':', updates.targetPercent);
+        
+        // Get all percentage-based asset classes except the one being edited
+        const otherPercentageClasses = Object.keys(updatedTargets).filter(
+          (key) => key !== assetClass && updatedTargets[key as AssetClass].targetMode === 'PERCENTAGE'
+        ) as AssetClass[];
+        
+        console.log('[handleUpdateAssetClass] Other percentage classes:', otherPercentageClasses);
+        
+        if (otherPercentageClasses.length > 0) {
+          const remainingPercent = 100 - updates.targetPercent;
+          console.log('[handleUpdateAssetClass] Remaining percent to distribute:', remainingPercent);
+          
+          // Get total of other classes' current percentages
+          const otherClassesTotal = otherPercentageClasses.reduce(
+            (sum, cls) => sum + (updatedTargets[cls].targetPercent || 0),
+            0
+          );
+          
+          console.log('[handleUpdateAssetClass] Total of other classes before redistribution:', otherClassesTotal);
+          
+          if (otherClassesTotal === 0) {
+            // Distribute equally
+            const equalPercent = remainingPercent / otherPercentageClasses.length;
+            console.log('[handleUpdateAssetClass] Distributing equally:', equalPercent, '% each');
+            otherPercentageClasses.forEach((cls) => {
+              updatedTargets[cls] = {
+                ...updatedTargets[cls],
+                targetPercent: equalPercent,
+              };
+            });
+          } else {
+            // Distribute proportionally
+            console.log('[handleUpdateAssetClass] Distributing proportionally');
+            otherPercentageClasses.forEach((cls) => {
+              const proportion = (updatedTargets[cls].targetPercent || 0) / otherClassesTotal;
+              const newPercent = proportion * remainingPercent;
+              console.log('[handleUpdateAssetClass]', cls, 'proportion:', proportion, 'new percent:', newPercent);
+              updatedTargets[cls] = {
+                ...updatedTargets[cls],
+                targetPercent: newPercent,
+              };
+            });
+          }
+        }
+      }
+    }
+    
+    console.log('[handleUpdateAssetClass] Final updated targets:', updatedTargets);
+    setAssetClassTargets(updatedTargets);
     
     // Only update targetMode for assets in this class, not targetPercent
     if (updates.targetMode) {
