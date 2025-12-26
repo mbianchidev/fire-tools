@@ -90,27 +90,14 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     const remainingPercent = 100 - newTargetPercent;
     console.log('[Sub-table] Remaining percent to distribute:', remainingPercent);
     
-    // Get total of other assets' current percentages
-    const otherAssetsTotal = classAssets.reduce((sum, a) => sum + (a.targetPercent || 0), 0);
-    console.log('[Sub-table] Total of other assets before redistribution:', otherAssetsTotal);
+    // Use equal distribution by default as per issue requirements
+    // The issue states that freed percentage should be distributed equally among other assets
+    const equalPercent = remainingPercent / classAssets.length;
+    console.log('[Sub-table] Distributing equally:', equalPercent, '% each');
     
-    if (otherAssetsTotal === 0) {
-      // Distribute equally if all others are 0
-      const equalPercent = remainingPercent / classAssets.length;
-      console.log('[Sub-table] Distributing equally:', equalPercent, '% each');
-      classAssets.forEach(asset => {
-        onUpdateAsset(asset.id, { targetPercent: equalPercent });
-      });
-    } else {
-      // Distribute proportionally based on current percentages
-      console.log('[Sub-table] Distributing proportionally');
-      classAssets.forEach(asset => {
-        const proportion = (asset.targetPercent || 0) / otherAssetsTotal;
-        const newPercent = proportion * remainingPercent;
-        console.log('[Sub-table] Asset:', asset.name, 'proportion:', proportion, 'new percent:', newPercent);
-        onUpdateAsset(asset.id, { targetPercent: newPercent });
-      });
-    }
+    classAssets.forEach(asset => {
+      onUpdateAsset(asset.id, { targetPercent: equalPercent });
+    });
   };
 
   const saveEditing = (assetId: string) => {

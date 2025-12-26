@@ -40,8 +40,37 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleDeleteAsset = (assetId: string) => {
-    const newAssets = assets.filter(asset => asset.id !== assetId);
-    updateAllocation(newAssets);
+    const assetToDelete = assets.find(a => a.id === assetId);
+    if (!assetToDelete) return;
+    
+    // Get all assets in the same class (excluding the one being deleted)
+    const classAssets = assets.filter(a => 
+      a.assetClass === assetToDelete.assetClass && 
+      a.targetMode === 'PERCENTAGE' &&
+      a.id !== assetId
+    );
+    
+    // If there are other percentage-based assets in the class, redistribute
+    if (classAssets.length > 0 && assetToDelete.targetMode === 'PERCENTAGE') {
+      // Redistribute equally among remaining assets in the class
+      const equalPercent = 100 / classAssets.length;
+      
+      // Update all remaining assets in the class
+      const updatedAssets = assets
+        .filter(asset => asset.id !== assetId)
+        .map(asset => {
+          if (asset.assetClass === assetToDelete.assetClass && asset.targetMode === 'PERCENTAGE') {
+            return { ...asset, targetPercent: equalPercent };
+          }
+          return asset;
+        });
+      
+      updateAllocation(updatedAssets);
+    } else {
+      // Just remove the asset if no redistribution needed
+      const newAssets = assets.filter(asset => asset.id !== assetId);
+      updateAllocation(newAssets);
+    }
   };
 
   const handleUpdateAssetClass = (assetClass: AssetClass, updates: { targetMode?: AllocationMode; targetPercent?: number }) => {
