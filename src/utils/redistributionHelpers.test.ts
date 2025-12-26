@@ -181,40 +181,9 @@ describe('redistributionHelpers', () => {
         { name: 'VWO', currentPercent: 5 },
       ];
       
-      // VBR changed to 25%, so remaining is 75%
-      // Should use equal distribution (no prevalent item)
-      const result = redistributePercentages(items, 75, 'equal');
-      
-      // Each should get 75/4 = 18.75%
-      // Adding to their current values:
-      // SPY: 25 + 18.75 = 43.75% (but issue says 30%)
-      
-      // Wait, that's not right. Let me reconsider...
-      // The issue says the NEW allocations are:
-      // SPY 30%, VTI 20%, VXUS 15%, VWO 10%, VBR 25%
-      // 
-      // So it's not adding to current, it's setting new values
-      // The 75% remaining is redistributed equally: 75/4 = 18.75% each
-      expect(result[0]).toBe(18.75);
-      expect(result[1]).toBe(18.75);
-      expect(result[2]).toBe(18.75);
-      expect(result[3]).toBe(18.75);
-      
-      // Hmm, but that doesn't match the issue's expected values
-      // Let me check: 30 + 20 + 15 + 10 + 25 = 100 ✓
-      // The increments are: +5, +5, +5, +5, -20
-      // So each got +5%, which is 20% / 4 = 5%
-      
-      // Actually the original was 100% total:
-      // SPY 25% + VTI 15% + VXUS 10% + VWO 5% + VBR 45% = 100%
-      // 
-      // When VBR changes to 25%, it frees up 20%
+      // VBR changed from 45% to 25%, freeing 20%
       // This 20% is distributed equally: 20 / 4 = 5% each
-      // So NEW values are: 25+5=30, 15+5=20, 10+5=15, 5+5=10
-      
-      // So the function should return the CHANGE, not the new total
-      // Or we should calculate based on freed percentage (20%), not remaining (75%)
-      
+      // New values are: 25+5=30, 15+5=20, 10+5=15, 5+5=10
       const freedPercent = 20; // 45 - 25
       const equalShare = freedPercent / items.length;
       

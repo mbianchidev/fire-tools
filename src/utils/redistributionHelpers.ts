@@ -1,5 +1,10 @@
 /**
  * Helper functions for target allocation redistribution
+ * 
+ * Note: This module provides both equal and proportional redistribution strategies.
+ * Currently, the application uses equal distribution for asset-specific reallocations.
+ * Proportional distribution functions are preserved for potential future use with
+ * asset class level redistributions or configurable redistribution strategies.
  */
 
 /**

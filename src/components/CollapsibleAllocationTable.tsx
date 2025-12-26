@@ -64,8 +64,6 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   };
 
   const startEditing = (asset: Asset) => {
-    console.log('[Sub-table] Starting to edit asset:', asset.name);
-    console.log('[Sub-table] Current target percent:', asset.targetPercent);
     setEditingAsset(asset.id);
     setEditValues({
       currentValue: asset.currentValue,
@@ -76,10 +74,6 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   const saveEditing = (assetId: string) => {
     const asset = assets.find(a => a.id === assetId);
     if (!asset) return;
-    
-    console.log('[Sub-table] Saving changes for asset:', asset.name);
-    console.log('[Sub-table] New current value:', editValues.currentValue);
-    console.log('[Sub-table] New target percent:', editValues.targetPercent);
     
     // If this is a percentage-based asset and we have batch update capability, use it
     if (asset.targetMode === 'PERCENTAGE' && onBatchUpdateAssets) {
@@ -92,17 +86,10 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
         a.id !== assetId
       );
       
-      console.log('[Sub-table] Redistributing percentages for asset class:', asset.assetClass);
-      console.log('[Sub-table] New target percent for edited asset:', newTargetPercent);
-      console.log('[Sub-table] Other assets in class:', classAssets.map(a => a.name));
-      
       if (classAssets.length > 0) {
         // Calculate remaining percentage to distribute
         const remainingPercent = 100 - newTargetPercent;
         const equalPercent = remainingPercent / classAssets.length;
-        
-        console.log('[Sub-table] Remaining percent to distribute:', remainingPercent);
-        console.log('[Sub-table] Distributing equally:', equalPercent, '% each');
         
         // Create a map of all updates to apply at once
         const updatesMap = new Map<string, Partial<Asset>>();
@@ -139,7 +126,6 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   };
 
   const cancelEditing = () => {
-    console.log('[Sub-table] Canceling edit');
     setEditingAsset(null);
   };
 
