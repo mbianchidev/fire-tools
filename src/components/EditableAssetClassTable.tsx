@@ -63,7 +63,7 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
           <tr>
             <th>Asset Class</th>
             <th>Target Mode</th>
-            <th>% Target</th>
+            <th>% Target (class)</th>
             <th>% Current</th>
             <th>Absolute Current</th>
             <th>Absolute Target</th>

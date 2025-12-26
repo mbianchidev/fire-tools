@@ -69,11 +69,53 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     });
   };
 
+  const redistributePercentages = (assetId: string, newTargetPercent: number, assetClass: AssetClass) => {
+    // Get all percentage-based assets in the same class
+    const classAssets = assets.filter(a => 
+      a.assetClass === assetClass && 
+      a.targetMode === 'PERCENTAGE' &&
+      a.id !== assetId
+    );
+    
+    if (classAssets.length === 0) return;
+    
+    // Calculate remaining percentage to distribute
+    const remainingPercent = 100 - newTargetPercent;
+    
+    // Get total of other assets' current percentages
+    const otherAssetsTotal = classAssets.reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+    
+    if (otherAssetsTotal === 0) {
+      // Distribute equally if all others are 0
+      const equalPercent = remainingPercent / classAssets.length;
+      classAssets.forEach(asset => {
+        onUpdateAsset(asset.id, { targetPercent: equalPercent });
+      });
+    } else {
+      // Distribute proportionally based on current percentages
+      classAssets.forEach(asset => {
+        const proportion = (asset.targetPercent || 0) / otherAssetsTotal;
+        const newPercent = proportion * remainingPercent;
+        onUpdateAsset(asset.id, { targetPercent: newPercent });
+      });
+    }
+  };
+
   const saveEditing = (assetId: string) => {
+    const asset = assets.find(a => a.id === assetId);
+    if (!asset) return;
+    
+    // First update the edited asset
     onUpdateAsset(assetId, {
       currentValue: editValues.currentValue,
       targetPercent: editValues.targetPercent,
     });
+    
+    // Then redistribute percentages if this is a percentage-based asset
+    if (asset.targetMode === 'PERCENTAGE') {
+      redistributePercentages(assetId, editValues.targetPercent, asset.assetClass);
+    }
+    
     setEditingAsset(null);
   };
 
@@ -156,7 +198,11 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                     const isEditing = editingAsset === asset.id;
 
                     return (
-                      <tr key={asset.id} className={asset.targetMode === 'OFF' ? 'excluded-row' : ''}>
+                      <tr 
+                        key={asset.id} 
+                        className={`${asset.targetMode === 'OFF' ? 'excluded-row' : ''} ${isEditing ? 'editing-row' : ''}`}
+                        onClick={() => !isEditing && startEditing(asset)}
+                      >
                         <td className="asset-name">{asset.name}</td>
                         <td>
                           <span className="sub-type-badge">
@@ -168,6 +214,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                           <select
                             value={asset.targetMode}
                             onChange={(e) => handleTargetModeChange(asset.id, e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
                             className="target-mode-select"
                           >
                             <option value="PERCENTAGE">%</option>
@@ -216,6 +263,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                               type="number"
                               value={asset.targetValue || 0}
                               onChange={(e) => handleTargetValueChange(asset.id, e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
                               className="target-input"
                               step="100"
                               min="0"

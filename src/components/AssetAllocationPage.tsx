@@ -10,6 +10,15 @@ import { CollapsibleAllocationTable } from './CollapsibleAllocationTable';
 export const AssetAllocationPage: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>(DEFAULT_ASSETS);
   const [currency] = useState<string>('EUR');
+  // Store asset class level targets independently (for future use in calculations)
+  // @ts-ignore - Will be used for independent asset class target calculations
+  const [assetClassTargets, setAssetClassTargets] = useState<Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>>({
+    STOCKS: { targetMode: 'PERCENTAGE', targetPercent: 60 },
+    BONDS: { targetMode: 'PERCENTAGE', targetPercent: 40 },
+    CASH: { targetMode: 'SET' },
+    CRYPTO: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+    REAL_ESTATE: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+  });
   const [allocation, setAllocation] = useState<PortfolioAllocation>(() =>
     calculatePortfolioAllocation(DEFAULT_ASSETS)
   );
@@ -36,18 +45,28 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleUpdateAssetClass = (assetClass: AssetClass, updates: { targetMode?: AllocationMode; targetPercent?: number }) => {
-    // Update all assets in this class
-    const newAssets = assets.map(asset => {
-      if (asset.assetClass === assetClass) {
-        return {
-          ...asset,
-          targetMode: updates.targetMode || asset.targetMode,
-          targetPercent: updates.targetPercent !== undefined ? updates.targetPercent : asset.targetPercent,
-        };
+    // Update the asset class level target independently
+    setAssetClassTargets(prev => ({
+      ...prev,
+      [assetClass]: {
+        targetMode: updates.targetMode || prev[assetClass]?.targetMode || 'PERCENTAGE',
+        targetPercent: updates.targetPercent,
       }
-      return asset;
-    });
-    updateAllocation(newAssets);
+    }));
+    
+    // Only update targetMode for assets in this class, not targetPercent
+    if (updates.targetMode) {
+      const newAssets = assets.map(asset => {
+        if (asset.assetClass === assetClass) {
+          return {
+            ...asset,
+            targetMode: updates.targetMode as AllocationMode,
+          };
+        }
+        return asset;
+      });
+      updateAllocation(newAssets);
+    }
   };
 
   const handleAddAsset = (newAsset: Asset) => {
@@ -144,7 +163,7 @@ export const AssetAllocationPage: React.FC = () => {
         )}
 
         <div className="allocation-section">
-          <h3>Asset Class Summary</h3>
+          <h3>Asset Classes</h3>
           <EditableAssetClassTable
             assetClasses={allocation.assetClasses}
             totalValue={allocation.totalValue}
