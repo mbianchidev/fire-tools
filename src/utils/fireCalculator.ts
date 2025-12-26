@@ -70,7 +70,11 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     });
     
     // Update portfolio for next year
-    portfolioValue = portfolioValue + netSavings + investmentYield;
+    // When working: add savings from labor income + investment yield
+    // When not working: netSavings already includes investment yield (via totalIncome)
+    portfolioValue = isWorking ? 
+      portfolioValue + netSavings + investmentYield : 
+      portfolioValue + netSavings;
     
     // Grow labor income
     if (isWorking) {
