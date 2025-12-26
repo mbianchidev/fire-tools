@@ -10,8 +10,7 @@ import { CollapsibleAllocationTable } from './CollapsibleAllocationTable';
 export const AssetAllocationPage: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>(DEFAULT_ASSETS);
   const [currency] = useState<string>('EUR');
-  // Store asset class level targets independently (for future use in calculations)
-  // @ts-ignore - Will be used for independent asset class target calculations
+  // Store asset class level targets independently for display in the Asset Classes table
   const [assetClassTargets, setAssetClassTargets] = useState<Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>>({
     STOCKS: { targetMode: 'PERCENTAGE', targetPercent: 60 },
     BONDS: { targetMode: 'PERCENTAGE', targetPercent: 40 },
@@ -40,8 +39,55 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleDeleteAsset = (assetId: string) => {
-    const newAssets = assets.filter(asset => asset.id !== assetId);
-    updateAllocation(newAssets);
+    const deletedAsset = assets.find(asset => asset.id === assetId);
+    if (!deletedAsset) {
+      return;
+    }
+    
+    // Get other percentage-based assets in the same class
+    const sameClassAssets = assets.filter(asset => 
+      asset.id !== assetId && 
+      asset.assetClass === deletedAsset.assetClass && 
+      asset.targetMode === 'PERCENTAGE'
+    );
+    
+    // If the deleted asset was percentage-based and there are other percentage-based assets in the same class
+    if (deletedAsset.targetMode === 'PERCENTAGE' && sameClassAssets.length > 0 && deletedAsset.targetPercent) {
+      const deletedPercent = deletedAsset.targetPercent;
+      
+      // Get total of remaining assets' percentages
+      const remainingTotal = sameClassAssets.reduce((sum, asset) => sum + (asset.targetPercent || 0), 0);
+      
+      // Redistribute the deleted percentage proportionally
+      let newAssets = assets.filter(asset => asset.id !== assetId);
+      
+      if (remainingTotal === 0) {
+        // Distribute equally if all others are 0
+        const equalShare = deletedPercent / sameClassAssets.length;
+        newAssets = newAssets.map(asset => {
+          if (asset.assetClass === deletedAsset.assetClass && asset.targetMode === 'PERCENTAGE') {
+            return { ...asset, targetPercent: (asset.targetPercent || 0) + equalShare };
+          }
+          return asset;
+        });
+      } else {
+        // Distribute proportionally
+        newAssets = newAssets.map(asset => {
+          if (asset.assetClass === deletedAsset.assetClass && asset.targetMode === 'PERCENTAGE') {
+            const proportion = (asset.targetPercent || 0) / remainingTotal;
+            const additionalPercent = proportion * deletedPercent;
+            return { ...asset, targetPercent: (asset.targetPercent || 0) + additionalPercent };
+          }
+          return asset;
+        });
+      }
+      
+      updateAllocation(newAssets);
+    } else {
+      // Just remove the asset without redistribution
+      const newAssets = assets.filter(asset => asset.id !== assetId);
+      updateAllocation(newAssets);
+    }
   };
 
   const handleUpdateAssetClass = (assetClass: AssetClass, updates: { targetMode?: AllocationMode; targetPercent?: number }) => {
@@ -225,6 +271,7 @@ export const AssetAllocationPage: React.FC = () => {
             assetClasses={allocation.assetClasses}
             totalValue={allocation.totalValue}
             currency={currency}
+            assetClassTargets={assetClassTargets}
             onUpdateAssetClass={handleUpdateAssetClass}
           />
         </div>
