@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { YearProjection } from '../types/calculator';
+import { formatCurrency } from '../utils/allocationCalculator';
 
 interface NetWorthChartProps {
   projections: YearProjection[];
@@ -21,7 +22,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({ projections, fireT
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis />
-          <Tooltip formatter={(value) => `$${Number(value).toLocaleString()}`} />
+          <Tooltip formatter={(value) => formatCurrency(Number(value))} />
           <Legend />
           <Line type="monotone" dataKey="Net Worth" stroke="#4CAF50" strokeWidth={2} />
           <Line type="monotone" dataKey="FIRE Target" stroke="#ff9800" strokeWidth={2} strokeDasharray="5 5" />

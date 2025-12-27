@@ -1,4 +1,5 @@
 import { CalculationResult } from '../types/calculator';
+import { formatCurrency } from '../utils/allocationCalculator';
 
 interface FIREMetricsProps {
   result: CalculationResult;
@@ -14,7 +15,7 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) 
       <div className="metrics-grid">
         <div className="metric-card">
           <div className="metric-label">FIRE Target</div>
-          <div className="metric-value">${fireTarget.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+          <div className="metric-value">{formatCurrency(fireTarget)}</div>
         </div>
         
         <div className="metric-card highlight">
@@ -31,7 +32,7 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) 
 
         <div className="metric-card">
           <div className="metric-label">Final Portfolio Value</div>
-          <div className="metric-value">${finalPortfolioValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+          <div className="metric-value">{formatCurrency(finalPortfolioValue)}</div>
         </div>
 
         <div className="metric-card">
