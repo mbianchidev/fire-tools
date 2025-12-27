@@ -158,6 +158,7 @@ describe('localStorage utilities', () => {
 
     it('should merge with defaults to ensure all fields exist', () => {
       const partialInputs = {
+        ...DEFAULT_INPUTS,
         initialSavings: 50000,
         stocksPercent: 60,
         bondsPercent: 30,
@@ -174,7 +175,7 @@ describe('localStorage utilities', () => {
       // Should have the partial values
       expect(loaded?.initialSavings).toBe(50000);
       expect(loaded?.stocksPercent).toBe(60);
-      // Should also have default values for missing fields
+      // Should also have default values for merged fields
       expect(loaded?.retirementAge).toBe(DEFAULT_INPUTS.retirementAge);
       expect(loaded?.expectedStockReturn).toBe(DEFAULT_INPUTS.expectedStockReturn);
     });

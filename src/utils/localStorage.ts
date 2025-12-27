@@ -36,7 +36,18 @@ function isValidCalculatorInputs(obj: any): obj is CalculatorInputs {
     typeof obj.currentAnnualExpenses === 'number' &&
     typeof obj.fireAnnualExpenses === 'number' &&
     typeof obj.annualLaborIncome === 'number' &&
-    typeof obj.yearOfBirth === 'number'
+    typeof obj.laborIncomeGrowthRate === 'number' &&
+    typeof obj.savingsRate === 'number' &&
+    typeof obj.desiredWithdrawalRate === 'number' &&
+    typeof obj.expectedStockReturn === 'number' &&
+    typeof obj.expectedBondReturn === 'number' &&
+    typeof obj.expectedCashReturn === 'number' &&
+    typeof obj.yearOfBirth === 'number' &&
+    typeof obj.retirementAge === 'number' &&
+    typeof obj.statePensionIncome === 'number' &&
+    typeof obj.privatePensionIncome === 'number' &&
+    typeof obj.otherIncome === 'number' &&
+    typeof obj.stopWorkingAtFIRE === 'boolean'
   );
 }
 

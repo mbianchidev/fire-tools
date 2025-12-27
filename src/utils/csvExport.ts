@@ -9,30 +9,38 @@ import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
  * Export FIRE Calculator inputs to CSV format
  */
 export function exportFireCalculatorToCSV(inputs: CalculatorInputs): string {
+  const escapeCSV = (value: any): string => {
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
   const rows = [
     ['FIRE Calculator Data Export'],
     ['Generated', new Date().toISOString()],
     [],
     ['Field', 'Value'],
-    ['Initial Savings', inputs.initialSavings],
-    ['Stocks Percent', inputs.stocksPercent],
-    ['Bonds Percent', inputs.bondsPercent],
-    ['Cash Percent', inputs.cashPercent],
-    ['Current Annual Expenses', inputs.currentAnnualExpenses],
-    ['FIRE Annual Expenses', inputs.fireAnnualExpenses],
-    ['Annual Labor Income', inputs.annualLaborIncome],
-    ['Labor Income Growth Rate', inputs.laborIncomeGrowthRate],
-    ['Savings Rate', inputs.savingsRate],
-    ['Desired Withdrawal Rate', inputs.desiredWithdrawalRate],
-    ['Expected Stock Return', inputs.expectedStockReturn],
-    ['Expected Bond Return', inputs.expectedBondReturn],
-    ['Expected Cash Return', inputs.expectedCashReturn],
-    ['Year of Birth', inputs.yearOfBirth],
-    ['Retirement Age', inputs.retirementAge],
-    ['State Pension Income', inputs.statePensionIncome],
-    ['Private Pension Income', inputs.privatePensionIncome],
-    ['Other Income', inputs.otherIncome],
-    ['Stop Working At FIRE', inputs.stopWorkingAtFIRE],
+    ['Initial Savings', escapeCSV(inputs.initialSavings)],
+    ['Stocks Percent', escapeCSV(inputs.stocksPercent)],
+    ['Bonds Percent', escapeCSV(inputs.bondsPercent)],
+    ['Cash Percent', escapeCSV(inputs.cashPercent)],
+    ['Current Annual Expenses', escapeCSV(inputs.currentAnnualExpenses)],
+    ['FIRE Annual Expenses', escapeCSV(inputs.fireAnnualExpenses)],
+    ['Annual Labor Income', escapeCSV(inputs.annualLaborIncome)],
+    ['Labor Income Growth Rate', escapeCSV(inputs.laborIncomeGrowthRate)],
+    ['Savings Rate', escapeCSV(inputs.savingsRate)],
+    ['Desired Withdrawal Rate', escapeCSV(inputs.desiredWithdrawalRate)],
+    ['Expected Stock Return', escapeCSV(inputs.expectedStockReturn)],
+    ['Expected Bond Return', escapeCSV(inputs.expectedBondReturn)],
+    ['Expected Cash Return', escapeCSV(inputs.expectedCashReturn)],
+    ['Year of Birth', escapeCSV(inputs.yearOfBirth)],
+    ['Retirement Age', escapeCSV(inputs.retirementAge)],
+    ['State Pension Income', escapeCSV(inputs.statePensionIncome)],
+    ['Private Pension Income', escapeCSV(inputs.privatePensionIncome)],
+    ['Other Income', escapeCSV(inputs.otherIncome)],
+    ['Stop Working At FIRE', escapeCSV(inputs.stopWorkingAtFIRE)],
   ];
 
   return rows.map(row => row.join(',')).join('\n');
@@ -249,5 +257,15 @@ export function importAssetAllocationFromCSV(csv: string): {
     throw new Error('No assets found in CSV file');
   }
 
-  return { assets, assetClassTargets: assetClassTargets as any };
+  // Validate asset class targets
+  const validAssetClasses: AssetClass[] = ['STOCKS', 'BONDS', 'CASH', 'CRYPTO', 'REAL_ESTATE'];
+  const validatedTargets: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }> = {} as Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>;
+  
+  for (const [key, value] of Object.entries(assetClassTargets)) {
+    if (validAssetClasses.includes(key as AssetClass)) {
+      validatedTargets[key as AssetClass] = value;
+    }
+  }
+
+  return { assets, assetClassTargets: validatedTargets };
 }
