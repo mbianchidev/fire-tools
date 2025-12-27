@@ -73,7 +73,7 @@ function FIRECalculatorPage() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/fire-calculator">
       <div className="app">
         <header className="app-header">
           <h1>🔥 FIRE Calculator</h1>
