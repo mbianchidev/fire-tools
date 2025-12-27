@@ -197,7 +197,7 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
                   {targetTotal !== undefined ? formatCurrency(targetTotal, currency) : '-'}
                 </td>
                 <td className={`currency-value ${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}`}>
-                  {delta > 0 ? '+' : ''}{formatCurrency(delta, currency)}
+                  {delta > 0 ? '+' : delta < 0 ? '-' : ''}{formatCurrency(Math.abs(delta), currency)}
                 </td>
                 <td>
                   <span 

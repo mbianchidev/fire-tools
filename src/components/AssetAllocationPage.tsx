@@ -441,11 +441,11 @@ export const AssetAllocationPage: React.FC = () => {
           <div className="section-header-with-actions">
             <h3>Portfolio Details by Asset Class</h3>
             <div className="table-actions">
-              <button onClick={() => setIsDialogOpen(true)} className="action-btn add-btn">
+              <button onClick={() => setIsDialogOpen(true)} className="action-btn primary-btn">
                 ➕ Add Asset
               </button>
-              <button onClick={handleStartFromScratch} className="action-btn danger-btn">
-                🗑️ Start from Scratch
+              <button onClick={handleStartFromScratch} className="action-btn reset-btn">
+                🔄 Reset
               </button>
               <button onClick={handleExport} className="action-btn export-btn">
                 📥 Export CSV

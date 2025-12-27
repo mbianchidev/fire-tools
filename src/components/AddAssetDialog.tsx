@@ -11,13 +11,13 @@ interface AddAssetDialogProps {
 const SUB_ASSET_TYPES: Record<AssetClass, SubAssetType[]> = {
   STOCKS: ['ETF', 'SINGLE_STOCK'],
   BONDS: ['ETF', 'SINGLE_BOND'],
-  CASH: ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'MONEY_ETF'],
+  CASH: ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF'],
   CRYPTO: ['COIN'],
   REAL_ESTATE: ['PROPERTY', 'REIT'],
 };
 
 // Only these sub-types can use SET mode
-const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'MONEY_ETF'];
+const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF'];
 
 export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose, onAdd }) => {
   const [assetClass, setAssetClass] = useState<AssetClass>('STOCKS');

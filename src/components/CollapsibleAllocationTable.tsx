@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Asset, AllocationDelta, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { formatCurrency, formatPercent, formatAssetName } from '../utils/allocationCalculator';
 
@@ -30,10 +30,29 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   const allClasses = new Set(assets.map(a => a.assetClass));
   const [collapsedClasses, setCollapsedClasses] = useState<Set<AssetClass>>(allClasses);
   const [editingAsset, setEditingAsset] = useState<string | null>(null);
-  const [editValues, setEditValues] = useState<{ currentValue: number; targetPercent: number }>({
+  const [editValues, setEditValues] = useState<{ name: string; currentValue: number; targetPercent: number }>({
+    name: '',
     currentValue: 0,
     targetPercent: 0,
   });
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  // Click outside to save (same behavior as Asset Classes table)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (editingAsset && tableRef.current && !tableRef.current.contains(event.target as Node)) {
+        console.log('[Sub-table] Click outside detected, saving changes');
+        saveEditing(editingAsset);
+      }
+    };
+
+    if (editingAsset) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [editingAsset, editValues]);
 
   const toggleCollapse = (assetClass: AssetClass) => {
     const newCollapsed = new Set(collapsedClasses);
@@ -75,6 +94,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     console.log('[Sub-table] Current target percent:', asset.targetPercent);
     setEditingAsset(asset.id);
     setEditValues({
+      name: asset.name,
       currentValue: asset.currentValue,
       targetPercent: asset.targetPercent || 0,
     });
@@ -127,11 +147,13 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     if (!asset) return;
     
     console.log('[Sub-table] Saving changes for asset:', asset.name);
+    console.log('[Sub-table] New name:', editValues.name);
     console.log('[Sub-table] New current value:', editValues.currentValue);
     console.log('[Sub-table] New target percent:', editValues.targetPercent);
     
-    // First update the edited asset
+    // First update the edited asset (including name)
     onUpdateAsset(assetId, {
+      name: editValues.name,
       currentValue: editValues.currentValue,
       targetPercent: editValues.targetPercent,
     });
@@ -167,7 +189,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   };
 
   return (
-    <div className="collapsible-allocation-table">
+    <div className="collapsible-allocation-table" ref={tableRef}>
       {Object.entries(groupedAssets).map(([assetClass, classAssets]) => {
         const isCollapsed = collapsedClasses.has(assetClass as AssetClass);
         const classTotal = classAssets.reduce((sum, asset) => 
@@ -210,7 +232,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
               <div className="class-header-right">
                 <span className="class-total">{formatCurrency(classTotal, currency)}</span>
                 <span className={`class-delta ${classDelta > 0 ? 'positive' : classDelta < 0 ? 'negative' : ''}`}>
-                  {classDelta !== 0 && (classDelta > 0 ? '+' : '')}{formatCurrency(classDelta, currency)}
+                  {classDelta > 0 ? '+' : classDelta < 0 ? '-' : ''}{formatCurrency(Math.abs(classDelta), currency)}
                 </span>
               </div>
             </div>
@@ -246,7 +268,19 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         className={`${asset.targetMode === 'OFF' ? 'excluded-row' : ''} ${isEditing ? 'editing-row' : ''}`}
                         onClick={() => !isEditing && startEditing(asset)}
                       >
-                        <td className="asset-name">{asset.name}</td>
+                        <td className="asset-name">
+                          {isEditing ? (
+                            <input
+                              type="text"
+                              value={editValues.name}
+                              onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
+                              onClick={(e) => e.stopPropagation()}
+                              className="edit-input edit-name-input"
+                            />
+                          ) : (
+                            asset.name
+                          )}
+                        </td>
                         <td>
                           <span className="sub-type-badge">
                             {formatAssetName(asset.subAssetType)}
@@ -313,7 +347,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                           )}
                         </td>
                         <td className={`currency-value ${delta.delta > 0 ? 'positive' : delta.delta < 0 ? 'negative' : ''}`}>
-                          {delta.delta > 0 ? '+' : ''}{formatCurrency(delta.delta, currency)}
+                          {delta.delta > 0 ? '+' : delta.delta < 0 ? '-' : ''}{formatCurrency(Math.abs(delta.delta), currency)}
                         </td>
                         <td>
                           <span 

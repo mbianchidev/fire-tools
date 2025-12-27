@@ -25,9 +25,39 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ data, title, c
     );
   }
 
-  const renderCustomLabel = (props: { name?: string; percentage?: number }) => {
-    if (!props.name || props.percentage === undefined) return '';
-    return `${props.name}: ${formatPercent(props.percentage)}`;
+  // Custom label renderer that handles line wrapping for long names
+  const renderCustomLabel = (props: {
+    cx?: number;
+    cy?: number;
+    midAngle?: number;
+    outerRadius?: number;
+    name?: string;
+    percentage?: number;
+  }) => {
+    const { cx, cy, midAngle, outerRadius, name, percentage } = props;
+    if (!name || percentage === undefined || !cx || !cy || !midAngle || !outerRadius) return null;
+    
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 25;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    
+    // Truncate long names and add percentage
+    const displayName = name.length > 15 ? name.substring(0, 12) + '...' : name;
+    const labelText = `${displayName}: ${formatPercent(percentage)}`;
+    
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#333"
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+        style={{ fontSize: '12px', fontWeight: 500 }}
+      >
+        {labelText}
+      </text>
+    );
   };
 
   const CustomTooltip = ({ active, payload }: TooltipProps) => {
@@ -42,6 +72,14 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ data, title, c
       );
     }
     return null;
+  };
+
+  // Custom legend formatter that wraps long names
+  const renderLegend = (value: string) => {
+    if (value.length > 20) {
+      return value.substring(0, 17) + '...';
+    }
+    return value;
   };
 
   return (
@@ -65,7 +103,7 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ data, title, c
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
+          <Legend formatter={renderLegend} />
         </PieChart>
       </ResponsiveContainer>
     </div>

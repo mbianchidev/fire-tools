@@ -42,6 +42,29 @@
   color: white;
 }
 
+/* Primary action button (Add Asset) - more prominent */
+.primary-btn {
+  background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+  color: white;
+  font-weight: 700;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* Reset button styling */
+.reset-btn {
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  color: white;
+}
+
+.reset-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
 .export-btn {
   background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
   color: white;
@@ -598,6 +621,11 @@
 .edit-input:focus {
   outline: none;
   border-color: #764ba2;
+}
+
+/* Asset name edit input - wider for text */
+.edit-name-input {
+  width: 180px;
 }
 
 .edit-actions {

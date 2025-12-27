@@ -91,7 +91,7 @@ export const DEFAULT_ASSETS: Asset[] = [
   // Cash - approximately 5k (SET to 5k target)
   {
     id: 'cash-1',
-    name: 'Emergency Fund',
+    name: 'Primary bank cash',
     ticker: 'CASH',
     assetClass: 'CASH',
     subAssetType: 'SAVINGS_ACCOUNT',

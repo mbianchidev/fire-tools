@@ -12,6 +12,7 @@ export type SubAssetType =
   | 'SINGLE_BOND' 
   | 'SAVINGS_ACCOUNT'
   | 'CHECKING_ACCOUNT'
+  | 'BROKERAGE_ACCOUNT'
   | 'MONEY_ETF'
   | 'COIN'
   | 'PROPERTY'
