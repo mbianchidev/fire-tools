@@ -7,7 +7,7 @@ import { CalculatorInputsForm } from './components/CalculatorInputsForm';
 import { IncomeExpensesChart } from './components/IncomeExpensesChart';
 import { NetWorthChart } from './components/NetWorthChart';
 import { FIREMetrics } from './components/FIREMetrics';
-import { MonteCarloSimulator } from './components/MonteCarloSimulator';
+import { MonteCarloPage } from './components/MonteCarloPage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import './App.css';
@@ -15,21 +15,39 @@ import './components/AssetAllocationManager.css';
 
 function Navigation() {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const toggleMenu = () => setIsOpen(!isOpen);
+  const closeMenu = () => setIsOpen(false);
   
   return (
     <nav className="app-nav">
-      <Link 
-        to="/asset-allocation" 
-        className={`nav-link ${location.pathname === '/asset-allocation' ? 'active' : ''}`}
-      >
-        📊 Asset Allocation
-      </Link>
-      <Link 
-        to="/" 
-        className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
-      >
-        🔥 FIRE Calculator
-      </Link>
+      <button className="nav-toggle" onClick={toggleMenu} aria-label="Toggle navigation">
+        {isOpen ? '✕' : '☰'}
+      </button>
+      <div className={`nav-links ${isOpen ? 'open' : ''}`}>
+        <Link 
+          to="/" 
+          className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+          onClick={closeMenu}
+        >
+          🔥 FIRE Calculator
+        </Link>
+        <Link 
+          to="/monte-carlo" 
+          className={`nav-link ${location.pathname === '/monte-carlo' ? 'active' : ''}`}
+          onClick={closeMenu}
+        >
+          🎲 Monte Carlo
+        </Link>
+        <Link 
+          to="/asset-allocation" 
+          className={`nav-link ${location.pathname === '/asset-allocation' ? 'active' : ''}`}
+          onClick={closeMenu}
+        >
+          📊 Asset Allocation
+        </Link>
+      </div>
     </nav>
   );
 }
@@ -87,10 +105,6 @@ function FIRECalculatorPage() {
               <NetWorthChart projections={result.projections} fireTarget={result.fireTarget} />
               <IncomeExpensesChart projections={result.projections} />
             </div>
-
-            <div className="separator" />
-
-            <MonteCarloSimulator inputs={inputs} />
           </>
         )}
       </div>
@@ -114,6 +128,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<FIRECalculatorPage />} />
+          <Route path="/monte-carlo" element={<MonteCarloPage />} />
           <Route path="/asset-allocation" element={<AssetAllocationPage />} />
         </Routes>
 

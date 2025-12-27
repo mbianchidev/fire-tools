@@ -97,7 +97,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
           <div className="results-grid">
             <div className="result-card success">
               <div className="result-label">Success Rate</div>
-              <div className="result-value">{result.successRate.toFixed(1)}%</div>
+              <div className="result-value">{result.successRate.toFixed(2)}%</div>
               <div className="result-subtitle">
                 {result.successCount} / {result.successCount + result.failureCount} simulations
               </div>
@@ -123,7 +123,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
 
           <div className="success-bar">
             <div className="success-bar-fill" style={{ width: `${result.successRate}%` }}>
-              {result.successRate > 10 && `${result.successRate.toFixed(1)}%`}
+              {result.successRate > 10 && `${result.successRate.toFixed(2)}%`}
             </div>
           </div>
         </div>

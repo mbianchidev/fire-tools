@@ -332,6 +332,30 @@ body {
   margin-top: 2rem;
 }
 
+.monte-carlo-container {
+  max-width: 1400px;
+}
+
+.monte-carlo-container .main-content {
+  max-width: 100%;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h2 {
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.page-description {
+  color: #666;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
 .monte-carlo-section h2 {
   color: #333;
   margin-bottom: 1rem;
@@ -481,6 +505,8 @@ body {
 @media (max-width: 1200px) {
   .app-container {
     flex-direction: column;
+    margin: 1rem auto;
+    gap: 1rem;
   }
 
   .sidebar {
@@ -494,25 +520,71 @@ body {
 }
 
 @media (max-width: 768px) {
+  .app-header {
+    padding: 1rem;
+  }
+
   .app-header h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .app-header p {
+    font-size: 0.9rem;
   }
 
   .app-container {
-    padding: 0 1rem;
+    padding: 0 0.5rem;
+    margin: 0.5rem auto;
+    gap: 0.5rem;
+  }
+
+  .sidebar,
+  .main-content {
+    padding: 1rem;
+    border-radius: 8px;
   }
 
   .metrics-grid,
   .results-grid,
   .mc-inputs {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .metric-card {
+    padding: 1rem;
   }
 
   .metric-card.highlight {
     transform: scale(1);
   }
 
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .result-card {
+    padding: 1rem;
+  }
+
   .result-card.success {
     transform: scale(1);
+  }
+
+  .result-value {
+    font-size: 1.5rem;
+  }
+
+  .fire-metrics h3,
+  .mc-results h3 {
+    font-size: 1.2rem;
+  }
+
+  .monte-carlo-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .chart-container h3 {
+    font-size: 1.1rem;
   }
 }

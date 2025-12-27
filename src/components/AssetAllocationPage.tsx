@@ -74,6 +74,8 @@ export const AssetAllocationPage: React.FC = () => {
   const [massEditAssetClass, setMassEditAssetClass] = useState<AssetClass | null>(null);
   // DCA helper dialog state
   const [isDCADialogOpen, setIsDCADialogOpen] = useState(false);
+  // Charts collapse state
+  const [isChartsCollapsed, setIsChartsCollapsed] = useState(false);
 
   const updateAllocation = (newAssets: Asset[], newAssetClassTargets?: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>) => {
     setAssets(newAssets);
@@ -433,7 +435,7 @@ export const AssetAllocationPage: React.FC = () => {
           <div className="section-header-with-actions">
             <h3>Asset Classes</h3>
             <button onClick={handleOpenMassEditAssetClass} className="action-btn reset-btn">
-              ✏️ Mass Edit
+              ✏️ Edit All
             </button>
           </div>
           <EditableAssetClassTable
@@ -447,19 +449,27 @@ export const AssetAllocationPage: React.FC = () => {
           />
         </div>
 
-        <div className="charts-row">
-          <AllocationChart
-            data={assetClassChartData}
-            title="Portfolio Allocation by Asset Class"
-            currency={currency}
-          />
-          
-          {selectedAssetClass && (
-            <AllocationChart
-              data={assetChartData}
-              title={`${formatAssetName(selectedAssetClass.assetClass)} Breakdown`}
-              currency={currency}
-            />
+        <div className="charts-section">
+          <div className="collapsible-header" onClick={() => setIsChartsCollapsed(!isChartsCollapsed)}>
+            <h3>Portfolio Allocation by Asset Class</h3>
+            <span className="collapse-icon-small">{isChartsCollapsed ? '▶' : '▼'}</span>
+          </div>
+          {!isChartsCollapsed && (
+            <div className="charts-row">
+              <AllocationChart
+                data={assetClassChartData}
+                title=""
+                currency={currency}
+              />
+              
+              {selectedAssetClass && (
+                <AllocationChart
+                  data={assetChartData}
+                  title={`${formatAssetName(selectedAssetClass.assetClass)} Breakdown`}
+                  currency={currency}
+                />
+              )}
+            </div>
           )}
         </div>
 
