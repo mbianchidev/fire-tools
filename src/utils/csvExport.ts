@@ -61,43 +61,49 @@ export function importFireCalculatorFromCSV(csv: string): CalculatorInputs {
       continue;
     }
 
-    const parts = line.split(',');
-    if (parts.length >= 2) {
-      const key = parts[0].trim();
-      const value = parts[1].trim();
+    // Parse CSV line properly handling quoted values
+    const commaIdx = line.indexOf(',');
+    if (commaIdx === -1) continue;
+    
+    const key = line.substring(0, commaIdx).trim();
+    let value = line.substring(commaIdx + 1).trim();
+    
+    // Remove surrounding quotes if present
+    if (value.startsWith('"') && value.endsWith('"')) {
+      value = value.slice(1, -1).replace(/""/g, '"');
+    }
 
-      // Map field names to property names
-      const fieldMap: Record<string, string> = {
-        'Initial Savings': 'initialSavings',
-        'Stocks Percent': 'stocksPercent',
-        'Bonds Percent': 'bondsPercent',
-        'Cash Percent': 'cashPercent',
-        'Current Annual Expenses': 'currentAnnualExpenses',
-        'FIRE Annual Expenses': 'fireAnnualExpenses',
-        'Annual Labor Income': 'annualLaborIncome',
-        'Labor Income Growth Rate': 'laborIncomeGrowthRate',
-        'Savings Rate': 'savingsRate',
-        'Desired Withdrawal Rate': 'desiredWithdrawalRate',
-        'Expected Stock Return': 'expectedStockReturn',
-        'Expected Bond Return': 'expectedBondReturn',
-        'Expected Cash Return': 'expectedCashReturn',
-        'Year of Birth': 'yearOfBirth',
-        'Retirement Age': 'retirementAge',
-        'State Pension Income': 'statePensionIncome',
-        'Private Pension Income': 'privatePensionIncome',
-        'Other Income': 'otherIncome',
-        'Stop Working At FIRE': 'stopWorkingAtFIRE',
-      };
+    // Map field names to property names
+    const fieldMap: Record<string, string> = {
+      'Initial Savings': 'initialSavings',
+      'Stocks Percent': 'stocksPercent',
+      'Bonds Percent': 'bondsPercent',
+      'Cash Percent': 'cashPercent',
+      'Current Annual Expenses': 'currentAnnualExpenses',
+      'FIRE Annual Expenses': 'fireAnnualExpenses',
+      'Annual Labor Income': 'annualLaborIncome',
+      'Labor Income Growth Rate': 'laborIncomeGrowthRate',
+      'Savings Rate': 'savingsRate',
+      'Desired Withdrawal Rate': 'desiredWithdrawalRate',
+      'Expected Stock Return': 'expectedStockReturn',
+      'Expected Bond Return': 'expectedBondReturn',
+      'Expected Cash Return': 'expectedCashReturn',
+      'Year of Birth': 'yearOfBirth',
+      'Retirement Age': 'retirementAge',
+      'State Pension Income': 'statePensionIncome',
+      'Private Pension Income': 'privatePensionIncome',
+      'Other Income': 'otherIncome',
+      'Stop Working At FIRE': 'stopWorkingAtFIRE',
+    };
 
-      const propName = fieldMap[key];
-      if (propName) {
-        if (propName === 'stopWorkingAtFIRE') {
-          data[propName] = value.toLowerCase() === 'true';
-        } else {
-          const numValue = parseFloat(value);
-          if (!isNaN(numValue)) {
-            data[propName] = numValue;
-          }
+    const propName = fieldMap[key];
+    if (propName) {
+      if (propName === 'stopWorkingAtFIRE') {
+        data[propName] = value.toLowerCase() === 'true';
+      } else {
+        const numValue = parseFloat(value);
+        if (!isNaN(numValue)) {
+          data[propName] = numValue;
         }
       }
     }
@@ -125,6 +131,14 @@ export function exportAssetAllocationToCSV(
   assets: Asset[],
   assetClassTargets: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>
 ): string {
+  const escapeCSV = (value: any): string => {
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
   const rows = [
     ['Asset Allocation Export'],
     ['Generated', new Date().toISOString()],
@@ -136,9 +150,9 @@ export function exportAssetAllocationToCSV(
   // Add asset class targets
   Object.entries(assetClassTargets).forEach(([assetClass, target]) => {
     rows.push([
-      assetClass,
-      target.targetMode,
-      target.targetPercent?.toString() || '',
+      escapeCSV(assetClass),
+      escapeCSV(target.targetMode),
+      escapeCSV(target.targetPercent?.toString() || ''),
     ]);
   });
 
@@ -152,16 +166,16 @@ export function exportAssetAllocationToCSV(
   // Add assets
   assets.forEach(asset => {
     rows.push([
-      asset.id,
-      `"${asset.name}"`, // Quote name to handle commas
-      asset.ticker,
-      asset.isin || '',
-      asset.assetClass,
-      asset.subAssetType,
-      asset.currentValue.toString(),
-      asset.targetMode,
-      asset.targetPercent?.toString() || '',
-      asset.targetValue?.toString() || '',
+      escapeCSV(asset.id),
+      escapeCSV(asset.name),
+      escapeCSV(asset.ticker),
+      escapeCSV(asset.isin || ''),
+      escapeCSV(asset.assetClass),
+      escapeCSV(asset.subAssetType),
+      escapeCSV(asset.currentValue.toString()),
+      escapeCSV(asset.targetMode),
+      escapeCSV(asset.targetPercent?.toString() || ''),
+      escapeCSV(asset.targetValue?.toString() || ''),
     ]);
   });
 

@@ -94,7 +94,7 @@ describe('CSV Export/Import', () => {
       expect(csv).toContain('STOCKS,PERCENTAGE,60');
       expect(csv).toContain('Assets');
       expect(csv).toContain('asset-1');
-      expect(csv).toContain('"Test Asset"');
+      expect(csv).toContain('Test Asset');
     });
 
     it('should handle asset names with commas', () => {
