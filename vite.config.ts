@@ -27,4 +27,4 @@ export default defineConfig(({ mode }) => ({
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
   },
-})
+}))
