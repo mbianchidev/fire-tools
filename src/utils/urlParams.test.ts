@@ -182,4 +182,33 @@ describe('urlParams', () => {
       expect(deserializedInputs).toEqual(originalInputs);
     });
   });
+
+  describe('partial URL parameters', () => {
+    it('handles partial URL parameters like user provided example', () => {
+      // Simulating the user's example: 
+      // /fire-calculator?initialSavings=100000&stocksPercent=70&bondsPercent=20&cashPercent=10&yearOfBirth=1985&stopWorkingAtFIRE=true
+      const params = new URLSearchParams();
+      params.set('initialSavings', '100000');
+      params.set('stocksPercent', '70');
+      params.set('bondsPercent', '20');
+      params.set('cashPercent', '10');
+      params.set('yearOfBirth', '1985');
+      params.set('stopWorkingAtFIRE', 'true');
+
+      const inputs = deserializeInputsFromURL(params);
+
+      // Should have the specified values
+      expect(inputs.initialSavings).toBe(100000);
+      expect(inputs.stocksPercent).toBe(70);
+      expect(inputs.bondsPercent).toBe(20);
+      expect(inputs.cashPercent).toBe(10);
+      expect(inputs.yearOfBirth).toBe(1985);
+      expect(inputs.stopWorkingAtFIRE).toBe(true);
+
+      // Other values should fall back to defaults
+      expect(inputs.annualLaborIncome).toBe(DEFAULT_INPUTS.annualLaborIncome);
+      expect(inputs.currentAnnualExpenses).toBe(DEFAULT_INPUTS.currentAnnualExpenses);
+      expect(inputs.expectedStockReturn).toBe(DEFAULT_INPUTS.expectedStockReturn);
+    });
+  });
 });
