@@ -21,10 +21,10 @@ export default defineConfig({
       },
     },
   ],
-  base: mode === 'production' ? '/fire-calculator/' : '/',
+  base: '/fire-calculator/',
   test: {
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
   },
-}))
+})
