@@ -213,8 +213,8 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   const getSortedAssets = (classAssets: Asset[], assetClass: string): AssetWithDelta[] => {
     const assetsWithDeltas: AssetWithDelta[] = classAssets.map(asset => ({
       asset,
-      delta: deltas.find(d => d.assetId === asset.id)!
-    })).filter(item => item.delta);
+      delta: deltas.find(d => d.assetId === asset.id)
+    })).filter((item): item is AssetWithDelta => item.delta !== undefined);
 
     const sortState = sortStates[assetClass];
     if (!sortState || !sortState.key || !sortState.direction) {
