@@ -18,6 +18,11 @@ interface CollapsibleAllocationTableProps {
 // Sub-types that require ISIN code (clicking ticker should copy ISIN)
 const ISIN_TYPES = ['ETF', 'SINGLE_STOCK', 'SINGLE_BOND', 'REIT', 'MONEY_ETF'];
 
+interface AssetWithDelta {
+  asset: Asset;
+  delta: AllocationDelta;
+}
+
 export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProps> = ({
   assets,
   deltas,
@@ -41,6 +46,9 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   });
   const tableRef = useRef<HTMLDivElement>(null);
   const editValuesRef = useRef(editValues);
+  
+  // Sorting state per asset class
+  const [sortStates, setSortStates] = useState<Record<string, { key: string | null; direction: 'asc' | 'desc' | null }>>({});
   
   // Keep ref updated with latest edit values
   useEffect(() => {
@@ -201,6 +209,68 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     }
   };
 
+  // Sorting helper functions
+  const getSortedAssets = (classAssets: Asset[], assetClass: string): AssetWithDelta[] => {
+    const assetsWithDeltas: AssetWithDelta[] = classAssets.map(asset => ({
+      asset,
+      delta: deltas.find(d => d.assetId === asset.id)!
+    })).filter(item => item.delta);
+
+    const sortState = sortStates[assetClass];
+    if (!sortState || !sortState.key || !sortState.direction) {
+      return assetsWithDeltas;
+    }
+
+    return [...assetsWithDeltas].sort((a, b) => {
+      const getNestedValue = (obj: any, path: string): any => {
+        return path.split('.').reduce((current: any, prop) => current?.[prop], obj);
+      };
+
+      const aValue = getNestedValue(a, sortState.key!);
+      const bValue = getNestedValue(b, sortState.key!);
+
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return 1;
+      if (bValue == null) return -1;
+
+      if (aValue < bValue) {
+        return sortState.direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return sortState.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  const requestSort = (assetClass: string, key: string) => {
+    setSortStates(prev => {
+      const currentState = prev[assetClass];
+      let direction: 'asc' | 'desc' | null = 'asc';
+
+      if (currentState?.key === key) {
+        if (currentState.direction === 'asc') {
+          direction = 'desc';
+        } else if (currentState.direction === 'desc') {
+          direction = null;
+        }
+      }
+
+      return {
+        ...prev,
+        [assetClass]: { key: direction ? key : null, direction }
+      };
+    });
+  };
+
+  const getSortIndicator = (assetClass: string, key: string): string => {
+    const sortState = sortStates[assetClass];
+    if (sortState?.key !== key) return '⇅';
+    if (sortState.direction === 'asc') return '↑';
+    if (sortState.direction === 'desc') return '↓';
+    return '⇅';
+  };
+
   return (
     <div className="collapsible-allocation-table" ref={tableRef}>
       {Object.entries(groupedAssets).map(([assetClass, classAssets]) => {
@@ -269,9 +339,9 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                       e.stopPropagation();
                       onMassEdit(assetClass as AssetClass);
                     }}
-                    title="Mass Edit Percentages"
+                    title="Edit All Percentages"
                   >
-                    ✏️ Mass Edit
+                    ✏️ Edit All
                   </button>
                 )}
               </div>
@@ -287,24 +357,42 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
               <table className="assets-table">
                 <thead>
                   <tr>
-                    <th>Asset Name</th>
-                    <th>Type</th>
-                    <th>Ticker</th>
-                    <th>Target Mode</th>
-                    <th>% Target</th>
-                    <th>% Current (Total)</th>
-                    <th>% Current (Class)</th>
-                    <th>Current Value</th>
-                    <th>Target Value</th>
-                    <th>Delta</th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'asset.name')}>
+                      Asset Name <span className="sort-indicator">{getSortIndicator(assetClass, 'asset.name')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'asset.type')}>
+                      Type <span className="sort-indicator">{getSortIndicator(assetClass, 'asset.type')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'asset.ticker')}>
+                      Ticker <span className="sort-indicator">{getSortIndicator(assetClass, 'asset.ticker')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'asset.targetMode')}>
+                      Target Mode <span className="sort-indicator">{getSortIndicator(assetClass, 'asset.targetMode')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'asset.targetPercent')}>
+                      % Target <span className="sort-indicator">{getSortIndicator(assetClass, 'asset.targetPercent')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'delta.currentPercent')}>
+                      % Current (Total) <span className="sort-indicator">{getSortIndicator(assetClass, 'delta.currentPercent')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'delta.currentPercentInClass')}>
+                      % Current (Class) <span className="sort-indicator">{getSortIndicator(assetClass, 'delta.currentPercentInClass')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'delta.currentValue')}>
+                      Current Value <span className="sort-indicator">{getSortIndicator(assetClass, 'delta.currentValue')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'delta.targetValue')}>
+                      Target Value <span className="sort-indicator">{getSortIndicator(assetClass, 'delta.targetValue')}</span>
+                    </th>
+                    <th className="sortable" onClick={() => requestSort(assetClass, 'delta.delta')}>
+                      Delta <span className="sort-indicator">{getSortIndicator(assetClass, 'delta.delta')}</span>
+                    </th>
                     <th>Action</th>
                     <th>Edit</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {classAssets.map(asset => {
-                    const delta = deltas.find(d => d.assetId === asset.id);
-                    if (!delta) return null;
+                  {getSortedAssets(classAssets, assetClass).map(({ asset, delta }) => {
 
                     const isEditing = editingAsset === asset.id;
 

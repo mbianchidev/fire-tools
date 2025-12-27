@@ -435,7 +435,7 @@ export const AssetAllocationPage: React.FC = () => {
           <div className="section-header-with-actions">
             <h3>Asset Classes</h3>
             <button onClick={handleOpenMassEditAssetClass} className="action-btn reset-btn">
-              ✏️ Mass Edit
+              ✏️ Edit All
             </button>
           </div>
           <EditableAssetClassTable
@@ -458,7 +458,7 @@ export const AssetAllocationPage: React.FC = () => {
             <div className="charts-row">
               <AllocationChart
                 data={assetClassChartData}
-                title="Portfolio Allocation by Asset Class"
+                title=""
                 currency={currency}
               />
               

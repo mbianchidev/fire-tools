@@ -54,15 +54,15 @@
   box-shadow: 0 4px 12px rgba(0, 150, 136, 0.4);
 }
 
-/* Reset button styling */
+/* Reset button styling - medium-dark grey */
 .reset-btn {
-  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  background: linear-gradient(135deg, #757575 0%, #616161 100%);
   color: white;
 }
 
 .reset-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(97, 97, 97, 0.4);
 }
 
 .export-btn {
