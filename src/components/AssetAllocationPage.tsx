@@ -7,6 +7,7 @@ import { AllocationChart } from './AllocationChart';
 import { AddAssetDialog } from './AddAssetDialog';
 import { CollapsibleAllocationTable } from './CollapsibleAllocationTable';
 import { MassEditDialog } from './MassEditDialog';
+import { DCAHelperDialog } from './DCAHelperDialog';
 
 /**
  * Calculate cash delta from assets and targets.
@@ -71,6 +72,8 @@ export const AssetAllocationPage: React.FC = () => {
   const [isMassEditOpen, setIsMassEditOpen] = useState(false);
   const [massEditMode, setMassEditMode] = useState<'assetClass' | 'asset'>('assetClass');
   const [massEditAssetClass, setMassEditAssetClass] = useState<AssetClass | null>(null);
+  // DCA helper dialog state
+  const [isDCADialogOpen, setIsDCADialogOpen] = useState(false);
 
   const updateAllocation = (newAssets: Asset[], newAssetClassTargets?: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>) => {
     setAssets(newAssets);
@@ -480,6 +483,9 @@ export const AssetAllocationPage: React.FC = () => {
           <div className="section-header-with-actions">
             <h3>Portfolio Details by Asset Class</h3>
             <div className="table-actions">
+              <button onClick={() => setIsDCADialogOpen(true)} className="action-btn dca-btn">
+                💰 DCA Helper
+              </button>
               <button onClick={() => setIsDialogOpen(true)} className="action-btn primary-btn">
                 ➕ Add Asset
               </button>
@@ -529,6 +535,14 @@ export const AssetAllocationPage: React.FC = () => {
         title={massEditMode === 'assetClass' ? 'Mass Edit Asset Classes' : `Mass Edit ${massEditAssetClass ? formatAssetName(massEditAssetClass) : ''} Assets`}
         mode={massEditMode}
         assetClassTargets={assetClassTargets}
+      />
+
+      <DCAHelperDialog
+        isOpen={isDCADialogOpen}
+        onClose={() => setIsDCADialogOpen(false)}
+        assets={assets}
+        assetClassTargets={assetClassTargets}
+        currency={currency}
       />
     </div>
   );
