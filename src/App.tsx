@@ -99,8 +99,11 @@ function FIRECalculatorPage() {
 }
 
 function App() {
+  // Use base path only in production (for GitHub Pages), not in local development
+  const basename = import.meta.env.MODE === 'production' ? '/fire-calculator' : '/';
+  
   return (
-    <Router basename="/fire-calculator">
+    <Router basename={basename}>
       <div className="app">
         <header className="app-header">
           <h1>🔥 FIRE Calculator</h1>
