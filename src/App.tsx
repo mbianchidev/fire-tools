@@ -11,6 +11,8 @@ import { MonteCarloPage } from './components/MonteCarloPage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
 import { HomePage } from './components/HomePage';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
+import { saveFireCalculatorInputs, loadFireCalculatorInputs } from './utils/localStorage';
+import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
 import './App.css';
 import './components/AssetAllocationManager.css';
 
@@ -61,11 +63,18 @@ function Navigation() {
 function FIRECalculatorPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Initialize state from URL if parameters exist, otherwise use defaults
+  // Initialize state from URL if parameters exist, otherwise from localStorage, then defaults
   const [inputs, setInputs] = useState<CalculatorInputs>(() => {
+    // Priority 1: URL parameters (for sharing)
     if (hasURLParams(searchParams)) {
       return deserializeInputsFromURL(searchParams);
     }
+    // Priority 2: localStorage (for persistence)
+    const saved = loadFireCalculatorInputs();
+    if (saved) {
+      return saved;
+    }
+    // Priority 3: defaults
     return DEFAULT_INPUTS;
   });
   
@@ -77,6 +86,11 @@ function FIRECalculatorPage() {
     setSearchParams(params, { replace: true });
   }, [inputs, setSearchParams]);
 
+  // Auto-save to localStorage when inputs change
+  useEffect(() => {
+    saveFireCalculatorInputs(inputs);
+  }, [inputs]);
+
   useEffect(() => {
     const calculationResult = calculateFIRE(inputs);
     setResult(calculationResult);
@@ -87,10 +101,58 @@ function FIRECalculatorPage() {
   
   const hasValidationErrors = result?.validationErrors && result.validationErrors.length > 0;
 
+  const handleExportCSV = () => {
+    const csv = exportFireCalculatorToCSV(inputs);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `fire-calculator-data-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const csv = e.target?.result as string;
+        const importedInputs = importFireCalculatorFromCSV(csv);
+        setInputs(importedInputs);
+      } catch (error) {
+        alert(`Error importing CSV: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    };
+    reader.readAsText(file);
+    // Reset the input value so the same file can be selected again
+    event.target.value = '';
+  };
+
   return (
     <div className="app-container">
       <div className="sidebar">
         <CalculatorInputsForm inputs={inputs} onChange={setInputs} />
+        
+        <div className="data-actions" style={{ marginTop: '20px', padding: '10px', borderTop: '1px solid #ddd' }}>
+          <h4 style={{ marginBottom: '10px' }}>💾 Data Management</h4>
+          <button onClick={handleExportCSV} className="action-btn export-btn" style={{ width: '100%', marginBottom: '8px' }}>
+            📥 Export CSV
+          </button>
+          <label className="action-btn import-btn" style={{ width: '100%', display: 'block', textAlign: 'center', cursor: 'pointer' }}>
+            📤 Import CSV
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleImportCSV}
+              style={{ display: 'none' }}
+            />
+          </label>
+        </div>
       </div>
 
       <div className="main-content">

@@ -30,9 +30,8 @@ const localStorageMock = (() => {
   };
 })();
 
-Object.defineProperty(global, 'localStorage', {
-  value: localStorageMock,
-});
+// @ts-ignore - override localStorage for tests
+globalThis.localStorage = localStorageMock;
 
 describe('localStorage utilities', () => {
   beforeEach(() => {
