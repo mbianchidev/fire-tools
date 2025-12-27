@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     {
@@ -21,7 +21,7 @@ export default defineConfig({
       },
     },
   ],
-  base: '/fire-calculator/',
+  base: mode === 'production' ? '/fire-calculator/' : '/',
   test: {
     globals: true,
     environment: 'jsdom',
