@@ -36,13 +36,64 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     targetPercent: 0,
   });
   const tableRef = useRef<HTMLDivElement>(null);
+  const editValuesRef = useRef(editValues);
+  
+  // Keep ref updated with latest edit values
+  useEffect(() => {
+    editValuesRef.current = editValues;
+  }, [editValues]);
+
+  // Redistribute percentages helper function
+  const redistributePercentages = (assetId: string, newTargetPercent: number, assetClass: AssetClass) => {
+    // Get all percentage-based assets in the same class
+    const classAssets = assets.filter(a => 
+      a.assetClass === assetClass && 
+      a.targetMode === 'PERCENTAGE' &&
+      a.id !== assetId
+    );
+    
+    if (classAssets.length === 0) return;
+    
+    // Calculate remaining percentage to distribute
+    const remainingPercent = 100 - newTargetPercent;
+    
+    // Get total of other assets' current VALUES (not percentages) for proportional distribution
+    const otherAssetsValueTotal = classAssets.reduce((sum, a) => sum + a.currentValue, 0);
+    
+    if (otherAssetsValueTotal === 0) {
+      // Distribute equally if all others have 0 value
+      const equalPercent = remainingPercent / classAssets.length;
+      classAssets.forEach(asset => {
+        onUpdateAsset(asset.id, { targetPercent: equalPercent });
+      });
+    } else {
+      // Distribute proportionally based on current VALUES
+      classAssets.forEach(asset => {
+        const proportion = asset.currentValue / otherAssetsValueTotal;
+        const newPercent = proportion * remainingPercent;
+        onUpdateAsset(asset.id, { targetPercent: newPercent });
+      });
+    }
+  };
 
   // Click outside to save (same behavior as Asset Classes table)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (editingAsset && tableRef.current && !tableRef.current.contains(event.target as Node)) {
-        console.log('[Sub-table] Click outside detected, saving changes');
-        saveEditing(editingAsset);
+        // Use ref to get latest edit values without causing re-renders
+        const asset = assets.find(a => a.id === editingAsset);
+        if (asset) {
+          onUpdateAsset(editingAsset, {
+            name: editValuesRef.current.name,
+            currentValue: editValuesRef.current.currentValue,
+            targetPercent: editValuesRef.current.targetPercent,
+          });
+          
+          if (asset.targetMode === 'PERCENTAGE') {
+            redistributePercentages(editingAsset, editValuesRef.current.targetPercent, asset.assetClass);
+          }
+        }
+        setEditingAsset(null);
       }
     };
 
@@ -52,7 +103,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [editingAsset, editValues]);
+  }, [editingAsset, assets, onUpdateAsset]);
 
   const toggleCollapse = (assetClass: AssetClass) => {
     const newCollapsed = new Set(collapsedClasses);
@@ -90,8 +141,6 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   };
 
   const startEditing = (asset: Asset) => {
-    console.log('[Sub-table] Starting to edit asset:', asset.name);
-    console.log('[Sub-table] Current target percent:', asset.targetPercent);
     setEditingAsset(asset.id);
     setEditValues({
       name: asset.name,
@@ -100,56 +149,9 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     });
   };
 
-  const redistributePercentages = (assetId: string, newTargetPercent: number, assetClass: AssetClass) => {
-    console.log('[Sub-table] Redistributing percentages for asset class:', assetClass);
-    console.log('[Sub-table] New target percent for edited asset:', newTargetPercent);
-    
-    // Get all percentage-based assets in the same class
-    const classAssets = assets.filter(a => 
-      a.assetClass === assetClass && 
-      a.targetMode === 'PERCENTAGE' &&
-      a.id !== assetId
-    );
-    
-    console.log('[Sub-table] Other assets in class:', classAssets.map(a => a.name));
-    
-    if (classAssets.length === 0) return;
-    
-    // Calculate remaining percentage to distribute
-    const remainingPercent = 100 - newTargetPercent;
-    console.log('[Sub-table] Remaining percent to distribute:', remainingPercent);
-    
-    // Get total of other assets' current VALUES (not percentages) for proportional distribution
-    const otherAssetsValueTotal = classAssets.reduce((sum, a) => sum + a.currentValue, 0);
-    console.log('[Sub-table] Total value of other assets:', otherAssetsValueTotal);
-    
-    if (otherAssetsValueTotal === 0) {
-      // Distribute equally if all others have 0 value
-      const equalPercent = remainingPercent / classAssets.length;
-      console.log('[Sub-table] Distributing equally:', equalPercent, '% each');
-      classAssets.forEach(asset => {
-        onUpdateAsset(asset.id, { targetPercent: equalPercent });
-      });
-    } else {
-      // Distribute proportionally based on current VALUES
-      console.log('[Sub-table] Distributing proportionally based on current values');
-      classAssets.forEach(asset => {
-        const proportion = asset.currentValue / otherAssetsValueTotal;
-        const newPercent = proportion * remainingPercent;
-        console.log('[Sub-table] Asset:', asset.name, 'value:', asset.currentValue, 'proportion:', proportion, 'new percent:', newPercent);
-        onUpdateAsset(asset.id, { targetPercent: newPercent });
-      });
-    }
-  };
-
   const saveEditing = (assetId: string) => {
     const asset = assets.find(a => a.id === assetId);
     if (!asset) return;
-    
-    console.log('[Sub-table] Saving changes for asset:', asset.name);
-    console.log('[Sub-table] New name:', editValues.name);
-    console.log('[Sub-table] New current value:', editValues.currentValue);
-    console.log('[Sub-table] New target percent:', editValues.targetPercent);
     
     // First update the edited asset (including name)
     onUpdateAsset(assetId, {
@@ -167,7 +169,6 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   };
 
   const cancelEditing = () => {
-    console.log('[Sub-table] Canceling edit');
     setEditingAsset(null);
   };
 
