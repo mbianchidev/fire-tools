@@ -84,11 +84,21 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="dialog-overlay" onClick={handleClose}>
-      <div className="dialog-content dca-dialog" onClick={(e) => e.stopPropagation()}>
+    <div className="dialog-overlay" onClick={handleClose} role="presentation">
+      <div 
+        className="dialog-content dca-dialog" 
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dca-dialog-title"
+      >
         <div className="dialog-header">
-          <h2>💰 DCA Investment Calculator</h2>
-          <button className="dialog-close" onClick={handleClose}>×</button>
+          <h2 id="dca-dialog-title">💰 DCA Investment Calculator</h2>
+          <button 
+            className="dialog-close" 
+            onClick={handleClose}
+            aria-label="Close DCA calculator dialog"
+          >×</button>
         </div>
 
         <div className="dialog-body">
@@ -109,11 +119,14 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                 min="0"
                 step="100"
                 disabled={isLoading}
+                aria-disabled={isLoading}
               />
               <button 
                 className="action-btn primary-btn"
                 onClick={handleCalculate}
                 disabled={isLoading || !investmentAmount}
+                aria-disabled={isLoading || !investmentAmount}
+                aria-label={isLoading ? 'Calculating DCA allocation' : 'Calculate DCA allocation'}
               >
                 {isLoading ? 'Calculating...' : 'Calculate'}
               </button>
@@ -121,13 +134,13 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
           </div>
 
           {error && (
-            <div className="error-message">
+            <div className="error-message" role="alert" aria-live="assertive">
               <strong>⚠️ Error:</strong> {error}
             </div>
           )}
 
           {calculation && (
-            <div className="dca-results">
+            <div className="dca-results" role="region" aria-live="polite" aria-label="DCA calculation results">
               <div className="dca-summary">
                 <h3>Investment Breakdown</h3>
                 <p>
@@ -142,15 +155,15 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
               </div>
 
               <div className="dca-table-container">
-                <table className="dca-table">
+                <table className="dca-table" role="table" aria-label="DCA investment allocation breakdown">
                   <thead>
                     <tr>
-                      <th>Asset</th>
-                      <th>Class</th>
-                      <th>Allocation</th>
-                      <th>Amount</th>
-                      <th>Price</th>
-                      <th>Shares</th>
+                      <th scope="col">Asset</th>
+                      <th scope="col">Class</th>
+                      <th scope="col">Allocation</th>
+                      <th scope="col">Amount</th>
+                      <th scope="col">Price</th>
+                      <th scope="col">Shares</th>
                     </tr>
                   </thead>
                   <tbody>

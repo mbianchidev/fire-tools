@@ -85,19 +85,21 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
       <div className="mass-edit-list">
         {percentageClasses.map(([cls]) => (
           <div key={cls} className="mass-edit-row">
-            <span className={`asset-class-badge ${cls.toLowerCase()}`}>
+            <label htmlFor={`mass-edit-${cls}`} className={`asset-class-badge ${cls.toLowerCase()}`}>
               {cls.replace('_', ' ')}
-            </span>
+            </label>
             <div className="mass-edit-input-group">
               <input
+                id={`mass-edit-${cls}`}
                 type="number"
                 value={editValues[cls] ?? 0}
                 onChange={(e) => handleValueChange(cls, parseFloat(e.target.value) || 0)}
                 className="mass-edit-input"
                 min="0"
                 max="100"
+                aria-label={`${cls.replace('_', ' ')} percentage`}
               />
-              <span className="percent-sign">%</span>
+              <span className="percent-sign" aria-hidden="true">%</span>
             </div>
           </div>
         ))}
@@ -117,17 +119,21 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
       <div className="mass-edit-list">
         {classAssets.map(asset => (
           <div key={asset.id} className="mass-edit-row">
-            <span className="asset-name">{asset.name} ({asset.ticker})</span>
+            <label htmlFor={`mass-edit-${asset.id}`} className="asset-name">
+              {asset.name} ({asset.ticker})
+            </label>
             <div className="mass-edit-input-group">
               <input
+                id={`mass-edit-${asset.id}`}
                 type="number"
                 value={editValues[asset.id] ?? 0}
                 onChange={(e) => handleValueChange(asset.id, parseFloat(e.target.value) || 0)}
                 className="mass-edit-input"
                 min="0"
                 max="100"
+                aria-label={`${asset.name} percentage`}
               />
-              <span className="percent-sign">%</span>
+              <span className="percent-sign" aria-hidden="true">%</span>
             </div>
           </div>
         ))}
@@ -136,11 +142,21 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
   };
 
   return (
-    <div className="dialog-overlay" onClick={onClose}>
-      <div className="dialog-content mass-edit-dialog" onClick={(e) => e.stopPropagation()}>
+    <div className="dialog-overlay" onClick={onClose} role="presentation">
+      <div 
+        className="dialog-content mass-edit-dialog" 
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="mass-edit-title"
+      >
         <div className="dialog-header">
-          <h3>{title}</h3>
-          <button className="dialog-close" onClick={onClose}>×</button>
+          <h3 id="mass-edit-title">{title}</h3>
+          <button 
+            className="dialog-close" 
+            onClick={onClose}
+            aria-label="Close mass edit dialog"
+          >×</button>
         </div>
 
         <div className="mass-edit-body">
@@ -150,17 +166,17 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
 
           {mode === 'assetClass' ? renderAssetClassMode() : renderAssetMode()}
 
-          <div className={`mass-edit-total ${isValid ? 'valid' : 'invalid'}`}>
+          <div className={`mass-edit-total ${isValid ? 'valid' : 'invalid'}`} role="status" aria-live="polite">
             <span>Total:</span>
             <span className="total-value">{total.toFixed(2)}%</span>
             {isValid ? (
-              <span className="valid-icon">✓</span>
+              <span className="valid-icon" aria-label="Valid total">✓</span>
             ) : (
-              <span className="invalid-icon">✗</span>
+              <span className="invalid-icon" aria-label="Invalid total">✗</span>
             )}
           </div>
 
-          {error && <div className="mass-edit-error">{error}</div>}
+          {error && <div className="mass-edit-error" role="alert">{error}</div>}
         </div>
 
         <div className="dialog-actions">
@@ -169,6 +185,7 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
             className="btn-submit" 
             onClick={handleSubmit}
             disabled={!isValid}
+            aria-disabled={!isValid}
           >
             Save All
           </button>
