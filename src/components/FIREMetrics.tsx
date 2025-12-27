@@ -10,17 +10,19 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) 
   const { yearsToFIRE, fireTarget, finalPortfolioValue } = result;
 
   return (
-    <div className="fire-metrics">
-      <h3>🎯 FIRE Metrics</h3>
+    <section className="fire-metrics" aria-labelledby="fire-metrics-heading">
+      <h3 id="fire-metrics-heading">🎯 FIRE Metrics</h3>
       <div className="metrics-grid">
         <div className="metric-card">
           <div className="metric-label">FIRE Target</div>
-          <div className="metric-value">{formatCurrency(fireTarget)}</div>
+          <div className="metric-value" aria-label={`FIRE target: ${formatCurrency(fireTarget)}`}>
+            {formatCurrency(fireTarget)}
+          </div>
         </div>
         
         <div className="metric-card highlight">
           <div className="metric-label">Years to FIRE</div>
-          <div className="metric-value">
+          <div className="metric-value" aria-label={yearsToFIRE >= 0 ? `${yearsToFIRE} years to FIRE` : 'FIRE not achieved'}>
             {yearsToFIRE >= 0 ? `${yearsToFIRE} years` : 'Not achieved'}
           </div>
           {yearsToFIRE >= 0 && (
@@ -32,14 +34,18 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) 
 
         <div className="metric-card">
           <div className="metric-label">Final Portfolio Value</div>
-          <div className="metric-value">{formatCurrency(finalPortfolioValue)}</div>
+          <div className="metric-value" aria-label={`Final portfolio value: ${formatCurrency(finalPortfolioValue)}`}>
+            {formatCurrency(finalPortfolioValue)}
+          </div>
         </div>
 
         <div className="metric-card">
           <div className="metric-label">Current Age</div>
-          <div className="metric-value">{currentAge} years</div>
+          <div className="metric-value" aria-label={`Current age: ${currentAge} years`}>
+            {currentAge} years
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

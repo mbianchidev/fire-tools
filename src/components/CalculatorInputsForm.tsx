@@ -51,11 +51,13 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>💰 Initial Values</h3>
         <div className="form-group">
-          <label>Initial Savings / Portfolio Value (€)</label>
+          <label htmlFor="initial-savings">Initial Savings / Portfolio Value (€)</label>
           <input
+            id="initial-savings"
             type="number"
             value={inputs.initialSavings}
             onChange={(e) => handleChange('initialSavings', safeParseFloat(e.target.value))}
+            aria-describedby="initial-savings-desc"
           />
         </div>
       </div>
@@ -63,36 +65,42 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>📊 Asset Allocation</h3>
         <div className="form-group">
-          <label>Stocks (%)</label>
+          <label htmlFor="stocks-percent">Stocks (%)</label>
           <input
+            id="stocks-percent"
             type="number"
             min="0"
             max="100"
             value={inputs.stocksPercent}
             onChange={(e) => handleChange('stocksPercent', safeParseFloat(e.target.value))}
+            aria-describedby="allocation-sum"
           />
         </div>
         <div className="form-group">
-          <label>Bonds (%)</label>
+          <label htmlFor="bonds-percent">Bonds (%)</label>
           <input
+            id="bonds-percent"
             type="number"
             min="0"
             max="100"
             value={inputs.bondsPercent}
             onChange={(e) => handleChange('bondsPercent', safeParseFloat(e.target.value))}
+            aria-describedby="allocation-sum"
           />
         </div>
         <div className="form-group">
-          <label>Cash (%)</label>
+          <label htmlFor="cash-percent">Cash (%)</label>
           <input
+            id="cash-percent"
             type="number"
             min="0"
             max="100"
             value={inputs.cashPercent}
             onChange={(e) => handleChange('cashPercent', safeParseFloat(e.target.value))}
+            aria-describedby="allocation-sum"
           />
         </div>
-        <div className="allocation-sum">
+        <div className="allocation-sum" id="allocation-sum" role="status" aria-live="polite">
           Total: {inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent}%
           {Math.abs((inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent) - 100) > 0.01 && 
             <span className="warning"> ⚠️ Should equal 100%</span>
@@ -103,16 +111,18 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>💵 Income</h3>
         <div className="form-group">
-          <label>Annual Labor Income (Net) (€)</label>
+          <label htmlFor="annual-labor-income">Annual Labor Income (Net) (€)</label>
           <input
+            id="annual-labor-income"
             type="number"
             value={inputs.annualLaborIncome}
             onChange={(e) => handleChange('annualLaborIncome', safeParseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
-          <label>Labor Income Growth Rate (%)</label>
+          <label htmlFor="labor-income-growth-rate">Labor Income Growth Rate (%)</label>
           <input
+            id="labor-income-growth-rate"
             type="number"
             step="0.1"
             value={inputs.laborIncomeGrowthRate}
@@ -120,24 +130,27 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>State Pension Income (Annual) (€)</label>
+          <label htmlFor="state-pension-income">State Pension Income (Annual) (€)</label>
           <input
+            id="state-pension-income"
             type="number"
             value={inputs.statePensionIncome}
             onChange={(e) => handleChange('statePensionIncome', safeParseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
-          <label>Private Pension Income (Annual) (€)</label>
+          <label htmlFor="private-pension-income">Private Pension Income (Annual) (€)</label>
           <input
+            id="private-pension-income"
             type="number"
             value={inputs.privatePensionIncome}
             onChange={(e) => handleChange('privatePensionIncome', safeParseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
-          <label>Other Income (Annual) (€)</label>
+          <label htmlFor="other-income">Other Income (Annual) (€)</label>
           <input
+            id="other-income"
             type="number"
             value={inputs.otherIncome}
             onChange={(e) => handleChange('otherIncome', safeParseFloat(e.target.value))}
@@ -148,28 +161,32 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>💸 Expenses & Savings</h3>
         <div className="form-group">
-          <label>Current Annual Expenses (€)</label>
+          <label htmlFor="current-annual-expenses">Current Annual Expenses (€)</label>
           <input
+            id="current-annual-expenses"
             type="number"
             value={inputs.currentAnnualExpenses}
             onChange={(e) => handleChange('currentAnnualExpenses', safeParseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
-          <label>FIRE Annual Expenses (€)</label>
+          <label htmlFor="fire-annual-expenses">FIRE Annual Expenses (€)</label>
           <input
+            id="fire-annual-expenses"
             type="number"
             value={inputs.fireAnnualExpenses}
             onChange={(e) => handleChange('fireAnnualExpenses', safeParseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
-          <label>Savings Rate (%) <span className="calculated-label">- Auto-calculated</span></label>
+          <label htmlFor="savings-rate">Savings Rate (%) <span className="calculated-label">- Auto-calculated</span></label>
           <input
+            id="savings-rate"
             type="number"
             value={(inputs.savingsRate ?? 0).toFixed(1)}
             readOnly
             className="calculated-field"
+            aria-readonly="true"
           />
         </div>
       </div>
@@ -177,8 +194,9 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>🎯 FIRE Target</h3>
         <div className="form-group">
-          <label>Desired Withdrawal Rate (%)</label>
+          <label htmlFor="desired-withdrawal-rate">Desired Withdrawal Rate (%)</label>
           <input
+            id="desired-withdrawal-rate"
             type="number"
             step="0.1"
             value={inputs.desiredWithdrawalRate}
@@ -190,8 +208,9 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>📈 Expected Returns</h3>
         <div className="form-group">
-          <label>Expected Stock Return (%)</label>
+          <label htmlFor="expected-stock-return">Expected Stock Return (%)</label>
           <input
+            id="expected-stock-return"
             type="number"
             step="0.1"
             value={inputs.expectedStockReturn}
@@ -199,8 +218,9 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>Expected Bond Return (%)</label>
+          <label htmlFor="expected-bond-return">Expected Bond Return (%)</label>
           <input
+            id="expected-bond-return"
             type="number"
             step="0.1"
             value={inputs.expectedBondReturn}
@@ -208,8 +228,9 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>Cash / Inflation Rate (%)</label>
+          <label htmlFor="expected-cash-return">Cash / Inflation Rate (%)</label>
           <input
+            id="expected-cash-return"
             type="number"
             step="0.1"
             value={inputs.expectedCashReturn}
@@ -221,16 +242,18 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>👤 Personal Information</h3>
         <div className="form-group">
-          <label>Year of Birth</label>
+          <label htmlFor="year-of-birth">Year of Birth</label>
           <input
+            id="year-of-birth"
             type="number"
             value={inputs.yearOfBirth}
             onChange={(e) => handleChange('yearOfBirth', safeParseInt(e.target.value))}
           />
         </div>
         <div className="form-group">
-          <label>Retirement Age for State Pension</label>
+          <label htmlFor="retirement-age">Retirement Age for State Pension</label>
           <input
+            id="retirement-age"
             type="number"
             value={inputs.retirementAge}
             onChange={(e) => handleChange('retirementAge', safeParseInt(e.target.value))}
@@ -241,8 +264,9 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>⚙️ Options</h3>
         <div className="form-group checkbox-group">
-          <label>
+          <label htmlFor="stop-working-at-fire">
             <input
+              id="stop-working-at-fire"
               type="checkbox"
               checked={inputs.stopWorkingAtFIRE}
               onChange={(e) => handleChange('stopWorkingAtFIRE', e.target.checked)}

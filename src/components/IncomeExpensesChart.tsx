@@ -14,21 +14,25 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({ projec
     'Expenses': p.expenses,
   }));
 
+  const chartDescription = `Income versus expenses bar chart showing ${data.length} years of projected labor income, investment yield, and expenses`;
+
   return (
     <div className="chart-container">
       <h3>Income vs Expenses</h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="year" />
-          <YAxis />
-          <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-          <Legend />
-          <Bar dataKey="Labor Income" fill="#4CAF50" />
-          <Bar dataKey="Investment Yield" fill="#2196F3" />
-          <Bar dataKey="Expenses" fill="#f44336" />
-        </BarChart>
-      </ResponsiveContainer>
+      <div role="img" aria-label={chartDescription}>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="year" />
+            <YAxis />
+            <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+            <Legend />
+            <Bar dataKey="Labor Income" fill="#4CAF50" />
+            <Bar dataKey="Investment Yield" fill="#2196F3" />
+            <Bar dataKey="Expenses" fill="#f44336" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };
