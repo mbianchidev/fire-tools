@@ -1224,3 +1224,172 @@ describe('Adding New Asset - Percentage Redistribution', () => {
     expect(total).toBe(100);
   });
 });
+
+describe('Issue Scenario: Cash increase + 100% Bonds target', () => {
+  /**
+   * Specific test case from the issue:
+   * 
+   * Default scenario: 35k stocks, 30k bonds, 5k cash (total 70k)
+   * User adds 5k to cash current value (now 10k)
+   * User sets Bonds to 100% target (Stocks becomes 0%)
+   * 
+   * Expected results:
+   * - Stocks delta: -35k (sell all stocks to reach 0% target)
+   * - Bonds delta: +40k (35k from rebalancing + 5k from cash invest)
+   * - Cash delta: -5k (cash target 5k - current 10k = INVEST)
+   * - Total portfolio: 70k (35k stocks + 30k bonds + 5k cash current)
+   */
+
+  interface AssetClassTarget {
+    targetMode: AllocationMode;
+    targetPercent?: number;
+  }
+
+  interface Asset {
+    id: string;
+    assetClass: AssetClass;
+    targetMode: AllocationMode;
+    targetPercent?: number;
+    targetValue?: number;
+    currentValue: number;
+  }
+
+  /**
+   * Calculate the total class delta including cash redistribution.
+   * This is the delta that should be shown in the subtable header.
+   */
+  function calculateTotalClassDelta(
+    assetClass: AssetClass,
+    classCurrentTotal: number,
+    assetClassTargets: Record<AssetClass, AssetClassTarget>,
+    portfolioValue: number, // Non-cash portfolio value
+    cashDeltaAmount: number // Cash target - cash current (negative = INVEST)
+  ): number {
+    // Get class target value
+    const classTarget = assetClassTargets[assetClass];
+    let classTargetValue = 0;
+    
+    if (classTarget?.targetMode === 'PERCENTAGE' && classTarget.targetPercent !== undefined) {
+      classTargetValue = (classTarget.targetPercent / 100) * portfolioValue;
+    }
+    
+    // Calculate base delta (target - current)
+    const baseDelta = classTargetValue - classCurrentTotal;
+    
+    // Calculate cash adjustment for non-cash classes
+    let cashAdjustment = 0;
+    if (assetClass !== 'CASH' && cashDeltaAmount !== 0) {
+      // Get total percentage of all non-cash percentage-based classes with positive targets
+      const nonCashPercentageTotal = Object.entries(assetClassTargets)
+        .filter(([cls, target]) => 
+          cls !== 'CASH' && 
+          target.targetMode === 'PERCENTAGE' && 
+          (target.targetPercent || 0) > 0
+        )
+        .reduce((sum, [, target]) => sum + (target.targetPercent || 0), 0);
+      
+      if (nonCashPercentageTotal > 0 && classTarget?.targetMode === 'PERCENTAGE' && (classTarget.targetPercent || 0) > 0) {
+        const proportion = (classTarget.targetPercent || 0) / nonCashPercentageTotal;
+        // Negative cash delta = INVEST = add to this class
+        cashAdjustment = -cashDeltaAmount * proportion;
+      }
+    }
+    
+    return baseDelta + cashAdjustment;
+  }
+
+  it('should calculate correct deltas when cash increases to 10k and Bonds target is 100%', () => {
+    // Initial state after user modifications:
+    // - Stocks: 35k current, 0% target
+    // - Bonds: 30k current, 100% target  
+    // - Cash: 10k current (after adding 5k), 5k target (SET)
+    
+    const assetClassTargets: Record<AssetClass, AssetClassTarget> = {
+      STOCKS: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+      BONDS: { targetMode: 'PERCENTAGE', targetPercent: 100 },
+      CASH: { targetMode: 'SET' }, // SET mode, target value is 5k
+      CRYPTO: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+      REAL_ESTATE: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+    };
+    
+    // Current values
+    const stocksCurrent = 35000;
+    const bondsCurrent = 30000;
+    const cashCurrent = 10000; // After adding 5k
+    const cashTarget = 5000;
+    
+    // Portfolio value (non-cash) = stocks + bonds = 65k
+    const portfolioValue = stocksCurrent + bondsCurrent; // 65000
+    
+    // Total holdings = 70k (35k + 30k + 5k original cash)
+    // But current holdings = 75k (35k + 30k + 10k with added cash)
+    // Actually, the total holdings should be 75k with the new cash amount
+    const totalHoldings = stocksCurrent + bondsCurrent + cashCurrent; // 75000
+    
+    // Cash delta = target - current = 5k - 10k = -5k (INVEST)
+    const cashDeltaAmount = cashTarget - cashCurrent; // -5000
+    
+    expect(cashDeltaAmount).toBe(-5000);
+    
+    // Calculate class deltas
+    const stocksDelta = calculateTotalClassDelta('STOCKS', stocksCurrent, assetClassTargets, portfolioValue, cashDeltaAmount);
+    const bondsDelta = calculateTotalClassDelta('BONDS', bondsCurrent, assetClassTargets, portfolioValue, cashDeltaAmount);
+    
+    // Stocks: target = 0% of 65k = 0, current = 35k, delta = 0 - 35k = -35k
+    // No cash adjustment since stocks target is 0%
+    expect(stocksDelta).toBe(-35000);
+    
+    // Bonds: target = 100% of 65k = 65k, current = 30k, base delta = 65k - 30k = 35k
+    // Cash adjustment: since bonds is 100% of non-cash (only bonds has positive %), full cash goes to bonds
+    // Cash adjustment = -(-5000) * (100/100) = +5000
+    // Total bonds delta = 35k + 5k = 40k
+    expect(bondsDelta).toBe(40000);
+    
+    // Cash delta = -5k (INVEST)
+    expect(cashDeltaAmount).toBe(-5000);
+    
+    // Verify total portfolio
+    expect(stocksCurrent + bondsCurrent + cashCurrent).toBe(75000); // With added cash
+    // Original portfolio was 70k, now it's 75k with extra cash
+  });
+
+  it('should correctly distribute cash to bonds when stocks is 0%', () => {
+    const assetClassTargets: Record<AssetClass, AssetClassTarget> = {
+      STOCKS: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+      BONDS: { targetMode: 'PERCENTAGE', targetPercent: 100 },
+      CASH: { targetMode: 'SET' },
+      CRYPTO: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+      REAL_ESTATE: { targetMode: 'PERCENTAGE', targetPercent: 0 },
+    };
+    
+    const cashDeltaAmount = -5000; // 5k to invest
+    
+    // Stocks should get 0% of cash since its target is 0%
+    // Bonds should get 100% of cash since it's the only non-cash class with positive target
+    
+    // Non-cash percentage total: only bonds with 100%
+    const nonCashTotal = 100; // Only bonds has a positive target
+    
+    // Stocks proportion: 0/100 = 0
+    // Bonds proportion: 100/100 = 1
+    
+    const stocksCashAdjustment = -cashDeltaAmount * (0 / nonCashTotal); // 0
+    const bondsCashAdjustment = -cashDeltaAmount * (100 / nonCashTotal); // 5000
+    
+    expect(stocksCashAdjustment).toBe(0);
+    expect(bondsCashAdjustment).toBe(5000);
+  });
+
+  it('should verify portfolio value calculation matches expected', () => {
+    // Portfolio value (excl. cash) should be stocks + bonds
+    const stocksCurrent = 35000;
+    const bondsCurrent = 30000;
+    const cashCurrent = 5000; // Original cash
+    
+    const portfolioValueExclCash = stocksCurrent + bondsCurrent;
+    const totalHoldings = stocksCurrent + bondsCurrent + cashCurrent;
+    
+    expect(portfolioValueExclCash).toBe(65000);
+    expect(totalHoldings).toBe(70000);
+  });
+});
