@@ -1495,18 +1495,18 @@ describe('Asset Classes Table - Correct delta and target with cash distribution'
   }
 
   it('should calculate correct Asset Classes table values with 60/40 stocks/bonds and INVEST cash', () => {
-    // Scenario: Cash increased from 5k to 10k (target remains 5k SET)
-    // Total holdings: 35k + 30k + 10k = 75k
+    // Scenario: User increased cash from 5k to 10k (target remains 5k SET)
+    // Current holdings: 35k stocks + 30k bonds + 10k cash = 75k total
     const result = calculateAssetClassTableWithCashDistribution(
       35000, // stocksCurrent
       30000, // bondsCurrent  
-      10000, // cashCurrent (increased from 5k)
+      10000, // cashCurrent (user increased from original 5k)
       5000,  // cashTargetValue (SET)
       60,    // stocksTargetPercent
       40     // bondsTargetPercent
     );
     
-    // Verify total portfolio (including cash)
+    // Verify total portfolio (including cash after increase)
     expect(result.totalPortfolio).toBe(75000); // 35k + 30k + 10k
     
     // Verify cash delta

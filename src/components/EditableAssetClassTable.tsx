@@ -129,7 +129,17 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
           </tr>
         </thead>
         <tbody>
-          {assetClasses.map(ac => {
+          {/* Pre-calculate nonCashPercentageTotal outside the loop for efficiency */}
+          {(() => {
+            const nonCashPercentageTotal = Object.entries(assetClassTargets)
+              .filter(([cls, target]) => 
+                cls !== 'CASH' && 
+                target.targetMode === 'PERCENTAGE' && 
+                (target.targetPercent || 0) > 0
+              )
+              .reduce((sum, [, target]) => sum + (target.targetPercent || 0), 0);
+            
+            return assetClasses.map(ac => {
             const isEditing = editingClass === ac.assetClass;
             // Use assetClassTargets for display, fall back to computed values
             const classTarget = assetClassTargets[ac.assetClass];
@@ -139,15 +149,6 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
             // Calculate cash distribution for non-cash classes
             let cashAdjustment = 0;
             if (ac.assetClass !== 'CASH' && cashDeltaAmount !== 0) {
-              // Get total percentage of all non-cash percentage-based classes with positive targets
-              const nonCashPercentageTotal = Object.entries(assetClassTargets)
-                .filter(([cls, target]) => 
-                  cls !== 'CASH' && 
-                  target.targetMode === 'PERCENTAGE' && 
-                  (target.targetPercent || 0) > 0
-                )
-                .reduce((sum, [, target]) => sum + (target.targetPercent || 0), 0);
-              
               if (nonCashPercentageTotal > 0 && displayTargetMode === 'PERCENTAGE' && (displayTargetPercent || 0) > 0) {
                 const proportion = (displayTargetPercent || 0) / nonCashPercentageTotal;
                 // Negative cash delta = INVEST = add to this class
@@ -250,7 +251,8 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
                 </td>
               </tr>
             );
-          })}
+          });
+          })()}
           <tr className="total-row">
             <td><strong>Total Portfolio</strong></td>
             <td colSpan={3}></td>
