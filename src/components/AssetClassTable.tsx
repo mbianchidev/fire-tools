@@ -1,5 +1,6 @@
 import { AssetClassSummary } from '../types/assetAllocation';
 import { formatCurrency, formatPercent } from '../utils/allocationCalculator';
+import { useTableSort } from '../utils/useTableSort';
 
 interface AssetClassTableProps {
   assetClasses: AssetClassSummary[];
@@ -12,6 +13,8 @@ export const AssetClassTable: React.FC<AssetClassTableProps> = ({
   totalValue,
   currency,
 }) => {
+  const { sortedData, requestSort, getSortIndicator } = useTableSort<AssetClassSummary>(assetClasses);
+
   const getActionColor = (action: string): string => {
     switch (action) {
       case 'BUY':
@@ -34,18 +37,32 @@ export const AssetClassTable: React.FC<AssetClassTableProps> = ({
       <table className="asset-class-table">
         <thead>
           <tr>
-            <th>Asset Class</th>
+            <th className="sortable" onClick={() => requestSort('assetClass')}>
+              Asset Class <span className="sort-indicator">{getSortIndicator('assetClass')}</span>
+            </th>
             <th>Target Mode</th>
-            <th>% Target</th>
-            <th>% Current</th>
-            <th>Absolute Current</th>
-            <th>Absolute Target</th>
-            <th>Delta</th>
-            <th>Action</th>
+            <th className="sortable" onClick={() => requestSort('targetPercent')}>
+              % Target <span className="sort-indicator">{getSortIndicator('targetPercent')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('currentPercent')}>
+              % Current <span className="sort-indicator">{getSortIndicator('currentPercent')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('currentTotal')}>
+              Absolute Current <span className="sort-indicator">{getSortIndicator('currentTotal')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('targetTotal')}>
+              Absolute Target <span className="sort-indicator">{getSortIndicator('targetTotal')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              Delta <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('action')}>
+              Action <span className="sort-indicator">{getSortIndicator('action')}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
-          {assetClasses.map(ac => (
+          {sortedData.map(ac => (
             <tr key={ac.assetClass} className={ac.targetMode === 'OFF' ? 'excluded-row' : ''}>
               <td>
                 <span className={`asset-class-badge ${ac.assetClass.toLowerCase()}`}>

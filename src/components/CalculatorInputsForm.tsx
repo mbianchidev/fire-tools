@@ -167,7 +167,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           <label>Savings Rate (%) <span className="calculated-label">- Auto-calculated</span></label>
           <input
             type="number"
-            value={(inputs.savingsRate ?? 0).toFixed(1)}
+            value={(inputs.savingsRate ?? 0).toFixed(2)}
             readOnly
             className="calculated-field"
           />

@@ -1,5 +1,6 @@
 import { Asset, AllocationDelta, AllocationMode } from '../types/assetAllocation';
 import { formatCurrency, formatPercent } from '../utils/allocationCalculator';
+import { useTableSort } from '../utils/useTableSort';
 
 interface AllocationTableProps {
   assets: Asset[];
@@ -8,12 +9,25 @@ interface AllocationTableProps {
   onUpdateAsset: (assetId: string, updates: Partial<Asset>) => void;
 }
 
+interface TableRow {
+  asset: Asset;
+  delta: AllocationDelta;
+}
+
 export const AllocationTable: React.FC<AllocationTableProps> = ({
   assets,
   deltas,
   currency,
   onUpdateAsset,
 }) => {
+  // Create combined data for sorting
+  const tableData: TableRow[] = assets.map(asset => ({
+    asset,
+    delta: deltas.find(d => d.assetId === asset.id)!,
+  })).filter(row => row.delta);
+
+  const { sortedData, requestSort, getSortIndicator } = useTableSort<TableRow>(tableData);
+
   const getActionColor = (action: string): string => {
     switch (action) {
       case 'BUY':
@@ -58,24 +72,39 @@ export const AllocationTable: React.FC<AllocationTableProps> = ({
       <table className="allocation-table">
         <thead>
           <tr>
-            <th>Asset / Index</th>
+            <th className="sortable" onClick={() => requestSort('asset')}>
+              Asset / Index <span className="sort-indicator">{getSortIndicator('asset')}</span>
+            </th>
             <th>Ticker</th>
-            <th>Asset Class</th>
+            <th className="sortable" onClick={() => requestSort('asset')}>
+              Asset Class <span className="sort-indicator">{getSortIndicator('asset')}</span>
+            </th>
             <th>Target Mode</th>
-            <th>% Target</th>
-            <th>% Current (Total)</th>
-            <th>% Current (Class)</th>
-            <th>Absolute Current</th>
-            <th>Absolute Target</th>
-            <th>Delta</th>
-            <th>Action</th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              % Target <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              % Current (Total) <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              % Current (Class) <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              Absolute Current <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              Absolute Target <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              Delta <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
+            <th className="sortable" onClick={() => requestSort('delta')}>
+              Action <span className="sort-indicator">{getSortIndicator('delta')}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
-          {assets.map(asset => {
-            const delta = deltas.find(d => d.assetId === asset.id);
-            if (!delta) return null;
-
+          {sortedData.map(({ asset, delta }) => {
             return (
               <tr key={asset.id} className={asset.targetMode === 'OFF' ? 'excluded-row' : ''}>
                 <td className="asset-name">{asset.name}</td>
