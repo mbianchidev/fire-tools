@@ -61,6 +61,7 @@ export interface CalculationResult {
   yearsToFIRE: number;
   fireTarget: number;
   finalPortfolioValue: number;
+  validationErrors?: string[];
 }
 
 export interface MonteCarloInputs {

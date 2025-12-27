@@ -7,11 +7,23 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
   const currentYear = new Date().getFullYear();
   const currentAge = currentYear - inputs.yearOfBirth;
   const projections: YearProjection[] = [];
+  const validationErrors: string[] = [];
   
   // Validate asset allocation
   const allocationSum = inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent;
   if (Math.abs(allocationSum - 100) > 0.01) {
-    throw new Error(`Asset allocation must sum to 100%, currently ${allocationSum.toFixed(2)}%`);
+    validationErrors.push(`Asset allocation must sum to 100%, currently ${allocationSum.toFixed(2)}%`);
+  }
+  
+  // If there are validation errors, return early with empty projections
+  if (validationErrors.length > 0) {
+    return {
+      projections: [],
+      yearsToFIRE: -1,
+      fireTarget: 0,
+      finalPortfolioValue: 0,
+      validationErrors,
+    };
   }
   
   // Calculate FIRE target based on desired withdrawal rate

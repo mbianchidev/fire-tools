@@ -7,7 +7,24 @@ interface CalculatorInputsProps {
 
 export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, onChange }) => {
   const handleChange = (field: keyof CalculatorInputs, value: number | boolean) => {
-    onChange({ ...inputs, [field]: value });
+    const newInputs = { ...inputs, [field]: value };
+    
+    // Auto-calculate savings rate when income or expenses change
+    if (field === 'annualLaborIncome' || field === 'currentAnnualExpenses') {
+      const income = field === 'annualLaborIncome' ? value as number : inputs.annualLaborIncome;
+      const expenses = field === 'currentAnnualExpenses' ? value as number : inputs.currentAnnualExpenses;
+      
+      if (income > 0) {
+        const calculatedSavingsRate = ((income - expenses) / income) * 100;
+        // Allow negative savings rate to represent deficit, but cap at 100% max
+        newInputs.savingsRate = Math.min(100, calculatedSavingsRate);
+      } else {
+        // If income is 0, set savings rate to 0
+        newInputs.savingsRate = 0;
+      }
+    }
+    
+    onChange(newInputs);
   };
 
   // Safe number parsing that preserves zero and handles NaN gracefully
@@ -147,13 +164,12 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>Savings Rate (%)</label>
+          <label>Savings Rate (%) <span className="calculated-label">- Auto-calculated</span></label>
           <input
             type="number"
-            min="0"
-            max="100"
-            value={inputs.savingsRate}
-            onChange={(e) => handleChange('savingsRate', safeParseFloat(e.target.value))}
+            value={(inputs.savingsRate ?? 0).toFixed(1)}
+            readOnly
+            className="calculated-field"
           />
         </div>
       </div>

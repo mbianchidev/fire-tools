@@ -44,6 +44,8 @@ function FIRECalculatorPage() {
 
   const currentYear = new Date().getFullYear();
   const currentAge = currentYear - inputs.yearOfBirth;
+  
+  const hasValidationErrors = result?.validationErrors && result.validationErrors.length > 0;
 
   return (
     <div className="app-container">
@@ -52,7 +54,16 @@ function FIRECalculatorPage() {
       </div>
 
       <div className="main-content">
-        {result && (
+        {hasValidationErrors && (
+          <div className="validation-error-banner">
+            <strong>⚠️ Validation Error</strong>
+            {result.validationErrors?.map((error, index) => (
+              <div key={index} className="validation-error-message">{error}</div>
+            ))}
+          </div>
+        )}
+        
+        {result && !hasValidationErrors && (
           <>
             <FIREMetrics result={result} currentAge={currentAge} />
             
