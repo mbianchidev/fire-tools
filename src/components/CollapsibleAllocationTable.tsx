@@ -101,7 +101,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     // Total should be: newTargetPercent + sum of newPercentages
     const calculatedTotal = newTargetPercent + newPercentages.reduce((sum, p) => sum + p.percent, 0);
     
-    if (Math.abs(calculatedTotal - 100) > 0.001) {
+    if (Math.abs(calculatedTotal - 100) > 0.001 && newPercentages.length > 0) {
       // Sort by current value ascending - asset with least value gets adjustment
       newPercentages.sort((a, b) => a.currentValue - b.currentValue);
       // Adjust the asset with the smallest current value to make total exactly 100%
@@ -109,9 +109,8 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
       newPercentages[0].percent += adjustment;
     }
     
-    // Ensure no percentage exceeds 100% or goes below 0%
+    // Ensure no individual percentage goes below 0% (edge case protection)
     newPercentages.forEach(p => {
-      if (p.percent > 100) p.percent = 100;
       if (p.percent < 0) p.percent = 0;
       updates[p.id] = { targetPercent: p.percent };
     });

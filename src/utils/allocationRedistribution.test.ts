@@ -525,93 +525,10 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
    * 
    * When exact proportions aren't possible due to rounding, the asset with the LEAST VALUE
    * gets the extra percentage to ensure total is ALWAYS 100% (never above).
+   * 
+   * Note: These tests use the same redistributeAssetPercentages function defined above,
+   * which was updated to use TARGET PERCENTAGES for redistribution.
    */
-
-  /**
-   * Updated redistributeAssetPercentages that uses TARGET PERCENTAGES for redistribution.
-   * This is the CORRECTED implementation that should be used in CollapsibleAllocationTable.
-   */
-  function redistributeByTargetPercentages(
-    assets: Asset[],
-    changedAssetId: string,
-    newPercent: number,
-    assetClass: AssetClass
-  ): Asset[] {
-    // Get all percentage-based assets in the same class except the changed one
-    const otherAssets = assets.filter(a => 
-      a.assetClass === assetClass && 
-      a.targetMode === 'PERCENTAGE' &&
-      a.id !== changedAssetId
-    );
-    
-    if (otherAssets.length === 0) {
-      return assets.map(asset => 
-        asset.id === changedAssetId 
-          ? { ...asset, targetPercent: newPercent }
-          : asset
-      );
-    }
-    
-    // Calculate remaining percentage to distribute
-    const remainingPercent = 100 - newPercent;
-    
-    // Get total of other assets' TARGET PERCENTAGES (not current values)
-    const otherAssetsTargetTotal = otherAssets.reduce((sum, a) => sum + (a.targetPercent || 0), 0);
-    
-    // Calculate new percentages
-    const newPercentages: { id: string; percent: number; currentValue: number }[] = [];
-    
-    assets.forEach(asset => {
-      if (asset.id === changedAssetId) {
-        newPercentages.push({ id: asset.id, percent: newPercent, currentValue: asset.currentValue });
-      } else if (asset.assetClass === assetClass && asset.targetMode === 'PERCENTAGE') {
-        let newPct: number;
-        if (otherAssetsTargetTotal === 0) {
-          // Distribute equally if all others have 0 target percent
-          newPct = remainingPercent / otherAssets.length;
-        } else {
-          // Distribute proportionally based on TARGET PERCENTAGES
-          const proportion = (asset.targetPercent || 0) / otherAssetsTargetTotal;
-          newPct = proportion * remainingPercent;
-        }
-        newPercentages.push({ id: asset.id, percent: newPct, currentValue: asset.currentValue });
-      }
-    });
-    
-    // Calculate total and adjust for rounding to ensure exactly 100%
-    const total = newPercentages.reduce((sum, p) => sum + p.percent, 0);
-    
-    if (Math.abs(total - 100) > 0.001) {
-      // Find the asset with the least current value (excluding the changed one)
-      const adjustableAssets = newPercentages.filter(p => p.id !== changedAssetId);
-      if (adjustableAssets.length > 0) {
-        // Sort by current value ascending - smallest value first
-        adjustableAssets.sort((a, b) => a.currentValue - b.currentValue);
-        const assetToAdjust = adjustableAssets[0];
-        // Adjust the smallest asset to make total exactly 100%
-        const adjustment = 100 - total;
-        const idx = newPercentages.findIndex(p => p.id === assetToAdjust.id);
-        if (idx !== -1) {
-          newPercentages[idx].percent += adjustment;
-        }
-      }
-    }
-    
-    // Ensure no percentage exceeds 100% (safety check)
-    newPercentages.forEach(p => {
-      if (p.percent > 100) p.percent = 100;
-      if (p.percent < 0) p.percent = 0;
-    });
-    
-    // Map back to assets
-    return assets.map(asset => {
-      const newPct = newPercentages.find(p => p.id === asset.id);
-      if (newPct !== undefined) {
-        return { ...asset, targetPercent: newPct.percent };
-      }
-      return asset;
-    });
-  }
 
   describe('Basic proportional redistribution based on target percentages', () => {
     it('should redistribute 50/30/20 to 40/36/24 when first asset changes from 50% to 40%', () => {
@@ -621,7 +538,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 20, currentValue: 20000 },
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 40, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 40, 'STOCKS');
       
       // a1 should be 40%
       expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(40);
@@ -646,7 +563,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 15, currentValue: 15000 },
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 50, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 50, 'STOCKS');
       
       // a1 should be 50%
       expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(50);
@@ -671,7 +588,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 30, currentValue: 30000 },
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 50, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 50, 'STOCKS');
       
       // a1 should be 50%
       expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(50);
@@ -698,7 +615,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.34, currentValue: 33340 },
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 40, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 40, 'STOCKS');
       
       // Verify total does not exceed 100%
       const total = result
@@ -716,7 +633,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 10, currentValue: 10000 },
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 80, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 80, 'STOCKS');
       
       // Even with 80% for a1, total should be exactly 100%
       const total = result
@@ -737,7 +654,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.34, currentValue: 40000 }, // medium value
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 10, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 10, 'STOCKS');
       
       // a1 should be 10%
       expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(10);
@@ -761,7 +678,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 25, currentValue: 10000 }, // same value
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 40, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 40, 'STOCKS');
       
       // Total must be 100%
       const total = result
@@ -779,7 +696,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 0, currentValue: 3000 },
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'a1', 60, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 60, 'STOCKS');
       
       // When other assets have 0 target percent, distribute equally
       // a2 and a3 should each get 20%
@@ -802,7 +719,7 @@ describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', 
         { id: 'bond2', assetClass: 'BONDS', targetMode: 'PERCENTAGE', targetPercent: 40, currentValue: 20000 },
       ];
       
-      const result = redistributeByTargetPercentages(initialAssets, 'stock1', 40, 'STOCKS');
+      const result = redistributeAssetPercentages(initialAssets, 'stock1', 40, 'STOCKS');
       
       // Bonds should be completely unchanged
       expect(result.find(a => a.id === 'bond1')?.targetPercent).toBe(60);
