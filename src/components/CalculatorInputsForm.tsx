@@ -1,4 +1,5 @@
 import { CalculatorInputs } from '../types/calculator';
+import { NumberInput } from './NumberInput';
 
 interface CalculatorInputsProps {
   inputs: CalculatorInputs;
@@ -27,23 +28,6 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
     onChange(newInputs);
   };
 
-  // Safe number parsing that preserves zero and handles NaN gracefully
-  const safeParseFloat = (value: string): number => {
-    if (value === '' || value === '-' || value === '.') {
-      return 0;
-    }
-    const parsed = parseFloat(value);
-    return isNaN(parsed) ? 0 : parsed;
-  };
-
-  const safeParseInt = (value: string): number => {
-    if (value === '' || value === '-') {
-      return 0;
-    }
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? 0 : parsed;
-  };
-
   return (
     <div className="inputs-form">
       <h2>FIRE Calculator Inputs</h2>
@@ -52,10 +36,9 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         <h3>💰 Initial Values</h3>
         <div className="form-group">
           <label>Initial Savings / Portfolio Value (€)</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.initialSavings}
-            onChange={(e) => handleChange('initialSavings', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('initialSavings', value)}
           />
         </div>
       </div>
@@ -64,32 +47,23 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         <h3>📊 Asset Allocation</h3>
         <div className="form-group">
           <label>Stocks (%)</label>
-          <input
-            type="number"
-            min="0"
-            max="100"
+          <NumberInput
             value={inputs.stocksPercent}
-            onChange={(e) => handleChange('stocksPercent', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('stocksPercent', value)}
           />
         </div>
         <div className="form-group">
           <label>Bonds (%)</label>
-          <input
-            type="number"
-            min="0"
-            max="100"
+          <NumberInput
             value={inputs.bondsPercent}
-            onChange={(e) => handleChange('bondsPercent', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('bondsPercent', value)}
           />
         </div>
         <div className="form-group">
           <label>Cash (%)</label>
-          <input
-            type="number"
-            min="0"
-            max="100"
+          <NumberInput
             value={inputs.cashPercent}
-            onChange={(e) => handleChange('cashPercent', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('cashPercent', value)}
           />
         </div>
         <div className="allocation-sum">
@@ -104,43 +78,37 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         <h3>💵 Income</h3>
         <div className="form-group">
           <label>Annual Labor Income (Net) (€)</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.annualLaborIncome}
-            onChange={(e) => handleChange('annualLaborIncome', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('annualLaborIncome', value)}
           />
         </div>
         <div className="form-group">
           <label>Labor Income Growth Rate (%)</label>
-          <input
-            type="number"
-            step="0.1"
+          <NumberInput
             value={inputs.laborIncomeGrowthRate}
-            onChange={(e) => handleChange('laborIncomeGrowthRate', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('laborIncomeGrowthRate', value)}
           />
         </div>
         <div className="form-group">
           <label>State Pension Income (Annual) (€)</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.statePensionIncome}
-            onChange={(e) => handleChange('statePensionIncome', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('statePensionIncome', value)}
           />
         </div>
         <div className="form-group">
           <label>Private Pension Income (Annual) (€)</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.privatePensionIncome}
-            onChange={(e) => handleChange('privatePensionIncome', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('privatePensionIncome', value)}
           />
         </div>
         <div className="form-group">
           <label>Other Income (Annual) (€)</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.otherIncome}
-            onChange={(e) => handleChange('otherIncome', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('otherIncome', value)}
           />
         </div>
       </div>
@@ -149,18 +117,16 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         <h3>💸 Expenses & Savings</h3>
         <div className="form-group">
           <label>Current Annual Expenses (€)</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.currentAnnualExpenses}
-            onChange={(e) => handleChange('currentAnnualExpenses', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('currentAnnualExpenses', value)}
           />
         </div>
         <div className="form-group">
           <label>FIRE Annual Expenses (€)</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.fireAnnualExpenses}
-            onChange={(e) => handleChange('fireAnnualExpenses', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('fireAnnualExpenses', value)}
           />
         </div>
         <div className="form-group">
@@ -178,11 +144,9 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         <h3>🎯 FIRE Target</h3>
         <div className="form-group">
           <label>Desired Withdrawal Rate (%)</label>
-          <input
-            type="number"
-            step="0.1"
+          <NumberInput
             value={inputs.desiredWithdrawalRate}
-            onChange={(e) => handleChange('desiredWithdrawalRate', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('desiredWithdrawalRate', value)}
           />
         </div>
       </div>
@@ -191,29 +155,23 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         <h3>📈 Expected Returns</h3>
         <div className="form-group">
           <label>Expected Stock Return (%)</label>
-          <input
-            type="number"
-            step="0.1"
+          <NumberInput
             value={inputs.expectedStockReturn}
-            onChange={(e) => handleChange('expectedStockReturn', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('expectedStockReturn', value)}
           />
         </div>
         <div className="form-group">
           <label>Expected Bond Return (%)</label>
-          <input
-            type="number"
-            step="0.1"
+          <NumberInput
             value={inputs.expectedBondReturn}
-            onChange={(e) => handleChange('expectedBondReturn', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('expectedBondReturn', value)}
           />
         </div>
         <div className="form-group">
           <label>Cash / Inflation Rate (%)</label>
-          <input
-            type="number"
-            step="0.1"
+          <NumberInput
             value={inputs.expectedCashReturn}
-            onChange={(e) => handleChange('expectedCashReturn', safeParseFloat(e.target.value))}
+            onChange={(value) => handleChange('expectedCashReturn', value)}
           />
         </div>
       </div>
@@ -222,18 +180,18 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         <h3>👤 Personal Information</h3>
         <div className="form-group">
           <label>Year of Birth</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.yearOfBirth}
-            onChange={(e) => handleChange('yearOfBirth', safeParseInt(e.target.value))}
+            onChange={(value) => handleChange('yearOfBirth', value)}
+            allowDecimals={false}
           />
         </div>
         <div className="form-group">
           <label>Retirement Age for State Pension</label>
-          <input
-            type="number"
+          <NumberInput
             value={inputs.retirementAge}
-            onChange={(e) => handleChange('retirementAge', safeParseInt(e.target.value))}
+            onChange={(value) => handleChange('retirementAge', value)}
+            allowDecimals={false}
           />
         </div>
       </div>

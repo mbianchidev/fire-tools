@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';
@@ -9,6 +9,7 @@ import { NetWorthChart } from './components/NetWorthChart';
 import { FIREMetrics } from './components/FIREMetrics';
 import { MonteCarloPage } from './components/MonteCarloPage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
+import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import './App.css';
 import './components/AssetAllocationManager.css';
 
@@ -52,8 +53,23 @@ function Navigation() {
 }
 
 function FIRECalculatorPage() {
-  const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Initialize state from URL if parameters exist, otherwise use defaults
+  const [inputs, setInputs] = useState<CalculatorInputs>(() => {
+    if (hasURLParams(searchParams)) {
+      return deserializeInputsFromURL(searchParams);
+    }
+    return DEFAULT_INPUTS;
+  });
+  
   const [result, setResult] = useState<CalculationResult | null>(null);
+
+  // Update URL when inputs change
+  useEffect(() => {
+    const params = serializeInputsToURL(inputs);
+    setSearchParams(params, { replace: true });
+  }, [inputs, setSearchParams]);
 
   useEffect(() => {
     const calculationResult = calculateFIRE(inputs);

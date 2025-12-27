@@ -1,5 +1,6 @@
 import { CalculationResult } from '../types/calculator';
 import { formatCurrency } from '../utils/allocationCalculator';
+import { useState } from 'react';
 
 interface FIREMetricsProps {
   result: CalculationResult;
@@ -8,10 +9,31 @@ interface FIREMetricsProps {
 
 export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) => {
   const { yearsToFIRE, fireTarget, finalPortfolioValue } = result;
+  const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setCopyFailed(false);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+      setCopyFailed(true);
+      setTimeout(() => setCopyFailed(false), 3000);
+    }
+  };
 
   return (
     <div className="fire-metrics">
-      <h3>🎯 FIRE Metrics</h3>
+      <div className="fire-metrics-header">
+        <h3>🎯 FIRE Metrics</h3>
+        <button className="share-button" onClick={handleShare}>
+          {copied ? '✓ Copied!' : copyFailed ? '✗ Failed' : '🔗 Share'}
+        </button>
+      </div>
       <div className="metrics-grid">
         <div className="metric-card">
           <div className="metric-label">FIRE Target</div>

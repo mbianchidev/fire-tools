@@ -1,6 +1,7 @@
 import { Asset, AllocationDelta, AllocationMode } from '../types/assetAllocation';
 import { formatCurrency, formatPercent } from '../utils/allocationCalculator';
 import { useTableSort } from '../utils/useTableSort';
+import { NumberInput } from './NumberInput';
 
 interface AllocationTableProps {
   assets: Asset[];
@@ -57,14 +58,12 @@ export const AllocationTable: React.FC<AllocationTableProps> = ({
     onUpdateAsset(assetId, updates);
   };
 
-  const handleTargetPercentChange = (assetId: string, value: string) => {
-    const percent = parseFloat(value) || 0;
-    onUpdateAsset(assetId, { targetPercent: percent });
+  const handleTargetPercentChange = (assetId: string, value: number) => {
+    onUpdateAsset(assetId, { targetPercent: value });
   };
 
-  const handleTargetValueChange = (assetId: string, value: string) => {
-    const val = parseFloat(value) || 0;
-    onUpdateAsset(assetId, { targetValue: val });
+  const handleTargetValueChange = (assetId: string, value: number) => {
+    onUpdateAsset(assetId, { targetValue: value });
   };
 
   return (
@@ -127,14 +126,10 @@ export const AllocationTable: React.FC<AllocationTableProps> = ({
                 </td>
                 <td>
                   {asset.targetMode === 'PERCENTAGE' ? (
-                    <input
-                      type="number"
+                    <NumberInput
                       value={asset.targetPercent || 0}
-                      onChange={(e) => handleTargetPercentChange(asset.id, e.target.value)}
+                      onChange={(value) => handleTargetPercentChange(asset.id, value)}
                       className="target-input"
-                      step="0.1"
-                      min="0"
-                      max="100"
                     />
                   ) : asset.targetMode === 'SET' ? (
                     <span className="set-label">SET</span>
@@ -147,13 +142,10 @@ export const AllocationTable: React.FC<AllocationTableProps> = ({
                 <td className="currency-value">{formatCurrency(delta.currentValue, currency)}</td>
                 <td className="currency-value">
                   {asset.targetMode === 'SET' ? (
-                    <input
-                      type="number"
+                    <NumberInput
                       value={asset.targetValue || 0}
-                      onChange={(e) => handleTargetValueChange(asset.id, e.target.value)}
+                      onChange={(value) => handleTargetValueChange(asset.id, value)}
                       className="target-input"
-                      step="100"
-                      min="0"
                     />
                   ) : (
                     formatCurrency(delta.targetValue, currency)

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Asset, AllocationDelta, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { formatCurrency, formatPercent, formatAssetName } from '../utils/allocationCalculator';
+import { NumberInput } from './NumberInput';
 
 interface CollapsibleAllocationTableProps {
   assets: Asset[];
@@ -187,9 +188,8 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     onUpdateAsset(assetId, updates);
   };
 
-  const handleTargetValueChange = (assetId: string, value: string) => {
-    const val = parseFloat(value) || 0;
-    onUpdateAsset(assetId, { targetValue: val });
+  const handleTargetValueChange = (assetId: string, value: number) => {
+    onUpdateAsset(assetId, { targetValue: value });
   };
 
   const copyIsinToClipboard = (asset: Asset) => {
@@ -364,13 +364,10 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         </td>
                         <td>
                           {isEditing && asset.targetMode === 'PERCENTAGE' ? (
-                            <input
-                              type="number"
+                            <NumberInput
                               value={editValues.targetPercent}
-                              onChange={(e) => setEditValues({ ...editValues, targetPercent: parseFloat(e.target.value) || 0 })}
+                              onChange={(value) => setEditValues({ ...editValues, targetPercent: value })}
                               className="edit-input"
-                              min="0"
-                              max="100"
                             />
                           ) : asset.targetMode === 'PERCENTAGE' ? (
                             formatPercent(asset.targetPercent || 0)
@@ -384,12 +381,10 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         <td>{formatPercent(delta.currentPercentInClass)}</td>
                         <td className="currency-value">
                           {isEditing ? (
-                            <input
-                              type="number"
+                            <NumberInput
                               value={editValues.currentValue}
-                              onChange={(e) => setEditValues({ ...editValues, currentValue: parseFloat(e.target.value) || 0 })}
+                              onChange={(value) => setEditValues({ ...editValues, currentValue: value })}
                               className="edit-input"
-                              min="0"
                             />
                           ) : (
                             formatCurrency(delta.currentValue, currency)
@@ -397,13 +392,10 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         </td>
                         <td className="currency-value">
                           {asset.targetMode === 'SET' ? (
-                            <input
-                              type="number"
+                            <NumberInput
                               value={asset.targetValue || 0}
-                              onChange={(e) => handleTargetValueChange(asset.id, e.target.value)}
-                              onClick={(e) => e.stopPropagation()}
+                              onChange={(value) => handleTargetValueChange(asset.id, value)}
                               className="target-input"
-                              min="0"
                             />
                           ) : (
                             formatCurrency(delta.targetValue, currency)

@@ -1237,7 +1237,8 @@
   align-items: stretch;
 }
 
-.input-row input[type="number"] {
+.input-row input[type="number"],
+.input-row input[type="text"] {
   flex: 1;
   padding: 0.75rem;
   border: 2px solid #e0e0e0;
@@ -1246,12 +1247,14 @@
   transition: border-color 0.3s;
 }
 
-.input-row input[type="number"]:focus {
+.input-row input[type="number"]:focus,
+.input-row input[type="text"]:focus {
   outline: none;
   border-color: #667eea;
 }
 
-.input-row input[type="number"]:disabled {
+.input-row input[type="number"]:disabled,
+.input-row input[type="text"]:disabled {
   background: #f5f5f5;
   cursor: not-allowed;
 }

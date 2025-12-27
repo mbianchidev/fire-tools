@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CalculatorInputs, MonteCarloInputs, MonteCarloResult } from '../types/calculator';
 import { runMonteCarloSimulation } from '../utils/monteCarlo';
+import { NumberInput } from './NumberInput';
 
 interface MonteCarloSimulatorProps {
   inputs: CalculatorInputs;
@@ -42,55 +43,42 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
       <div className="mc-inputs">
         <div className="form-group">
           <label>Number of Simulations</label>
-          <input
-            type="number"
+          <NumberInput
             value={mcInputs.numSimulations}
-            onChange={(e) => handleInputChange('numSimulations', parseInt(e.target.value) || 100)}
-            min="100"
-            max="10000"
-            step="100"
+            onChange={(value) => handleInputChange('numSimulations', value)}
+            allowDecimals={false}
           />
         </div>
 
         <div className="form-group">
           <label>Stock Volatility (% std dev)</label>
-          <input
-            type="number"
+          <NumberInput
             value={mcInputs.stockVolatility}
-            onChange={(e) => handleInputChange('stockVolatility', parseFloat(e.target.value) || 0)}
-            step="1"
+            onChange={(value) => handleInputChange('stockVolatility', value)}
           />
         </div>
 
         <div className="form-group">
           <label>Bond Volatility (% std dev)</label>
-          <input
-            type="number"
+          <NumberInput
             value={mcInputs.bondVolatility}
-            onChange={(e) => handleInputChange('bondVolatility', parseFloat(e.target.value) || 0)}
-            step="1"
+            onChange={(value) => handleInputChange('bondVolatility', value)}
           />
         </div>
 
         <div className="form-group">
           <label>Black Swan Probability (% per year)</label>
-          <input
-            type="number"
+          <NumberInput
             value={mcInputs.blackSwanProbability}
-            onChange={(e) => handleInputChange('blackSwanProbability', parseFloat(e.target.value) || 0)}
-            step="0.5"
-            min="0"
-            max="10"
+            onChange={(value) => handleInputChange('blackSwanProbability', value)}
           />
         </div>
 
         <div className="form-group">
           <label>Black Swan Impact (%)</label>
-          <input
-            type="number"
+          <NumberInput
             value={mcInputs.blackSwanImpact}
-            onChange={(e) => handleInputChange('blackSwanImpact', parseFloat(e.target.value) || 0)}
-            step="5"
+            onChange={(value) => handleInputChange('blackSwanImpact', value)}
           />
         </div>
       </div>
