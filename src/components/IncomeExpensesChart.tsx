@@ -1,5 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { YearProjection } from '../types/calculator';
+import { formatCurrency } from '../utils/allocationCalculator';
 
 interface IncomeExpensesChartProps {
   projections: YearProjection[];
@@ -21,7 +22,7 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({ projec
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="year" />
           <YAxis />
-          <Tooltip formatter={(value) => `$${Number(value).toLocaleString()}`} />
+          <Tooltip formatter={(value) => formatCurrency(Number(value))} />
           <Legend />
           <Bar dataKey="Labor Income" fill="#4CAF50" />
           <Bar dataKey="Investment Yield" fill="#2196F3" />

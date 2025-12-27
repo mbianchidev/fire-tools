@@ -51,7 +51,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>💰 Initial Values</h3>
         <div className="form-group">
-          <label>Initial Savings / Portfolio Value ($)</label>
+          <label>Initial Savings / Portfolio Value (€)</label>
           <input
             type="number"
             value={inputs.initialSavings}
@@ -103,7 +103,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>💵 Income</h3>
         <div className="form-group">
-          <label>Annual Labor Income (Net) ($)</label>
+          <label>Annual Labor Income (Net) (€)</label>
           <input
             type="number"
             value={inputs.annualLaborIncome}
@@ -120,7 +120,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>State Pension Income (Annual) ($)</label>
+          <label>State Pension Income (Annual) (€)</label>
           <input
             type="number"
             value={inputs.statePensionIncome}
@@ -128,7 +128,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>Private Pension Income (Annual) ($)</label>
+          <label>Private Pension Income (Annual) (€)</label>
           <input
             type="number"
             value={inputs.privatePensionIncome}
@@ -136,7 +136,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>Other Income (Annual) ($)</label>
+          <label>Other Income (Annual) (€)</label>
           <input
             type="number"
             value={inputs.otherIncome}
@@ -148,7 +148,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section">
         <h3>💸 Expenses & Savings</h3>
         <div className="form-group">
-          <label>Current Annual Expenses ($)</label>
+          <label>Current Annual Expenses (€)</label>
           <input
             type="number"
             value={inputs.currentAnnualExpenses}
@@ -156,7 +156,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>FIRE Annual Expenses ($)</label>
+          <label>FIRE Annual Expenses (€)</label>
           <input
             type="number"
             value={inputs.fireAnnualExpenses}
