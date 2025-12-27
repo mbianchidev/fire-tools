@@ -9,6 +9,7 @@ import { NetWorthChart } from './components/NetWorthChart';
 import { FIREMetrics } from './components/FIREMetrics';
 import { MonteCarloSimulator } from './components/MonteCarloSimulator';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
+import { HomePage } from './components/HomePage';
 import './App.css';
 import './components/AssetAllocationManager.css';
 
@@ -18,16 +19,22 @@ function Navigation() {
   return (
     <nav className="app-nav">
       <Link 
+        to="/" 
+        className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+      >
+        🏠 Home
+      </Link>
+      <Link 
+        to="/fire-calculator" 
+        className={`nav-link ${location.pathname === '/fire-calculator' ? 'active' : ''}`}
+      >
+        🔥 FIRE Calculator
+      </Link>
+      <Link 
         to="/asset-allocation" 
         className={`nav-link ${location.pathname === '/asset-allocation' ? 'active' : ''}`}
       >
         📊 Asset Allocation
-      </Link>
-      <Link 
-        to="/" 
-        className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
-      >
-        🔥 FIRE Calculator
       </Link>
     </nav>
   );
@@ -84,26 +91,27 @@ function FIRECalculatorPage() {
 
 function App() {
   // Use base path only in production (for GitHub Pages), not in local development
-  const basename = import.meta.env.MODE === 'production' ? '/fire-calculator' : '/';
+  const basename = import.meta.env.MODE === 'production' ? '/fire-tools' : '/';
   
   return (
     <Router basename={basename}>
       <div className="app">
         <header className="app-header">
-          <h1>🔥 FIRE Calculator</h1>
+          <h1>🔥 Fire Tools</h1>
           <p>Financial Independence Retire Early - Plan Your Path to Freedom</p>
         </header>
 
         <Navigation />
 
         <Routes>
-          <Route path="/" element={<FIRECalculatorPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
           <Route path="/asset-allocation" element={<AssetAllocationPage />} />
         </Routes>
 
         <footer className="app-footer">
           <p>
-            FIRE Calculator - Disclaimer: This is for educational purposes only. 
+            Fire Tools - Disclaimer: This is for educational purposes only. 
             Consult with a financial advisor for professional advice.
           </p>
         </footer>
