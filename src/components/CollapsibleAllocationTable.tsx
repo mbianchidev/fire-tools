@@ -221,10 +221,28 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
           );
         }
         
-        // Calculate class delta with cash adjustment for non-cash classes
+        // Calculate cash adjustment distributed proportionally to non-cash classes
         // Cash delta: positive = SAVE (subtract from other classes), negative = INVEST (add to other classes)
-        // For non-cash classes: add -cashDeltaAmount (so INVEST adds, SAVE subtracts)
-        const cashAdjustment = assetClass !== 'CASH' ? -cashDeltaAmount : 0;
+        // The cash amount should be distributed based on each non-cash class's target percentage
+        let cashAdjustment = 0;
+        if (assetClass !== 'CASH' && cashDeltaAmount !== 0 && assetClassTargets) {
+          // Get total percentage of all non-cash percentage-based classes
+          const nonCashPercentageTotal = Object.entries(assetClassTargets)
+            .filter(([cls, target]) => 
+              cls !== 'CASH' && 
+              target.targetMode === 'PERCENTAGE' && 
+              (target.targetPercent || 0) > 0
+            )
+            .reduce((sum, [, target]) => sum + (target.targetPercent || 0), 0);
+          
+          if (nonCashPercentageTotal > 0 && classTarget?.targetMode === 'PERCENTAGE' && classTarget.targetPercent) {
+            // Distribute cash proportionally based on this class's share of total non-cash targets
+            const proportion = classTarget.targetPercent / nonCashPercentageTotal;
+            // Negative cash delta = INVEST = add to this class
+            // Positive cash delta = SAVE = subtract from this class
+            cashAdjustment = -cashDeltaAmount * proportion;
+          }
+        }
         const classDelta = classTargetValue - classTotal + cashAdjustment;
 
         return (
