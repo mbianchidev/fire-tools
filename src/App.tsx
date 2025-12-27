@@ -57,7 +57,7 @@ function FIRECalculatorPage() {
         {hasValidationErrors && (
           <div className="validation-error-banner">
             <strong>⚠️ Validation Error</strong>
-            {result.validationErrors!.map((error, index) => (
+            {result.validationErrors?.map((error, index) => (
               <div key={index} className="validation-error-message">{error}</div>
             ))}
           </div>
