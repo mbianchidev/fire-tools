@@ -118,8 +118,5 @@ export function deserializeInputsFromURL(params: URLSearchParams): CalculatorInp
  * Check if URL contains any calculator input parameters
  */
 export function hasURLParams(params: URLSearchParams): boolean {
-  return params.has('initialSavings') || 
-         params.has('stocksPercent') || 
-         params.has('yearOfBirth') ||
-         params.size > 0;
+  return params.size > 0;
 }
