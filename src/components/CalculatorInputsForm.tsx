@@ -16,7 +16,11 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       
       if (income > 0) {
         const calculatedSavingsRate = ((income - expenses) / income) * 100;
-        newInputs.savingsRate = Math.max(0, Math.min(100, calculatedSavingsRate));
+        // Allow negative savings rate to represent deficit, but cap at 100% max
+        newInputs.savingsRate = Math.min(100, calculatedSavingsRate);
+      } else {
+        // If income is 0, set savings rate to 0
+        newInputs.savingsRate = 0;
       }
     }
     
@@ -163,9 +167,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           <label>Savings Rate (%) <span className="calculated-label">- Auto-calculated</span></label>
           <input
             type="number"
-            min="0"
-            max="100"
-            value={inputs.savingsRate.toFixed(1)}
+            value={(inputs.savingsRate ?? 0).toFixed(1)}
             readOnly
             className="calculated-field"
           />
