@@ -775,6 +775,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  font: inherit;
+}
+
+.collapsible-header:hover {
+  opacity: 0.8;
 }
 
 .collapsible-header h4 {
