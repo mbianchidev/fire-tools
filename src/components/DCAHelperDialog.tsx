@@ -102,12 +102,10 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
             <div className="input-row">
               <input
                 id="investment-amount"
-                type="number"
+                type="text"
                 value={investmentAmount}
                 onChange={(e) => setInvestmentAmount(e.target.value)}
                 placeholder="Enter amount to invest"
-                min="0"
-                step="100"
                 disabled={isLoading}
               />
               <button 

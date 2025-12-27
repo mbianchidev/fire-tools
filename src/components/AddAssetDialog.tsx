@@ -42,9 +42,9 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
   const [name, setName] = useState('');
   const [ticker, setTicker] = useState('');
   const [isin, setIsin] = useState('');
-  const [currentValue, setCurrentValue] = useState<number>(0);
+  const [currentValue, setCurrentValue] = useState<string>('0');
   const [targetMode, setTargetMode] = useState<AllocationMode>('PERCENTAGE');
-  const [targetPercent, setTargetPercent] = useState<number>(0);
+  const [targetPercent, setTargetPercent] = useState<string>('0');
 
   const handleAssetClassChange = (newClass: AssetClass) => {
     setAssetClass(newClass);
@@ -99,10 +99,10 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
       isin: ISIN_REQUIRED.includes(subAssetType) ? isin.trim().toUpperCase() : undefined,
       assetClass,
       subAssetType,
-      currentValue,
+      currentValue: parseFloat(currentValue) || 0,
       targetMode,
-      targetPercent: targetMode === 'PERCENTAGE' ? targetPercent : undefined,
-      targetValue: targetMode === 'SET' ? currentValue : undefined,
+      targetPercent: targetMode === 'PERCENTAGE' ? (parseFloat(targetPercent) || 0) : undefined,
+      targetValue: targetMode === 'SET' ? (parseFloat(currentValue) || 0) : undefined,
     };
 
     onAdd(newAsset);
@@ -111,8 +111,8 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
     setName('');
     setTicker('');
     setIsin('');
-    setCurrentValue(0);
-    setTargetPercent(0);
+    setCurrentValue('0');
+    setTargetPercent('0');
     onClose();
   };
 
@@ -205,11 +205,9 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
           <div className="form-group">
             <label>Current Value (EUR) *</label>
             <input
-              type="number"
+              type="text"
               value={currentValue}
-              onChange={(e) => setCurrentValue(parseFloat(e.target.value) || 0)}
-              min="0"
-              step="0.01"
+              onChange={(e) => setCurrentValue(e.target.value)}
               className="dialog-input"
               required
             />
@@ -236,12 +234,9 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
               <div className="form-group">
                 <label>Target % (of Asset Class) *</label>
                 <input
-                  type="number"
+                  type="text"
                   value={targetPercent}
-                  onChange={(e) => setTargetPercent(parseFloat(e.target.value) || 0)}
-                  min="0"
-                  max="100"
-                  step="0.1"
+                  onChange={(e) => setTargetPercent(e.target.value)}
                   className="dialog-input"
                 />
               </div>

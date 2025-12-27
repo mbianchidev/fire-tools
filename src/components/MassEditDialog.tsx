@@ -90,12 +90,11 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
             </span>
             <div className="mass-edit-input-group">
               <input
-                type="number"
+                type="text"
                 value={editValues[cls] ?? 0}
                 onChange={(e) => handleValueChange(cls, parseFloat(e.target.value) || 0)}
+                onFocus={(e) => e.target.select()}
                 className="mass-edit-input"
-                min="0"
-                max="100"
               />
               <span className="percent-sign">%</span>
             </div>
@@ -120,12 +119,11 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
             <span className="asset-name">{asset.name} ({asset.ticker})</span>
             <div className="mass-edit-input-group">
               <input
-                type="number"
+                type="text"
                 value={editValues[asset.id] ?? 0}
                 onChange={(e) => handleValueChange(asset.id, parseFloat(e.target.value) || 0)}
+                onFocus={(e) => e.target.select()}
                 className="mass-edit-input"
-                min="0"
-                max="100"
               />
               <span className="percent-sign">%</span>
             </div>
