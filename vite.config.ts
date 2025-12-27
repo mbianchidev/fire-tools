@@ -11,16 +11,14 @@ export default defineConfig({
         server.middlewares.use((req, res, next) => {
           // Handle /fire-calculator?params by rewriting to /fire-calculator/?params
           if (req.url) {
-            const startsWithBase = req.url.startsWith('/fire-calculator');
-            const hasTrailingSlash = req.url.startsWith('/fire-calculator/');
-            const hasQuery = req.url.includes('?');
-            
-            if (startsWithBase && !hasTrailingSlash && hasQuery) {
-              // Rewrite /fire-calculator?params to /fire-calculator/?params
-              req.url = req.url.replace('/fire-calculator?', '/fire-calculator/?');
-            } else if (startsWithBase && !hasTrailingSlash && !hasQuery) {
-              // Rewrite /fire-calculator to /fire-calculator/
-              req.url = '/fire-calculator/';
+            // Only process exact /fire-calculator or /fire-calculator? paths
+            if (req.url === '/fire-calculator' || req.url.startsWith('/fire-calculator?')) {
+              // Rewrite to add trailing slash
+              if (req.url === '/fire-calculator') {
+                req.url = '/fire-calculator/';
+              } else if (req.url.startsWith('/fire-calculator?')) {
+                req.url = req.url.replace('/fire-calculator?', '/fire-calculator/?');
+              }
             }
           }
           next();
