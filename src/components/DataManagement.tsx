@@ -22,10 +22,10 @@ export const DataManagement: React.FC<DataManagementProps> = ({
       </div>
       {isOpen && (
         <div className="data-management-content">
-          <button onClick={onExport} className="action-btn export-btn" style={{ width: '100%', marginBottom: '8px' }}>
+          <button onClick={onExport} className="action-btn export-btn" style={{ width: '100%', marginBottom: '8px', justifyContent: 'center' }}>
             📥 Export CSV
           </button>
-          <label className="action-btn import-btn" style={{ width: '100%', display: 'block', textAlign: 'center', cursor: 'pointer', marginBottom: '8px' }}>
+          <label className="action-btn import-btn" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', marginBottom: '8px' }}>
             📤 Import CSV
             <input
               type="file"
@@ -34,7 +34,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({
               style={{ display: 'none' }}
             />
           </label>
-          <button onClick={onReset} className="action-btn reset-btn" style={{ width: '100%', backgroundColor: '#ef4444', color: 'white' }}>
+          <button onClick={onReset} className="action-btn reset-btn" style={{ width: '100%', backgroundColor: '#ef4444', color: 'white', justifyContent: 'center' }}>
             🔄 Reset All Data
           </button>
         </div>

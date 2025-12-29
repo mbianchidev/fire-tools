@@ -1012,6 +1012,18 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+/* For Asset Classes header - make btn-mass-edit visible on light background */
+.section-header-with-actions .btn-mass-edit {
+  background: rgba(117, 117, 117, 0.1);
+  color: #424242;
+  border: 1px solid rgba(117, 117, 117, 0.3);
+}
+
+.section-header-with-actions .btn-mass-edit:hover {
+  background: rgba(117, 117, 117, 0.2);
+  border-color: rgba(117, 117, 117, 0.5);
+}
+
 /* Mass Edit Dialog */
 .mass-edit-dialog {
   max-width: 500px;

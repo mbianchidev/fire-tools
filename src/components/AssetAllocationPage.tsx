@@ -474,7 +474,7 @@ export const AssetAllocationPage: React.FC = () => {
         <div className="allocation-section">
           <div className="section-header-with-actions">
             <h3>Asset Classes</h3>
-            <button onClick={handleOpenMassEditAssetClass} className="action-btn reset-btn">
+            <button onClick={handleOpenMassEditAssetClass} className="btn-mass-edit" style={{ marginLeft: '1rem' }}>
               ✏️ Edit All
             </button>
           </div>
@@ -533,14 +533,14 @@ export const AssetAllocationPage: React.FC = () => {
           <div className="section-header-with-actions">
             <h3>Portfolio Details by Asset Class</h3>
             <div className="table-actions">
-              <button onClick={() => setIsDCADialogOpen(true)} className="action-btn dca-btn">
+              <button onClick={() => setIsDCADialogOpen(true)} className="action-btn" style={{ background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)', color: 'white' }}>
                 💰 DCA Helper
               </button>
               <button onClick={() => setIsDialogOpen(true)} className="action-btn primary-btn">
                 ➕ Add Asset
               </button>
-              <button onClick={handleStartFromScratch} className="action-btn reset-btn">
-                🔄 Reset
+              <button onClick={handleStartFromScratch} className="action-btn" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: 'white' }}>
+                🔄 Reset Assets
               </button>
             </div>
           </div>
