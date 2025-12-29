@@ -36,12 +36,14 @@ function Navigation({ accountName }: { accountName: string }) {
         <Link 
           to="/" 
           className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
+          onClick={closeMenu}
         >
           🏠 Home
         </Link>
         <Link 
           to="/fire-calculator" 
           className={`nav-link ${location.pathname === '/fire-calculator' ? 'active' : ''}`}
+          onClick={closeMenu}
         >
           🔥 FIRE Calculator
         </Link>
