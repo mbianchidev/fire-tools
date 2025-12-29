@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { YearProjection } from '../types/calculator';
 import { formatCurrency } from '../utils/allocationCalculator';
@@ -7,20 +6,27 @@ interface NetWorthChartProps {
   projections: YearProjection[];
   fireTarget: number;
   currentAge: number;
+  zoomYears: number | 'all';
+  onZoomChange: (years: number | 'all') => void;
+  customZoomInput: string;
+  onCustomZoomInputChange: (value: string) => void;
 }
 
-type ZoomLevel = 'all' | '10' | '20' | '30';
-
-export const NetWorthChart: React.FC<NetWorthChartProps> = ({ projections, fireTarget, currentAge }) => {
-  const [zoomLevel, setZoomLevel] = useState<ZoomLevel>('all');
-
+export const NetWorthChart: React.FC<NetWorthChartProps> = ({ 
+  projections, 
+  fireTarget, 
+  currentAge,
+  zoomYears,
+  onZoomChange,
+  customZoomInput,
+  onCustomZoomInputChange
+}) => {
   // Filter data based on zoom level
   const getFilteredData = () => {
     let filtered = projections;
     
-    if (zoomLevel !== 'all') {
-      const years = parseInt(zoomLevel);
-      filtered = projections.filter(p => p.age <= currentAge + years);
+    if (zoomYears !== 'all') {
+      filtered = projections.filter(p => p.age <= currentAge + zoomYears);
     }
     
     return filtered.map(p => ({
@@ -43,71 +49,79 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({ projections, fireT
     return value.toString();
   };
 
+  const handleCustomZoomSubmit = () => {
+    const years = parseInt(customZoomInput);
+    if (!isNaN(years) && years > 0) {
+      onZoomChange(years);
+    }
+  };
+
+  const handleCustomZoomKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleCustomZoomSubmit();
+    }
+  };
+
+  const buttonStyle = (isActive: boolean) => ({
+    padding: '5px 10px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    background: isActive ? '#4CAF50' : 'white',
+    color: isActive ? 'white' : 'black',
+    cursor: 'pointer',
+    fontSize: '12px',
+  });
+
   return (
     <div className="chart-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
         <h3>Net Worth Growth</h3>
-        <div style={{ display: 'flex', gap: '5px' }}>
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
           <button
-            onClick={() => setZoomLevel('10')}
-            className={`zoom-button ${zoomLevel === '10' ? 'active' : ''}`}
-            style={{
-              padding: '5px 10px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              background: zoomLevel === '10' ? '#4CAF50' : 'white',
-              color: zoomLevel === '10' ? 'white' : 'black',
-              cursor: 'pointer',
-              fontSize: '12px',
-            }}
-          >
-            10 Years
-          </button>
-          <button
-            onClick={() => setZoomLevel('20')}
-            className={`zoom-button ${zoomLevel === '20' ? 'active' : ''}`}
-            style={{
-              padding: '5px 10px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              background: zoomLevel === '20' ? '#4CAF50' : 'white',
-              color: zoomLevel === '20' ? 'white' : 'black',
-              cursor: 'pointer',
-              fontSize: '12px',
-            }}
+            onClick={() => onZoomChange(20)}
+            className={`zoom-button ${zoomYears === 20 ? 'active' : ''}`}
+            style={buttonStyle(zoomYears === 20)}
           >
             20 Years
           </button>
           <button
-            onClick={() => setZoomLevel('30')}
-            className={`zoom-button ${zoomLevel === '30' ? 'active' : ''}`}
-            style={{
-              padding: '5px 10px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              background: zoomLevel === '30' ? '#4CAF50' : 'white',
-              color: zoomLevel === '30' ? 'white' : 'black',
-              cursor: 'pointer',
-              fontSize: '12px',
-            }}
+            onClick={() => onZoomChange(30)}
+            className={`zoom-button ${zoomYears === 30 ? 'active' : ''}`}
+            style={buttonStyle(zoomYears === 30)}
           >
             30 Years
           </button>
           <button
-            onClick={() => setZoomLevel('all')}
-            className={`zoom-button ${zoomLevel === 'all' ? 'active' : ''}`}
-            style={{
-              padding: '5px 10px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              background: zoomLevel === 'all' ? '#4CAF50' : 'white',
-              color: zoomLevel === 'all' ? 'white' : 'black',
-              cursor: 'pointer',
-              fontSize: '12px',
-            }}
+            onClick={() => onZoomChange(40)}
+            className={`zoom-button ${zoomYears === 40 ? 'active' : ''}`}
+            style={buttonStyle(zoomYears === 40)}
+          >
+            40 Years
+          </button>
+          <button
+            onClick={() => onZoomChange('all')}
+            className={`zoom-button ${zoomYears === 'all' ? 'active' : ''}`}
+            style={buttonStyle(zoomYears === 'all')}
           >
             All Years
           </button>
+          <input
+            type="number"
+            placeholder="Custom"
+            value={customZoomInput}
+            onChange={(e) => onCustomZoomInputChange(e.target.value)}
+            onKeyPress={handleCustomZoomKeyPress}
+            onBlur={handleCustomZoomSubmit}
+            style={{
+              width: '70px',
+              padding: '5px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+              fontSize: '12px',
+            }}
+            min="1"
+            step="1"
+          />
         </div>
       </div>
       <ResponsiveContainer width="100%" height={300}>

@@ -84,6 +84,10 @@ function FIRECalculatorPage() {
   });
   
   const [result, setResult] = useState<CalculationResult | null>(null);
+  
+  // Shared zoom state for both charts (default to 30 years)
+  const [zoomYears, setZoomYears] = useState<number | 'all'>(30);
+  const [customZoomInput, setCustomZoomInput] = useState<string>('');
 
   // Update URL when inputs change
   useEffect(() => {
@@ -173,8 +177,23 @@ function FIRECalculatorPage() {
             <FIREMetrics result={result} currentAge={currentAge} />
             
             <div className="charts-section">
-              <NetWorthChart projections={result.projections} fireTarget={result.fireTarget} currentAge={currentAge} />
-              <IncomeExpensesChart projections={result.projections} currentAge={currentAge} />
+              <NetWorthChart 
+                projections={result.projections} 
+                fireTarget={result.fireTarget} 
+                currentAge={currentAge}
+                zoomYears={zoomYears}
+                onZoomChange={setZoomYears}
+                customZoomInput={customZoomInput}
+                onCustomZoomInputChange={setCustomZoomInput}
+              />
+              <IncomeExpensesChart 
+                projections={result.projections} 
+                currentAge={currentAge}
+                zoomYears={zoomYears}
+                onZoomChange={setZoomYears}
+                customZoomInput={customZoomInput}
+                onCustomZoomInputChange={setCustomZoomInput}
+              />
             </div>
           </>
         )}
