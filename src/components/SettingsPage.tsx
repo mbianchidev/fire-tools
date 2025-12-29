@@ -11,7 +11,8 @@ import './SettingsPage.css';
 const formatWithSeparator = (value: number, decimalSeparator: '.' | ','): string => {
   const str = value.toString();
   if (decimalSeparator === ',') {
-    return str.replace('.', ',');
+    // Replace all periods with commas for decimal separator
+    return str.split('.').join(',');
   }
   return str;
 };
@@ -19,9 +20,13 @@ const formatWithSeparator = (value: number, decimalSeparator: '.' | ','): string
 // Helper to parse number with decimal separator
 const parseWithSeparator = (value: string, decimalSeparator: '.' | ','): number => {
   if (decimalSeparator === ',') {
-    return parseFloat(value.replace(',', '.'));
+    // First remove thousands separators (periods in European format), then replace comma with period
+    const normalized = value.split('.').join('').replace(',', '.');
+    return parseFloat(normalized);
   }
-  return parseFloat(value);
+  // For period decimal separator, remove thousands separators (commas)
+  const normalized = value.split(',').join('');
+  return parseFloat(normalized);
 };
 
 interface SettingsPageProps {
