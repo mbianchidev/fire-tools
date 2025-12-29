@@ -5,29 +5,8 @@ import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } 
 import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV } from '../utils/csvExport';
 import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData } from '../utils/localStorage';
 import { DEFAULT_INPUTS } from '../utils/defaults';
+import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
 import './SettingsPage.css';
-
-// Helper to format number with decimal separator
-const formatWithSeparator = (value: number, decimalSeparator: '.' | ','): string => {
-  const str = value.toString();
-  if (decimalSeparator === ',') {
-    // Replace all periods with commas for decimal separator
-    return str.split('.').join(',');
-  }
-  return str;
-};
-
-// Helper to parse number with decimal separator
-const parseWithSeparator = (value: string, decimalSeparator: '.' | ','): number => {
-  if (decimalSeparator === ',') {
-    // First remove thousands separators (periods in European format), then replace comma with period
-    const normalized = value.split('.').join('').replace(',', '.');
-    return parseFloat(normalized);
-  }
-  // For period decimal separator, remove thousands separators (commas)
-  const normalized = value.split(',').join('');
-  return parseFloat(normalized);
-};
 
 interface SettingsPageProps {
   onSettingsChange?: (settings: UserSettings) => void;
@@ -103,24 +82,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   // Handle rate text input blur (commit change)
   const handleRateTextBlur = (currency: SupportedCurrency) => {
     const textValue = rateTextValues[currency] || '';
-    const parsed = parseWithSeparator(textValue, settings.decimalSeparator);
     
-    if (isNaN(parsed) || parsed <= 0) {
+    // Use shared validation function with decimal separator support
+    const result = validateNumberInput(textValue, {
+      min: 0.0001,
+      allowNegative: false,
+      allowDecimals: true,
+      required: true,
+      decimalSeparator: settings.decimalSeparator,
+    });
+    
+    if (!result.isValid || result.parsedValue === undefined || result.parsedValue <= 0) {
       // Reset to current value on invalid input
       const currentRate = settings.currencySettings.fallbackRates[currency] ?? DEFAULT_FALLBACK_RATES[currency];
       setRateTextValues(prev => ({ 
         ...prev, 
         [currency]: formatWithSeparator(currentRate, settings.decimalSeparator) 
       }));
-      if (isNaN(parsed)) {
-        showMessage('error', 'Please enter a valid number');
-      } else {
-        showMessage('error', 'Rate must be a positive number');
-      }
+      showMessage('error', result.errorMessage || 'Rate must be a positive number');
       return;
     }
     
-    handleFallbackRateChange(currency, parsed);
+    handleFallbackRateChange(currency, result.parsedValue);
   };
 
   // Reset fallback rates to defaults
