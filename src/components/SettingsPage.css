@@ -202,11 +202,12 @@
 
 .rate-input-wrapper input {
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.75rem 1rem;
   border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  max-width: 100px;
+  border-radius: 8px;
+  font-size: 1rem;
+  max-width: 120px;
+  width: 100%;
 }
 
 .rate-input-wrapper input:focus {
@@ -225,6 +226,10 @@
 
 .data-management-group:last-child {
   margin-bottom: 0;
+}
+
+.data-management-group .setting-help {
+  margin-bottom: 1rem;
 }
 
 .import-buttons {
