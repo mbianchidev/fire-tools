@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
       },
     },
   ],
-  base: mode === 'production' ? '/fire-tools/' : '/',
+  base: mode === 'production' ? '/fire-calculator/' : '/',
   test: {
     globals: true,
     environment: 'jsdom',

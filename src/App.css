@@ -49,6 +49,29 @@ body {
   position: relative;
 }
 
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  cursor: pointer;
+  color: #667eea;
+  padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  line-height: 1;
+  transition: transform 0.2s;
+  z-index: 10;
+}
+
+.nav-toggle:hover {
+  transform: scale(1.1);
+}
+
+.nav-toggle:active {
+  transform: scale(0.95);
+}
+
 .nav-links {
   display: flex;
   gap: 1rem;
@@ -69,6 +92,10 @@ body {
   font-weight: 500;
   transition: all 0.3s;
   background: transparent;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-link:hover {
@@ -545,6 +572,164 @@ body {
 }
 
 /* Responsive design */
+/* Mobile breakpoints: 320px (small), 375px (medium), 425px (large), 768px (tablet), 1024px (laptop), 1440px (desktop), 2560px (4K) */
+
+/* Mobile navigation styles (below 1024px) */
+@media (max-width: 1023px) {
+  .nav-toggle {
+    display: block;
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .app-nav {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+    gap: 0;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-link {
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .profile-menu-container {
+    position: static;
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* Tablet and up (768px+) - Keep toggle hidden, show horizontal nav */
+@media (min-width: 1024px) {
+  .nav-toggle {
+    display: none;
+  }
+
+  .nav-links {
+    display: flex !important;
+    flex-direction: row;
+  }
+
+  .profile-menu-container {
+    position: absolute;
+    right: 2rem;
+  }
+}
+
+/* Mobile small (320px) */
+@media (max-width: 374px) {
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .app-header p {
+    font-size: 0.85rem;
+  }
+
+  .app-nav {
+    padding: 0.75rem;
+  }
+
+  .nav-link {
+    font-size: 1rem;
+    padding: 0.875rem;
+  }
+}
+
+/* Tablet landscape and small laptop (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .app-header h1 {
+    font-size: 2rem;
+  }
+
+  .app-header p {
+    font-size: 1rem;
+  }
+
+  .nav-link {
+    font-size: 1.15rem;
+  }
+}
+
+/* Large laptop and desktop (1440px+) */
+@media (min-width: 1440px) {
+  .app-container {
+    max-width: 2000px;
+  }
+
+  .sidebar {
+    flex: 0 0 450px;
+  }
+
+  .app-header h1 {
+    font-size: 3rem;
+  }
+
+  .app-header p {
+    font-size: 1.2rem;
+  }
+}
+
+/* 4K displays (2560px+) */
+@media (min-width: 2560px) {
+  .app-header {
+    padding: 3rem;
+  }
+
+  .app-header h1 {
+    font-size: 4rem;
+  }
+
+  .app-header p {
+    font-size: 1.5rem;
+  }
+
+  .app-nav {
+    padding: 1.5rem 3rem;
+  }
+
+  .nav-link {
+    padding: 1rem 2rem;
+    font-size: 1.3rem;
+    min-height: 56px;
+  }
+
+  .app-container {
+    max-width: 2400px;
+    padding: 0 3rem;
+    gap: 3rem;
+  }
+
+  .sidebar {
+    flex: 0 0 500px;
+    padding: 3rem;
+  }
+
+  .main-content {
+    padding: 3rem;
+  }
+}
+
+/* Existing responsive styles for layout */
 @media (max-width: 1200px) {
   .app-container {
     flex-direction: column;
@@ -576,14 +761,14 @@ body {
   }
 
   .app-container {
-    padding: 0 0.5rem;
-    margin: 0.5rem auto;
-    gap: 0.5rem;
+    padding: 0 1rem;
+    margin: 1rem auto;
+    gap: 1rem;
   }
 
   .sidebar,
   .main-content {
-    padding: 1rem;
+    padding: 1.25rem;
     border-radius: 8px;
   }
 
@@ -591,11 +776,11 @@ body {
   .results-grid,
   .mc-inputs {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
+    gap: 0.75rem;
   }
 
   .metric-card {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .metric-card.highlight {
@@ -607,7 +792,7 @@ body {
   }
 
   .result-card {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .result-card.success {
@@ -620,14 +805,28 @@ body {
 
   .fire-metrics h3,
   .mc-results h3 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 
   .monte-carlo-section h2 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 
   .chart-container h3 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+  }
+
+  /* Touch-friendly button sizes */
+  .share-button,
+  .run-simulation-btn {
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .form-group input[type="number"],
+  .form-group input[type="text"] {
+    min-height: 48px;
+    font-size: max(16px, 1rem); /* Prevent iOS zoom */
   }
 }

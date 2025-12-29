@@ -4,7 +4,7 @@ A comprehensive suite of financial tools for FIRE (Financial Independence Retire
 
 ## 🌐 Live Demo
 
-The latest version is automatically deployed to: **[https://mbianchidev.github.io/fire-tools/](https://mbianchidev.github.io/fire-tools/)**
+The latest version is automatically deployed to: **[https://mbianchidev.github.io/fire-calculator/](https://mbianchidev.github.io/fire-calculator/)**
 
 ## Features
 
@@ -49,8 +49,8 @@ The latest version is automatically deployed to: **[https://mbianchidev.github.i
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/mbianchidev/fire-tools.git
-cd fire-tools
+git clone https://github.com/mbianchidev/fire-calculator.git
+cd fire-calculator
 ```
 
 2. Install dependencies:
@@ -80,7 +80,7 @@ The project is automatically deployed to GitHub Pages on every push to the `main
 **Automatic Deployment:**
 - Pushes to the `main` branch trigger the deployment workflow
 - The workflow builds the project and deploys to GitHub Pages
-- The live site is available at: https://mbianchidev.github.io/fire-tools/
+- The live site is available at: https://mbianchidev.github.io/fire-calculator/
 
 **Workflow Details:**
 - Build job: Installs dependencies, runs build, and uploads artifacts
