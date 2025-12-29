@@ -85,8 +85,9 @@ interface Asset {
 
 /**
  * Redistributes asset percentages within a class when one asset's target is changed.
- * This mimics the behavior in CollapsibleAllocationTable.redistributePercentages
- * Redistribution is based on CURRENT VALUES, not target percentages.
+ * This mimics the CORRECTED behavior in CollapsibleAllocationTable.redistributePercentages
+ * Redistribution is based on TARGET PERCENTAGES, not current values.
+ * When rounding adjustments are needed, the asset with least value gets the extra.
  */
 function redistributeAssetPercentages(
   assets: Asset[],
@@ -112,25 +113,60 @@ function redistributeAssetPercentages(
   // Calculate remaining percentage to distribute
   const remainingPercent = 100 - newPercent;
   
-  // Get total of other assets' current VALUES (not percentages)
-  const otherAssetsValueTotal = otherAssets.reduce((sum, a) => sum + a.currentValue, 0);
+  // Get total of other assets' TARGET PERCENTAGES (not current values)
+  const otherAssetsTargetTotal = otherAssets.reduce((sum, a) => sum + (a.targetPercent || 0), 0);
   
-  return assets.map(asset => {
+  // Calculate new percentages
+  const newPercentages: { id: string; percent: number; currentValue: number }[] = [];
+  
+  assets.forEach(asset => {
     if (asset.id === changedAssetId) {
-      return { ...asset, targetPercent: newPercent };
-    }
-    
-    if (asset.assetClass === assetClass && asset.targetMode === 'PERCENTAGE') {
-      if (otherAssetsValueTotal === 0) {
-        // Distribute equally if all others have 0 value
-        return { ...asset, targetPercent: remainingPercent / otherAssets.length };
+      newPercentages.push({ id: asset.id, percent: newPercent, currentValue: asset.currentValue });
+    } else if (asset.assetClass === assetClass && asset.targetMode === 'PERCENTAGE') {
+      let newPct: number;
+      if (otherAssetsTargetTotal === 0) {
+        // Distribute equally if all others have 0 target percent
+        newPct = remainingPercent / otherAssets.length;
       } else {
-        // Distribute proportionally based on current VALUES
-        const proportion = asset.currentValue / otherAssetsValueTotal;
-        return { ...asset, targetPercent: proportion * remainingPercent };
+        // Distribute proportionally based on TARGET PERCENTAGES
+        const proportion = (asset.targetPercent || 0) / otherAssetsTargetTotal;
+        newPct = proportion * remainingPercent;
+      }
+      newPercentages.push({ id: asset.id, percent: newPct, currentValue: asset.currentValue });
+    }
+  });
+  
+  // Calculate total and adjust for rounding to ensure exactly 100%
+  const total = newPercentages.reduce((sum, p) => sum + p.percent, 0);
+  
+  if (Math.abs(total - 100) > 0.001) {
+    // Find the asset with the least current value (excluding the changed one)
+    const adjustableAssets = newPercentages.filter(p => p.id !== changedAssetId);
+    if (adjustableAssets.length > 0) {
+      // Sort by current value ascending - smallest value first
+      adjustableAssets.sort((a, b) => a.currentValue - b.currentValue);
+      const assetToAdjust = adjustableAssets[0];
+      // Adjust the smallest asset to make total exactly 100%
+      const adjustment = 100 - total;
+      const idx = newPercentages.findIndex(p => p.id === assetToAdjust.id);
+      if (idx !== -1) {
+        newPercentages[idx].percent += adjustment;
       }
     }
-    
+  }
+  
+  // Ensure no percentage exceeds 100% (safety check)
+  newPercentages.forEach(p => {
+    if (p.percent > 100) p.percent = 100;
+    if (p.percent < 0) p.percent = 0;
+  });
+  
+  // Map back to assets
+  return assets.map(asset => {
+    const newPct = newPercentages.find(p => p.id === asset.id);
+    if (newPct !== undefined) {
+      return { ...asset, targetPercent: newPct.percent };
+    }
     return asset;
   });
 }
@@ -271,8 +307,8 @@ describe('Asset Classes Table - Target Allocation Redistribution', () => {
 });
 
 describe('Asset-Specific Table - Target Allocation Redistribution', () => {
-  describe('Example 1: Stock assets redistribution based on current values', () => {
-    it('should redistribute proportionally based on CURRENT VALUES when VBR changes from 45% to 25%', () => {
+  describe('Example 1: Stock assets redistribution based on TARGET PERCENTAGES', () => {
+    it('should redistribute proportionally based on TARGET PERCENTAGES when VBR changes from 45% to 25%', () => {
       const initialAssets: Asset[] = [
         { id: 'spy', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 25, currentValue: 25000 },
         { id: 'vti', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 15, currentValue: 15000 },
@@ -286,20 +322,20 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
       // VBR should be 25%
       expect(result.find(a => a.id === 'vbr')?.targetPercent).toBe(25);
       
-      // Remaining 75% distributed proportionally based on CURRENT VALUES
-      // Other assets value total: 25000 + 15000 + 10000 + 5000 = 55000
-      // SPY: 25000/55000 * 75 = 34.09%
-      // VTI: 15000/55000 * 75 = 20.45%
-      // VXUS: 10000/55000 * 75 = 13.64%
-      // VWO: 5000/55000 * 75 = 6.82%
+      // Remaining 75% distributed proportionally based on TARGET PERCENTAGES
+      // Other assets target total: 25 + 15 + 10 + 5 = 55
+      // SPY: 25/55 * 75 = 34.09%
+      // VTI: 15/55 * 75 = 20.45%
+      // VXUS: 10/55 * 75 = 13.64%
+      // VWO: 5/55 * 75 = 6.82%
       
-      const otherValueTotal = 25000 + 15000 + 10000 + 5000; // 55000
+      const otherTargetTotal = 25 + 15 + 10 + 5; // 55
       const remaining = 75;
       
-      expect(result.find(a => a.id === 'spy')?.targetPercent).toBeCloseTo((25000 / otherValueTotal) * remaining, 2);
-      expect(result.find(a => a.id === 'vti')?.targetPercent).toBeCloseTo((15000 / otherValueTotal) * remaining, 2);
-      expect(result.find(a => a.id === 'vxus')?.targetPercent).toBeCloseTo((10000 / otherValueTotal) * remaining, 2);
-      expect(result.find(a => a.id === 'vwo')?.targetPercent).toBeCloseTo((5000 / otherValueTotal) * remaining, 2);
+      expect(result.find(a => a.id === 'spy')?.targetPercent).toBeCloseTo((25 / otherTargetTotal) * remaining, 2);
+      expect(result.find(a => a.id === 'vti')?.targetPercent).toBeCloseTo((15 / otherTargetTotal) * remaining, 2);
+      expect(result.find(a => a.id === 'vxus')?.targetPercent).toBeCloseTo((10 / otherTargetTotal) * remaining, 2);
+      expect(result.find(a => a.id === 'vwo')?.targetPercent).toBeCloseTo((5 / otherTargetTotal) * remaining, 2);
       
       // Verify total is 100%
       const total = result
@@ -308,15 +344,12 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
       expect(total).toBeCloseTo(100, 2);
     });
     
-    it('should redistribute based on current values matching issue example', () => {
-      // Issue example: User edits asset A to be 10% (from original 5%)
-      // Asset B originally 60% -> 58%
-      // Asset C originally 30% -> 32%
-      // This implies redistribution based on current values
+    it('should redistribute based on TARGET PERCENTAGES', () => {
+      // When asset A goes from 5% to 10%, remaining 90% distributed based on target percentages
       const initialAssets: Asset[] = [
         { id: 'A', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 5, currentValue: 10000 },
         { id: 'B', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 60, currentValue: 60000 },
-        { id: 'C', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 30, currentValue: 30000 },
+        { id: 'C', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 35, currentValue: 30000 },
       ];
       
       const result = redistributeAssetPercentages(initialAssets, 'A', 10, 'STOCKS');
@@ -324,18 +357,15 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
       // A should be 10%
       expect(result.find(a => a.id === 'A')?.targetPercent).toBe(10);
       
-      // Remaining 90% distributed based on current values
-      // Other value total: 60000 + 30000 = 90000
-      // B: 60000/90000 * 90 = 60%
-      // C: 30000/90000 * 90 = 30%
-      // Wait, this gives same percentages because values match original percentages!
-      
-      // Let's verify with different scenario where values don't match percentages
-      const otherValueTotal = 60000 + 30000; // 90000
+      // Remaining 90% distributed based on TARGET PERCENTAGES (not current values)
+      // Other target total: 60 + 35 = 95
+      // B: 60/95 * 90 = 56.84%
+      // C: 35/95 * 90 = 33.16%
+      const otherTargetTotal = 60 + 35; // 95
       const remaining = 90;
       
-      expect(result.find(a => a.id === 'B')?.targetPercent).toBeCloseTo((60000 / otherValueTotal) * remaining, 2);
-      expect(result.find(a => a.id === 'C')?.targetPercent).toBeCloseTo((30000 / otherValueTotal) * remaining, 2);
+      expect(result.find(a => a.id === 'B')?.targetPercent).toBeCloseTo((60 / otherTargetTotal) * remaining, 2);
+      expect(result.find(a => a.id === 'C')?.targetPercent).toBeCloseTo((35 / otherTargetTotal) * remaining, 2);
     });
   });
   
@@ -394,7 +424,7 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
   });
   
   describe('Edge cases', () => {
-    it('should distribute based on current values (equal values = equal distribution)', () => {
+    it('should distribute equally when all other assets have 0 target percent (equal distribution)', () => {
       const initialAssets: Asset[] = [
         { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 0, currentValue: 10000 },
         { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 0, currentValue: 10000 },
@@ -406,14 +436,14 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
       // a3 should be 40%
       expect(result.find(a => a.id === 'a3')?.targetPercent).toBe(40);
       
-      // Remaining 60% should be split based on current values (equal values = equal split)
-      // a1: 10000/20000 * 60 = 30%
-      // a2: 10000/20000 * 60 = 30%
+      // When other assets have 0 target percent, distribute equally
+      // a1: 60 / 2 = 30%
+      // a2: 60 / 2 = 30%
       expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(30);
       expect(result.find(a => a.id === 'a2')?.targetPercent).toBe(30);
     });
     
-    it('should distribute equally when all other assets have 0 value', () => {
+    it('should distribute equally when all other assets have 0 target percent (regardless of current value)', () => {
       const initialAssets: Asset[] = [
         { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 0, currentValue: 0 },
         { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 0, currentValue: 0 },
@@ -425,7 +455,7 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
       // a3 should be 40%
       expect(result.find(a => a.id === 'a3')?.targetPercent).toBe(40);
       
-      // Remaining 60% should be split equally when all others have 0 value
+      // Remaining 60% should be split equally when all others have 0 target percent
       expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(30);
       expect(result.find(a => a.id === 'a2')?.targetPercent).toBe(30);
     });
@@ -447,7 +477,7 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
       // Stock1 should be 30%
       expect(result.find(a => a.id === 'stock1')?.targetPercent).toBe(30);
       
-      // Stock2 should get all remaining 70% (it's the only other stock with value)
+      // Stock2 should get all remaining 70% (it's the only other stock with target %)
       expect(result.find(a => a.id === 'stock2')?.targetPercent).toBe(70);
     });
     
@@ -477,6 +507,230 @@ describe('Asset-Specific Table - Target Allocation Redistribution', () => {
       expect(result.find(a => a.id === 'stock1')).toBeUndefined();
       expect(result.find(a => a.id === 'cash')).toBeDefined();
       expect(result.length).toBe(1);
+    });
+  });
+});
+
+describe('Asset-Specific Table - Target Percentage Redistribution (Issue Fix)', () => {
+  /**
+   * CRITICAL FIX: Redistribution should be based on TARGET PERCENTAGES, not current values.
+   * 
+   * Example from issue:
+   * - 3 assets at 50/30/20 target percentages
+   * - When 50% becomes 40%, the 10% reduction should be redistributed proportionally
+   * - Remaining assets have 30% and 20% = total 50%
+   * - Asset B gets: 30/50 * 60 = 36%
+   * - Asset C gets: 20/50 * 60 = 24%
+   * - Final allocation: 40/36/24 = 100%
+   * 
+   * When exact proportions aren't possible due to rounding, the asset with the LEAST VALUE
+   * gets the extra percentage to ensure total is ALWAYS 100% (never above).
+   * 
+   * Note: These tests use the same redistributeAssetPercentages function defined above,
+   * which was updated to use TARGET PERCENTAGES for redistribution.
+   */
+
+  describe('Basic proportional redistribution based on target percentages', () => {
+    it('should redistribute 50/30/20 to 40/36/24 when first asset changes from 50% to 40%', () => {
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 50, currentValue: 50000 },
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 30, currentValue: 30000 },
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 20, currentValue: 20000 },
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 40, 'STOCKS');
+      
+      // a1 should be 40%
+      expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(40);
+      
+      // Remaining 60% distributed based on TARGET PERCENTAGES (30 and 20)
+      // a2: 30/(30+20) * 60 = 36%
+      // a3: 20/(30+20) * 60 = 24%
+      expect(result.find(a => a.id === 'a2')?.targetPercent).toBe(36);
+      expect(result.find(a => a.id === 'a3')?.targetPercent).toBe(24);
+      
+      // Verify total is exactly 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBe(100);
+    });
+
+    it('should redistribute 60/25/15 to 50/30/20 when first asset changes from 60% to 50%', () => {
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 60, currentValue: 60000 },
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 25, currentValue: 25000 },
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 15, currentValue: 15000 },
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 50, 'STOCKS');
+      
+      // a1 should be 50%
+      expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(50);
+      
+      // Remaining 50% distributed based on TARGET PERCENTAGES (25 and 15)
+      // a2: 25/(25+15) * 50 = 31.25%
+      // a3: 15/(25+15) * 50 = 18.75%
+      expect(result.find(a => a.id === 'a2')?.targetPercent).toBeCloseTo(31.25, 2);
+      expect(result.find(a => a.id === 'a3')?.targetPercent).toBeCloseTo(18.75, 2);
+      
+      // Verify total is exactly 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBeCloseTo(100, 2);
+    });
+
+    it('should redistribute when increasing percentage (40/30/30 to 50/25/25)', () => {
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 40, currentValue: 40000 },
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 30, currentValue: 30000 },
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 30, currentValue: 30000 },
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 50, 'STOCKS');
+      
+      // a1 should be 50%
+      expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(50);
+      
+      // Remaining 50% distributed based on TARGET PERCENTAGES (30 and 30)
+      // a2: 30/(30+30) * 50 = 25%
+      // a3: 30/(30+30) * 50 = 25%
+      expect(result.find(a => a.id === 'a2')?.targetPercent).toBe(25);
+      expect(result.find(a => a.id === 'a3')?.targetPercent).toBe(25);
+      
+      // Verify total is exactly 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBe(100);
+    });
+  });
+
+  describe('Total percentage validation - NEVER above 100%', () => {
+    it('should ensure total is exactly 100% even with floating point arithmetic', () => {
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.33, currentValue: 33330 },
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.33, currentValue: 33330 },
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.34, currentValue: 33340 },
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 40, 'STOCKS');
+      
+      // Verify total does not exceed 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBeLessThanOrEqual(100);
+      expect(total).toBeGreaterThanOrEqual(99.99); // Should be very close to 100
+    });
+
+    it('should never allow total to exceed 100% regardless of input', () => {
+      // Edge case: what if somehow percentages are already wrong?
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 70, currentValue: 70000 },
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 20, currentValue: 20000 },
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 10, currentValue: 10000 },
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 80, 'STOCKS');
+      
+      // Even with 80% for a1, total should be exactly 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBeLessThanOrEqual(100);
+    });
+  });
+
+  describe('Rounding adjustment - least value asset gets extra', () => {
+    it('should give rounding remainder to asset with least current value', () => {
+      // Create a scenario where rounding might cause issues
+      // 3 assets at 33.33/33.33/33.34, when first changes to 10%
+      // Remaining 90% split 33.33/33.34 out of 66.67 total
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.33, currentValue: 50000 }, // higher value
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.33, currentValue: 10000 }, // lower value - should get adjustment
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 33.34, currentValue: 40000 }, // medium value
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 10, 'STOCKS');
+      
+      // a1 should be 10%
+      expect(result.find(a => a.id === 'a1')?.targetPercent).toBe(10);
+      
+      // Verify total is exactly 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBeCloseTo(100, 5);
+      
+      // When there's a rounding discrepancy, the asset with least value (a2) should be adjusted
+      // Verify all percentages are positive
+      expect(result.find(a => a.id === 'a2')?.targetPercent).toBeGreaterThan(0);
+      expect(result.find(a => a.id === 'a3')?.targetPercent).toBeGreaterThan(0);
+    });
+
+    it('should handle equal values by adjusting first in sorted order', () => {
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 50, currentValue: 10000 },
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 25, currentValue: 10000 }, // same value
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 25, currentValue: 10000 }, // same value
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 40, 'STOCKS');
+      
+      // Total must be 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBeCloseTo(100, 5);
+    });
+  });
+
+  describe('Edge cases for target percentage redistribution', () => {
+    it('should handle assets with 0 target percentage', () => {
+      const initialAssets: Asset[] = [
+        { id: 'a1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 100, currentValue: 100000 },
+        { id: 'a2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 0, currentValue: 5000 },
+        { id: 'a3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 0, currentValue: 3000 },
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'a1', 60, 'STOCKS');
+      
+      // When other assets have 0 target percent, distribute equally
+      // a2 and a3 should each get 20%
+      expect(result.find(a => a.id === 'a2')?.targetPercent).toBe(20);
+      expect(result.find(a => a.id === 'a3')?.targetPercent).toBe(20);
+      
+      // Verify total is exactly 100%
+      const total = result
+        .filter(a => a.assetClass === 'STOCKS' && a.targetMode === 'PERCENTAGE')
+        .reduce((sum, a) => sum + (a.targetPercent || 0), 0);
+      expect(total).toBe(100);
+    });
+
+    it('should not affect assets in different classes', () => {
+      const initialAssets: Asset[] = [
+        { id: 'stock1', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 50, currentValue: 50000 },
+        { id: 'stock2', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 30, currentValue: 30000 },
+        { id: 'stock3', assetClass: 'STOCKS', targetMode: 'PERCENTAGE', targetPercent: 20, currentValue: 20000 },
+        { id: 'bond1', assetClass: 'BONDS', targetMode: 'PERCENTAGE', targetPercent: 60, currentValue: 30000 },
+        { id: 'bond2', assetClass: 'BONDS', targetMode: 'PERCENTAGE', targetPercent: 40, currentValue: 20000 },
+      ];
+      
+      const result = redistributeAssetPercentages(initialAssets, 'stock1', 40, 'STOCKS');
+      
+      // Bonds should be completely unchanged
+      expect(result.find(a => a.id === 'bond1')?.targetPercent).toBe(60);
+      expect(result.find(a => a.id === 'bond2')?.targetPercent).toBe(40);
+      
+      // Stocks should be redistributed
+      expect(result.find(a => a.id === 'stock1')?.targetPercent).toBe(40);
+      // stock2: 30/(30+20) * 60 = 36%
+      expect(result.find(a => a.id === 'stock2')?.targetPercent).toBe(36);
+      // stock3: 20/(30+20) * 60 = 24%
+      expect(result.find(a => a.id === 'stock3')?.targetPercent).toBe(24);
     });
   });
 });

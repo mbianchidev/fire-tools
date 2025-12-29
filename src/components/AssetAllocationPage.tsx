@@ -97,6 +97,13 @@ export const AssetAllocationPage: React.FC = () => {
     updateAllocation(newAssets);
   };
 
+  const handleBatchUpdateAssets = (updates: Record<string, Partial<Asset>>) => {
+    const newAssets = assets.map(asset =>
+      updates[asset.id] ? { ...asset, ...updates[asset.id] } : asset
+    );
+    updateAllocation(newAssets);
+  };
+
   const handleDeleteAsset = (assetId: string) => {
     const deletedAsset = assets.find(asset => asset.id === assetId);
     if (!deletedAsset) {
@@ -526,6 +533,7 @@ export const AssetAllocationPage: React.FC = () => {
             assetClassTargets={assetClassTargets}
             portfolioValue={portfolioValue}
             onUpdateAsset={handleUpdateAsset}
+            onBatchUpdateAssets={handleBatchUpdateAssets}
             onDeleteAsset={handleDeleteAsset}
             onMassEdit={handleOpenMassEditAsset}
           />

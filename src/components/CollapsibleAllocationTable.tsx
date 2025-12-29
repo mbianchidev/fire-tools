@@ -11,6 +11,7 @@ interface CollapsibleAllocationTableProps {
   assetClassTargets?: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>;
   portfolioValue?: number;
   onUpdateAsset: (assetId: string, updates: Partial<Asset>) => void;
+  onBatchUpdateAssets?: (updates: Record<string, Partial<Asset>>) => void; // Batch update for redistribution
   onDeleteAsset: (assetId: string) => void;
   onMassEdit?: (assetClass: AssetClass) => void; // Handler for opening mass edit dialog
 }
@@ -31,6 +32,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   assetClassTargets,
   portfolioValue,
   onUpdateAsset,
+  onBatchUpdateAssets,
   onDeleteAsset,
   onMassEdit,
 }) => {
@@ -56,7 +58,10 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   }, [editValues]);
 
   // Redistribute percentages helper function
-  const redistributePercentages = (assetId: string, newTargetPercent: number, assetClass: AssetClass) => {
+  // Uses TARGET PERCENTAGES for proportional distribution (not current values)
+  // When rounding adjustments are needed, the asset with the least current value gets the extra
+  // Returns a Record of assetId -> { targetPercent } updates for batch processing
+  const calculateRedistributedPercentages = (assetId: string, newTargetPercent: number, assetClass: AssetClass): Record<string, Partial<Asset>> => {
     // Get all percentage-based assets in the same class
     const classAssets = assets.filter(a => 
       a.assetClass === assetClass && 
@@ -64,28 +69,53 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
       a.id !== assetId
     );
     
-    if (classAssets.length === 0) return;
+    const updates: Record<string, Partial<Asset>> = {};
+    
+    if (classAssets.length === 0) return updates;
     
     // Calculate remaining percentage to distribute
     const remainingPercent = 100 - newTargetPercent;
     
-    // Get total of other assets' current VALUES (not percentages) for proportional distribution
-    const otherAssetsValueTotal = classAssets.reduce((sum, a) => sum + a.currentValue, 0);
+    // Get total of other assets' TARGET PERCENTAGES for proportional distribution
+    const otherAssetsTargetTotal = classAssets.reduce((sum, a) => sum + (a.targetPercent || 0), 0);
     
-    if (otherAssetsValueTotal === 0) {
-      // Distribute equally if all others have 0 value
+    // Calculate new percentages for all other assets
+    const newPercentages: { id: string; percent: number; currentValue: number }[] = [];
+    
+    if (otherAssetsTargetTotal === 0) {
+      // Distribute equally if all others have 0 target percent
       const equalPercent = remainingPercent / classAssets.length;
       classAssets.forEach(asset => {
-        onUpdateAsset(asset.id, { targetPercent: equalPercent });
+        newPercentages.push({ id: asset.id, percent: equalPercent, currentValue: asset.currentValue });
       });
     } else {
-      // Distribute proportionally based on current VALUES
+      // Distribute proportionally based on TARGET PERCENTAGES
       classAssets.forEach(asset => {
-        const proportion = asset.currentValue / otherAssetsValueTotal;
+        const proportion = (asset.targetPercent || 0) / otherAssetsTargetTotal;
         const newPercent = proportion * remainingPercent;
-        onUpdateAsset(asset.id, { targetPercent: newPercent });
+        newPercentages.push({ id: asset.id, percent: newPercent, currentValue: asset.currentValue });
       });
     }
+    
+    // Calculate total and adjust for rounding to ensure exactly 100%
+    // Total should be: newTargetPercent + sum of newPercentages
+    const calculatedTotal = newTargetPercent + newPercentages.reduce((sum, p) => sum + p.percent, 0);
+    
+    if (Math.abs(calculatedTotal - 100) > 0.001 && newPercentages.length > 0) {
+      // Sort by current value ascending - asset with least value gets adjustment
+      newPercentages.sort((a, b) => a.currentValue - b.currentValue);
+      // Adjust the asset with the smallest current value to make total exactly 100%
+      const adjustment = 100 - calculatedTotal;
+      newPercentages[0].percent += adjustment;
+    }
+    
+    // Ensure no individual percentage goes below 0% (edge case protection)
+    newPercentages.forEach(p => {
+      if (p.percent < 0) p.percent = 0;
+      updates[p.id] = { targetPercent: p.percent };
+    });
+    
+    return updates;
   };
 
   // Click outside to save (same behavior as Asset Classes table)
@@ -95,14 +125,29 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
         // Use ref to get latest edit values without causing re-renders
         const asset = assets.find(a => a.id === editingAsset);
         if (asset) {
-          onUpdateAsset(editingAsset, {
-            name: editValuesRef.current.name,
-            currentValue: editValuesRef.current.currentValue,
-            targetPercent: editValuesRef.current.targetPercent,
-          });
+          // Calculate all updates including redistribution
+          const mainUpdate: Record<string, Partial<Asset>> = {
+            [editingAsset]: {
+              name: editValuesRef.current.name,
+              currentValue: editValuesRef.current.currentValue,
+              targetPercent: editValuesRef.current.targetPercent,
+            }
+          };
           
+          let redistributionUpdates: Record<string, Partial<Asset>> = {};
           if (asset.targetMode === 'PERCENTAGE') {
-            redistributePercentages(editingAsset, editValuesRef.current.targetPercent, asset.assetClass);
+            redistributionUpdates = calculateRedistributedPercentages(editingAsset, editValuesRef.current.targetPercent, asset.assetClass);
+          }
+          
+          // Combine all updates and apply as batch if available
+          const allUpdates = { ...mainUpdate, ...redistributionUpdates };
+          if (onBatchUpdateAssets) {
+            onBatchUpdateAssets(allUpdates);
+          } else {
+            // Fallback to individual updates
+            Object.entries(allUpdates).forEach(([id, updates]) => {
+              onUpdateAsset(id, updates);
+            });
           }
         }
         setEditingAsset(null);
@@ -115,7 +160,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
         document.removeEventListener('mousedown', handleClickOutside);
       };
     }
-  }, [editingAsset, assets, onUpdateAsset]);
+  }, [editingAsset, assets, onUpdateAsset, onBatchUpdateAssets]);
 
   const toggleCollapse = (assetClass: AssetClass) => {
     const newCollapsed = new Set(collapsedClasses);
@@ -165,16 +210,29 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     const asset = assets.find(a => a.id === assetId);
     if (!asset) return;
     
-    // First update the edited asset (including name)
-    onUpdateAsset(assetId, {
-      name: editValues.name,
-      currentValue: editValues.currentValue,
-      targetPercent: editValues.targetPercent,
-    });
+    // Calculate all updates including redistribution
+    const mainUpdate: Record<string, Partial<Asset>> = {
+      [assetId]: {
+        name: editValues.name,
+        currentValue: editValues.currentValue,
+        targetPercent: editValues.targetPercent,
+      }
+    };
     
-    // Then redistribute percentages if this is a percentage-based asset
+    let redistributionUpdates: Record<string, Partial<Asset>> = {};
     if (asset.targetMode === 'PERCENTAGE') {
-      redistributePercentages(assetId, editValues.targetPercent, asset.assetClass);
+      redistributionUpdates = calculateRedistributedPercentages(assetId, editValues.targetPercent, asset.assetClass);
+    }
+    
+    // Combine all updates and apply as batch if available
+    const allUpdates = { ...mainUpdate, ...redistributionUpdates };
+    if (onBatchUpdateAssets) {
+      onBatchUpdateAssets(allUpdates);
+    } else {
+      // Fallback to individual updates
+      Object.entries(allUpdates).forEach(([id, updates]) => {
+        onUpdateAsset(id, updates);
+      });
     }
     
     setEditingAsset(null);

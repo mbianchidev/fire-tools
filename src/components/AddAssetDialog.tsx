@@ -17,7 +17,7 @@ const SUB_ASSET_TYPES: Record<AssetClass, SubAssetType[]> = {
 };
 
 // Only these sub-types can use SET mode
-const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF'];
+const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF', 'PROPERTY'];
 
 // Sub-types that require ISIN code
 const ISIN_REQUIRED: SubAssetType[] = ['ETF', 'SINGLE_STOCK', 'SINGLE_BOND', 'REIT', 'MONEY_ETF'];

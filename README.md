@@ -1,13 +1,19 @@
-# 🔥 FIRE Calculator
+# 🔥 Fire Tools
 
-A comprehensive FIRE (Financial Independence Retire Early) calculator application with Monte Carlo simulations.
+A comprehensive suite of financial tools for FIRE (Financial Independence Retire Early) planning, including calculators and portfolio management features.
 
 ## 🌐 Live Demo
 
-The latest version is automatically deployed to: **[https://mbianchidev.github.io/fire-calculator/](https://mbianchidev.github.io/fire-calculator/)**
+The latest version is automatically deployed to: **[https://mbianchidev.github.io/fire-tools/](https://mbianchidev.github.io/fire-tools/)**
 
 ## Features
 
+### 🏠 Homepage
+- Overview of all available tools
+- Quick navigation to FIRE Calculator and Asset Allocation Manager
+- Clear descriptions of each tool's functionality
+
+### 🔥 FIRE Calculator
 - **Comprehensive Input Parameters**
   - Initial savings and asset allocation (stocks, bonds, cash)
   - Income and expense projections
@@ -26,6 +32,12 @@ The latest version is automatically deployed to: **[https://mbianchidev.github.i
   - Calculate probability of successfully reaching FIRE
   - View success/failure rates and median years to FIRE
 
+### 📊 Asset Allocation Manager
+- Portfolio allocation tracking and visualization
+- Rebalancing recommendations
+- DCA (Dollar Cost Averaging) helper
+- Import/Export functionality for portfolio data
+
 ## Getting Started
 
 ### Prerequisites
@@ -37,8 +49,8 @@ The latest version is automatically deployed to: **[https://mbianchidev.github.i
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/mbianchidev/fire-calculator.git
-cd fire-calculator
+git clone https://github.com/mbianchidev/fire-tools.git
+cd fire-tools
 ```
 
 2. Install dependencies:
@@ -68,7 +80,7 @@ The project is automatically deployed to GitHub Pages on every push to the `main
 **Automatic Deployment:**
 - Pushes to the `main` branch trigger the deployment workflow
 - The workflow builds the project and deploys to GitHub Pages
-- The live site is available at: https://mbianchidev.github.io/fire-calculator/
+- The live site is available at: https://mbianchidev.github.io/fire-tools/
 
 **Workflow Details:**
 - Build job: Installs dependencies, runs build, and uploads artifacts
@@ -80,33 +92,44 @@ If you need to deploy manually or to a different environment, build the project 
 
 ## Usage
 
-1. **Configure Your Inputs**: Use the left sidebar to enter your financial information
+1. **Homepage**: Visit the root page to see an overview of all available tools
+   - Navigate to FIRE Calculator or Asset Allocation Manager
+   - Read about the features and capabilities
+
+2. **FIRE Calculator** (at `/fire-calculator`): Configure Your Inputs
+   - Use the left sidebar to enter your financial information
    - Start with initial savings and asset allocation
    - Enter your income, expenses, and savings rate
    - Set your FIRE target withdrawal rate
    - Configure expected market returns
 
-2. **View Projections**: The main area displays:
+3. **View Projections**: The main area displays:
    - Years to FIRE and key metrics
    - Net worth growth chart
    - Income vs expenses breakdown
 
-3. **Run Monte Carlo Simulations**: 
+4. **Run Monte Carlo Simulations**: 
    - Scroll to the Monte Carlo section
    - Adjust simulation parameters (volatility, Black Swan probability)
    - Click "Run Simulations" to see probability of success
+
+5. **Asset Allocation Manager** (at `/asset-allocation`):
+   - Track your portfolio allocation across different asset classes
+   - Get rebalancing recommendations
+   - Use the DCA helper for investment planning
 
 ## Technology Stack
 
 - **React 19** - UI framework
 - **TypeScript** - Type safety
+- **React Router** - Client-side routing
 - **Vite** - Build tool
 - **Recharts** - Data visualization
 - **CSS3** - Styling
 
 ## Disclaimer
 
-This calculator is for educational and planning purposes only. It makes assumptions about future market returns and does not account for all real-world factors. Always consult with a qualified financial advisor before making investment decisions.
+These tools are for educational and planning purposes only. They make assumptions about future market returns and do not account for all real-world factors. Always consult with a qualified financial advisor before making investment decisions.
 
 ## Contributing
 
