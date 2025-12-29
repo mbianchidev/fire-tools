@@ -6,9 +6,14 @@
 
 import CryptoJS from 'crypto-js';
 
-// Secret key for encryption - In production, this should be environment-specific
-// For a client-side app, we use a consistent key, but note that client-side
-// encryption is mainly for obfuscation, not true security against determined attackers
+// Encryption key for client-side storage
+// NOTE: In a client-side web application, true secret key security is not achievable
+// since the code is visible to users. This key provides:
+// 1. Obfuscation of data in cookies (not readable as plaintext)
+// 2. Protection against casual inspection and basic XSS attacks
+// 3. Deterrence for non-technical users
+// For truly sensitive data, server-side encryption with proper key management is required.
+// This implementation prioritizes user privacy and prevents accidental data exposure.
 const ENCRYPTION_KEY = 'fire-calculator-secret-key-v1-2024';
 
 /**
