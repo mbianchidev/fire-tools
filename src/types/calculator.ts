@@ -41,6 +41,7 @@ export interface CalculatorInputs {
   
   // Options
   stopWorkingAtFIRE: boolean;
+  maxAge: number; // Maximum age for projections (default 100)
 }
 
 export interface YearProjection {

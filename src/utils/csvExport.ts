@@ -41,6 +41,7 @@ export function exportFireCalculatorToCSV(inputs: CalculatorInputs): string {
     ['Private Pension Income', escapeCSV(inputs.privatePensionIncome)],
     ['Other Income', escapeCSV(inputs.otherIncome)],
     ['Stop Working At FIRE', escapeCSV(inputs.stopWorkingAtFIRE)],
+    ['Max Age', escapeCSV(inputs.maxAge)],
   ];
 
   return rows.map(row => row.join(',')).join('\n');
@@ -94,6 +95,7 @@ export function importFireCalculatorFromCSV(csv: string): CalculatorInputs {
       'Private Pension Income': 'privatePensionIncome',
       'Other Income': 'otherIncome',
       'Stop Working At FIRE': 'stopWorkingAtFIRE',
+      'Max Age': 'maxAge',
     };
 
     const propName = fieldMap[key];

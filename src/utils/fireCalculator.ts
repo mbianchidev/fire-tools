@@ -27,43 +27,38 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
   }
   
   // Calculate FIRE target based on desired withdrawal rate
-  if (inputs.desiredWithdrawalRate <= 0) {
-    throw new Error('desiredWithdrawalRate must be greater than 0');
+  // Special case: if withdrawal rate is 0, FIRE is achieved immediately
+  let fireTarget: number;
+  if (inputs.desiredWithdrawalRate === 0) {
+    fireTarget = 0; // FIRE is achieved with any amount if withdrawal rate is 0
+  } else if (inputs.desiredWithdrawalRate < 0) {
+    throw new Error('desiredWithdrawalRate must be greater than or equal to 0');
+  } else {
+    fireTarget = inputs.fireAnnualExpenses / (inputs.desiredWithdrawalRate / 100);
   }
-  const fireTarget = inputs.fireAnnualExpenses / (inputs.desiredWithdrawalRate / 100);
   
-  let portfolioValue = 0; // Start with 0 at birth
+  let portfolioValue = inputs.initialSavings;
   let laborIncome = inputs.annualLaborIncome;
-  let isFIREAchieved = false;
-  let yearsToFIRE = -1;
+  let isFIREAchieved = inputs.desiredWithdrawalRate === 0; // FIRE achieved immediately if withdrawal rate is 0
+  let yearsToFIRE = inputs.desiredWithdrawalRate === 0 ? 0 : -1;
   
-  // Project from birth (age 0) to age 100
-  const birthYear = inputs.yearOfBirth;
-  const maxYears = 101; // Age 0 through 100 inclusive
+  // Project from current age to maxAge
+  const maxYears = Math.max(0, inputs.maxAge - currentAge + 1);
   
   for (let i = 0; i < maxYears; i++) {
-    const age = i; // Age starts at 0
-    const year = birthYear + i;
+    const year = currentYear + i;
+    const age = currentAge + i;
     
-    // Determine if person has reached current age yet
-    const hasReachedCurrentAge = age >= currentAge;
-    
-    // At current age, initialize the portfolio with initial savings
-    if (age === currentAge) {
-      portfolioValue = inputs.initialSavings;
-    }
-    
-    // Check if FIRE is achieved (only after reaching current age)
-    const justAchievedFIRE = hasReachedCurrentAge && !isFIREAchieved && portfolioValue >= fireTarget;
+    // Check if FIRE is achieved (skip if already achieved at start due to withdrawal rate = 0)
+    const justAchievedFIRE = !isFIREAchieved && portfolioValue >= fireTarget;
     if (justAchievedFIRE) {
       isFIREAchieved = true;
-      yearsToFIRE = age - currentAge; // Years from current age to FIRE
+      yearsToFIRE = i;
     }
     
     // If stopWorkingAtFIRE is enabled, stop working once FIRE is achieved.
     // Otherwise, keep working regardless of FIRE status.
-    // Only work after reaching current age
-    const isWorking = hasReachedCurrentAge && (inputs.stopWorkingAtFIRE ? !isFIREAchieved : true);
+    const isWorking = inputs.stopWorkingAtFIRE ? !isFIREAchieved : true;
     
     // Calculate investment yield based on asset allocation
     const portfolioReturn = (
@@ -71,24 +66,21 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
       (inputs.bondsPercent / 100) * (inputs.expectedBondReturn / 100) +
       (inputs.cashPercent / 100) * (inputs.expectedCashReturn / 100)
     );
-    const investmentYield = hasReachedCurrentAge ? portfolioValue * portfolioReturn : 0;
+    const investmentYield = portfolioValue * portfolioReturn;
     
-    // Calculate income (only after reaching current age)
+    // Calculate income
     const currentLaborIncome = isWorking ? laborIncome : 0;
-    const pensionIncome = hasReachedCurrentAge && age >= inputs.retirementAge ? 
+    const pensionIncome = age >= inputs.retirementAge ? 
       inputs.statePensionIncome + inputs.privatePensionIncome : 0;
-    const otherIncomeTotal = hasReachedCurrentAge ? pensionIncome + inputs.otherIncome : 0;
+    const otherIncomeTotal = pensionIncome + inputs.otherIncome;
     const totalIncome = currentLaborIncome + investmentYield + otherIncomeTotal;
     
-    // Calculate expenses (only after reaching current age)
-    const expenses = hasReachedCurrentAge ? (isFIREAchieved ? inputs.fireAnnualExpenses : inputs.currentAnnualExpenses) : 0;
+    // Calculate expenses
+    const expenses = isFIREAchieved ? inputs.fireAnnualExpenses : inputs.currentAnnualExpenses;
     
     // Calculate net change in portfolio
     let portfolioChange: number;
-    if (!hasReachedCurrentAge) {
-      // Before current age: no portfolio changes
-      portfolioChange = 0;
-    } else if (isWorking) {
+    if (isWorking) {
       // While working: save a percentage of labor income, plus all investment returns
       // The savings rate already accounts for expenses (if you save 30%, you spend 70%)
       const laborSavings = laborIncome * (inputs.savingsRate / 100);
@@ -115,13 +107,13 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     // Update portfolio for next year
     portfolioValue = portfolioValue + portfolioChange;
     
-    // Grow labor income (only after current age)
-    if (isWorking && hasReachedCurrentAge) {
+    // Grow labor income
+    if (isWorking) {
       laborIncome = laborIncome * (1 + inputs.laborIncomeGrowthRate / 100);
     }
     
-    // Stop if portfolio is significantly depleted (only after current age)
-    if (hasReachedCurrentAge && portfolioValue < -1000) {
+    // Stop if portfolio is significantly depleted
+    if (portfolioValue < -1000) {
       break;
     }
   }

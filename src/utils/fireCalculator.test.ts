@@ -23,28 +23,46 @@ describe('FIRE Calculator', () => {
     privatePensionIncome: 0,
     otherIncome: 0,
     stopWorkingAtFIRE: true,
+    maxAge: 100,
   };
 
   describe('Projection timeline', () => {
-    it('should project from birth (age 0) to age 100', () => {
+    it('should project from current age to maxAge', () => {
       // ARRANGE & ACT
+      const currentYear = new Date().getFullYear();
+      const currentAge = currentYear - baseInputs.yearOfBirth;
       const result = calculateFIRE(baseInputs);
       
       // ASSERT
       expect(result.projections.length).toBeGreaterThan(0);
       
-      // First projection should start at age 0
+      // First projection should start at current age
       const firstProjection = result.projections[0];
-      expect(firstProjection.age).toBe(0);
-      expect(firstProjection.year).toBe(baseInputs.yearOfBirth);
+      expect(firstProjection.age).toBe(currentAge);
+      expect(firstProjection.year).toBe(currentYear);
       
-      // Last projection should be at age 100
+      // Last projection should be at maxAge
       const lastProjection = result.projections[result.projections.length - 1];
-      expect(lastProjection.age).toBe(100);
-      expect(lastProjection.year).toBe(baseInputs.yearOfBirth + 100);
+      expect(lastProjection.age).toBe(baseInputs.maxAge);
+      expect(lastProjection.year).toBe(currentYear + (baseInputs.maxAge - currentAge));
       
-      // Should have 101 projections (age 0 through 100 inclusive)
-      expect(result.projections.length).toBe(101);
+      // Should have correct number of projections
+      const expectedProjections = baseInputs.maxAge - currentAge + 1;
+      expect(result.projections.length).toBe(expectedProjections);
+    });
+
+    it('should handle withdrawal rate of 0 without crashing', () => {
+      // ARRANGE
+      const inputs = { ...baseInputs, desiredWithdrawalRate: 0 };
+      
+      // ACT
+      const result = calculateFIRE(inputs);
+      
+      // ASSERT
+      expect(result.fireTarget).toBe(0);
+      expect(result.yearsToFIRE).toBe(0);
+      expect(result.projections.length).toBeGreaterThan(0);
+      expect(result.projections[0].portfolioValue).toBe(inputs.initialSavings);
     });
   });
 });

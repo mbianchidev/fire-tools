@@ -25,4 +25,5 @@ export const DEFAULT_INPUTS: CalculatorInputs = {
   privatePensionIncome: 0,
   otherIncome: 0,
   stopWorkingAtFIRE: true,
+  maxAge: 100,
 };
