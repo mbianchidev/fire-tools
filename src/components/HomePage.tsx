@@ -16,15 +16,30 @@ export function HomePage() {
           <div className="feature-icon">🔥</div>
           <h2>FIRE Calculator</h2>
           <p>
-            Calculate your path to financial independence with comprehensive projections, 
-            Monte Carlo simulations, and detailed analysis of your retirement timeline.
+            Calculate your path to financial independence with comprehensive projections 
+            and detailed analysis of your retirement timeline.
           </p>
           <div className="feature-highlights">
             <span className="highlight-item">📊 Visual Projections</span>
-            <span className="highlight-item">🎲 Monte Carlo Simulations</span>
             <span className="highlight-item">📈 Net Worth Tracking</span>
+            <span className="highlight-item">💰 Income & Expenses</span>
           </div>
           <span className="cta-link">Start Planning →</span>
+        </Link>
+
+        <Link to="/monte-carlo" className="feature-card">
+          <div className="feature-icon">🎲</div>
+          <h2>Monte Carlo Simulations</h2>
+          <p>
+            Run thousands of simulations with randomized market returns to assess the 
+            probability of reaching FIRE and account for market volatility.
+          </p>
+          <div className="feature-highlights">
+            <span className="highlight-item">🎯 Success Probability</span>
+            <span className="highlight-item">📉 Volatility Analysis</span>
+            <span className="highlight-item">⚡ Black Swan Events</span>
+          </div>
+          <span className="cta-link">Run Simulations →</span>
         </Link>
 
         <Link to="/asset-allocation" className="feature-card">
