@@ -7,12 +7,24 @@ interface IncomeExpensesChartProps {
 }
 
 export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({ projections }) => {
-  const data = projections.slice(0, 30).map(p => ({
+  // Show data from birth to age 100, but highlight the working years
+  const data = projections.map(p => ({
     year: p.year,
+    age: p.age,
     'Labor Income': p.laborIncome,
     'Investment Yield': p.investmentYield,
     'Expenses': p.expenses,
   }));
+
+  // Format large numbers for Y axis (e.g., 1M, 5M, 10M)
+  const formatYAxis = (value: number) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value.toString();
+  };
 
   return (
     <div className="chart-container">
@@ -20,9 +32,16 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({ projec
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="year" />
-          <YAxis />
-          <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+          <XAxis dataKey="age" label={{ value: 'Age', position: 'insideBottom', offset: -5 }} />
+          <YAxis 
+            tickFormatter={formatYAxis}
+            domain={[0, 'auto']}
+            allowDataOverflow={false}
+          />
+          <Tooltip 
+            formatter={(value) => formatCurrency(Number(value))} 
+            labelFormatter={(label) => `Age ${label}`}
+          />
           <Legend />
           <Bar dataKey="Labor Income" fill="#4CAF50" />
           <Bar dataKey="Investment Yield" fill="#2196F3" />
