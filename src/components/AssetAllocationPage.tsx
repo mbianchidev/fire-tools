@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Asset, PortfolioAllocation, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { calculatePortfolioAllocation, prepareAssetClassChartData, prepareAssetChartData, formatAssetName, formatCurrency } from '../utils/allocationCalculator';
 import { DEFAULT_ASSETS, DEFAULT_PORTFOLIO_VALUE } from '../utils/defaultAssets';
-import { saveAssetAllocation, loadAssetAllocation } from '../utils/localStorage';
+import { saveAssetAllocation, loadAssetAllocation, clearAllData } from '../utils/localStorage';
 import { exportAssetAllocationToCSV, importAssetAllocationFromCSV } from '../utils/csvExport';
 import { EditableAssetClassTable } from './EditableAssetClassTable';
 import { AllocationChart } from './AllocationChart';
@@ -10,6 +10,7 @@ import { AddAssetDialog } from './AddAssetDialog';
 import { CollapsibleAllocationTable } from './CollapsibleAllocationTable';
 import { MassEditDialog } from './MassEditDialog';
 import { DCAHelperDialog } from './DCAHelperDialog';
+import { DataManagement } from './DataManagement';
 
 /**
  * Calculate cash delta from assets and targets.
@@ -330,6 +331,15 @@ export const AssetAllocationPage: React.FC = () => {
     event.target.value = '';
   };
 
+  const handleResetData = () => {
+    if (confirm('Are you sure you want to reset all data? This will clear all saved data from localStorage and reset to defaults.')) {
+      clearAllData();
+      setAssets(DEFAULT_ASSETS);
+      setAssetClassTargets(defaultTargets);
+      updateAllocation(DEFAULT_ASSETS, defaultTargets);
+    }
+  };
+
   // Calculate cash delta (positive = SAVE, negative = INVEST)
   // The delta is applied to non-cash asset classes:
   // - If INVEST (negative cash delta), add to other classes
@@ -442,6 +452,14 @@ export const AssetAllocationPage: React.FC = () => {
           )}
         </div>
 
+        {/* Data Management Section - After "How to Use" */}
+        <DataManagement
+          onExport={handleExport}
+          onImport={handleImport}
+          onReset={handleResetData}
+          defaultOpen={false}
+        />
+
         {!allocation.isValid && (
           <div className="validation-errors">
             <strong>⚠️ Validation Errors:</strong>
@@ -524,18 +542,6 @@ export const AssetAllocationPage: React.FC = () => {
               <button onClick={handleStartFromScratch} className="action-btn reset-btn">
                 🔄 Reset
               </button>
-              <button onClick={handleExport} className="action-btn export-btn">
-                📥 Export CSV
-              </button>
-              <label className="action-btn import-btn">
-                📤 Import CSV
-                <input
-                  type="file"
-                  accept=".csv"
-                  onChange={handleImport}
-                  style={{ display: 'none' }}
-                />
-              </label>
             </div>
           </div>
           <CollapsibleAllocationTable

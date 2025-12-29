@@ -10,6 +10,7 @@ import { FIREMetrics } from './components/FIREMetrics';
 import { MonteCarloPage } from './components/MonteCarloPage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
 import { HomePage } from './components/HomePage';
+import { DataManagement } from './components/DataManagement';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData } from './utils/localStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
@@ -143,26 +144,14 @@ function FIRECalculatorPage() {
   return (
     <div className="app-container">
       <div className="sidebar">
-        <CalculatorInputsForm inputs={inputs} onChange={setInputs} />
+        <DataManagement
+          onExport={handleExportCSV}
+          onImport={handleImportCSV}
+          onReset={handleResetData}
+          defaultOpen={true}
+        />
         
-        <div className="data-actions" style={{ marginTop: '20px', padding: '10px', borderTop: '1px solid #ddd' }}>
-          <h4 style={{ marginBottom: '10px' }}>💾 Data Management</h4>
-          <button onClick={handleExportCSV} className="action-btn export-btn" style={{ width: '100%', marginBottom: '8px' }}>
-            📥 Export CSV
-          </button>
-          <label className="action-btn import-btn" style={{ width: '100%', display: 'block', textAlign: 'center', cursor: 'pointer', marginBottom: '8px' }}>
-            📤 Import CSV
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleImportCSV}
-              style={{ display: 'none' }}
-            />
-          </label>
-          <button onClick={handleResetData} className="action-btn reset-btn" style={{ width: '100%', backgroundColor: '#ef4444', color: 'white' }}>
-            🔄 Reset All Data
-          </button>
-        </div>
+        <CalculatorInputsForm inputs={inputs} onChange={setInputs} />
       </div>
 
       <div className="main-content">

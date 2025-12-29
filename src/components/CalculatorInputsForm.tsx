@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { CalculatorInputs } from '../types/calculator';
 import { NumberInput } from './NumberInput';
 
@@ -7,6 +8,21 @@ interface CalculatorInputsProps {
 }
 
 export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, onChange }) => {
+  const [openSections, setOpenSections] = useState({
+    initialValues: true,
+    assetAllocation: true,
+    income: true,
+    expenses: true,
+    fireTarget: true,
+    expectedReturns: true,
+    personalInfo: true,
+    options: true,
+  });
+
+  const toggleSection = (section: keyof typeof openSections) => {
+    setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
   const handleChange = (field: keyof CalculatorInputs, value: number | boolean) => {
     const newInputs = { ...inputs, [field]: value };
     
@@ -32,8 +48,11 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
     <div className="inputs-form">
       <h2>FIRE Calculator Inputs</h2>
       
-      <div className="form-section">
-        <h3>💰 Initial Values</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('initialValues')}>
+          <h3>💰 Initial Values <span className="collapse-icon-small">{openSections.initialValues ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.initialValues && (<div className="form-section-content">
         <div className="form-group">
           <label>Initial Savings / Portfolio Value (€)</label>
           <NumberInput
@@ -41,10 +60,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             onChange={(value) => handleChange('initialSavings', value)}
           />
         </div>
+        </div>)}
       </div>
 
-      <div className="form-section">
-        <h3>📊 Asset Allocation</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('assetAllocation')}>
+          <h3>📊 Asset Allocation <span className="collapse-icon-small">{openSections.assetAllocation ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.assetAllocation && (<div className="form-section-content">
         <div className="form-group">
           <label>Stocks (%)</label>
           <NumberInput
@@ -72,10 +95,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             <span className="warning"> ⚠️ Should equal 100%</span>
           }
         </div>
+        </div>)}
       </div>
 
-      <div className="form-section">
-        <h3>💵 Income</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('income')}>
+          <h3>💵 Income <span className="collapse-icon-small">{openSections.income ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.income && (<div className="form-section-content">
         <div className="form-group">
           <label>Annual Labor Income (Net) (€)</label>
           <NumberInput
@@ -111,10 +138,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             onChange={(value) => handleChange('otherIncome', value)}
           />
         </div>
+        </div>)}
       </div>
 
-      <div className="form-section">
-        <h3>💸 Expenses & Savings</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('expenses')}>
+          <h3>💸 Expenses & Savings <span className="collapse-icon-small">{openSections.expenses ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.expenses && (<div className="form-section-content">
         <div className="form-group">
           <label>Current Annual Expenses (€)</label>
           <NumberInput
@@ -138,10 +169,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             className="calculated-field"
           />
         </div>
+        </div>)}
       </div>
 
-      <div className="form-section">
-        <h3>🎯 FIRE Target</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('fireTarget')}>
+          <h3>🎯 FIRE Target <span className="collapse-icon-small">{openSections.fireTarget ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.fireTarget && (<div className="form-section-content">
         <div className="form-group">
           <label>Desired Withdrawal Rate (%)</label>
           <NumberInput
@@ -149,10 +184,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             onChange={(value) => handleChange('desiredWithdrawalRate', value)}
           />
         </div>
+        </div>)}
       </div>
 
-      <div className="form-section">
-        <h3>📈 Expected Returns</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('expectedReturns')}>
+          <h3>📈 Expected Returns <span className="collapse-icon-small">{openSections.expectedReturns ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.expectedReturns && (<div className="form-section-content">
         <div className="form-group">
           <label>Expected Stock Return (%)</label>
           <NumberInput
@@ -174,10 +213,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             onChange={(value) => handleChange('expectedCashReturn', value)}
           />
         </div>
+        </div>)}
       </div>
 
-      <div className="form-section">
-        <h3>👤 Personal Information</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('personalInfo')}>
+          <h3>👤 Personal Information <span className="collapse-icon-small">{openSections.personalInfo ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.personalInfo && (<div className="form-section-content">
         <div className="form-group">
           <label>Year of Birth</label>
           <NumberInput
@@ -194,10 +237,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             allowDecimals={false}
           />
         </div>
+        </div>)}
       </div>
 
-      <div className="form-section">
-        <h3>⚙️ Options</h3>
+      <div className="form-section collapsible-section">
+        <div className="collapsible-header" onClick={() => toggleSection('options')}>
+          <h3>⚙️ Options <span className="collapse-icon-small">{openSections.options ? '▼' : '▶'}</span></h3>
+        </div>
+        {openSections.options && (<div className="form-section-content">
         <div className="form-group checkbox-group">
           <label>
             <input
@@ -208,6 +255,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             Stop working when reaching FIRE number
           </label>
         </div>
+        </div>)}
       </div>
     </div>
   );
