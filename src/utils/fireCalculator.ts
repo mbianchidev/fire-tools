@@ -15,6 +15,41 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     validationErrors.push(`Asset allocation must sum to 100%, currently ${allocationSum.toFixed(2)}%`);
   }
   
+  // Validate withdrawal rate (must not be negative)
+  if (inputs.desiredWithdrawalRate < 0) {
+    validationErrors.push('Withdrawal rate cannot be negative');
+  }
+  
+  // Validate reasonable ranges for inputs to prevent calculation errors
+  if (inputs.currentAnnualExpenses < 0) {
+    validationErrors.push('Current annual expenses cannot be negative');
+  }
+  
+  if (inputs.fireAnnualExpenses < 0) {
+    validationErrors.push('FIRE annual expenses cannot be negative');
+  }
+  
+  if (inputs.annualLaborIncome < 0) {
+    validationErrors.push('Annual labor income cannot be negative');
+  }
+  
+  if (inputs.maxAge < currentAge) {
+    validationErrors.push('Maximum age must be greater than or equal to current age');
+  }
+  
+  if (inputs.maxAge > 150) {
+    validationErrors.push('Maximum age must be 150 or less');
+  }
+  
+  // Check for extreme values that could cause calculation issues
+  const MAX_SAFE_VALUE = Number.MAX_SAFE_INTEGER / 1000; // Conservative limit
+  if (inputs.initialSavings > MAX_SAFE_VALUE || 
+      inputs.currentAnnualExpenses > MAX_SAFE_VALUE ||
+      inputs.fireAnnualExpenses > MAX_SAFE_VALUE ||
+      inputs.annualLaborIncome > MAX_SAFE_VALUE) {
+    validationErrors.push('Input values are too large for calculation');
+  }
+  
   // If there are validation errors, return early with empty projections
   if (validationErrors.length > 0) {
     return {
@@ -31,10 +66,19 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
   let fireTarget: number;
   if (inputs.desiredWithdrawalRate === 0) {
     fireTarget = 0; // FIRE is achieved with any amount if withdrawal rate is 0
-  } else if (inputs.desiredWithdrawalRate < 0) {
-    throw new Error('desiredWithdrawalRate must be greater than or equal to 0');
   } else {
     fireTarget = inputs.fireAnnualExpenses / (inputs.desiredWithdrawalRate / 100);
+    // Check if fireTarget is reasonable
+    if (!isFinite(fireTarget) || fireTarget > MAX_SAFE_VALUE) {
+      validationErrors.push('FIRE target calculation resulted in an invalid value');
+      return {
+        projections: [],
+        yearsToFIRE: -1,
+        fireTarget: 0,
+        finalPortfolioValue: 0,
+        validationErrors,
+      };
+    }
   }
   
   let portfolioValue = inputs.initialSavings;
@@ -107,9 +151,19 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     // Update portfolio for next year
     portfolioValue = portfolioValue + portfolioChange;
     
+    // Safety check: if portfolio value becomes too large or invalid, stop calculation
+    const MAX_SAFE_VALUE = Number.MAX_SAFE_INTEGER / 1000;
+    if (!isFinite(portfolioValue) || Math.abs(portfolioValue) > MAX_SAFE_VALUE) {
+      break;
+    }
+    
     // Grow labor income
     if (isWorking) {
       laborIncome = laborIncome * (1 + inputs.laborIncomeGrowthRate / 100);
+      // Safety check for labor income growth
+      if (!isFinite(laborIncome) || laborIncome > MAX_SAFE_VALUE) {
+        laborIncome = MAX_SAFE_VALUE;
+      }
     }
     
     // Stop if portfolio is significantly depleted
