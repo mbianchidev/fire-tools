@@ -1631,6 +1631,14 @@
   margin-top: 1rem !important;
 }
 
+/* Apply to Portfolio button in confirmation summary */
+.apply-to-portfolio-btn {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  width: 100%;
+}
+
 /* Update dca-actions for multiple buttons */
 .dca-actions {
   display: flex;

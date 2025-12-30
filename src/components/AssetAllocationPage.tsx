@@ -612,6 +612,20 @@ export const AssetAllocationPage: React.FC = () => {
         assets={assets}
         assetClassTargets={assetClassTargets}
         currency={currency}
+        onConfirmInvestments={(updates) => {
+          // Apply confirmed investment amounts to the portfolio by updating asset current values
+          const newAssets = assets.map(asset => {
+            const update = updates[asset.id];
+            if (update) {
+              return {
+                ...asset,
+                currentValue: asset.currentValue + update.valueIncrease,
+              };
+            }
+            return asset;
+          });
+          updateAllocation(newAssets);
+        }}
       />
     </div>
   );
