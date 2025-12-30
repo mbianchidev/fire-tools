@@ -1,4 +1,4 @@
-import './CookiePolicyPage.css';
+import './PolicyPages.css';
 
 export function CookiePolicyPage() {
   return (
