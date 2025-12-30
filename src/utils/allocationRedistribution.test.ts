@@ -2167,4 +2167,192 @@ describe('Allocation Percentage Bug Fixes', () => {
       expect(totalPercent).toBeCloseTo(100, 1);
     });
   });
+
+  describe('Bug 2: Asset-specific deltas should sum to class delta', () => {
+    it('should have sum of individual asset deltas equal to class delta', () => {
+      // This test verifies that the sum of individual asset deltas within a class
+      // equals the class delta shown in the Asset Classes table
+      const assets: TypedAsset[] = [
+        // Stocks (multiple assets)
+        {
+          id: 'spy',
+          name: 'S&P 500 Index ETF',
+          ticker: 'SPY',
+          assetClass: 'STOCKS',
+          subAssetType: 'ETF',
+          currentValue: 68000,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 40,
+        },
+        {
+          id: 'vti',
+          name: 'Vanguard Total Stock Market',
+          ticker: 'VTI',
+          assetClass: 'STOCKS',
+          subAssetType: 'ETF',
+          currentValue: 45900,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 27,
+        },
+        {
+          id: 'vxus',
+          name: 'International Developed Markets',
+          ticker: 'VXUS',
+          assetClass: 'STOCKS',
+          subAssetType: 'ETF',
+          currentValue: 28900,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 17,
+        },
+        {
+          id: 'vwo',
+          name: 'Emerging Markets ETF',
+          ticker: 'VWO',
+          assetClass: 'STOCKS',
+          subAssetType: 'ETF',
+          currentValue: 17000,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 10,
+        },
+        {
+          id: 'vbr',
+          name: 'Small Cap Value',
+          ticker: 'VBR',
+          assetClass: 'STOCKS',
+          subAssetType: 'ETF',
+          currentValue: 10200,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 6,
+        },
+        // Bonds
+        {
+          id: 'bnd',
+          name: 'Total Bond Market',
+          ticker: 'BND',
+          assetClass: 'BONDS',
+          subAssetType: 'ETF',
+          currentValue: 25000,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 50,
+        },
+        {
+          id: 'tip',
+          name: 'Treasury Inflation Protected',
+          ticker: 'TIP',
+          assetClass: 'BONDS',
+          subAssetType: 'ETF',
+          currentValue: 12000,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 30,
+        },
+        {
+          id: 'bndx',
+          name: 'International Bonds',
+          ticker: 'BNDX',
+          assetClass: 'BONDS',
+          subAssetType: 'ETF',
+          currentValue: 8000,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 20,
+        },
+        // Cash
+        {
+          id: 'cash1',
+          name: 'Emergency Fund',
+          ticker: 'CASH',
+          assetClass: 'CASH',
+          subAssetType: 'SAVINGS_ACCOUNT',
+          currentValue: 5000,
+          targetMode: 'SET',
+          targetValue: 5000,
+        },
+      ];
+
+      const assetClassTargets = {
+        STOCKS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 90 },
+        BONDS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 10 },
+        CASH: { targetMode: 'SET' as AllocationMode },
+        CRYPTO: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+        REAL_ESTATE: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+      };
+
+      // Total holdings: 220k
+      // Portfolio value (excl. cash): 215k
+      const portfolioValue = 215000;
+      
+      const allocation = calculatePortfolioAllocation(assets, assetClassTargets, portfolioValue);
+      
+      // Get class summaries
+      const stocksClass = allocation.assetClasses.find(ac => ac.assetClass === 'STOCKS')!;
+      const bondsClass = allocation.assetClasses.find(ac => ac.assetClass === 'BONDS')!;
+      
+      // Get individual asset deltas
+      const stockDeltas = allocation.deltas.filter(d => 
+        assets.find(a => a.id === d.assetId)?.assetClass === 'STOCKS'
+      );
+      const bondDeltas = allocation.deltas.filter(d => 
+        assets.find(a => a.id === d.assetId)?.assetClass === 'BONDS'
+      );
+      
+      // Sum of individual stock deltas should equal stocks class delta
+      const sumStockDeltas = stockDeltas.reduce((sum, d) => sum + d.delta, 0);
+      expect(sumStockDeltas).toBeCloseTo(stocksClass.delta, 0);
+      
+      // Sum of individual bond deltas should equal bonds class delta
+      const sumBondDeltas = bondDeltas.reduce((sum, d) => sum + d.delta, 0);
+      expect(sumBondDeltas).toBeCloseTo(bondsClass.delta, 0);
+    });
+
+    it('should distribute class delta proportionally to individual assets based on target percent', () => {
+      // Simple case: 2 stocks with 60%/40% split
+      const assets: TypedAsset[] = [
+        {
+          id: 'stock1',
+          name: 'Stock 1',
+          ticker: 'STK1',
+          assetClass: 'STOCKS',
+          subAssetType: 'ETF',
+          currentValue: 30000,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 60,
+        },
+        {
+          id: 'stock2',
+          name: 'Stock 2',
+          ticker: 'STK2',
+          assetClass: 'STOCKS',
+          subAssetType: 'ETF',
+          currentValue: 20000,
+          targetMode: 'PERCENTAGE',
+          targetPercent: 40,
+        },
+      ];
+
+      const assetClassTargets = {
+        STOCKS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 100 },
+        BONDS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+        CASH: { targetMode: 'SET' as AllocationMode },
+        CRYPTO: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+        REAL_ESTATE: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+      };
+
+      // Portfolio value = 50000
+      const portfolioValue = 50000;
+      
+      const allocation = calculatePortfolioAllocation(assets, assetClassTargets, portfolioValue);
+      
+      const stock1Delta = allocation.deltas.find(d => d.assetId === 'stock1')!;
+      const stock2Delta = allocation.deltas.find(d => d.assetId === 'stock2')!;
+      
+      // Class target: 100% of 50k = 50k
+      // Stock1: 60% of 50k = 30k, current = 30k, delta = 0
+      // Stock2: 40% of 50k = 20k, current = 20k, delta = 0
+      expect(stock1Delta.delta).toBeCloseTo(0, 0);
+      expect(stock2Delta.delta).toBeCloseTo(0, 0);
+      
+      // Verify target values
+      expect(stock1Delta.targetValue).toBeCloseTo(30000, 0);
+      expect(stock2Delta.targetValue).toBeCloseTo(20000, 0);
+    });
+  });
 });

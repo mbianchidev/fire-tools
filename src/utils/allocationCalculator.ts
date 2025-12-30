@@ -40,7 +40,8 @@ export function groupAssetsByClass(assets: Asset[]): Map<AssetClass, Asset[]> {
 export function calculateAssetClassSummaries(
   assets: Asset[],
   totalValue: number,
-  totalHoldings?: number
+  totalHoldings?: number,
+  assetClassTargets?: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>
 ): AssetClassSummary[] {
   const grouped = groupAssetsByClass(assets);
   const summaries: AssetClassSummary[] = [];
@@ -75,8 +76,17 @@ export function calculateAssetClassSummaries(
         }
         return sum;
       }, 0);
+    } else if (assetClassTargets && assetClassTargets[assetClass]) {
+      // Use class-level target from assetClassTargets if provided
+      const classTarget = assetClassTargets[assetClass];
+      targetMode = classTarget.targetMode;
+      targetPercent = classTarget.targetPercent;
+      if (targetMode === 'PERCENTAGE' && targetPercent !== undefined) {
+        targetTotal = totalValue > 0 ? (targetPercent / 100) * totalValue : 0;
+      }
     } else {
-      // Calculate percentage target
+      // Fallback: Calculate percentage target from individual assets
+      // Note: This sums to 100% within the class, which may not be the intended class allocation
       targetPercent = classAssets.reduce((sum, asset) => {
         if (asset.targetMode === 'PERCENTAGE') {
           return sum + (asset.targetPercent || 0);
@@ -330,8 +340,8 @@ export function calculatePortfolioAllocation(
   const totalValue = portfolioValue ?? calculateTotalValue(assets);
   // Calculate total holdings including all assets (for display purposes and currentPercent calculation)
   const totalHoldings = assets.reduce((sum, a) => sum + a.currentValue, 0);
-  // Pass totalHoldings so currentPercent is calculated based on all holdings (sums to 100%)
-  const assetClasses = calculateAssetClassSummaries(assets, totalValue, totalHoldings);
+  // Pass totalHoldings and assetClassTargets so calculations are correct
+  const assetClasses = calculateAssetClassSummaries(assets, totalValue, totalHoldings, assetClassTargets);
   const deltas = calculateAllocationDeltas(assets, totalValue, assetClassTargets, cashDeltaAmount, totalHoldings);
   
   return {
