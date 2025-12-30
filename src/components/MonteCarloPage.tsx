@@ -1,14 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { CalculationResult } from '../types/calculator';
+import { CalculationResult, CalculatorInputs } from '../types/calculator';
 import { DEFAULT_INPUTS } from '../utils/defaults';
 import { calculateFIRE } from '../utils/fireCalculator';
+import { loadFireCalculatorInputs, loadAssetAllocation } from '../utils/cookieStorage';
 import { MonteCarloSimulator } from './MonteCarloSimulator';
 
 export const MonteCarloPage: React.FC = () => {
   const location = useLocation();
-  const inputs = location.state?.inputs || DEFAULT_INPUTS;
+  
+  // Load inputs from location state, cookies, or defaults (only once on mount)
+  const [baseInputs] = useState<CalculatorInputs>(() => {
+    return location.state?.inputs || loadFireCalculatorInputs() || DEFAULT_INPUTS;
+  });
+  
   const [result, setResult] = useState<CalculationResult | null>(null);
+
+  // Load asset allocation data for use when useAssetAllocationValue is enabled
+  const assetAllocationData = useMemo(() => {
+    const saved = loadAssetAllocation();
+    if (!saved.assets || saved.assets.length === 0) {
+      return undefined;
+    }
+    
+    // Calculate total portfolio value (all assets including cash)
+    const totalValue = saved.assets
+      .filter(a => a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    
+    if (totalValue === 0) {
+      return undefined;
+    }
+    
+    // Calculate percentage for each major asset class
+    const stocksValue = saved.assets
+      .filter(a => a.assetClass === 'STOCKS' && a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    const bondsValue = saved.assets
+      .filter(a => a.assetClass === 'BONDS' && a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    const cashValue = saved.assets
+      .filter(a => a.assetClass === 'CASH' && a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    
+    return {
+      totalValue,
+      stocksPercent: (stocksValue / totalValue) * 100,
+      bondsPercent: (bondsValue / totalValue) * 100,
+      cashPercent: (cashValue / totalValue) * 100,
+    };
+  }, []);
+
+  // Apply asset allocation data if useAssetAllocationValue is enabled
+  const inputs: CalculatorInputs = useMemo(() => {
+    if (baseInputs.useAssetAllocationValue && assetAllocationData) {
+      return {
+        ...baseInputs,
+        initialSavings: assetAllocationData.totalValue,
+        stocksPercent: assetAllocationData.stocksPercent,
+        bondsPercent: assetAllocationData.bondsPercent,
+        cashPercent: assetAllocationData.cashPercent,
+      };
+    }
+    return baseInputs;
+  }, [baseInputs, assetAllocationData]);
 
   useEffect(() => {
     const calculationResult = calculateFIRE(inputs);
