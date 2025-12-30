@@ -126,6 +126,41 @@ If you need to deploy manually or to a different environment, build the project 
 - **Vite** - Build tool
 - **Recharts** - Data visualization
 - **CSS3** - Styling
+- **js-cookie** - Secure cookie management
+- **crypto-js** - AES encryption for sensitive data
+
+## Data Storage & Security
+
+This application uses **encrypted cookies** to store your financial data securely on your device. This approach provides several benefits over traditional localStorage:
+
+### Security Features
+- **AES Encryption**: All data is encrypted using AES encryption before being stored in cookies
+- **Secure Cookies**: Cookies are configured with `SameSite=Strict` and `Secure` flags (in HTTPS)
+- **Client-side Only**: Your data never leaves your browser - all calculations and storage are performed locally
+- **XSS Protection**: Encrypted storage helps protect against cross-site scripting attacks
+
+### What Gets Stored
+The following data is stored in encrypted cookies:
+1. **FIRE Calculator Inputs**: Your savings, income, expenses, and financial projections
+2. **Asset Allocation Data**: Your portfolio assets and target allocations
+3. **User Settings**: Display preferences and currency settings
+
+### Data Management
+- **Export**: Download your data as CSV files for backup or analysis
+- **Import**: Import previously exported data to restore your settings
+- **Clear Data**: Remove all stored data with a single click in the Settings page
+- **Automatic Persistence**: Your data is automatically saved as you make changes
+
+### Privacy Notice
+- All data is stored locally in your browser's cookies
+- No data is transmitted to any servers
+- Clearing your browser's cookies will remove all stored data
+- Use the export feature regularly to back up your financial data
+
+### Dependencies
+The secure storage implementation uses:
+- **[js-cookie](https://github.com/js-cookie/js-cookie)** (v3.x) - Lightweight JavaScript API for handling cookies
+- **[crypto-js](https://www.npmjs.com/package/crypto-js)** (v4.x) - JavaScript library of crypto standards for encryption
 
 ## Disclaimer
 

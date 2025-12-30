@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/settings';
+import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
 import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV } from '../utils/csvExport';
-import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData } from '../utils/localStorage';
+import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData } from '../utils/cookieStorage';
 import { DEFAULT_INPUTS } from '../utils/defaults';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
 import './SettingsPage.css';
@@ -200,7 +200,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
 
   // Reset all data
   const handleResetAll = () => {
-    if (confirm('Are you sure you want to reset ALL data? This will clear all saved data from localStorage and cannot be undone.')) {
+    if (confirm('Are you sure you want to reset ALL data? This will clear all saved data from cookies and cannot be undone.')) {
       clearAllData();
       showMessage('success', 'All data has been reset!');
     }

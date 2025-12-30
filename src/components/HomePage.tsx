@@ -2,8 +2,41 @@ import { Link } from 'react-router-dom';
 import './HomePage.css';
 
 export function HomePage() {
+  // Check if running on GitHub Pages
+  const isGitHubPages = window.location.hostname.includes('github.io');
+
   return (
     <div className="homepage">
+      {isGitHubPages && (
+        <div className="security-warning-banner">
+          <div className="warning-icon">🔒⚠️</div>
+          <div className="warning-content">
+            <h3>Security Notice: GitHub Pages Deployment</h3>
+            <p>
+              <strong>Warning:</strong> This application is deployed on GitHub Pages, which does not support 
+              server-side data storage or HTTP-only cookies. While data is encrypted using AES, 
+              it is still vulnerable to XSS attacks and other client-side exploits that could 
+              exfiltrate your financial data.
+            </p>
+            <p>
+              <strong>For better security:</strong> We strongly recommend deploying this application 
+              locally on your own machine. Local deployment provides better isolation and reduces 
+              attack surface.
+            </p>
+            <div className="warning-actions">
+              <a 
+                href="https://github.com/mbianchidev/fire-calculator#getting-started" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="warning-button"
+              >
+                📖 View Local Setup Instructions
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="hero-section">
         <h1 className="hero-title">🔥 Fire Tools</h1>
         <p className="hero-subtitle">
