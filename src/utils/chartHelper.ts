@@ -18,3 +18,24 @@ export function calculateXAxisInterval(dataLength: number): 'preserveStartEnd' |
     return 3;
   }
 }
+
+/**
+ * Calculate the appropriate bar size for bar charts based on data length
+ * 
+ * @param dataLength - Number of data points to display
+ * @returns Bar size in pixels
+ * 
+ * Bar size logic:
+ * - 0-20 data points: 40px (wide bars for better visibility with few data points)
+ * - 21-40 data points: 20px (medium bars for moderate amount of data)
+ * - 41+ data points: 10px (thin bars to fit many data points)
+ */
+export function calculateBarSize(dataLength: number): number {
+  if (dataLength <= 20) {
+    return 40;
+  } else if (dataLength <= 40) {
+    return 20;
+  } else {
+    return 10;
+  }
+}
