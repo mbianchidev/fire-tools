@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useSearchParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';
 import { calculateFIRE } from './utils/fireCalculator';
@@ -14,7 +14,7 @@ import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
 import { SettingsPage } from './components/SettingsPage';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
-import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData } from './utils/cookieStorage';
+import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
 import { loadSettings, type UserSettings } from './utils/cookieSettings';
 import './App.css';
@@ -47,6 +47,14 @@ function Navigation({ accountName }: { accountName: string }) {
           <span aria-hidden="true">🏠</span> Home
         </Link>
         <Link 
+          to="/asset-allocation" 
+          className={`nav-link ${location.pathname === '/asset-allocation' ? 'active' : ''}`}
+          onClick={closeMenu}
+          aria-current={location.pathname === '/asset-allocation' ? 'page' : undefined}
+        >
+          <span aria-hidden="true">📊</span> Asset Allocation
+        </Link>
+        <Link 
           to="/fire-calculator" 
           className={`nav-link ${location.pathname === '/fire-calculator' ? 'active' : ''}`}
           onClick={closeMenu}
@@ -61,14 +69,6 @@ function Navigation({ accountName }: { accountName: string }) {
           aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
         >
           <span aria-hidden="true">🎲</span> Monte Carlo
-        </Link>
-        <Link 
-          to="/asset-allocation" 
-          className={`nav-link ${location.pathname === '/asset-allocation' ? 'active' : ''}`}
-          onClick={closeMenu}
-          aria-current={location.pathname === '/asset-allocation' ? 'page' : undefined}
-        >
-          <span aria-hidden="true">📊</span> Asset Allocation
         </Link>
       </div>
       <ProfileMenu accountName={accountName} />
@@ -100,6 +100,41 @@ function FIRECalculatorPage() {
   const [zoomYears, setZoomYears] = useState<number | 'all'>(30);
   const [customZoomInput, setCustomZoomInput] = useState<string>('');
 
+  // Load asset allocation data for use in calculator
+  const assetAllocationData = useMemo(() => {
+    const saved = loadAssetAllocation();
+    if (!saved.assets || saved.assets.length === 0) {
+      return undefined;
+    }
+    
+    // Calculate total portfolio value (all assets including cash)
+    const totalValue = saved.assets
+      .filter(a => a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    
+    if (totalValue === 0) {
+      return undefined;
+    }
+    
+    // Calculate percentage for each major asset class
+    const stocksValue = saved.assets
+      .filter(a => a.assetClass === 'STOCKS' && a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    const bondsValue = saved.assets
+      .filter(a => a.assetClass === 'BONDS' && a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    const cashValue = saved.assets
+      .filter(a => a.assetClass === 'CASH' && a.targetMode !== 'OFF')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    
+    return {
+      totalValue,
+      stocksPercent: (stocksValue / totalValue) * 100,
+      bondsPercent: (bondsValue / totalValue) * 100,
+      cashPercent: (cashValue / totalValue) * 100,
+    };
+  }, []);
+
   // Update URL when inputs change
   useEffect(() => {
     const params = serializeInputsToURL(inputs);
@@ -111,10 +146,22 @@ function FIRECalculatorPage() {
     saveFireCalculatorInputs(inputs);
   }, [inputs]);
 
+  // Calculate FIRE results, using asset allocation data if enabled
   useEffect(() => {
-    const calculationResult = calculateFIRE(inputs);
+    // If using asset allocation value, override the inputs with asset allocation data
+    let effectiveInputs = inputs;
+    if (inputs.useAssetAllocationValue && assetAllocationData) {
+      effectiveInputs = {
+        ...inputs,
+        initialSavings: assetAllocationData.totalValue,
+        stocksPercent: assetAllocationData.stocksPercent,
+        bondsPercent: assetAllocationData.bondsPercent,
+        cashPercent: assetAllocationData.cashPercent,
+      };
+    }
+    const calculationResult = calculateFIRE(effectiveInputs);
     setResult(calculationResult);
-  }, [inputs]);
+  }, [inputs, assetAllocationData]);
 
   const currentYear = new Date().getFullYear();
   const currentAge = currentYear - inputs.yearOfBirth;
@@ -170,7 +217,11 @@ function FIRECalculatorPage() {
           defaultOpen={true}
         />
         
-        <CalculatorInputsForm inputs={inputs} onChange={setInputs} />
+        <CalculatorInputsForm 
+          inputs={inputs} 
+          onChange={setInputs} 
+          assetAllocationData={assetAllocationData}
+        />
       </aside>
 
       <main className="main-content">

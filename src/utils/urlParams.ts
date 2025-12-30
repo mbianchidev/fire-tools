@@ -48,6 +48,7 @@ export function serializeInputsToURL(inputs: CalculatorInputs): URLSearchParams 
   // Options
   params.set('stopWorkingAtFIRE', inputs.stopWorkingAtFIRE.toString());
   params.set('maxAge', inputs.maxAge.toString());
+  params.set('useAssetAllocationValue', inputs.useAssetAllocationValue.toString());
 
   return params;
 }
@@ -115,6 +116,7 @@ export function deserializeInputsFromURL(params: URLSearchParams): CalculatorInp
     // Options
     stopWorkingAtFIRE: parseBoolean(params.get('stopWorkingAtFIRE'), DEFAULT_INPUTS.stopWorkingAtFIRE),
     maxAge: parseInt(params.get('maxAge'), DEFAULT_INPUTS.maxAge),
+    useAssetAllocationValue: parseBoolean(params.get('useAssetAllocationValue'), DEFAULT_INPUTS.useAssetAllocationValue),
   };
 }
 

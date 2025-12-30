@@ -44,6 +44,21 @@ export function HomePage() {
       </section>
 
       <section className="features-grid" aria-label="Available tools">
+        <Link to="/asset-allocation" className="feature-card" aria-labelledby="asset-allocation-title">
+          <div className="feature-icon" aria-hidden="true">📊</div>
+          <h2 id="asset-allocation-title">Asset Allocation Manager</h2>
+          <p>
+            Manage your investment portfolio with intelligent asset allocation tools, 
+            rebalancing strategies, and DCA helper functionality.
+          </p>
+          <div className="feature-highlights">
+            <span className="highlight-item"><span aria-hidden="true">💼</span> Portfolio Management</span>
+            <span className="highlight-item"><span aria-hidden="true">⚖️</span> Rebalancing Tools</span>
+            <span className="highlight-item"><span aria-hidden="true">📉</span> DCA Helper</span>
+          </div>
+          <span className="cta-link" aria-hidden="true">Manage Portfolio →</span>
+        </Link>
+
         <Link to="/fire-calculator" className="feature-card" aria-labelledby="fire-calc-title">
           <div className="feature-icon" aria-hidden="true">🔥</div>
           <h2 id="fire-calc-title">FIRE Calculator</h2>
@@ -72,21 +87,6 @@ export function HomePage() {
             <span className="highlight-item"><span aria-hidden="true">⚡</span> Black Swan Events</span>
           </div>
           <span className="cta-link" aria-hidden="true">Run Simulations →</span>
-        </Link>
-
-        <Link to="/asset-allocation" className="feature-card" aria-labelledby="asset-allocation-title">
-          <div className="feature-icon" aria-hidden="true">📊</div>
-          <h2 id="asset-allocation-title">Asset Allocation Manager</h2>
-          <p>
-            Manage your investment portfolio with intelligent asset allocation tools, 
-            rebalancing strategies, and DCA helper functionality.
-          </p>
-          <div className="feature-highlights">
-            <span className="highlight-item"><span aria-hidden="true">💼</span> Portfolio Management</span>
-            <span className="highlight-item"><span aria-hidden="true">⚖️</span> Rebalancing Tools</span>
-            <span className="highlight-item"><span aria-hidden="true">📉</span> DCA Helper</span>
-          </div>
-          <span className="cta-link" aria-hidden="true">Manage Portfolio →</span>
         </Link>
       </section>
 

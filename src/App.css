@@ -935,3 +935,75 @@ body {
     font-size: max(16px, 1rem); /* Prevent iOS zoom */
   }
 }
+
+/* Monte Carlo Chart Styles */
+.monte-carlo-charts {
+  margin-top: 2rem;
+}
+
+.monte-carlo-charts .chart-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.monte-carlo-charts .chart-section h4 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.distribution-stats {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.distribution-stats .stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.distribution-stats .stat-row:nth-child(odd) {
+  background: #f8f9fa;
+}
+
+.distribution-stats .stat-row.median {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  font-weight: 600;
+}
+
+.distribution-stats .stat-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.distribution-stats .stat-value {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.distribution-stats .stat-value.best-case {
+  color: #4CAF50;
+}
+
+.distribution-stats .stat-value.worst-case {
+  color: #f44336;
+}
+
+.monte-carlo-chart-placeholder {
+  padding: 2rem;
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+  color: #666;
+}
