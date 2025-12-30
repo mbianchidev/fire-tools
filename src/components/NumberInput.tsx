@@ -66,6 +66,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   return (
     <input
       type="text"
+      inputMode="decimal"
       value={stringValue}
       onChange={handleChange}
       onBlur={handleBlur}
@@ -73,6 +74,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
       className={className}
       placeholder={placeholder}
       readOnly={readOnly}
+      aria-readonly={readOnly}
     />
   );
 };

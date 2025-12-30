@@ -28,8 +28,13 @@ function Navigation({ accountName }: { accountName: string }) {
   const closeMenu = () => setIsOpen(false);
   
   return (
-    <nav className="app-nav">
-      <button className="nav-toggle" onClick={toggleMenu} aria-label="Toggle navigation">
+    <nav className="app-nav" aria-label="Main navigation">
+      <button 
+        className="nav-toggle" 
+        onClick={toggleMenu} 
+        aria-label="Toggle navigation menu"
+        aria-expanded={isOpen}
+      >
         {isOpen ? '✕' : '☰'}
       </button>
       <div className={`nav-links ${isOpen ? 'open' : ''}`}>
@@ -37,29 +42,33 @@ function Navigation({ accountName }: { accountName: string }) {
           to="/" 
           className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}
           onClick={closeMenu}
+          aria-current={location.pathname === '/' ? 'page' : undefined}
         >
-          🏠 Home
+          <span aria-hidden="true">🏠</span> Home
         </Link>
         <Link 
           to="/fire-calculator" 
           className={`nav-link ${location.pathname === '/fire-calculator' ? 'active' : ''}`}
           onClick={closeMenu}
+          aria-current={location.pathname === '/fire-calculator' ? 'page' : undefined}
         >
-          🔥 FIRE Calculator
+          <span aria-hidden="true">🔥</span> FIRE Calculator
         </Link>
         <Link 
           to="/monte-carlo" 
           className={`nav-link ${location.pathname === '/monte-carlo' ? 'active' : ''}`}
           onClick={closeMenu}
+          aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
         >
-          🎲 Monte Carlo
+          <span aria-hidden="true">🎲</span> Monte Carlo
         </Link>
         <Link 
           to="/asset-allocation" 
           className={`nav-link ${location.pathname === '/asset-allocation' ? 'active' : ''}`}
           onClick={closeMenu}
+          aria-current={location.pathname === '/asset-allocation' ? 'page' : undefined}
         >
-          📊 Asset Allocation
+          <span aria-hidden="true">📊</span> Asset Allocation
         </Link>
       </div>
       <ProfileMenu accountName={accountName} />
@@ -153,7 +162,7 @@ function FIRECalculatorPage() {
 
   return (
     <div className="app-container">
-      <div className="sidebar">
+      <aside className="sidebar" aria-label="Calculator inputs">
         <DataManagement
           onExport={handleExportCSV}
           onImport={handleImportCSV}
@@ -162,11 +171,11 @@ function FIRECalculatorPage() {
         />
         
         <CalculatorInputsForm inputs={inputs} onChange={setInputs} />
-      </div>
+      </aside>
 
-      <div className="main-content">
+      <main className="main-content">
         {hasValidationErrors && (
-          <div className="validation-error-banner">
+          <div className="validation-error-banner" role="alert" aria-live="polite">
             <strong>⚠️ Validation Error</strong>
             {result.validationErrors?.map((error, index) => (
               <div key={index} className="validation-error-message">{error}</div>
@@ -199,7 +208,7 @@ function FIRECalculatorPage() {
             </div>
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 }
@@ -218,6 +227,8 @@ function App() {
   return (
     <Router basename={basename}>
       <div className="app">
+        <a href="#main-content" className="skip-link">Skip to main content</a>
+        
         <header className="app-header">
           <h1>🔥 Fire Tools</h1>
           <p>Financial Independence Retire Early - Plan Your Path to Freedom</p>

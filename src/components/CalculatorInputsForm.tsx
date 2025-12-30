@@ -49,12 +49,17 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <h2>FIRE Calculator Inputs</h2>
       
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('initialValues')}>
-          <h3>💰 Initial Values <span className="collapse-icon-small">{openSections.initialValues ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.initialValues && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('initialValues')}
+          aria-expanded={openSections.initialValues}
+          aria-controls="initial-values-content"
+        >
+          <h3><span aria-hidden="true">💰</span> Initial Values <span className="collapse-icon-small" aria-hidden="true">{openSections.initialValues ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.initialValues && (<div id="initial-values-content" className="form-section-content">
         <div className="form-group">
-          <label>Initial Savings / Portfolio Value (€)</label>
+          <label htmlFor="initial-savings">Initial Savings / Portfolio Value (€)</label>
           <NumberInput
             value={inputs.initialSavings}
             onChange={(value) => handleChange('initialSavings', value)}
@@ -64,75 +69,85 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       </div>
 
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('assetAllocation')}>
-          <h3>📊 Asset Allocation <span className="collapse-icon-small">{openSections.assetAllocation ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.assetAllocation && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('assetAllocation')}
+          aria-expanded={openSections.assetAllocation}
+          aria-controls="asset-allocation-content"
+        >
+          <h3><span aria-hidden="true">📊</span> Asset Allocation <span className="collapse-icon-small" aria-hidden="true">{openSections.assetAllocation ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.assetAllocation && (<div id="asset-allocation-content" className="form-section-content">
         <div className="form-group">
-          <label>Stocks (%)</label>
+          <label htmlFor="stocks-percent">Stocks (%)</label>
           <NumberInput
             value={inputs.stocksPercent}
             onChange={(value) => handleChange('stocksPercent', value)}
           />
         </div>
         <div className="form-group">
-          <label>Bonds (%)</label>
+          <label htmlFor="bonds-percent">Bonds (%)</label>
           <NumberInput
             value={inputs.bondsPercent}
             onChange={(value) => handleChange('bondsPercent', value)}
           />
         </div>
         <div className="form-group">
-          <label>Cash (%)</label>
+          <label htmlFor="cash-percent">Cash (%)</label>
           <NumberInput
             value={inputs.cashPercent}
             onChange={(value) => handleChange('cashPercent', value)}
           />
         </div>
-        <div className="allocation-sum">
+        <div className="allocation-sum" role="status" aria-live="polite">
           Total: {inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent}%
           {Math.abs((inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent) - 100) > 0.01 && 
-            <span className="warning"> ⚠️ Should equal 100%</span>
+            <span className="warning"> <span aria-hidden="true">⚠️</span> Should equal 100%</span>
           }
         </div>
         </div>)}
       </div>
 
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('income')}>
-          <h3>💵 Income <span className="collapse-icon-small">{openSections.income ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.income && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('income')}
+          aria-expanded={openSections.income}
+          aria-controls="income-content"
+        >
+          <h3><span aria-hidden="true">💵</span> Income <span className="collapse-icon-small" aria-hidden="true">{openSections.income ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.income && (<div id="income-content" className="form-section-content">
         <div className="form-group">
-          <label>Annual Labor Income (Net) (€)</label>
+          <label htmlFor="labor-income">Annual Labor Income (Net) (€)</label>
           <NumberInput
             value={inputs.annualLaborIncome}
             onChange={(value) => handleChange('annualLaborIncome', value)}
           />
         </div>
         <div className="form-group">
-          <label>Labor Income Growth Rate (%)</label>
+          <label htmlFor="labor-income-growth">Labor Income Growth Rate (%)</label>
           <NumberInput
             value={inputs.laborIncomeGrowthRate}
             onChange={(value) => handleChange('laborIncomeGrowthRate', value)}
           />
         </div>
         <div className="form-group">
-          <label>State Pension Income (Annual) (€)</label>
+          <label htmlFor="state-pension">State Pension Income (Annual) (€)</label>
           <NumberInput
             value={inputs.statePensionIncome}
             onChange={(value) => handleChange('statePensionIncome', value)}
           />
         </div>
         <div className="form-group">
-          <label>Private Pension Income (Annual) (€)</label>
+          <label htmlFor="private-pension">Private Pension Income (Annual) (€)</label>
           <NumberInput
             value={inputs.privatePensionIncome}
             onChange={(value) => handleChange('privatePensionIncome', value)}
           />
         </div>
         <div className="form-group">
-          <label>Other Income (Annual) (€)</label>
+          <label htmlFor="other-income">Other Income (Annual) (€)</label>
           <NumberInput
             value={inputs.otherIncome}
             onChange={(value) => handleChange('otherIncome', value)}
@@ -142,43 +157,56 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       </div>
 
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('expenses')}>
-          <h3>💸 Expenses & Savings <span className="collapse-icon-small">{openSections.expenses ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.expenses && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('expenses')}
+          aria-expanded={openSections.expenses}
+          aria-controls="expenses-content"
+        >
+          <h3><span aria-hidden="true">💸</span> Expenses & Savings <span className="collapse-icon-small" aria-hidden="true">{openSections.expenses ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.expenses && (<div id="expenses-content" className="form-section-content">
         <div className="form-group">
-          <label>Current Annual Expenses (€)</label>
+          <label htmlFor="current-expenses">Current Annual Expenses (€)</label>
           <NumberInput
             value={inputs.currentAnnualExpenses}
             onChange={(value) => handleChange('currentAnnualExpenses', value)}
           />
         </div>
         <div className="form-group">
-          <label>FIRE Annual Expenses (€)</label>
+          <label htmlFor="fire-expenses">FIRE Annual Expenses (€)</label>
           <NumberInput
             value={inputs.fireAnnualExpenses}
             onChange={(value) => handleChange('fireAnnualExpenses', value)}
           />
         </div>
         <div className="form-group">
-          <label>Savings Rate (%) <span className="calculated-label">- Auto-calculated</span></label>
+          <label htmlFor="savings-rate">Savings Rate (%) <span className="calculated-label">- Auto-calculated</span></label>
           <input
-            type="number"
+            id="savings-rate"
+            type="text"
+            inputMode="decimal"
             value={(inputs.savingsRate ?? 0).toFixed(2)}
             readOnly
             className="calculated-field"
+            aria-readonly="true"
           />
         </div>
         </div>)}
       </div>
 
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('fireTarget')}>
-          <h3>🎯 FIRE Target <span className="collapse-icon-small">{openSections.fireTarget ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.fireTarget && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('fireTarget')}
+          aria-expanded={openSections.fireTarget}
+          aria-controls="fire-target-content"
+        >
+          <h3><span aria-hidden="true">🎯</span> FIRE Target <span className="collapse-icon-small" aria-hidden="true">{openSections.fireTarget ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.fireTarget && (<div id="fire-target-content" className="form-section-content">
         <div className="form-group">
-          <label>Desired Withdrawal Rate (%)</label>
+          <label htmlFor="withdrawal-rate">Desired Withdrawal Rate (%)</label>
           <NumberInput
             value={inputs.desiredWithdrawalRate}
             onChange={(value) => handleChange('desiredWithdrawalRate', value)}
@@ -188,26 +216,31 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       </div>
 
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('expectedReturns')}>
-          <h3>📈 Expected Returns <span className="collapse-icon-small">{openSections.expectedReturns ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.expectedReturns && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('expectedReturns')}
+          aria-expanded={openSections.expectedReturns}
+          aria-controls="expected-returns-content"
+        >
+          <h3><span aria-hidden="true">📈</span> Expected Returns <span className="collapse-icon-small" aria-hidden="true">{openSections.expectedReturns ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.expectedReturns && (<div id="expected-returns-content" className="form-section-content">
         <div className="form-group">
-          <label>Expected Stock Return (%)</label>
+          <label htmlFor="stock-return">Expected Stock Return (%)</label>
           <NumberInput
             value={inputs.expectedStockReturn}
             onChange={(value) => handleChange('expectedStockReturn', value)}
           />
         </div>
         <div className="form-group">
-          <label>Expected Bond Return (%)</label>
+          <label htmlFor="bond-return">Expected Bond Return (%)</label>
           <NumberInput
             value={inputs.expectedBondReturn}
             onChange={(value) => handleChange('expectedBondReturn', value)}
           />
         </div>
         <div className="form-group">
-          <label>Cash / Inflation Rate (%)</label>
+          <label htmlFor="cash-return">Cash / Inflation Rate (%)</label>
           <NumberInput
             value={inputs.expectedCashReturn}
             onChange={(value) => handleChange('expectedCashReturn', value)}
@@ -217,12 +250,17 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       </div>
 
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('personalInfo')}>
-          <h3>👤 Personal Information <span className="collapse-icon-small">{openSections.personalInfo ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.personalInfo && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('personalInfo')}
+          aria-expanded={openSections.personalInfo}
+          aria-controls="personal-info-content"
+        >
+          <h3><span aria-hidden="true">👤</span> Personal Information <span className="collapse-icon-small" aria-hidden="true">{openSections.personalInfo ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.personalInfo && (<div id="personal-info-content" className="form-section-content">
         <div className="form-group">
-          <label>Year of Birth</label>
+          <label htmlFor="year-of-birth">Year of Birth</label>
           <NumberInput
             value={inputs.yearOfBirth}
             onChange={(value) => handleChange('yearOfBirth', value)}
@@ -230,7 +268,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label>Retirement Age for State Pension</label>
+          <label htmlFor="retirement-age">Retirement Age for State Pension</label>
           <NumberInput
             value={inputs.retirementAge}
             onChange={(value) => handleChange('retirementAge', value)}
@@ -241,10 +279,15 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       </div>
 
       <div className="form-section collapsible-section">
-        <div className="collapsible-header" onClick={() => toggleSection('options')}>
-          <h3>⚙️ Options <span className="collapse-icon-small">{openSections.options ? '▼' : '▶'}</span></h3>
-        </div>
-        {openSections.options && (<div className="form-section-content">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('options')}
+          aria-expanded={openSections.options}
+          aria-controls="options-content"
+        >
+          <h3><span aria-hidden="true">⚙️</span> Options <span className="collapse-icon-small" aria-hidden="true">{openSections.options ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.options && (<div id="options-content" className="form-section-content">
         <div className="form-group checkbox-group">
           <label>
             <input
