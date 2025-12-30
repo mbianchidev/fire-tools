@@ -37,10 +37,23 @@ export function HomePage() {
             </div>
           </div>
         )}
-        <h1 id="hero-title" className="hero-title"><span aria-hidden="true">🔥</span> Fire Tools</h1>
+        <h1 id="hero-title" className="hero-title"><span aria-hidden="true">💸</span> Fire Tools</h1>
         <p className="hero-subtitle">
-          Your comprehensive toolkit for Financial Independence Retire Early (FIRE) planning
+          Rocket fuel for your financial planning 🚀
         </p>
+      </section>
+
+      <section className="info-section" aria-labelledby="about-title">
+        <h3 id="about-title">About FIRE Tools</h3>
+        <p>
+          FIRE Tools is designed to help you plan and achieve Financial Independence Retire Early. 
+          Our suite of calculators and tools provides data-driven insights to make informed decisions 
+          about your financial future.
+        </p>
+        <div className="disclaimer" role="note" aria-label="Important disclaimer">
+          <strong><span aria-hidden="true">⚠️</span> Disclaimer:</strong> These tools are for educational and planning purposes only. 
+          Always consult with a qualified financial advisor before making investment decisions.
+        </div>
       </section>
 
       <section className="features-grid" aria-label="Available tools">
@@ -88,19 +101,6 @@ export function HomePage() {
           </div>
           <span className="cta-link" aria-hidden="true">Run Simulations →</span>
         </Link>
-      </section>
-
-      <section className="info-section" aria-labelledby="about-title">
-        <h3 id="about-title">About FIRE Tools</h3>
-        <p>
-          FIRE Tools is designed to help you plan and achieve Financial Independence Retire Early. 
-          Our suite of calculators and tools provides data-driven insights to make informed decisions 
-          about your financial future.
-        </p>
-        <div className="disclaimer" role="note" aria-label="Important disclaimer">
-          <strong><span aria-hidden="true">⚠️</span> Disclaimer:</strong> These tools are for educational and planning purposes only. 
-          Always consult with a qualified financial advisor before making investment decisions.
-        </div>
       </section>
     </main>
   );

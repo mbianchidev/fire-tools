@@ -1017,7 +1017,7 @@
   color: white;
 }
 
-/* Mass Edit Button - consistent prominent style for all locations */
+/* Mass Edit Button - orange-ish style for consistency with palette */
 .btn-mass-edit {
   padding: 0.4rem 0.8rem;
   border: none;
@@ -1025,29 +1025,29 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
   color: white;
   transition: all 0.3s;
   margin-left: 0.5rem;
-  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
 }
 
 .btn-mass-edit:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 8px rgba(255, 152, 0, 0.4);
 }
 
-/* For Asset Classes header - same prominent style on light background */
+/* For Asset Classes header - same orange style on light background */
 .section-header-with-actions .btn-mass-edit {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
   color: white;
   border: none;
-  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
 }
 
 .section-header-with-actions .btn-mass-edit:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 8px rgba(255, 152, 0, 0.4);
 }
 
 /* Mass Edit Dialog */

@@ -64,6 +64,14 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.header-emoji {
+  margin-right: 0.25rem;
+}
+
+.nav-emoji {
+  margin-right: 0.35rem;
+}
+
 .app-header p {
   color: #666;
   font-size: 1.1rem;

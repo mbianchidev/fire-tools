@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CalculatorInputs } from '../types/calculator';
 import { NumberInput } from './NumberInput';
 import { calculateYearsOfExpenses } from '../utils/fireCalculator';
@@ -22,11 +22,22 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
     assetAllocation: true,
     income: true,
     expenses: true,
-    fireTarget: true,
+    fireParams: true,
     expectedReturns: true,
-    personalInfo: true,
+    pension: true,
     options: true,
   });
+
+  // Collapse Initial Values and Asset Allocation when "from asset allocation" is enabled
+  useEffect(() => {
+    if (inputs.useAssetAllocationValue) {
+      setOpenSections(prev => ({
+        ...prev,
+        initialValues: false,
+        assetAllocation: false,
+      }));
+    }
+  }, [inputs.useAssetAllocationValue]);
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -89,7 +100,11 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           aria-expanded={openSections.initialValues}
           aria-controls="initial-values-content"
         >
-          <h3><span aria-hidden="true">💰</span> Initial Values <span className="collapse-icon-small" aria-hidden="true">{openSections.initialValues ? '▼' : '▶'}</span></h3>
+          <h3>
+            <span aria-hidden="true">💰</span> Initial Values 
+            {inputs.useAssetAllocationValue && <span className="calculated-label"> - From Asset Allocation</span>}
+            <span className="collapse-icon-small" aria-hidden="true">{openSections.initialValues ? '▼' : '▶'}</span>
+          </h3>
         </button>
         {openSections.initialValues && (<div id="initial-values-content" className="form-section-content">
         <div className="form-group">
@@ -228,6 +243,36 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
+          <label htmlFor="other-income">Side Income / Working After FIRE (Annual) (€)</label>
+          <NumberInput
+            id="other-income"
+            value={inputs.otherIncome}
+            onChange={(value) => handleChange('otherIncome', value)}
+          />
+        </div>
+        </div>)}
+      </div>
+
+      <div className="form-section collapsible-section">
+        <button 
+          className="collapsible-header" 
+          onClick={() => toggleSection('pension')}
+          aria-expanded={openSections.pension}
+          aria-controls="pension-content"
+        >
+          <h3><span aria-hidden="true">🏦</span> Pension <span className="collapse-icon-small" aria-hidden="true">{openSections.pension ? '▼' : '▶'}</span></h3>
+        </button>
+        {openSections.pension && (<div id="pension-content" className="form-section-content">
+        <div className="form-group">
+          <label htmlFor="retirement-age">Retirement Age for State Pension</label>
+          <NumberInput
+            id="retirement-age"
+            value={inputs.retirementAge}
+            onChange={(value) => handleChange('retirementAge', value)}
+            allowDecimals={false}
+          />
+        </div>
+        <div className="form-group">
           <label htmlFor="state-pension">State Pension Income (Annual) (€)</label>
           <NumberInput
             id="state-pension"
@@ -241,14 +286,6 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             id="private-pension"
             value={inputs.privatePensionIncome}
             onChange={(value) => handleChange('privatePensionIncome', value)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="other-income">Side Income / Working After FIRE (Annual) (€)</label>
-          <NumberInput
-            id="other-income"
-            value={inputs.otherIncome}
-            onChange={(value) => handleChange('otherIncome', value)}
           />
         </div>
         </div>)}
@@ -298,13 +335,22 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       <div className="form-section collapsible-section">
         <button 
           className="collapsible-header" 
-          onClick={() => toggleSection('fireTarget')}
-          aria-expanded={openSections.fireTarget}
-          aria-controls="fire-target-content"
+          onClick={() => toggleSection('fireParams')}
+          aria-expanded={openSections.fireParams}
+          aria-controls="fire-params-content"
         >
-          <h3><span aria-hidden="true">🎯</span> FIRE Target <span className="collapse-icon-small" aria-hidden="true">{openSections.fireTarget ? '▼' : '▶'}</span></h3>
+          <h3><span aria-hidden="true">🎯</span> FIRE Parameters <span className="collapse-icon-small" aria-hidden="true">{openSections.fireParams ? '▼' : '▶'}</span></h3>
         </button>
-        {openSections.fireTarget && (<div id="fire-target-content" className="form-section-content">
+        {openSections.fireParams && (<div id="fire-params-content" className="form-section-content">
+        <div className="form-group">
+          <label htmlFor="current-age">Current Age</label>
+          <NumberInput
+            id="current-age"
+            value={currentYear - inputs.yearOfBirth}
+            onChange={(value) => handleChange('yearOfBirth', currentYear - value)}
+            allowDecimals={false}
+          />
+        </div>
         <div className="form-group">
           <label htmlFor="withdrawal-rate">Desired Withdrawal Rate (%)</label>
           <NumberInput
@@ -360,37 +406,6 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             id="cash-return"
             value={inputs.expectedCashReturn}
             onChange={(value) => handleChange('expectedCashReturn', value)}
-          />
-        </div>
-        </div>)}
-      </div>
-
-      <div className="form-section collapsible-section">
-        <button 
-          className="collapsible-header" 
-          onClick={() => toggleSection('personalInfo')}
-          aria-expanded={openSections.personalInfo}
-          aria-controls="personal-info-content"
-        >
-          <h3><span aria-hidden="true">👤</span> Personal Information <span className="collapse-icon-small" aria-hidden="true">{openSections.personalInfo ? '▼' : '▶'}</span></h3>
-        </button>
-        {openSections.personalInfo && (<div id="personal-info-content" className="form-section-content">
-        <div className="form-group">
-          <label htmlFor="current-age">Current Age</label>
-          <NumberInput
-            id="current-age"
-            value={currentYear - inputs.yearOfBirth}
-            onChange={(value) => handleChange('yearOfBirth', currentYear - value)}
-            allowDecimals={false}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="retirement-age">Retirement Age for State Pension</label>
-          <NumberInput
-            id="retirement-age"
-            value={inputs.retirementAge}
-            onChange={(value) => handleChange('retirementAge', value)}
-            allowDecimals={false}
           />
         </div>
         </div>)}

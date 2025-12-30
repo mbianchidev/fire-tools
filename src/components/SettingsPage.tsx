@@ -265,6 +265,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           </div>
         </section>
 
+        {/* Currency Disclaimer - Moved before currency settings */}
+        <section className="settings-section disclaimer">
+          <h2>⚠️ Disclaimer</h2>
+          <p>
+            Exchange rates are fetched from publicly available APIs and may not reflect real-time rates.
+            Fallback rates are used when the API is unavailable. For accurate financial decisions,
+            please verify rates with your financial institution.
+          </p>
+        </section>
+
         {/* Currency Settings */}
         <section className="settings-section">
           <h2>💱 Currency Conversion Fallback Rates</h2>
@@ -334,16 +344,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               🗑️ Reset All Data
             </button>
           </div>
-        </section>
-
-        {/* Currency Disclaimer */}
-        <section className="settings-section disclaimer">
-          <h2>⚠️ Disclaimer</h2>
-          <p>
-            Exchange rates are fetched from publicly available APIs and may not reflect real-time rates.
-            Fallback rates are used when the API is unavailable. For accurate financial decisions,
-            please verify rates with your financial institution.
-          </p>
         </section>
       </div>
     </div>
