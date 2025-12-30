@@ -139,7 +139,7 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result }) => {
               formatter={(value) => [`${value} simulations`, 'Count']}
               labelFormatter={(label) => `Years: ${label}`}
             />
-            <Legend />
+            <Legend wrapperStyle={{ paddingTop: '12px' }} />
             <Bar 
               dataKey="count" 
               fill="#4CAF50" 

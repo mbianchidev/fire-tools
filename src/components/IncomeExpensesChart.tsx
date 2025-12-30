@@ -154,7 +154,7 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
             formatter={(value) => formatCurrency(Number(value))} 
             labelFormatter={(label) => `Age ${label}`}
           />
-          <Legend wrapperStyle={{ paddingTop: '10px' }} />
+          <Legend wrapperStyle={{ paddingTop: '12px' }} />
           <Bar dataKey="Labor Income" fill="#4CAF50" />
           <Bar dataKey="Investment Yield" fill="#2196F3" />
           <Bar dataKey="State Pension" fill="#9C27B0" />

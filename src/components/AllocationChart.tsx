@@ -118,7 +118,7 @@ export const AllocationChart: React.FC<AllocationChartProps> = ({ data, title, c
             ))}
           </Pie>
           <Tooltip content={<CustomTooltip />} />
-          <Legend formatter={renderLegend} />
+          <Legend formatter={renderLegend} wrapperStyle={{ paddingTop: '12px' }} />
         </PieChart>
       </ResponsiveContainer>
     </div>
