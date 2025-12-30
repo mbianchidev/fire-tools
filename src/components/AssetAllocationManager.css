@@ -107,8 +107,10 @@
 .allocation-table-container,
 .asset-class-table-container {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
 }
 
 .allocation-table,
@@ -544,7 +546,9 @@
 
 /* Collapsible Table Styles */
 .collapsible-allocation-table {
-  margin-top: 2rem;
+  margin-top: 1rem;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .asset-class-group {
@@ -552,6 +556,7 @@
   border: 2px solid #e0e0e0;
   border-radius: 8px;
   overflow: hidden;
+  max-width: 100%;
 }
 
 .asset-class-header {
@@ -563,6 +568,8 @@
   color: white;
   cursor: pointer;
   transition: all 0.3s;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .asset-class-header:hover {
@@ -572,7 +579,9 @@
 .class-header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .collapse-icon {
@@ -588,7 +597,8 @@
 .class-header-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  flex-shrink: 0;
 }
 
 .class-total {
@@ -605,6 +615,13 @@
   width: 100%;
   border-collapse: collapse;
   background: white;
+}
+
+/* Table scroll wrapper for mobile */
+.asset-class-group > table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  display: block;
 }
 
 .assets-table th,
@@ -781,6 +798,7 @@
   max-width: 1800px;
   margin: 2rem auto;
   padding: 0 2rem;
+  overflow-x: hidden; /* Prevent horizontal overflow on the page */
 }
 
 .page-header {
@@ -795,11 +813,15 @@
   font-size: 2.5rem;
   color: #333;
   margin-bottom: 0.5rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .page-header p {
   color: #666;
   font-size: 1.1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Responsive */
@@ -1652,6 +1674,7 @@
   .asset-allocation-page {
     padding: 0 0.5rem;
     margin: 0.5rem auto;
+    overflow-x: hidden;
   }
 
   .page-header {
@@ -1659,11 +1682,13 @@
   }
 
   .page-header h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    line-height: 1.3;
   }
 
   .page-header p {
     font-size: 0.9rem;
+    line-height: 1.5;
   }
 
   .portfolio-summary {
@@ -1689,7 +1714,8 @@
   }
 
   .allocation-section {
-    padding: 1rem;
+    padding: 0.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .allocation-table,
@@ -1897,29 +1923,32 @@ select:disabled {
 /* Mobile Small (320px) */
 @media (max-width: 374px) {
   .asset-allocation-page {
-    padding: 0 0.75rem;
-    margin: 0.75rem auto;
+    padding: 0 0.5rem;
+    margin: 0.5rem auto;
+    overflow-x: hidden;
   }
 
   .page-header {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .page-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    line-height: 1.3;
   }
 
   .page-header p {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
   }
 
   .asset-allocation-manager {
-    padding: 1rem 0;
+    padding: 0.5rem 0;
   }
 
   .action-btn {
-    padding: 0.625rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.85rem;
     width: 100%;
   }
 
@@ -1931,36 +1960,87 @@ select:disabled {
   .table-actions .action-btn {
     width: 100%;
   }
+
+  .asset-class-header {
+    padding: 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .class-header-left {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .class-header-right {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+
+  .class-total {
+    font-size: 1rem;
+  }
+
+  .class-delta {
+    font-size: 0.9rem;
+  }
+
+  .asset-class-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .allocation-section h3 {
+    font-size: 1.1rem;
+  }
 }
 
 /* Mobile Medium (375px - 424px) */
 @media (min-width: 375px) and (max-width: 424px) {
   .asset-allocation-page {
-    padding: 0 1rem;
-    margin: 1rem auto;
+    padding: 0 0.75rem;
+    margin: 0.75rem auto;
+    overflow-x: hidden;
   }
 
   .page-header {
-    padding: 1.25rem;
+    padding: 1rem;
   }
 
   .page-header h1 {
-    font-size: 1.75rem;
+    font-size: 1.4rem;
+    line-height: 1.3;
   }
 
   .page-header p {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .asset-class-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .allocation-section h3 {
+    font-size: 1.2rem;
   }
 }
 
 /* Mobile Large (425px - 767px) */
 @media (min-width: 425px) and (max-width: 767px) {
   .asset-allocation-page {
-    padding: 0 1.25rem;
+    padding: 0 1rem;
+    overflow-x: hidden;
   }
 
   .page-header h1 {
-    font-size: 2rem;
+    font-size: 1.6rem;
+    line-height: 1.3;
+  }
+
+  .page-header p {
+    font-size: 0.95rem;
   }
 
   .table-actions {
@@ -1970,12 +2050,23 @@ select:disabled {
 
   .table-actions .action-btn {
     flex: 1 1 calc(50% - 0.25rem);
-    min-width: 140px;
+    min-width: 130px;
+  }
+
+  .allocation-section h3 {
+    font-size: 1.3rem;
   }
 }
 
 /* All Mobile Devices (up to 767px) */
 @media (max-width: 767px) {
+  /* Prevent horizontal overflow on mobile */
+  .asset-allocation-page,
+  .asset-allocation-manager {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
   /* Portfolio value section */
   .portfolio-value-section {
     padding: 1rem;
