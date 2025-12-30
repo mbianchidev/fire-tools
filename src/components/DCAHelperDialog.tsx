@@ -43,6 +43,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
   const [isConfirmMode, setIsConfirmMode] = useState(false);
   const [confirmedAllocations, setConfirmedAllocations] = useState<Record<string, ConfirmedDCAAssetAllocation>>({});
   const [actualSharesInputs, setActualSharesInputs] = useState<Record<string, string>>({});
+  const [actualAmountInputs, setActualAmountInputs] = useState<Record<string, string>>({});
 
   const handleCalculate = async () => {
     const amount = parseFloat(investmentAmount);
@@ -72,12 +73,15 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
       
       setCalculation(calcWithShares);
       
-      // Initialize actual shares inputs with suggested values
-      const initialInputs: Record<string, string> = {};
+      // Initialize actual inputs with suggested values
+      const initialSharesInputs: Record<string, string> = {};
+      const initialAmountInputs: Record<string, string> = {};
       calcWithShares.allocations.forEach(a => {
-        initialInputs[a.assetId] = a.shares !== undefined ? formatShares(a.shares) : '';
+        initialSharesInputs[a.assetId] = a.shares !== undefined ? formatShares(a.shares) : '';
+        initialAmountInputs[a.assetId] = a.investmentAmount.toFixed(2);
       });
-      setActualSharesInputs(initialInputs);
+      setActualSharesInputs(initialSharesInputs);
+      setActualAmountInputs(initialAmountInputs);
       
       // Show a warning if no prices could be fetched
       if (successfulFetches === 0 && tickers.length > 0) {
@@ -98,6 +102,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     setIsConfirmMode(false);
     setConfirmedAllocations({});
     setActualSharesInputs({});
+    setActualAmountInputs({});
   };
 
   const handleClose = () => {
@@ -112,20 +117,47 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     }));
   };
 
-  const handleConfirmInvestment = (allocation: DCAAssetAllocation) => {
-    const actualSharesStr = actualSharesInputs[allocation.assetId];
-    const actualShares = parseFloat(actualSharesStr);
-    
-    if (isNaN(actualShares) || actualShares < 0) {
-      setError(`Please enter a valid number of shares for ${allocation.assetName}`);
-      return;
-    }
-    
-    const confirmed = confirmInvestment(allocation, actualShares);
-    setConfirmedAllocations(prev => ({
+  const handleActualAmountChange = (assetId: string, value: string) => {
+    setActualAmountInputs(prev => ({
       ...prev,
-      [allocation.assetId]: confirmed,
+      [assetId]: value,
     }));
+  };
+
+  const handleConfirmInvestment = (allocation: DCAAssetAllocation) => {
+    const hasPrice = allocation.currentPrice !== undefined && !allocation.priceError;
+    
+    if (hasPrice) {
+      // Use shares-based confirmation when price is available
+      const actualSharesStr = actualSharesInputs[allocation.assetId];
+      const actualShares = parseFloat(actualSharesStr);
+      
+      if (isNaN(actualShares) || actualShares < 0) {
+        setError(`Please enter a valid number of shares for ${allocation.assetName}`);
+        return;
+      }
+      
+      const confirmed = confirmInvestment(allocation, actualShares, undefined);
+      setConfirmedAllocations(prev => ({
+        ...prev,
+        [allocation.assetId]: confirmed,
+      }));
+    } else {
+      // Use amount-based confirmation when price is unavailable
+      const actualAmountStr = actualAmountInputs[allocation.assetId];
+      const actualAmount = parseFloat(actualAmountStr);
+      
+      if (isNaN(actualAmount) || actualAmount < 0) {
+        setError(`Please enter a valid amount for ${allocation.assetName}`);
+        return;
+      }
+      
+      const confirmed = confirmInvestment(allocation, undefined, actualAmount);
+      setConfirmedAllocations(prev => ({
+        ...prev,
+        [allocation.assetId]: confirmed,
+      }));
+    }
     setError('');
   };
 
@@ -136,19 +168,35 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     let hasError = false;
     
     calculation.allocations.forEach(allocation => {
-      const actualSharesStr = actualSharesInputs[allocation.assetId];
-      const actualShares = parseFloat(actualSharesStr);
+      const hasPrice = allocation.currentPrice !== undefined && !allocation.priceError;
       
-      if (isNaN(actualShares) || actualShares < 0) {
-        hasError = true;
-        return;
+      if (hasPrice) {
+        // Use shares-based confirmation when price is available
+        const actualSharesStr = actualSharesInputs[allocation.assetId];
+        const actualShares = parseFloat(actualSharesStr);
+        
+        if (isNaN(actualShares) || actualShares < 0) {
+          hasError = true;
+          return;
+        }
+        
+        newConfirmed[allocation.assetId] = confirmInvestment(allocation, actualShares, undefined);
+      } else {
+        // Use amount-based confirmation when price is unavailable
+        const actualAmountStr = actualAmountInputs[allocation.assetId];
+        const actualAmount = parseFloat(actualAmountStr);
+        
+        if (isNaN(actualAmount) || actualAmount < 0) {
+          hasError = true;
+          return;
+        }
+        
+        newConfirmed[allocation.assetId] = confirmInvestment(allocation, undefined, actualAmount);
       }
-      
-      newConfirmed[allocation.assetId] = confirmInvestment(allocation, actualShares);
     });
     
     if (hasError) {
-      setError('Please enter valid share amounts for all assets before confirming');
+      setError('Please enter valid amounts for all assets before confirming');
       return;
     }
     
@@ -314,31 +362,58 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                           {isConfirmMode && (
                             <>
                               <td className="actual-shares-cell">
-                                {allocation.priceError ? (
-                                  <span className="error-text">-</span>
-                                ) : confirmed?.isConfirmed ? (
-                                  <strong>{formatShares(confirmed.actualShares || 0)}</strong>
+                                {confirmed?.isConfirmed ? (
+                                  // Show confirmed value
+                                  allocation.currentPrice && !allocation.priceError ? (
+                                    <strong>{formatShares(confirmed.actualShares || 0)}</strong>
+                                  ) : (
+                                    <strong>{formatDCACurrency(confirmed.actualAmount || 0, currency)}</strong>
+                                  )
                                 ) : (
-                                  <div className="actual-shares-input-group">
-                                    <input
-                                      type="number"
-                                      step={SHARES_INPUT_STEP}
-                                      min="0"
-                                      className="actual-shares-input"
-                                      value={actualSharesInputs[allocation.assetId] || ''}
-                                      onChange={(e) => handleActualSharesChange(allocation.assetId, e.target.value)}
-                                      placeholder="Shares"
-                                      aria-label={`Actual shares for ${allocation.assetName}`}
-                                    />
-                                    <button
-                                      className="confirm-single-btn"
-                                      onClick={() => handleConfirmInvestment(allocation)}
-                                      disabled={!actualSharesInputs[allocation.assetId]}
-                                      aria-label={`Confirm ${allocation.assetName}`}
-                                    >
-                                      ✓
-                                    </button>
-                                  </div>
+                                  // Show input field - shares if price available, amount otherwise
+                                  allocation.currentPrice && !allocation.priceError ? (
+                                    <div className="actual-shares-input-group">
+                                      <input
+                                        type="number"
+                                        step={SHARES_INPUT_STEP}
+                                        min="0"
+                                        className="actual-shares-input"
+                                        value={actualSharesInputs[allocation.assetId] || ''}
+                                        onChange={(e) => handleActualSharesChange(allocation.assetId, e.target.value)}
+                                        placeholder="Shares"
+                                        aria-label={`Actual shares for ${allocation.assetName}`}
+                                      />
+                                      <button
+                                        className="confirm-single-btn"
+                                        onClick={() => handleConfirmInvestment(allocation)}
+                                        disabled={!actualSharesInputs[allocation.assetId]}
+                                        aria-label={`Confirm ${allocation.assetName}`}
+                                      >
+                                        ✓
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="actual-shares-input-group">
+                                      <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        className="actual-amount-input"
+                                        value={actualAmountInputs[allocation.assetId] || ''}
+                                        onChange={(e) => handleActualAmountChange(allocation.assetId, e.target.value)}
+                                        placeholder={currency}
+                                        aria-label={`Actual amount for ${allocation.assetName}`}
+                                      />
+                                      <button
+                                        className="confirm-single-btn"
+                                        onClick={() => handleConfirmInvestment(allocation)}
+                                        disabled={!actualAmountInputs[allocation.assetId]}
+                                        aria-label={`Confirm ${allocation.assetName}`}
+                                      >
+                                        ✓
+                                      </button>
+                                    </div>
+                                  )
                                 )}
                               </td>
                               <td className={`deviation-cell ${getDeviationClass(confirmed?.deviation?.status)}`}>

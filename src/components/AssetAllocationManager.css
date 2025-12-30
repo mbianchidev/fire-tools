@@ -1501,7 +1501,8 @@
   gap: 0.25rem;
 }
 
-.actual-shares-input {
+.actual-shares-input,
+.actual-amount-input {
   width: 80px;
   padding: 0.4rem;
   border: 2px solid #667eea;
@@ -1510,7 +1511,8 @@
   text-align: right;
 }
 
-.actual-shares-input:focus {
+.actual-shares-input:focus,
+.actual-amount-input:focus {
   outline: none;
   border-color: #764ba2;
 }

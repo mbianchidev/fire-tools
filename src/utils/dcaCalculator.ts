@@ -251,7 +251,8 @@ export type InvestmentDeviationStatus = 'exact' | 'over' | 'under' | 'unknown';
 
 export interface InvestmentDeviationInput {
   suggestedShares: number;
-  actualShares: number;
+  actualShares?: number;
+  actualAmount?: number;
   suggestedAmount: number;
   currentPrice?: number;
 }
@@ -265,6 +266,7 @@ export interface InvestmentDeviationResult {
 
 export interface ConfirmedDCAAssetAllocation extends DCAAssetAllocation {
   actualShares?: number;
+  actualAmount?: number;
   isConfirmed?: boolean;
   deviation?: InvestmentDeviationResult;
 }
@@ -274,6 +276,9 @@ const EXACT_DEVIATION_THRESHOLD = 0.01;
 
 /**
  * Calculate the deviation between actual and suggested investment.
+ * Supports two input modes:
+ * 1. Shares-based: Provide actualShares and currentPrice to calculate actualAmount
+ * 2. Amount-based: Provide actualAmount directly (useful when price is unavailable)
  * 
  * @param input - The input containing suggested and actual values
  * @returns The deviation result with amount, percentage, and status
@@ -281,17 +286,28 @@ const EXACT_DEVIATION_THRESHOLD = 0.01;
 export function calculateInvestmentDeviation(
   input: InvestmentDeviationInput
 ): InvestmentDeviationResult {
-  const { actualShares, suggestedAmount, currentPrice } = input;
+  const { actualShares, actualAmount: providedActualAmount, suggestedAmount, currentPrice } = input;
   
-  // Handle missing current price
-  if (currentPrice === undefined) {
+  // Determine actual amount - either from shares*price or directly provided
+  let actualAmount: number | undefined;
+  
+  if (providedActualAmount !== undefined) {
+    // Amount was directly provided (amount-based input)
+    actualAmount = providedActualAmount;
+  } else if (actualShares !== undefined && currentPrice !== undefined) {
+    // Calculate from shares and price (shares-based input)
+    actualAmount = actualShares * currentPrice;
+  } else if (actualShares !== undefined && currentPrice === undefined) {
+    // Shares provided but no price - can't calculate deviation
+    return {
+      status: 'unknown',
+    };
+  } else {
+    // No valid input
     return {
       status: 'unknown',
     };
   }
-  
-  // Calculate actual amount
-  const actualAmount = actualShares * currentPrice;
   
   // Calculate deviation
   const deviationAmount = actualAmount - suggestedAmount;
@@ -300,7 +316,7 @@ export function calculateInvestmentDeviation(
   let deviationPercent: number;
   if (suggestedAmount === 0) {
     // If nothing was suggested but something was bought, it's a 100% deviation
-    deviationPercent = actualShares > 0 ? 100 : 0;
+    deviationPercent = actualAmount > 0 ? 100 : 0;
   } else {
     deviationPercent = (deviationAmount / suggestedAmount) * 100;
   }
@@ -346,19 +362,25 @@ export function formatDeviation(deviation: number | undefined): string {
 }
 
 /**
- * Confirm an investment by adding actual shares bought.
+ * Confirm an investment by adding actual shares bought or amount spent.
+ * Supports two input modes:
+ * 1. Shares-based: Provide actualShares (requires price for deviation calculation)
+ * 2. Amount-based: Provide actualAmount (works without price)
  * 
  * @param allocation - The DCA asset allocation
- * @param actualShares - The actual number of shares bought
+ * @param actualShares - The actual number of shares bought (optional)
+ * @param actualAmount - The actual amount spent (optional, used when price unavailable)
  * @returns The confirmed allocation with deviation calculation
  */
 export function confirmInvestment(
   allocation: DCAAssetAllocation,
-  actualShares: number
+  actualShares?: number,
+  actualAmount?: number
 ): ConfirmedDCAAssetAllocation {
   const deviation = calculateInvestmentDeviation({
     suggestedShares: allocation.shares || 0,
     actualShares,
+    actualAmount,
     suggestedAmount: allocation.investmentAmount,
     currentPrice: allocation.currentPrice,
   });
@@ -366,6 +388,7 @@ export function confirmInvestment(
   return {
     ...allocation,
     actualShares,
+    actualAmount: actualAmount ?? deviation.actualAmount,
     isConfirmed: true,
     deviation,
   };
