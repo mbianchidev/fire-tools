@@ -6,6 +6,7 @@
 import Cookies from 'js-cookie';
 import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { CalculatorInputs } from '../types/calculator';
+import { ExpenseTrackerData, YearData, MonthData, IncomeEntry, ExpenseEntry } from '../types/expenseTracker';
 import { DEFAULT_INPUTS } from './defaults';
 import { encryptData, decryptData } from './cookieEncryption';
 
@@ -13,6 +14,7 @@ import { encryptData, decryptData } from './cookieEncryption';
 const ASSET_ALLOCATION_KEY = 'fire-calculator-asset-allocation';
 const ASSET_CLASS_TARGETS_KEY = 'fire-calculator-asset-class-targets';
 const FIRE_CALCULATOR_INPUTS_KEY = 'fire-calculator-inputs';
+const EXPENSE_TRACKER_KEY = 'fire-tools-expense-tracker';
 
 // Cookie options - secure settings for production
 const COOKIE_OPTIONS: Cookies.CookieAttributes = {
@@ -185,6 +187,113 @@ export function clearFireCalculatorInputs(): void {
   }
 }
 
+// Data validation helpers for expense tracker
+function isValidIncomeEntry(obj: any): obj is IncomeEntry {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.id === 'string' &&
+    obj.type === 'income' &&
+    typeof obj.date === 'string' &&
+    typeof obj.amount === 'number' &&
+    typeof obj.description === 'string' &&
+    typeof obj.source === 'string'
+  );
+}
+
+function isValidExpenseEntry(obj: any): obj is ExpenseEntry {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.id === 'string' &&
+    obj.type === 'expense' &&
+    typeof obj.date === 'string' &&
+    typeof obj.amount === 'number' &&
+    typeof obj.description === 'string' &&
+    typeof obj.category === 'string' &&
+    typeof obj.expenseType === 'string'
+  );
+}
+
+function isValidMonthData(obj: any): obj is MonthData {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.year === 'number' &&
+    typeof obj.month === 'number' &&
+    Array.isArray(obj.incomes) &&
+    Array.isArray(obj.expenses) &&
+    Array.isArray(obj.budgets) &&
+    obj.incomes.every(isValidIncomeEntry) &&
+    obj.expenses.every(isValidExpenseEntry)
+  );
+}
+
+function isValidYearData(obj: any): obj is YearData {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.year === 'number' &&
+    Array.isArray(obj.months) &&
+    obj.months.every(isValidMonthData)
+  );
+}
+
+function isValidExpenseTrackerData(obj: any): obj is ExpenseTrackerData {
+  return (
+    typeof obj === 'object' &&
+    Array.isArray(obj.years) &&
+    typeof obj.currentYear === 'number' &&
+    typeof obj.currentMonth === 'number' &&
+    typeof obj.currency === 'string' &&
+    obj.years.every(isValidYearData)
+  );
+}
+
+/**
+ * Save Expense Tracker data to encrypted cookies
+ */
+export function saveExpenseTrackerData(data: ExpenseTrackerData): void {
+  try {
+    const dataJson = JSON.stringify(data);
+    const encryptedData = encryptData(dataJson);
+    
+    Cookies.set(EXPENSE_TRACKER_KEY, encryptedData, COOKIE_OPTIONS);
+  } catch (error) {
+    console.error('Failed to save expense tracker data to cookies:', error);
+    throw new Error('Failed to save data to cookies. Cookies may be disabled.');
+  }
+}
+
+/**
+ * Load Expense Tracker data from encrypted cookies
+ */
+export function loadExpenseTrackerData(): ExpenseTrackerData | null {
+  try {
+    const encryptedData = Cookies.get(EXPENSE_TRACKER_KEY);
+    if (encryptedData) {
+      const decryptedData = decryptData(encryptedData);
+      if (decryptedData) {
+        const parsed = JSON.parse(decryptedData);
+        if (isValidExpenseTrackerData(parsed)) {
+          return parsed;
+        }
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Failed to load expense tracker data from cookies:', error);
+    return null;
+  }
+}
+
+/**
+ * Clear Expense Tracker data from cookies
+ */
+export function clearExpenseTrackerData(): void {
+  try {
+    Cookies.remove(EXPENSE_TRACKER_KEY, { path: '/' });
+  } catch (error) {
+    console.error('Failed to clear expense tracker data from cookies:', error);
+  }
+}
+
 /**
  * Clear all FIRE Calculator data from cookies
  * This includes both Asset Allocation and FIRE Calculator inputs
@@ -192,6 +301,7 @@ export function clearFireCalculatorInputs(): void {
 export function clearAllData(): void {
   clearAssetAllocation();
   clearFireCalculatorInputs();
+  clearExpenseTrackerData();
 }
 
 /**
