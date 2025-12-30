@@ -29,20 +29,24 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) 
   };
 
   return (
-    <div className="fire-metrics">
+    <section className="fire-metrics" aria-labelledby="fire-metrics-heading">
       <div className="fire-metrics-header">
-        <h3>🎯 FIRE Metrics</h3>
-        <button className="share-button" onClick={handleShare}>
-          {copied ? '✓ Copied!' : copyFailed ? '✗ Failed' : '🔗 Share'}
+        <h3 id="fire-metrics-heading"><span aria-hidden="true">🎯</span> FIRE Metrics</h3>
+        <button 
+          className="share-button" 
+          onClick={handleShare}
+          aria-label={copied ? 'Link copied to clipboard' : 'Copy link to share this calculation'}
+        >
+          <span aria-hidden="true">{copied ? '✓' : copyFailed ? '✗' : '🔗'}</span> {copied ? 'Copied!' : copyFailed ? 'Failed' : 'Share'}
         </button>
       </div>
-      <div className="metrics-grid">
-        <div className="metric-card">
+      <div className="metrics-grid" role="list">
+        <div className="metric-card" role="listitem">
           <div className="metric-label">FIRE Target</div>
           <div className="metric-value">{hasErrors ? 'N/A' : formatCurrency(fireTarget)}</div>
         </div>
         
-        <div className="metric-card highlight">
+        <div className="metric-card highlight" role="listitem">
           <div className="metric-label">Years to FIRE</div>
           <div className="metric-value">
             {hasErrors ? 'N/A' : yearsToFIRE >= 0 ? `${yearsToFIRE} years` : 'Not achieved'}
@@ -54,16 +58,16 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) 
           )}
         </div>
 
-        <div className="metric-card">
+        <div className="metric-card" role="listitem">
           <div className="metric-label">Final Portfolio Value</div>
           <div className="metric-value">{hasErrors ? 'N/A' : formatCurrency(finalPortfolioValue)}</div>
         </div>
 
-        <div className="metric-card">
+        <div className="metric-card" role="listitem">
           <div className="metric-label">Current Age</div>
           <div className="metric-value">{currentAge} years</div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

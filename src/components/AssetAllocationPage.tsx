@@ -409,36 +409,41 @@ export const AssetAllocationPage: React.FC = () => {
 
   return (
     <div className="asset-allocation-page">
-      <div className="page-header">
-        <h1>📊 Asset Allocation Manager</h1>
+      <header className="page-header">
+        <h1><span aria-hidden="true">📊</span> Asset Allocation Manager</h1>
         <p>
           Manage and visualize your portfolio asset allocation. Set target allocations,
           track current positions, and see recommended actions to rebalance your portfolio.
         </p>
-      </div>
+      </header>
 
-      <div className="asset-allocation-manager">
+      <main className="asset-allocation-manager" id="main-content">
         {/* Portfolio Value - calculated from non-cash assets */}
-        <div className="portfolio-value-section">
+        <section className="portfolio-value-section" aria-labelledby="portfolio-value-heading">
           <div className="portfolio-value-label">
-            <strong>Portfolio Value (excl. Cash):</strong>
+            <strong id="portfolio-value-heading">Portfolio Value (excl. Cash):</strong>
             <span className="portfolio-value">{formatCurrency(portfolioValue, currency)}</span>
           </div>
           <div className="portfolio-value-info">
             Total holdings (incl. cash): {formatCurrency(allocation.totalHoldings, currency)}
           </div>
-        </div>
+        </section>
 
         {/* How to Use - Collapsible at top */}
-        <div className="allocation-info collapsible-section">
-          <div className="collapsible-header" onClick={() => setIsHowToUseOpen(!isHowToUseOpen)}>
-            <h4>💡 How to Use <span className="collapse-icon-small">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
-          </div>
+        <section className="allocation-info collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => setIsHowToUseOpen(!isHowToUseOpen)}
+            aria-expanded={isHowToUseOpen}
+            aria-controls="how-to-use-content"
+          >
+            <h4><span aria-hidden="true">💡</span> How to Use <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
+          </button>
           {isHowToUseOpen && (
-            <ul className="how-to-use-content">
+            <ul id="how-to-use-content" className="how-to-use-content">
               <li><strong>Add Asset:</strong> Click the "Add Asset" button to add a new asset with type selection</li>
-              <li><strong>Edit Asset:</strong> Click the edit (✎) button in any row to edit the current value and target %</li>
-              <li><strong>Delete Asset:</strong> When editing an asset, click the trash icon (🗑️) to delete it</li>
+              <li><strong>Edit Asset:</strong> Click the edit <span aria-label="edit button">(✎)</span> button in any row to edit the current value and target %</li>
+              <li><strong>Delete Asset:</strong> When editing an asset, click the trash icon <span aria-label="delete button">(🗑️)</span> to delete it</li>
               <li><strong>Collapsible Tables:</strong> Click on an asset class header to expand/collapse and see individual assets</li>
               <li><strong>Target Mode:</strong> Choose "%" for percentage-based allocation, "SET" for fixed amounts (only for cash types), or "OFF" to exclude</li>
               <li><strong>Percentage targets</strong> for active assets within a class should sum to 100%</li>
@@ -450,7 +455,7 @@ export const AssetAllocationPage: React.FC = () => {
               </li>
             </ul>
           )}
-        </div>
+        </section>
 
         {/* Data Management Section - After "How to Use" */}
         <DataManagement
@@ -461,8 +466,8 @@ export const AssetAllocationPage: React.FC = () => {
         />
 
         {!allocation.isValid && (
-          <div className="validation-errors">
-            <strong>⚠️ Validation Errors:</strong>
+          <div className="validation-errors" role="alert" aria-live="polite">
+            <strong><span aria-hidden="true">⚠️</span> Validation Errors:</strong>
             <ul>
               {allocation.validationErrors.map((error, index) => (
                 <li key={index}>{error}</li>
@@ -471,11 +476,16 @@ export const AssetAllocationPage: React.FC = () => {
           </div>
         )}
 
-        <div className="allocation-section">
+        <section className="allocation-section" aria-labelledby="asset-classes-heading">
           <div className="section-header-with-actions">
-            <h3>Asset Classes</h3>
-            <button onClick={handleOpenMassEditAssetClass} className="btn-mass-edit" style={{ marginLeft: '1rem' }}>
-              ✏️ Edit All
+            <h3 id="asset-classes-heading">Asset Classes</h3>
+            <button 
+              onClick={handleOpenMassEditAssetClass} 
+              className="btn-mass-edit" 
+              style={{ marginLeft: '1rem' }}
+              aria-label="Edit all asset class allocations"
+            >
+              <span aria-hidden="true">✏️</span> Edit All
             </button>
           </div>
           <EditableAssetClassTable
@@ -487,15 +497,20 @@ export const AssetAllocationPage: React.FC = () => {
             assetClassTargets={assetClassTargets}
             onUpdateAssetClass={handleUpdateAssetClass}
           />
-        </div>
+        </section>
 
-        <div className="charts-section">
-          <div className="collapsible-header" onClick={() => setIsChartsCollapsed(!isChartsCollapsed)}>
-            <h3>Portfolio Allocation by Asset Class</h3>
-            <span className="collapse-icon-small">{isChartsCollapsed ? '▶' : '▼'}</span>
-          </div>
+        <section className="charts-section" aria-labelledby="charts-heading">
+          <button 
+            className="collapsible-header" 
+            onClick={() => setIsChartsCollapsed(!isChartsCollapsed)}
+            aria-expanded={!isChartsCollapsed}
+            aria-controls="charts-content"
+          >
+            <h3 id="charts-heading">Portfolio Allocation by Asset Class</h3>
+            <span className="collapse-icon-small" aria-hidden="true">{isChartsCollapsed ? '▶' : '▼'}</span>
+          </button>
           {!isChartsCollapsed && (
-            <div className="charts-row">
+            <div id="charts-content" className="charts-row">
               <AllocationChart
                 data={assetClassChartData}
                 title=""
@@ -511,11 +526,12 @@ export const AssetAllocationPage: React.FC = () => {
               )}
             </div>
           )}
-        </div>
+        </section>
 
         <div className="class-selector">
-          <label>View Asset Class Details:</label>
+          <label htmlFor="asset-class-select">View Asset Class Details:</label>
           <select 
+            id="asset-class-select"
             value={selectedClass || ''} 
             onChange={(e) => setSelectedClass(e.target.value || null)}
             className="class-select"
@@ -529,18 +545,32 @@ export const AssetAllocationPage: React.FC = () => {
           </select>
         </div>
 
-        <div className="allocation-section">
+        <section className="allocation-section" aria-labelledby="portfolio-details-heading">
           <div className="section-header-with-actions">
-            <h3>Portfolio Details by Asset Class</h3>
+            <h3 id="portfolio-details-heading">Portfolio Details by Asset Class</h3>
             <div className="table-actions">
-              <button onClick={() => setIsDCADialogOpen(true)} className="action-btn" style={{ background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)', color: 'white' }}>
-                💰 DCA Helper
+              <button 
+                onClick={() => setIsDCADialogOpen(true)} 
+                className="action-btn" 
+                style={{ background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)', color: 'white' }}
+                aria-label="Open Dollar Cost Averaging helper"
+              >
+                <span aria-hidden="true">💰</span> DCA Helper
               </button>
-              <button onClick={() => setIsDialogOpen(true)} className="action-btn primary-btn">
-                ➕ Add Asset
+              <button 
+                onClick={() => setIsDialogOpen(true)} 
+                className="action-btn primary-btn"
+                aria-label="Add new asset to portfolio"
+              >
+                <span aria-hidden="true">➕</span> Add Asset
               </button>
-              <button onClick={handleStartFromScratch} className="action-btn" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: 'white' }}>
-                🔄 Reset Assets
+              <button 
+                onClick={handleStartFromScratch} 
+                className="action-btn" 
+                style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', color: 'white' }}
+                aria-label="Reset all assets to defaults"
+              >
+                <span aria-hidden="true">🔄</span> Reset Assets
               </button>
             </div>
           </div>
@@ -556,8 +586,8 @@ export const AssetAllocationPage: React.FC = () => {
             onDeleteAsset={handleDeleteAsset}
             onMassEdit={handleOpenMassEditAsset}
           />
-        </div>
-      </div>
+        </section>
+      </main>
 
       <AddAssetDialog
         isOpen={isDialogOpen}

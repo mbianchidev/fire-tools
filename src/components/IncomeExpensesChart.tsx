@@ -72,14 +72,16 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
   });
 
   return (
-    <div className="chart-container">
+    <section className="chart-container" aria-labelledby="income-expenses-chart-heading">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-        <h3>Income vs Expenses</h3>
-        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+        <h3 id="income-expenses-chart-heading">Income vs Expenses</h3>
+        <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }} role="group" aria-label="Chart zoom controls">
           <button
             onClick={() => onZoomChange(20)}
             className={`zoom-button ${zoomYears === 20 ? 'active' : ''}`}
             style={buttonStyle(zoomYears === 20)}
+            aria-pressed={zoomYears === 20}
+            aria-label="Zoom to 20 years"
           >
             20 Years
           </button>
@@ -87,6 +89,8 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
             onClick={() => onZoomChange(30)}
             className={`zoom-button ${zoomYears === 30 ? 'active' : ''}`}
             style={buttonStyle(zoomYears === 30)}
+            aria-pressed={zoomYears === 30}
+            aria-label="Zoom to 30 years"
           >
             30 Years
           </button>
@@ -94,6 +98,8 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
             onClick={() => onZoomChange(40)}
             className={`zoom-button ${zoomYears === 40 ? 'active' : ''}`}
             style={buttonStyle(zoomYears === 40)}
+            aria-pressed={zoomYears === 40}
+            aria-label="Zoom to 40 years"
           >
             40 Years
           </button>
@@ -101,11 +107,14 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
             onClick={() => onZoomChange('all')}
             className={`zoom-button ${zoomYears === 'all' ? 'active' : ''}`}
             style={buttonStyle(zoomYears === 'all')}
+            aria-pressed={zoomYears === 'all'}
+            aria-label="Show all years"
           >
             All Years
           </button>
           <input
             type="number"
+            inputMode="numeric"
             placeholder="Custom"
             value={customZoomInput}
             onChange={(e) => onCustomZoomInputChange(e.target.value)}
@@ -120,11 +129,12 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
             }}
             min="1"
             step="1"
+            aria-label="Custom zoom in years"
           />
         </div>
       </div>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+        <BarChart data={data} aria-label="Income and expenses comparison chart over time">
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="age" label={{ value: 'Age', position: 'insideBottom', offset: -5 }} />
           <YAxis 
@@ -142,6 +152,6 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
           <Bar dataKey="Expenses" fill="#f44336" />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </section>
   );
 };

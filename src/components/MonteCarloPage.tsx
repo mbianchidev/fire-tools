@@ -19,18 +19,18 @@ export const MonteCarloPage: React.FC = () => {
 
   return (
     <div className="app-container monte-carlo-container">
-      <div className="main-content">
-        <div className="page-header">
-          <h2>🎲 Monte Carlo Simulations</h2>
+      <main className="main-content" id="main-content">
+        <header className="page-header">
+          <h2><span aria-hidden="true">🎲</span> Monte Carlo Simulations</h2>
           <p className="page-description">
             Run multiple simulations with random market returns to assess the probability of reaching FIRE.
             This helps you understand the range of potential outcomes and the likelihood of success under different market conditions.
           </p>
-        </div>
+        </header>
 
         {hasValidationErrors && (
-          <div className="validation-error-banner">
-            <strong>⚠️ Validation Error</strong>
+          <div className="validation-error-banner" role="alert" aria-live="polite">
+            <strong><span aria-hidden="true">⚠️</span> Validation Error</strong>
             {result.validationErrors?.map((error, index) => (
               <div key={index} className="validation-error-message">{error}</div>
             ))}
@@ -43,7 +43,7 @@ export const MonteCarloPage: React.FC = () => {
         {result && !hasValidationErrors && (
           <MonteCarloSimulator inputs={inputs} />
         )}
-      </div>
+      </main>
     </div>
   );
 };

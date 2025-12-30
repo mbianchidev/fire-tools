@@ -34,16 +34,17 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
   };
 
   return (
-    <div className="monte-carlo-section">
-      <h2>🎲 Monte Carlo Simulations</h2>
+    <section className="monte-carlo-section" aria-labelledby="monte-carlo-heading">
+      <h2 id="monte-carlo-heading"><span aria-hidden="true">🎲</span> Monte Carlo Simulations</h2>
       <p className="section-description">
         Run multiple simulations with random market returns to assess the probability of reaching FIRE.
       </p>
 
       <div className="mc-inputs">
         <div className="form-group">
-          <label>Number of Simulations</label>
+          <label htmlFor="num-simulations">Number of Simulations</label>
           <NumberInput
+            id="num-simulations"
             value={mcInputs.numSimulations}
             onChange={(value) => handleInputChange('numSimulations', value)}
             allowDecimals={false}
@@ -51,32 +52,36 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         </div>
 
         <div className="form-group">
-          <label>Stock Volatility (% std dev)</label>
+          <label htmlFor="stock-volatility">Stock Volatility (% std dev)</label>
           <NumberInput
+            id="stock-volatility"
             value={mcInputs.stockVolatility}
             onChange={(value) => handleInputChange('stockVolatility', value)}
           />
         </div>
 
         <div className="form-group">
-          <label>Bond Volatility (% std dev)</label>
+          <label htmlFor="bond-volatility">Bond Volatility (% std dev)</label>
           <NumberInput
+            id="bond-volatility"
             value={mcInputs.bondVolatility}
             onChange={(value) => handleInputChange('bondVolatility', value)}
           />
         </div>
 
         <div className="form-group">
-          <label>Black Swan Probability (% per year)</label>
+          <label htmlFor="black-swan-prob">Black Swan Probability (% per year)</label>
           <NumberInput
+            id="black-swan-prob"
             value={mcInputs.blackSwanProbability}
             onChange={(value) => handleInputChange('blackSwanProbability', value)}
           />
         </div>
 
         <div className="form-group">
-          <label>Black Swan Impact (%)</label>
+          <label htmlFor="black-swan-impact">Black Swan Impact (%)</label>
           <NumberInput
+            id="black-swan-impact"
             value={mcInputs.blackSwanImpact}
             onChange={(value) => handleInputChange('blackSwanImpact', value)}
           />
@@ -87,15 +92,16 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         className="run-simulation-btn" 
         onClick={runSimulation}
         disabled={isRunning}
+        aria-label={isRunning ? 'Running simulations, please wait' : 'Run Monte Carlo simulations'}
       >
-        {isRunning ? '⏳ Running Simulations...' : '▶️ Run Simulations'}
+        <span aria-hidden="true">{isRunning ? '⏳' : '▶️'}</span> {isRunning ? 'Running Simulations...' : 'Run Simulations'}
       </button>
 
       {result && (
-        <div className="mc-results">
-          <h3>Simulation Results</h3>
-          <div className="results-grid">
-            <div className="result-card success">
+        <div className="mc-results" role="region" aria-labelledby="simulation-results-heading" aria-live="polite">
+          <h3 id="simulation-results-heading">Simulation Results</h3>
+          <div className="results-grid" role="list">
+            <div className="result-card success" role="listitem">
               <div className="result-label">Success Rate</div>
               <div className="result-value">{result.successRate.toFixed(2)}%</div>
               <div className="result-subtitle">
@@ -103,17 +109,17 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
               </div>
             </div>
 
-            <div className="result-card">
+            <div className="result-card" role="listitem">
               <div className="result-label">Successful Simulations</div>
               <div className="result-value">{result.successCount}</div>
             </div>
 
-            <div className="result-card failure">
+            <div className="result-card failure" role="listitem">
               <div className="result-label">Failed Simulations</div>
               <div className="result-value">{result.failureCount}</div>
             </div>
 
-            <div className="result-card">
+            <div className="result-card" role="listitem">
               <div className="result-label">Median Years to FIRE</div>
               <div className="result-value">
                 {result.medianYearsToFIRE > 0 ? `${result.medianYearsToFIRE} years` : 'N/A'}
@@ -121,13 +127,13 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             </div>
           </div>
 
-          <div className="success-bar">
+          <div className="success-bar" role="progressbar" aria-valuenow={result.successRate} aria-valuemin={0} aria-valuemax={100} aria-label={`Success rate: ${result.successRate.toFixed(2)}%`}>
             <div className="success-bar-fill" style={{ width: `${result.successRate}%` }}>
               {result.successRate > 10 && `${result.successRate.toFixed(2)}%`}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
