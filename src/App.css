@@ -648,26 +648,47 @@ body {
 
 /* Mobile navigation styles (below 1024px) */
 @media (max-width: 1023px) {
-  .nav-toggle {
-    display: block;
-    position: absolute;
-    left: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
   .app-nav {
     flex-direction: column;
     align-items: stretch;
     padding: 1rem;
     gap: 0;
+    position: relative;
+  }
+
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: transparent;
+    transition: background-color 0.2s, transform 0.2s;
+    position: relative;
+    z-index: 10;
+  }
+
+  .nav-toggle:hover {
+    background: rgba(102, 126, 234, 0.1);
+  }
+
+  /* When menu is open, style the close button more prominently */
+  .nav-toggle[aria-expanded="true"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .nav-toggle[aria-expanded="true"]:hover {
+    background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
   }
 
   .nav-links {
     display: none;
     flex-direction: column;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     width: 100%;
   }
 
