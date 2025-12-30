@@ -1,0 +1,1081 @@
+import { useState, useEffect, useMemo } from 'react';
+import {
+  ExpenseTrackerData,
+  IncomeEntry,
+  ExpenseEntry,
+  ExpenseCategory,
+  IncomeSource,
+  ExpenseType,
+  TransactionFilter,
+  TransactionSort,
+  EXPENSE_CATEGORIES,
+  INCOME_SOURCES,
+  createEmptyMonthData,
+  createEmptyYearData,
+  generateTransactionId,
+  getCategoryInfo,
+} from '../types/expenseTracker';
+import { SupportedCurrency } from '../types/currency';
+import {
+  calculateTransactionSummary,
+  calculateCategoryBreakdown,
+  calculateBudgetRuleBreakdown,
+  calculateMonthlyComparison,
+  calculateCategoryTrends,
+  filterTransactions,
+  sortTransactions,
+} from '../utils/expenseCalculator';
+import {
+  saveExpenseTrackerData,
+  loadExpenseTrackerData,
+} from '../utils/cookieStorage';
+import {
+  exportExpenseTrackerToCSV,
+  importExpenseTrackerFromCSV,
+} from '../utils/csvExport';
+import { DataManagement } from './DataManagement';
+import { ExpenseBreakdownChart } from './ExpenseBreakdownChart';
+import { SpendingTrendChart } from './SpendingTrendChart';
+import { MonthlyComparisonChart } from './MonthlyComparisonChart';
+import './ExpenseTrackerPage.css';
+
+// Month names for display
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+// Helper to format currency
+function formatCurrency(amount: number, currency: string): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+// Get default data
+function getDefaultData(): ExpenseTrackerData {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  return {
+    years: [
+      {
+        year: currentYear,
+        months: [createEmptyMonthData(currentYear, currentMonth)],
+        isArchived: false,
+      },
+    ],
+    currentYear,
+    currentMonth,
+    currency: 'EUR',
+  };
+}
+
+export function ExpenseTrackerPage() {
+  // State
+  const [data, setData] = useState<ExpenseTrackerData>(() => {
+    const saved = loadExpenseTrackerData();
+    return saved || getDefaultData();
+  });
+  
+  // View state
+  const [selectedYear, setSelectedYear] = useState(data.currentYear);
+  const [selectedMonth, setSelectedMonth] = useState(data.currentMonth);
+  const [activeTab, setActiveTab] = useState<'transactions' | 'budgets' | 'analytics'>('transactions');
+  
+  // Form state
+  const [showIncomeForm, setShowIncomeForm] = useState(false);
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<IncomeEntry | ExpenseEntry | null>(null);
+  
+  // Filter/sort state
+  const [filter, setFilter] = useState<TransactionFilter>({});
+  const [sort, setSort] = useState<TransactionSort>({ field: 'date', direction: 'desc' });
+  
+  // How to use collapsed state
+  const [isHowToUseOpen, setIsHowToUseOpen] = useState(false);
+  
+  // Budget rule info collapsed state
+  const [isBudgetRuleInfoOpen, setIsBudgetRuleInfoOpen] = useState(true);
+
+  // Save data whenever it changes
+  useEffect(() => {
+    saveExpenseTrackerData(data);
+  }, [data]);
+
+  // Get current month data
+  const currentMonthData = useMemo(() => {
+    const yearData = data.years.find(y => y.year === selectedYear);
+    if (!yearData) return null;
+    return yearData.months.find(m => m.month === selectedMonth);
+  }, [data, selectedYear, selectedMonth]);
+
+  // Calculate summary for current month
+  const summary = useMemo(() => {
+    if (!currentMonthData) {
+      return { totalIncome: 0, totalExpenses: 0, netBalance: 0, savingsAmount: 0, savingsRate: 0 };
+    }
+    return calculateTransactionSummary(currentMonthData.incomes, currentMonthData.expenses);
+  }, [currentMonthData]);
+
+  // Calculate category breakdown
+  const categoryBreakdown = useMemo(() => {
+    if (!currentMonthData) return [];
+    return calculateCategoryBreakdown(currentMonthData.expenses, currentMonthData.budgets);
+  }, [currentMonthData]);
+
+  // Calculate 50/30/20 breakdown
+  const budgetRuleBreakdown = useMemo(() => {
+    if (!currentMonthData) return null;
+    return calculateBudgetRuleBreakdown(currentMonthData.incomes, currentMonthData.expenses);
+  }, [currentMonthData]);
+
+  // Get filtered and sorted transactions
+  const filteredTransactions = useMemo(() => {
+    if (!currentMonthData) return [];
+    const allTransactions = [...currentMonthData.incomes, ...currentMonthData.expenses];
+    const filtered = filterTransactions(allTransactions, filter);
+    return sortTransactions(filtered, sort);
+  }, [currentMonthData, filter, sort]);
+
+  // Get all months data for charts
+  const allMonthsData = useMemo(() => {
+    const yearData = data.years.find(y => y.year === selectedYear);
+    return yearData?.months || [];
+  }, [data, selectedYear]);
+
+  // Monthly comparison data
+  const monthlyComparisonData = useMemo(() => {
+    return calculateMonthlyComparison(allMonthsData);
+  }, [allMonthsData]);
+
+  // Category trends data
+  const categoryTrendsData = useMemo(() => {
+    return calculateCategoryTrends(allMonthsData);
+  }, [allMonthsData]);
+
+  // Add or update a month
+  const ensureMonthExists = (year: number, month: number): void => {
+    setData(prev => {
+      const newData = { ...prev };
+      let yearData = newData.years.find(y => y.year === year);
+      
+      if (!yearData) {
+        yearData = createEmptyYearData(year);
+        newData.years.push(yearData);
+        newData.years.sort((a, b) => a.year - b.year);
+      }
+      
+      let monthData = yearData.months.find(m => m.month === month);
+      if (!monthData) {
+        monthData = createEmptyMonthData(year, month);
+        yearData.months.push(monthData);
+        yearData.months.sort((a, b) => a.month - b.month);
+      }
+      
+      return newData;
+    });
+  };
+
+  // Add income
+  const handleAddIncome = (income: Omit<IncomeEntry, 'id' | 'type'>) => {
+    const [year, month] = income.date.split('-').map(Number);
+    ensureMonthExists(year, month);
+    
+    setData(prev => {
+      const newData = { ...prev };
+      const yearData = newData.years.find(y => y.year === year)!;
+      const monthData = yearData.months.find(m => m.month === month)!;
+      
+      const newIncome: IncomeEntry = {
+        ...income,
+        id: generateTransactionId(),
+        type: 'income',
+      };
+      
+      monthData.incomes.push(newIncome);
+      return newData;
+    });
+    
+    setShowIncomeForm(false);
+  };
+
+  // Add expense
+  const handleAddExpense = (expense: Omit<ExpenseEntry, 'id' | 'type'>) => {
+    const [year, month] = expense.date.split('-').map(Number);
+    ensureMonthExists(year, month);
+    
+    setData(prev => {
+      const newData = { ...prev };
+      const yearData = newData.years.find(y => y.year === year)!;
+      const monthData = yearData.months.find(m => m.month === month)!;
+      
+      const newExpense: ExpenseEntry = {
+        ...expense,
+        id: generateTransactionId(),
+        type: 'expense',
+      };
+      
+      monthData.expenses.push(newExpense);
+      return newData;
+    });
+    
+    setShowExpenseForm(false);
+  };
+
+  // Update income
+  const handleUpdateIncome = (id: string, updates: Partial<IncomeEntry>) => {
+    setData(prev => {
+      const newData = { ...prev };
+      for (const yearData of newData.years) {
+        for (const monthData of yearData.months) {
+          const index = monthData.incomes.findIndex(i => i.id === id);
+          if (index !== -1) {
+            monthData.incomes[index] = { ...monthData.incomes[index], ...updates };
+            return newData;
+          }
+        }
+      }
+      return newData;
+    });
+    setEditingTransaction(null);
+  };
+
+  // Update expense
+  const handleUpdateExpense = (id: string, updates: Partial<ExpenseEntry>) => {
+    setData(prev => {
+      const newData = { ...prev };
+      for (const yearData of newData.years) {
+        for (const monthData of yearData.months) {
+          const index = monthData.expenses.findIndex(e => e.id === id);
+          if (index !== -1) {
+            monthData.expenses[index] = { ...monthData.expenses[index], ...updates };
+            return newData;
+          }
+        }
+      }
+      return newData;
+    });
+    setEditingTransaction(null);
+  };
+
+  // Delete transaction
+  const handleDeleteTransaction = (id: string, type: 'income' | 'expense') => {
+    if (!confirm('Are you sure you want to delete this transaction?')) return;
+    
+    setData(prev => {
+      const newData = { ...prev };
+      for (const yearData of newData.years) {
+        for (const monthData of yearData.months) {
+          if (type === 'income') {
+            const index = monthData.incomes.findIndex(i => i.id === id);
+            if (index !== -1) {
+              monthData.incomes.splice(index, 1);
+              return newData;
+            }
+          } else {
+            const index = monthData.expenses.findIndex(e => e.id === id);
+            if (index !== -1) {
+              monthData.expenses.splice(index, 1);
+              return newData;
+            }
+          }
+        }
+      }
+      return newData;
+    });
+  };
+
+  // Update budget for a category
+  const handleUpdateBudget = (category: ExpenseCategory, amount: number) => {
+    ensureMonthExists(selectedYear, selectedMonth);
+    
+    setData(prev => {
+      const newData = { ...prev };
+      const yearData = newData.years.find(y => y.year === selectedYear)!;
+      const monthData = yearData.months.find(m => m.month === selectedMonth)!;
+      
+      const existingIndex = monthData.budgets.findIndex(b => b.category === category);
+      if (existingIndex !== -1) {
+        if (amount <= 0) {
+          monthData.budgets.splice(existingIndex, 1);
+        } else {
+          monthData.budgets[existingIndex].monthlyBudget = amount;
+        }
+      } else if (amount > 0) {
+        monthData.budgets.push({ category, monthlyBudget: amount });
+      }
+      
+      return newData;
+    });
+  };
+
+  // Export data
+  const handleExport = () => {
+    const csv = exportExpenseTrackerToCSV(data);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `expense-tracker-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Import data
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const csv = e.target?.result as string;
+        const imported = importExpenseTrackerFromCSV(csv);
+        setData(imported);
+        setSelectedYear(imported.currentYear);
+        setSelectedMonth(imported.currentMonth);
+      } catch (error) {
+        alert(`Error importing CSV: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
+  // Reset data
+  const handleResetData = () => {
+    if (confirm('Are you sure you want to reset all expense tracker data? This cannot be undone.')) {
+      const defaultData = getDefaultData();
+      setData(defaultData);
+      setSelectedYear(defaultData.currentYear);
+      setSelectedMonth(defaultData.currentMonth);
+    }
+  };
+
+  // Available years for selector
+  const availableYears = useMemo(() => {
+    const years = data.years.map(y => y.year);
+    const currentYear = new Date().getFullYear();
+    if (!years.includes(currentYear)) {
+      years.push(currentYear);
+    }
+    return years.sort((a, b) => b - a);
+  }, [data]);
+
+  // Available months for selector
+  const availableMonths = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => i + 1);
+  }, []);
+
+  return (
+    <div className="expense-tracker-page">
+      <header className="page-header">
+        <h1><span aria-hidden="true">💰</span> Expense & Income Tracker</h1>
+        <p>
+          Track your income and expenses, set budgets, and gain insights into your spending patterns.
+        </p>
+      </header>
+
+      <main className="expense-tracker-main" id="main-content">
+        {/* How to Use Section */}
+        <section className="allocation-info collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => setIsHowToUseOpen(!isHowToUseOpen)}
+            aria-expanded={isHowToUseOpen}
+            aria-controls="how-to-use-content"
+          >
+            <h4><span aria-hidden="true">💡</span> How to Use <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
+          </button>
+          {isHowToUseOpen && (
+            <ul id="how-to-use-content" className="how-to-use-content">
+              <li><strong>Add Transactions:</strong> Click "Add Income" or "Add Expense" to record new transactions</li>
+              <li><strong>Edit/Delete:</strong> Click on any transaction row to edit or delete it</li>
+              <li><strong>Set Budgets:</strong> Go to the Budgets tab to set monthly spending limits per category</li>
+              <li><strong>Needs vs Wants:</strong> Categorize expenses to track your 50/30/20 budget rule compliance</li>
+              <li><strong>View Analytics:</strong> Check the Analytics tab for charts and spending trends</li>
+              <li><strong>Navigate Months:</strong> Use the month/year selectors to view different periods</li>
+            </ul>
+          )}
+        </section>
+
+        {/* Data Management */}
+        <DataManagement
+          onExport={handleExport}
+          onImport={handleImport}
+          onReset={handleResetData}
+          defaultOpen={false}
+        />
+
+        {/* Month/Year Selector */}
+        <section className="period-selector" aria-labelledby="period-selector-heading">
+          <h3 id="period-selector-heading" className="visually-hidden">Select Period</h3>
+          <div className="selector-row">
+            <div className="selector-group">
+              <label htmlFor="year-select">Year:</label>
+              <select
+                id="year-select"
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+              >
+                {availableYears.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <div className="selector-group">
+              <label htmlFor="month-select">Month:</label>
+              <select
+                id="month-select"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(Number(e.target.value))}
+              >
+                {availableMonths.map(month => (
+                  <option key={month} value={month}>{MONTH_NAMES[month - 1]}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              className="btn-add-month"
+              onClick={() => ensureMonthExists(selectedYear, selectedMonth)}
+            >
+              <span aria-hidden="true">➕</span> Add This Month
+            </button>
+          </div>
+        </section>
+
+        {/* Summary Cards */}
+        <section className="summary-section" aria-labelledby="summary-heading">
+          <h3 id="summary-heading">Summary for {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h3>
+          <div className="summary-cards">
+            <div className="summary-card income">
+              <span className="card-icon" aria-hidden="true">📈</span>
+              <div className="card-content">
+                <span className="card-label">Total Income</span>
+                <span className="card-value">{formatCurrency(summary.totalIncome, data.currency)}</span>
+              </div>
+            </div>
+            <div className="summary-card expenses">
+              <span className="card-icon" aria-hidden="true">📉</span>
+              <div className="card-content">
+                <span className="card-label">Total Expenses</span>
+                <span className="card-value">{formatCurrency(summary.totalExpenses, data.currency)}</span>
+              </div>
+            </div>
+            <div className={`summary-card balance ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
+              <span className="card-icon" aria-hidden="true">{summary.netBalance >= 0 ? '💰' : '⚠️'}</span>
+              <div className="card-content">
+                <span className="card-label">Net Balance</span>
+                <span className="card-value">{formatCurrency(summary.netBalance, data.currency)}</span>
+              </div>
+            </div>
+            <div className="summary-card savings">
+              <span className="card-icon" aria-hidden="true">🏦</span>
+              <div className="card-content">
+                <span className="card-label">Savings Rate</span>
+                <span className="card-value">{summary.savingsRate.toFixed(1)}%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 50/30/20 Budget Rule */}
+        {budgetRuleBreakdown && (
+          <section className="budget-rule-section">
+            <button 
+              className="collapsible-header" 
+              onClick={() => setIsBudgetRuleInfoOpen(!isBudgetRuleInfoOpen)}
+              aria-expanded={isBudgetRuleInfoOpen}
+              aria-controls="budget-rule-content"
+            >
+              <h3><span aria-hidden="true">📊</span> 50/30/20 Budget Rule <span className="collapse-icon-small" aria-hidden="true">{isBudgetRuleInfoOpen ? '▼' : '▶'}</span></h3>
+            </button>
+            {isBudgetRuleInfoOpen && (
+              <div id="budget-rule-content" className="budget-rule-content">
+                <div className="budget-rule-info">
+                  <p>
+                    <strong>The 50/30/20 Rule:</strong> Allocate 50% of income to needs, 30% to wants, and 20% to savings.
+                  </p>
+                </div>
+                <div className="budget-rule-bars">
+                  <div className="rule-bar">
+                    <div className="rule-bar-label">
+                      <span>Needs (50%)</span>
+                      <span>{budgetRuleBreakdown.needs.percentage.toFixed(1)}%</span>
+                    </div>
+                    <div className="rule-bar-track">
+                      <div 
+                        className={`rule-bar-fill needs ${budgetRuleBreakdown.needs.percentage > 50 ? 'over' : ''}`}
+                        style={{ width: `${Math.min(budgetRuleBreakdown.needs.percentage, 100)}%` }}
+                      />
+                      <div className="rule-bar-target" style={{ left: '50%' }} />
+                    </div>
+                    <span className="rule-bar-amount">{formatCurrency(budgetRuleBreakdown.needs.amount, data.currency)}</span>
+                  </div>
+                  <div className="rule-bar">
+                    <div className="rule-bar-label">
+                      <span>Wants (30%)</span>
+                      <span>{budgetRuleBreakdown.wants.percentage.toFixed(1)}%</span>
+                    </div>
+                    <div className="rule-bar-track">
+                      <div 
+                        className={`rule-bar-fill wants ${budgetRuleBreakdown.wants.percentage > 30 ? 'over' : ''}`}
+                        style={{ width: `${Math.min(budgetRuleBreakdown.wants.percentage, 100)}%` }}
+                      />
+                      <div className="rule-bar-target" style={{ left: '30%' }} />
+                    </div>
+                    <span className="rule-bar-amount">{formatCurrency(budgetRuleBreakdown.wants.amount, data.currency)}</span>
+                  </div>
+                  <div className="rule-bar">
+                    <div className="rule-bar-label">
+                      <span>Savings (20%)</span>
+                      <span>{budgetRuleBreakdown.savings.percentage.toFixed(1)}%</span>
+                    </div>
+                    <div className="rule-bar-track">
+                      <div 
+                        className={`rule-bar-fill savings ${budgetRuleBreakdown.savings.percentage >= 20 ? 'good' : ''}`}
+                        style={{ width: `${Math.min(budgetRuleBreakdown.savings.percentage, 100)}%` }}
+                      />
+                      <div className="rule-bar-target" style={{ left: '20%' }} />
+                    </div>
+                    <span className="rule-bar-amount">{formatCurrency(budgetRuleBreakdown.savings.amount, data.currency)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Tabs */}
+        <div className="tabs" role="tablist" aria-label="Expense tracker sections">
+          <button
+            role="tab"
+            aria-selected={activeTab === 'transactions'}
+            onClick={() => setActiveTab('transactions')}
+            className={`tab ${activeTab === 'transactions' ? 'active' : ''}`}
+          >
+            <span aria-hidden="true">📝</span> Transactions
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'budgets'}
+            onClick={() => setActiveTab('budgets')}
+            className={`tab ${activeTab === 'budgets' ? 'active' : ''}`}
+          >
+            <span aria-hidden="true">💵</span> Budgets
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'analytics'}
+            onClick={() => setActiveTab('analytics')}
+            className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
+          >
+            <span aria-hidden="true">📊</span> Analytics
+          </button>
+        </div>
+
+        {/* Transactions Tab */}
+        {activeTab === 'transactions' && (
+          <section className="transactions-section" role="tabpanel" aria-labelledby="transactions-tab">
+            <div className="section-header">
+              <h3>Transactions</h3>
+              <div className="transaction-actions">
+                <button className="btn-add income" onClick={() => setShowIncomeForm(true)}>
+                  <span aria-hidden="true">➕</span> Add Income
+                </button>
+                <button className="btn-add expense" onClick={() => setShowExpenseForm(true)}>
+                  <span aria-hidden="true">➕</span> Add Expense
+                </button>
+              </div>
+            </div>
+
+            {/* Filter/Sort Controls */}
+            <div className="filter-controls">
+              <div className="filter-group">
+                <label htmlFor="sort-field">Sort by:</label>
+                <select
+                  id="sort-field"
+                  value={sort.field}
+                  onChange={(e) => setSort({ ...sort, field: e.target.value as TransactionSort['field'] })}
+                >
+                  <option value="date">Date</option>
+                  <option value="amount">Amount</option>
+                  <option value="category">Category</option>
+                </select>
+                <button
+                  className="sort-direction-btn"
+                  onClick={() => setSort({ ...sort, direction: sort.direction === 'asc' ? 'desc' : 'asc' })}
+                  aria-label={`Sort ${sort.direction === 'asc' ? 'descending' : 'ascending'}`}
+                >
+                  {sort.direction === 'asc' ? '↑' : '↓'}
+                </button>
+              </div>
+              <div className="filter-group">
+                <label htmlFor="filter-type">Type:</label>
+                <select
+                  id="filter-type"
+                  value={filter.expenseType || ''}
+                  onChange={(e) => setFilter({ ...filter, expenseType: e.target.value as ExpenseType || undefined })}
+                >
+                  <option value="">All</option>
+                  <option value="NEED">Needs</option>
+                  <option value="WANT">Wants</option>
+                </select>
+              </div>
+              <div className="filter-group">
+                <label htmlFor="filter-search">Search:</label>
+                <input
+                  id="filter-search"
+                  type="text"
+                  placeholder="Search..."
+                  value={filter.searchTerm || ''}
+                  onChange={(e) => setFilter({ ...filter, searchTerm: e.target.value || undefined })}
+                />
+              </div>
+            </div>
+
+            {/* Transaction List */}
+            <div className="transactions-list">
+              {filteredTransactions.length === 0 ? (
+                <div className="empty-state">
+                  <p>No transactions for this period. Add your first transaction!</p>
+                </div>
+              ) : (
+                <table className="transactions-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Description</th>
+                      <th>Category/Source</th>
+                      <th>Type</th>
+                      <th className="amount-col">Amount</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredTransactions.map((transaction) => (
+                      <tr 
+                        key={transaction.id} 
+                        className={transaction.type === 'income' ? 'income-row' : 'expense-row'}
+                      >
+                        <td>{transaction.date}</td>
+                        <td>{transaction.description}</td>
+                        <td>
+                          {transaction.type === 'income' 
+                            ? INCOME_SOURCES.find(s => s.id === (transaction as IncomeEntry).source)?.name
+                            : getCategoryInfo((transaction as ExpenseEntry).category).name
+                          }
+                        </td>
+                        <td>
+                          {transaction.type === 'income' ? (
+                            <span className="type-badge income">Income</span>
+                          ) : (
+                            <span className={`type-badge ${(transaction as ExpenseEntry).expenseType.toLowerCase()}`}>
+                              {(transaction as ExpenseEntry).expenseType === 'NEED' ? 'Need' : 'Want'}
+                            </span>
+                          )}
+                        </td>
+                        <td className={`amount-col ${transaction.type === 'income' ? 'positive' : 'negative'}`}>
+                          {transaction.type === 'income' ? '+' : '-'}
+                          {formatCurrency(transaction.amount, data.currency)}
+                        </td>
+                        <td>
+                          <button
+                            className="btn-icon"
+                            onClick={() => setEditingTransaction(transaction)}
+                            aria-label="Edit transaction"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            className="btn-icon delete"
+                            onClick={() => handleDeleteTransaction(transaction.id, transaction.type)}
+                            aria-label="Delete transaction"
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Budgets Tab */}
+        {activeTab === 'budgets' && (
+          <section className="budgets-section" role="tabpanel" aria-labelledby="budgets-tab">
+            <h3>Monthly Budgets for {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h3>
+            <p className="section-description">
+              Set monthly spending limits for each category. The remaining amount shows how much you can still spend.
+            </p>
+            <div className="budgets-grid">
+              {EXPENSE_CATEGORIES.map(category => {
+                const breakdown = categoryBreakdown.find(b => b.category === category.id);
+                const budget = currentMonthData?.budgets.find(b => b.category === category.id);
+                const spent = breakdown?.totalAmount || 0;
+                const budgeted = budget?.monthlyBudget || 0;
+                const remaining = budgeted - spent;
+                const percentUsed = budgeted > 0 ? (spent / budgeted) * 100 : 0;
+
+                return (
+                  <div key={category.id} className="budget-card">
+                    <div className="budget-header">
+                      <span className="category-icon" aria-hidden="true">{category.icon}</span>
+                      <span className="category-name">{category.name}</span>
+                      <span className={`expense-type-badge ${category.defaultExpenseType.toLowerCase()}`}>
+                        {category.defaultExpenseType === 'NEED' ? 'Need' : 'Want'}
+                      </span>
+                    </div>
+                    <div className="budget-details">
+                      <div className="budget-input-row">
+                        <label htmlFor={`budget-${category.id}`}>Budget:</label>
+                        <input
+                          id={`budget-${category.id}`}
+                          type="number"
+                          min="0"
+                          value={budgeted || ''}
+                          placeholder="0"
+                          onChange={(e) => handleUpdateBudget(category.id, Number(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="budget-stats">
+                        <span>Spent: {formatCurrency(spent, data.currency)}</span>
+                        {budgeted > 0 && (
+                          <span className={remaining >= 0 ? 'positive' : 'negative'}>
+                            Remaining: {formatCurrency(remaining, data.currency)}
+                          </span>
+                        )}
+                      </div>
+                      {budgeted > 0 && (
+                        <div className="budget-progress">
+                          <div 
+                            className={`budget-progress-fill ${percentUsed > 100 ? 'over' : percentUsed > 80 ? 'warning' : ''}`}
+                            style={{ width: `${Math.min(percentUsed, 100)}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && (
+          <section className="analytics-section" role="tabpanel" aria-labelledby="analytics-tab">
+            <h3>Spending Analytics for {selectedYear}</h3>
+            
+            {/* Expense Breakdown Pie Chart */}
+            <div className="chart-container">
+              <h4>Expense Breakdown - {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h4>
+              <ExpenseBreakdownChart 
+                data={categoryBreakdown}
+                currency={data.currency}
+              />
+            </div>
+
+            {/* Monthly Comparison Chart */}
+            <div className="chart-container">
+              <h4>Monthly Spending Comparison</h4>
+              <MonthlyComparisonChart 
+                data={monthlyComparisonData}
+                currency={data.currency}
+              />
+            </div>
+
+            {/* Category Trends Chart */}
+            <div className="chart-container">
+              <h4>Category Spending Trends</h4>
+              <SpendingTrendChart 
+                data={categoryTrendsData}
+                currency={data.currency}
+              />
+            </div>
+
+            {/* Category Breakdown Table */}
+            <div className="breakdown-table-container">
+              <h4>Category Breakdown</h4>
+              <table className="breakdown-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Current Month</th>
+                    <th>% of Total</th>
+                    <th>Budget</th>
+                    <th>Remaining</th>
+                    <th>Transactions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {categoryBreakdown.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="empty-state">No expenses recorded for this period</td>
+                    </tr>
+                  ) : (
+                    categoryBreakdown.map(item => (
+                      <tr key={item.category}>
+                        <td>
+                          <span className="category-icon" aria-hidden="true">
+                            {getCategoryInfo(item.category).icon}
+                          </span>
+                          {getCategoryInfo(item.category).name}
+                        </td>
+                        <td>{formatCurrency(item.totalAmount, data.currency)}</td>
+                        <td>{item.percentage.toFixed(1)}%</td>
+                        <td>{item.budgeted ? formatCurrency(item.budgeted, data.currency) : '-'}</td>
+                        <td className={item.remaining !== undefined ? (item.remaining >= 0 ? 'positive' : 'negative') : ''}>
+                          {item.remaining !== undefined ? formatCurrency(item.remaining, data.currency) : '-'}
+                        </td>
+                        <td>{item.transactionCount}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* Income Form Dialog */}
+        {showIncomeForm && (
+          <TransactionFormDialog
+            type="income"
+            onSubmit={handleAddIncome}
+            onClose={() => setShowIncomeForm(false)}
+            currency={data.currency}
+            defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
+          />
+        )}
+
+        {/* Expense Form Dialog */}
+        {showExpenseForm && (
+          <TransactionFormDialog
+            type="expense"
+            onSubmit={handleAddExpense}
+            onClose={() => setShowExpenseForm(false)}
+            currency={data.currency}
+            defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
+          />
+        )}
+
+        {/* Edit Transaction Dialog */}
+        {editingTransaction && (
+          <TransactionFormDialog
+            type={editingTransaction.type}
+            initialData={editingTransaction}
+            onSubmit={(data) => {
+              if (editingTransaction.type === 'income') {
+                handleUpdateIncome(editingTransaction.id, data as Partial<IncomeEntry>);
+              } else {
+                handleUpdateExpense(editingTransaction.id, data as Partial<ExpenseEntry>);
+              }
+            }}
+            onClose={() => setEditingTransaction(null)}
+            currency={data.currency}
+          />
+        )}
+      </main>
+    </div>
+  );
+}
+
+// Transaction Form Dialog Component
+interface TransactionFormDialogProps {
+  type: 'income' | 'expense';
+  initialData?: IncomeEntry | ExpenseEntry;
+  onSubmit: (data: any) => void;
+  onClose: () => void;
+  currency: SupportedCurrency;
+  defaultDate?: string;
+}
+
+function TransactionFormDialog({
+  type,
+  initialData,
+  onSubmit,
+  onClose,
+  currency,
+  defaultDate,
+}: TransactionFormDialogProps) {
+  const isEditing = !!initialData;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const [date, setDate] = useState(initialData?.date || defaultDate || today);
+  const [amount, setAmount] = useState(initialData?.amount?.toString() || '');
+  const [description, setDescription] = useState(initialData?.description || '');
+  
+  // Income-specific
+  const [source, setSource] = useState<IncomeSource>(
+    (initialData as IncomeEntry)?.source || 'SALARY'
+  );
+  
+  // Expense-specific
+  const [category, setCategory] = useState<ExpenseCategory>(
+    (initialData as ExpenseEntry)?.category || 'OTHER'
+  );
+  const [subCategory, setSubCategory] = useState(
+    (initialData as ExpenseEntry)?.subCategory || ''
+  );
+  const [expenseType, setExpenseType] = useState<ExpenseType>(
+    (initialData as ExpenseEntry)?.expenseType || 
+    getCategoryInfo((initialData as ExpenseEntry)?.category || 'OTHER').defaultExpenseType
+  );
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      alert('Please enter a valid amount greater than 0');
+      return;
+    }
+
+    if (type === 'income') {
+      onSubmit({
+        date,
+        amount: parsedAmount,
+        description,
+        source,
+      });
+    } else {
+      onSubmit({
+        date,
+        amount: parsedAmount,
+        description,
+        category,
+        subCategory: subCategory || undefined,
+        expenseType,
+      });
+    }
+  };
+
+  // Update expense type when category changes
+  const handleCategoryChange = (newCategory: ExpenseCategory) => {
+    setCategory(newCategory);
+    setExpenseType(getCategoryInfo(newCategory).defaultExpenseType);
+  };
+
+  return (
+    <div className="dialog-overlay" onClick={onClose}>
+      <div className="dialog" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <div className="dialog-header">
+          <h2>{isEditing ? 'Edit' : 'Add'} {type === 'income' ? 'Income' : 'Expense'}</h2>
+          <button className="dialog-close" onClick={onClose} aria-label="Close dialog">×</button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="dialog-form">
+          <div className="form-group">
+            <label htmlFor="transaction-date">Date</label>
+            <input
+              id="transaction-date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="transaction-amount">Amount ({currency})</label>
+            <input
+              id="transaction-amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              required
+            />
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="transaction-description">Description</label>
+            <input
+              id="transaction-description"
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter description..."
+              required
+            />
+          </div>
+          
+          {type === 'income' ? (
+            <div className="form-group">
+              <label htmlFor="income-source">Source</label>
+              <select
+                id="income-source"
+                value={source}
+                onChange={(e) => setSource(e.target.value as IncomeSource)}
+              >
+                {INCOME_SOURCES.map(s => (
+                  <option key={s.id} value={s.id}>{s.icon} {s.name}</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <>
+              <div className="form-group">
+                <label htmlFor="expense-category">Category</label>
+                <select
+                  id="expense-category"
+                  value={category}
+                  onChange={(e) => handleCategoryChange(e.target.value as ExpenseCategory)}
+                >
+                  {EXPENSE_CATEGORIES.map(c => (
+                    <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="expense-subcategory">Sub-category (optional)</label>
+                <input
+                  id="expense-subcategory"
+                  type="text"
+                  value={subCategory}
+                  onChange={(e) => setSubCategory(e.target.value)}
+                  placeholder="e.g., Electricity, Gas..."
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="expense-type">Type</label>
+                <select
+                  id="expense-type"
+                  value={expenseType}
+                  onChange={(e) => setExpenseType(e.target.value as ExpenseType)}
+                >
+                  <option value="NEED">Need (Essential)</option>
+                  <option value="WANT">Want (Non-essential)</option>
+                </select>
+              </div>
+            </>
+          )}
+          
+          <div className="dialog-actions">
+            <button type="button" className="btn-cancel" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-submit">
+              {isEditing ? 'Update' : 'Add'} {type === 'income' ? 'Income' : 'Expense'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
