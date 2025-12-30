@@ -141,6 +141,21 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
         return rest;
       });
     }
+    
+    // Real-time deviation calculation
+    if (calculation) {
+      const allocation = calculation.allocations.find(a => a.assetId === assetId);
+      if (allocation && allocation.currentPrice && !allocation.priceError) {
+        const actualShares = parseFloat(value);
+        if (!isNaN(actualShares) && actualShares >= 0) {
+          const confirmed = confirmInvestment(allocation, actualShares, undefined);
+          setConfirmedAllocations(prev => ({
+            ...prev,
+            [assetId]: { ...confirmed, isConfirmed: false }, // Keep unconfirmed but show deviation
+          }));
+        }
+      }
+    }
   };
 
   const handleActualAmountChange = (assetId: string, value: string) => {
@@ -154,6 +169,21 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
         const { [assetId]: _, ...rest } = prev;
         return rest;
       });
+    }
+    
+    // Real-time deviation calculation
+    if (calculation) {
+      const allocation = calculation.allocations.find(a => a.assetId === assetId);
+      if (allocation) {
+        const actualAmount = parseFloat(value);
+        if (!isNaN(actualAmount) && actualAmount >= 0) {
+          const confirmed = confirmInvestment(allocation, undefined, actualAmount);
+          setConfirmedAllocations(prev => ({
+            ...prev,
+            [assetId]: { ...confirmed, isConfirmed: false }, // Keep unconfirmed but show deviation
+          }));
+        }
+      }
     }
   };
 
@@ -317,26 +347,28 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
             Enter an amount below to see the exact dollar and share breakdown for each asset.
           </p>
 
-          <div className="dca-input-section">
-            <label htmlFor="investment-amount">Investment Amount ({currency}):</label>
-            <div className="input-row">
-              <input
-                id="investment-amount"
-                type="text"
-                value={investmentAmount}
-                onChange={(e) => setInvestmentAmount(e.target.value)}
-                placeholder="Enter amount to invest"
-                disabled={isLoading}
-              />
-              <button 
-                className="action-btn primary-btn"
-                onClick={handleCalculate}
-                disabled={isLoading || !investmentAmount}
-              >
-                {isLoading ? 'Calculating...' : 'Calculate'}
-              </button>
+          {!isConfirmMode && (
+            <div className="dca-input-section">
+              <label htmlFor="investment-amount">Investment Amount ({currency}):</label>
+              <div className="input-row">
+                <input
+                  id="investment-amount"
+                  type="text"
+                  value={investmentAmount}
+                  onChange={(e) => setInvestmentAmount(e.target.value)}
+                  placeholder="Enter amount to invest"
+                  disabled={isLoading}
+                />
+                <button 
+                  className="action-btn primary-btn"
+                  onClick={handleCalculate}
+                  disabled={isLoading || !investmentAmount}
+                >
+                  {isLoading ? 'Calculating...' : 'Calculate'}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {error && (
             <div className="error-message">
@@ -482,7 +514,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                                 )}
                               </td>
                               <td className={`deviation-cell ${getDeviationClass(confirmed?.deviation?.status)}`}>
-                                {confirmed?.isConfirmed && confirmed.deviation ? (
+                                {confirmed?.deviation ? (
                                   <div className="deviation-display">
                                     <span className="deviation-percent">
                                       {formatDeviation(confirmed.deviation.deviationPercent)}
@@ -582,12 +614,12 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                   </>
                 ) : (
                   <>
-                    <button className="action-btn reset-btn" onClick={() => {
+                    <button className="action-btn back-btn" onClick={() => {
                       setIsConfirmMode(false);
                       setConfirmedAllocations({});
                       setInputErrors({});
                     }}>
-                      Back to Suggestion
+                      ← Back to Suggestions
                     </button>
                     {!allConfirmed && (
                       <button 
@@ -597,8 +629,8 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                         ✓ Confirm All
                       </button>
                     )}
-                    <button className="action-btn reset-btn" onClick={handleReset}>
-                      Start Over
+                    <button className="action-btn start-over-btn" onClick={handleReset}>
+                      🔄 Start Over
                     </button>
                   </>
                 )}
