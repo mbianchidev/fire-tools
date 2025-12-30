@@ -61,13 +61,15 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     };
   }
   
-  // Calculate FIRE target based on desired withdrawal rate
-  // Special case: if withdrawal rate is 0, FIRE is achieved immediately
+  // Calculate FIRE target based on years of expenses parameter
+  // Special case: if withdrawal rate is 0, FIRE is achieved immediately (no savings needed)
+  // Otherwise, FIRE target = annual expenses × years of expenses needed
   let fireTarget: number;
   if (inputs.desiredWithdrawalRate === 0) {
     fireTarget = 0; // FIRE is achieved with any amount if withdrawal rate is 0
   } else {
-    fireTarget = inputs.fireAnnualExpenses / (inputs.desiredWithdrawalRate / 100);
+    // Use yearsOfExpenses directly to calculate FIRE target
+    fireTarget = inputs.fireAnnualExpenses * inputs.yearsOfExpenses;
     // Check if fireTarget is reasonable
     if (!isFinite(fireTarget) || fireTarget > MAX_SAFE_VALUE) {
       validationErrors.push('FIRE target calculation resulted in an invalid value');
@@ -128,7 +130,8 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
       // While working: save a percentage of labor income, plus all investment returns
       // The savings rate already accounts for expenses (if you save 30%, you spend 70%)
       const laborSavings = laborIncome * (inputs.savingsRate / 100);
-      portfolioChange = laborSavings + investmentYield;
+      // Include other income (side gig, pension if applicable) in savings
+      portfolioChange = laborSavings + investmentYield + otherIncomeTotal;
     } else {
       // Not working: live off portfolio (income - expenses, including investment returns)
       portfolioChange = totalIncome - expenses;

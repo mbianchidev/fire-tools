@@ -29,6 +29,7 @@ export function serializeInputsToURL(inputs: CalculatorInputs): URLSearchParams 
 
   // FIRE Target
   params.set('desiredWithdrawalRate', inputs.desiredWithdrawalRate.toString());
+  params.set('yearsOfExpenses', inputs.yearsOfExpenses.toString());
 
   // Expected Returns
   params.set('expectedStockReturn', inputs.expectedStockReturn.toString());
@@ -95,6 +96,7 @@ export function deserializeInputsFromURL(params: URLSearchParams): CalculatorInp
 
     // FIRE Target
     desiredWithdrawalRate: parseNumber(params.get('desiredWithdrawalRate'), DEFAULT_INPUTS.desiredWithdrawalRate),
+    yearsOfExpenses: parseNumber(params.get('yearsOfExpenses'), DEFAULT_INPUTS.yearsOfExpenses),
 
     // Expected Returns
     expectedStockReturn: parseNumber(params.get('expectedStockReturn'), DEFAULT_INPUTS.expectedStockReturn),

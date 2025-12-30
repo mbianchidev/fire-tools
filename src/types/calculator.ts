@@ -24,6 +24,7 @@ export interface CalculatorInputs {
   
   // FIRE Target
   desiredWithdrawalRate: number;
+  yearsOfExpenses: number; // Years of expenses needed for FIRE (default: ~33.33, equivalent to 3% withdrawal rate)
   
   // Expected Returns
   expectedStockReturn: number;

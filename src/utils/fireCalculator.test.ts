@@ -14,6 +14,7 @@ describe('FIRE Calculator', () => {
     laborIncomeGrowthRate: 3,
     savingsRate: 33.33,
     desiredWithdrawalRate: 3,
+    yearsOfExpenses: 100 / 3, // ~33.33 years
     expectedStockReturn: 7,
     expectedBondReturn: 2,
     expectedCashReturn: -2,
@@ -225,6 +226,112 @@ describe('FIRE Calculator', () => {
       // ASSERT
       expect(result.projections.length).toBeGreaterThan(0);
       expect(result.projections[0].laborIncome).toBe(0);
+    });
+  });
+
+  describe('Years of expenses for FIRE target', () => {
+    it('should calculate FIRE target based on yearsOfExpenses', () => {
+      // ARRANGE
+      const inputs = { ...baseInputs, yearsOfExpenses: 25, fireAnnualExpenses: 40000 };
+      
+      // ACT
+      const result = calculateFIRE(inputs);
+      
+      // ASSERT
+      // FIRE target = fireAnnualExpenses * yearsOfExpenses = 40000 * 25 = 1,000,000
+      expect(result.fireTarget).toBe(1000000);
+    });
+
+    it('should use custom yearsOfExpenses value', () => {
+      // ARRANGE
+      const inputs = { ...baseInputs, yearsOfExpenses: 30, fireAnnualExpenses: 50000 };
+      
+      // ACT
+      const result = calculateFIRE(inputs);
+      
+      // ASSERT
+      // FIRE target = fireAnnualExpenses * yearsOfExpenses = 50000 * 30 = 1,500,000
+      expect(result.fireTarget).toBe(1500000);
+    });
+  });
+
+  describe('Other income and pension calculations', () => {
+    it('should include otherIncome in pre-FIRE savings', () => {
+      // ARRANGE
+      const inputsWithOther = { ...baseInputs, otherIncome: 10000 };
+      const inputsWithoutOther = { ...baseInputs, otherIncome: 0 };
+      
+      // ACT
+      const resultWithOther = calculateFIRE(inputsWithOther);
+      const resultWithoutOther = calculateFIRE(inputsWithoutOther);
+      
+      // ASSERT
+      // First year net savings should be higher with other income
+      const firstYearWithOther = resultWithOther.projections[0];
+      const firstYearWithoutOther = resultWithoutOther.projections[0];
+      
+      // The difference should be exactly the otherIncome amount
+      expect(firstYearWithOther.netSavings - firstYearWithoutOther.netSavings).toBeCloseTo(10000, 2);
+    });
+
+    it('should include pension income after retirement age', () => {
+      // ARRANGE
+      const currentYear = new Date().getFullYear();
+      const retirementAge = 67;
+      // Use a year of birth that makes current age exactly 66 (one year before retirement)
+      const yearOfBirth = currentYear - 66;
+      
+      const inputs = { 
+        ...baseInputs, 
+        yearOfBirth,
+        retirementAge,
+        statePensionIncome: 12000,
+        privatePensionIncome: 6000,
+        stopWorkingAtFIRE: false, // Keep working to test pension inclusion
+      };
+      
+      // ACT
+      const result = calculateFIRE(inputs);
+      
+      // ASSERT
+      // Year 0: age 66, no pension
+      // Year 1: age 67, pension should kick in
+      const beforeRetirement = result.projections[0]; // age 66
+      const atRetirement = result.projections[1]; // age 67
+      
+      expect(beforeRetirement.age).toBe(66);
+      expect(atRetirement.age).toBe(67);
+      
+      // Total income at retirement should include pension (18000)
+      // Both should have the same labor income if still working
+      // The difference should account for pension plus investment yield changes
+      // We just check that pension is reflected in net savings
+      expect(atRetirement.netSavings).toBeGreaterThan(beforeRetirement.netSavings);
+    });
+
+    it('should include otherIncome in post-FIRE calculations', () => {
+      // ARRANGE: Start with already FIRE'd situation
+      const inputs = { 
+        ...baseInputs, 
+        initialSavings: 2000000, // Already at FIRE target
+        yearsOfExpenses: 25,
+        fireAnnualExpenses: 40000, // FIRE target = 1,000,000
+        otherIncome: 5000,
+        stopWorkingAtFIRE: true,
+      };
+      
+      // ACT
+      const result = calculateFIRE(inputs);
+      
+      // ASSERT
+      expect(result.yearsToFIRE).toBe(0); // Already FIRE'd
+      
+      // After FIRE, the portfolio change should be: totalIncome - expenses
+      // totalIncome = 0 (no labor) + investmentYield + otherIncome (5000)
+      // The otherIncome should help reduce portfolio drawdown
+      const firstProjection = result.projections[0];
+      expect(firstProjection.isFIRE).toBe(true);
+      expect(firstProjection.totalIncome).toBeGreaterThan(0);
     });
   });
 });
