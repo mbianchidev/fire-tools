@@ -43,6 +43,7 @@ export function exportFireCalculatorToCSV(inputs: CalculatorInputs): string {
     ['Other Income', escapeCSV(inputs.otherIncome)],
     ['Stop Working At FIRE', escapeCSV(inputs.stopWorkingAtFIRE)],
     ['Max Age', escapeCSV(inputs.maxAge)],
+    ['Use Asset Allocation Value', escapeCSV(inputs.useAssetAllocationValue)],
   ];
 
   return rows.map(row => row.join(',')).join('\n');
@@ -98,11 +99,12 @@ export function importFireCalculatorFromCSV(csv: string): CalculatorInputs {
       'Other Income': 'otherIncome',
       'Stop Working At FIRE': 'stopWorkingAtFIRE',
       'Max Age': 'maxAge',
+      'Use Asset Allocation Value': 'useAssetAllocationValue',
     };
 
     const propName = fieldMap[key];
     if (propName) {
-      if (propName === 'stopWorkingAtFIRE') {
+      if (propName === 'stopWorkingAtFIRE' || propName === 'useAssetAllocationValue') {
         data[propName] = value.toLowerCase() === 'true';
       } else {
         const numValue = parseFloat(value);

@@ -1,6 +1,34 @@
 import { describe, it, expect } from 'vitest';
-import { calculateFIRE } from './fireCalculator';
+import { calculateFIRE, calculateYearsOfExpenses } from './fireCalculator';
 import { CalculatorInputs } from '../types/calculator';
+
+describe('calculateYearsOfExpenses', () => {
+  it('should calculate 33.33 years for 3% withdrawal rate', () => {
+    const result = calculateYearsOfExpenses(3);
+    expect(result).toBe(33.33);
+  });
+
+  it('should calculate 25 years for 4% withdrawal rate', () => {
+    const result = calculateYearsOfExpenses(4);
+    expect(result).toBe(25);
+  });
+
+  it('should return 0 for 0% withdrawal rate', () => {
+    const result = calculateYearsOfExpenses(0);
+    expect(result).toBe(0);
+  });
+
+  it('should calculate 50 years for 2% withdrawal rate', () => {
+    const result = calculateYearsOfExpenses(2);
+    expect(result).toBe(50);
+  });
+
+  it('should round to 2 decimal places', () => {
+    // 100 / 7 = 14.285714...
+    const result = calculateYearsOfExpenses(7);
+    expect(result).toBe(14.29);
+  });
+});
 
 describe('FIRE Calculator', () => {
   const baseInputs: CalculatorInputs = {
@@ -25,6 +53,7 @@ describe('FIRE Calculator', () => {
     otherIncome: 0,
     stopWorkingAtFIRE: true,
     maxAge: 100,
+    useAssetAllocationValue: false,
   };
 
   describe('Projection timeline', () => {

@@ -1,6 +1,20 @@
 import { CalculatorInputs, YearProjection, CalculationResult } from '../types/calculator';
 
 /**
+ * Calculate years of expenses from withdrawal rate
+ * Formula: yearsOfExpenses = 100 / withdrawalRate
+ * Returns value rounded to 2 decimal places
+ * Returns 0 if withdrawalRate is 0 (FIRE is achieved with any amount)
+ */
+export function calculateYearsOfExpenses(withdrawalRate: number): number {
+  if (withdrawalRate === 0) {
+    return 0;
+  }
+  const years = 100 / withdrawalRate;
+  return Math.round(years * 100) / 100; // Round to 2 decimal places
+}
+
+/**
  * Calculate FIRE projection based on inputs
  */
 export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {

@@ -1,13 +1,22 @@
 import { useState } from 'react';
 import { CalculatorInputs } from '../types/calculator';
 import { NumberInput } from './NumberInput';
+import { calculateYearsOfExpenses } from '../utils/fireCalculator';
+
+interface AssetAllocationData {
+  totalValue: number;
+  stocksPercent: number;
+  bondsPercent: number;
+  cashPercent: number;
+}
 
 interface CalculatorInputsProps {
   inputs: CalculatorInputs;
   onChange: (inputs: CalculatorInputs) => void;
+  assetAllocationData?: AssetAllocationData; // Data from asset allocation page
 }
 
-export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, onChange }) => {
+export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, onChange, assetAllocationData }) => {
   const [openSections, setOpenSections] = useState({
     initialValues: true,
     assetAllocation: true,
@@ -41,8 +50,33 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
       }
     }
     
+    // Auto-calculate yearsOfExpenses when withdrawal rate changes
+    if (field === 'desiredWithdrawalRate') {
+      newInputs.yearsOfExpenses = calculateYearsOfExpenses(value as number);
+    }
+    
     onChange(newInputs);
   };
+
+  // Calculate yearsOfExpenses from withdrawal rate (always derived, not user-editable)
+  const calculatedYearsOfExpenses = calculateYearsOfExpenses(inputs.desiredWithdrawalRate);
+
+  // Current year for age calculations
+  const currentYear = new Date().getFullYear();
+
+  // When using asset allocation data, show values from asset allocation page
+  const effectivePortfolioValue = inputs.useAssetAllocationValue && assetAllocationData 
+    ? assetAllocationData.totalValue 
+    : inputs.initialSavings;
+  const effectiveStocksPercent = inputs.useAssetAllocationValue && assetAllocationData 
+    ? assetAllocationData.stocksPercent 
+    : inputs.stocksPercent;
+  const effectiveBondsPercent = inputs.useAssetAllocationValue && assetAllocationData 
+    ? assetAllocationData.bondsPercent 
+    : inputs.bondsPercent;
+  const effectiveCashPercent = inputs.useAssetAllocationValue && assetAllocationData 
+    ? assetAllocationData.cashPercent 
+    : inputs.cashPercent;
 
   return (
     <div className="inputs-form">
@@ -59,12 +93,27 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </button>
         {openSections.initialValues && (<div id="initial-values-content" className="form-section-content">
         <div className="form-group">
-          <label htmlFor="initial-savings">Initial Savings / Portfolio Value (€)</label>
-          <NumberInput
-            id="initial-savings"
-            value={inputs.initialSavings}
-            onChange={(value) => handleChange('initialSavings', value)}
-          />
+          <label htmlFor="initial-savings">
+            Initial Savings / Portfolio Value (€)
+            {inputs.useAssetAllocationValue && <span className="calculated-label"> - From Asset Allocation</span>}
+          </label>
+          {inputs.useAssetAllocationValue ? (
+            <input
+              id="initial-savings"
+              type="number"
+              inputMode="decimal"
+              value={effectivePortfolioValue.toFixed(2)}
+              readOnly
+              className="calculated-field"
+              aria-readonly="true"
+            />
+          ) : (
+            <NumberInput
+              id="initial-savings"
+              value={inputs.initialSavings}
+              onChange={(value) => handleChange('initialSavings', value)}
+            />
+          )}
         </div>
         </div>)}
       </div>
@@ -76,36 +125,76 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           aria-expanded={openSections.assetAllocation}
           aria-controls="asset-allocation-content"
         >
-          <h3><span aria-hidden="true">📊</span> Asset Allocation <span className="collapse-icon-small" aria-hidden="true">{openSections.assetAllocation ? '▼' : '▶'}</span></h3>
+          <h3>
+            <span aria-hidden="true">📊</span> Asset Allocation 
+            {inputs.useAssetAllocationValue && <span className="calculated-label"> - From Asset Allocation</span>}
+            <span className="collapse-icon-small" aria-hidden="true">{openSections.assetAllocation ? '▼' : '▶'}</span>
+          </h3>
         </button>
         {openSections.assetAllocation && (<div id="asset-allocation-content" className="form-section-content">
         <div className="form-group">
           <label htmlFor="stocks-percent">Stocks (%)</label>
-          <NumberInput
-            id="stocks-percent"
-            value={inputs.stocksPercent}
-            onChange={(value) => handleChange('stocksPercent', value)}
-          />
+          {inputs.useAssetAllocationValue ? (
+            <input
+              id="stocks-percent"
+              type="number"
+              inputMode="decimal"
+              value={effectiveStocksPercent.toFixed(2)}
+              readOnly
+              className="calculated-field"
+              aria-readonly="true"
+            />
+          ) : (
+            <NumberInput
+              id="stocks-percent"
+              value={inputs.stocksPercent}
+              onChange={(value) => handleChange('stocksPercent', value)}
+            />
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="bonds-percent">Bonds (%)</label>
-          <NumberInput
-            id="bonds-percent"
-            value={inputs.bondsPercent}
-            onChange={(value) => handleChange('bondsPercent', value)}
-          />
+          {inputs.useAssetAllocationValue ? (
+            <input
+              id="bonds-percent"
+              type="number"
+              inputMode="decimal"
+              value={effectiveBondsPercent.toFixed(2)}
+              readOnly
+              className="calculated-field"
+              aria-readonly="true"
+            />
+          ) : (
+            <NumberInput
+              id="bonds-percent"
+              value={inputs.bondsPercent}
+              onChange={(value) => handleChange('bondsPercent', value)}
+            />
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="cash-percent">Cash (%)</label>
-          <NumberInput
-            id="cash-percent"
-            value={inputs.cashPercent}
-            onChange={(value) => handleChange('cashPercent', value)}
-          />
+          {inputs.useAssetAllocationValue ? (
+            <input
+              id="cash-percent"
+              type="number"
+              inputMode="decimal"
+              value={effectiveCashPercent.toFixed(2)}
+              readOnly
+              className="calculated-field"
+              aria-readonly="true"
+            />
+          ) : (
+            <NumberInput
+              id="cash-percent"
+              value={inputs.cashPercent}
+              onChange={(value) => handleChange('cashPercent', value)}
+            />
+          )}
         </div>
         <div className="allocation-sum" role="status" aria-live="polite">
-          Total: {inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent}%
-          {Math.abs((inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent) - 100) > 0.01 && 
+          Total: {(effectiveStocksPercent + effectiveBondsPercent + effectiveCashPercent).toFixed(2)}%
+          {Math.abs((effectiveStocksPercent + effectiveBondsPercent + effectiveCashPercent) - 100) > 0.01 && 
             <span className="warning"> <span aria-hidden="true">⚠️</span> Should equal 100%</span>
           }
         </div>
@@ -225,11 +314,15 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label htmlFor="years-of-expenses">Years of Expenses Needed for FIRE</label>
-          <NumberInput
+          <label htmlFor="years-of-expenses">Years of Expenses Needed for FIRE <span className="calculated-label">- Auto-calculated</span></label>
+          <input
             id="years-of-expenses"
-            value={inputs.yearsOfExpenses}
-            onChange={(value) => handleChange('yearsOfExpenses', value)}
+            type="number"
+            inputMode="decimal"
+            value={calculatedYearsOfExpenses.toFixed(2)}
+            readOnly
+            className="calculated-field"
+            aria-readonly="true"
           />
         </div>
         </div>)}
@@ -283,11 +376,11 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </button>
         {openSections.personalInfo && (<div id="personal-info-content" className="form-section-content">
         <div className="form-group">
-          <label htmlFor="year-of-birth">Year of Birth</label>
+          <label htmlFor="current-age">Current Age</label>
           <NumberInput
-            id="year-of-birth"
-            value={inputs.yearOfBirth}
-            onChange={(value) => handleChange('yearOfBirth', value)}
+            id="current-age"
+            value={currentYear - inputs.yearOfBirth}
+            onChange={(value) => handleChange('yearOfBirth', currentYear - value)}
             allowDecimals={false}
           />
         </div>
@@ -321,6 +414,16 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
               onChange={(e) => handleChange('stopWorkingAtFIRE', e.target.checked)}
             />
             Stop working when reaching FIRE number
+          </label>
+        </div>
+        <div className="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={inputs.useAssetAllocationValue}
+              onChange={(e) => handleChange('useAssetAllocationValue', e.target.checked)}
+            />
+            Use Asset Allocation portfolio value and allocation
           </label>
         </div>
         </div>)}

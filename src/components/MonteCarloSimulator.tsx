@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CalculatorInputs, MonteCarloInputs, MonteCarloResult } from '../types/calculator';
 import { runMonteCarloSimulation } from '../utils/monteCarlo';
 import { NumberInput } from './NumberInput';
+import { MonteCarloChart } from './MonteCarloChart';
 
 interface MonteCarloSimulatorProps {
   inputs: CalculatorInputs;
@@ -132,6 +133,8 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
               {result.successRate > 10 && `${result.successRate.toFixed(2)}%`}
             </div>
           </div>
+
+          <MonteCarloChart result={result} />
         </div>
       )}
     </section>

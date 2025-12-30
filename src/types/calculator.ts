@@ -43,6 +43,7 @@ export interface CalculatorInputs {
   // Options
   stopWorkingAtFIRE: boolean;
   maxAge: number; // Maximum age for projections (default 100)
+  useAssetAllocationValue: boolean; // When true, use asset allocation total as portfolio value
 }
 
 export interface YearProjection {
