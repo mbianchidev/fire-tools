@@ -2012,9 +2012,18 @@ describe('Allocation Percentage Bug Fixes', () => {
         .reduce((sum, a) => sum + a.currentValue, 0);
       expect(portfolioValue).toBe(215000);
       
+      // Define asset class targets for the scenario
+      const assetClassTargets = {
+        STOCKS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 90 },
+        BONDS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 10 },
+        CASH: { targetMode: 'SET' as AllocationMode },
+        CRYPTO: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+        REAL_ESTATE: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+      };
+      
       // Calculate asset class summaries
-      // Pass totalHoldings (220k) so currentPercent is calculated correctly
-      const summaries = calculateAssetClassSummaries(assets, portfolioValue, totalHoldings);
+      // Pass totalHoldings (220k) and assetClassTargets so percentages are calculated correctly
+      const summaries = calculateAssetClassSummaries(assets, portfolioValue, totalHoldings, assetClassTargets);
       
       // Find the summaries by asset class
       const stocksSummary = summaries.find(s => s.assetClass === 'STOCKS')!;

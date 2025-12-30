@@ -57,6 +57,7 @@ export function calculateAssetClassSummaries(
     }, 0);
     
     // currentPercent should be based on total holdings (all assets) for accurate display
+    // This fixes the bug where percentages could exceed 100% when cash was excluded from denominator
     const currentPercent = percentageBase > 0 ? (currentTotal / percentageBase) * 100 : 0;
     
     // Determine class-level target
@@ -77,7 +78,7 @@ export function calculateAssetClassSummaries(
         return sum;
       }, 0);
     } else if (assetClassTargets && assetClassTargets[assetClass]) {
-      // Use class-level target from assetClassTargets if provided
+      // Use class-level target from assetClassTargets if provided (preferred path)
       const classTarget = assetClassTargets[assetClass];
       targetMode = classTarget.targetMode;
       targetPercent = classTarget.targetPercent;
@@ -86,7 +87,8 @@ export function calculateAssetClassSummaries(
       }
     } else {
       // Fallback: Calculate percentage target from individual assets
-      // Note: This sums to 100% within the class, which may not be the intended class allocation
+      // This path is for backward compatibility when assetClassTargets is not provided
+      // Note: Individual asset percentages sum to 100% within the class, not the portfolio
       targetPercent = classAssets.reduce((sum, asset) => {
         if (asset.targetMode === 'PERCENTAGE') {
           return sum + (asset.targetPercent || 0);
