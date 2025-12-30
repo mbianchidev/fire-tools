@@ -7,6 +7,7 @@ interface NumberInputProps {
   placeholder?: string;
   readOnly?: boolean;
   allowDecimals?: boolean;
+  id?: string;
 }
 
 /**
@@ -20,6 +21,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   placeholder,
   readOnly = false,
   allowDecimals = true,
+  id,
 }) => {
   const [stringValue, setStringValue] = useState(value.toString());
   const [isFocused, setIsFocused] = useState(false);
@@ -65,6 +67,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
 
   return (
     <input
+      id={id}
       type="text"
       inputMode="decimal"
       value={stringValue}

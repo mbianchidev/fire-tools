@@ -44,6 +44,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         <div className="form-group">
           <label htmlFor="num-simulations">Number of Simulations</label>
           <NumberInput
+            id="num-simulations"
             value={mcInputs.numSimulations}
             onChange={(value) => handleInputChange('numSimulations', value)}
             allowDecimals={false}
@@ -53,6 +54,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         <div className="form-group">
           <label htmlFor="stock-volatility">Stock Volatility (% std dev)</label>
           <NumberInput
+            id="stock-volatility"
             value={mcInputs.stockVolatility}
             onChange={(value) => handleInputChange('stockVolatility', value)}
           />
@@ -61,6 +63,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         <div className="form-group">
           <label htmlFor="bond-volatility">Bond Volatility (% std dev)</label>
           <NumberInput
+            id="bond-volatility"
             value={mcInputs.bondVolatility}
             onChange={(value) => handleInputChange('bondVolatility', value)}
           />
@@ -69,6 +72,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         <div className="form-group">
           <label htmlFor="black-swan-prob">Black Swan Probability (% per year)</label>
           <NumberInput
+            id="black-swan-prob"
             value={mcInputs.blackSwanProbability}
             onChange={(value) => handleInputChange('blackSwanProbability', value)}
           />
@@ -77,6 +81,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         <div className="form-group">
           <label htmlFor="black-swan-impact">Black Swan Impact (%)</label>
           <NumberInput
+            id="black-swan-impact"
             value={mcInputs.blackSwanImpact}
             onChange={(value) => handleInputChange('blackSwanImpact', value)}
           />
