@@ -5,6 +5,9 @@ const defaultIncome = 60000;
 const defaultExpenses = 40000;
 const defaultSavingsRate = ((defaultIncome - defaultExpenses) / defaultIncome) * 100;
 
+// Default years of expenses for FIRE target (equivalent to 3% withdrawal rate)
+const defaultYearsOfExpenses = 100 / 3; // ~33.33 years
+
 export const DEFAULT_INPUTS: CalculatorInputs = {
   initialSavings: 50000,
   stocksPercent: 70,
@@ -16,6 +19,7 @@ export const DEFAULT_INPUTS: CalculatorInputs = {
   laborIncomeGrowthRate: 3,
   savingsRate: defaultSavingsRate,
   desiredWithdrawalRate: 3,
+  yearsOfExpenses: defaultYearsOfExpenses,
   expectedStockReturn: 7,
   expectedBondReturn: 2,
   expectedCashReturn: -2,

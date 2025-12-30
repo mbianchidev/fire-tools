@@ -32,6 +32,9 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
       age: p.age,
       'Labor Income': p.laborIncome,
       'Investment Yield': p.investmentYield,
+      'State Pension': p.statePensionIncome,
+      'Private Pension': p.privatePensionIncome,
+      'Other Income': p.otherIncome,
       'Expenses': p.expenses,
     }));
   };
@@ -149,6 +152,9 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
           <Legend wrapperStyle={{ paddingTop: '10px' }} />
           <Bar dataKey="Labor Income" fill="#4CAF50" />
           <Bar dataKey="Investment Yield" fill="#2196F3" />
+          <Bar dataKey="State Pension" fill="#9C27B0" />
+          <Bar dataKey="Private Pension" fill="#FF9800" />
+          <Bar dataKey="Other Income" fill="#00BCD4" />
           <Bar dataKey="Expenses" fill="#f44336" />
         </BarChart>
       </ResponsiveContainer>

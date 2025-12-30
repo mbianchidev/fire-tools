@@ -155,7 +155,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
           />
         </div>
         <div className="form-group">
-          <label htmlFor="other-income">Other Income (Annual) (€)</label>
+          <label htmlFor="other-income">Side Income / Working After FIRE (Annual) (€)</label>
           <NumberInput
             id="other-income"
             value={inputs.otherIncome}
@@ -222,6 +222,14 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             id="withdrawal-rate"
             value={inputs.desiredWithdrawalRate}
             onChange={(value) => handleChange('desiredWithdrawalRate', value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="years-of-expenses">Years of Expenses Needed for FIRE</label>
+          <NumberInput
+            id="years-of-expenses"
+            value={inputs.yearsOfExpenses}
+            onChange={(value) => handleChange('yearsOfExpenses', value)}
           />
         </div>
         </div>)}

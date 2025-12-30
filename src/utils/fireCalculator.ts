@@ -61,13 +61,15 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     };
   }
   
-  // Calculate FIRE target based on desired withdrawal rate
-  // Special case: if withdrawal rate is 0, FIRE is achieved immediately
+  // Calculate FIRE target based on years of expenses parameter
+  // Special case: if withdrawal rate is 0, FIRE is achieved immediately (no savings needed)
+  // Otherwise, FIRE target = annual expenses × years of expenses needed
   let fireTarget: number;
   if (inputs.desiredWithdrawalRate === 0) {
     fireTarget = 0; // FIRE is achieved with any amount if withdrawal rate is 0
   } else {
-    fireTarget = inputs.fireAnnualExpenses / (inputs.desiredWithdrawalRate / 100);
+    // Use yearsOfExpenses directly to calculate FIRE target
+    fireTarget = inputs.fireAnnualExpenses * inputs.yearsOfExpenses;
     // Check if fireTarget is reasonable
     if (!isFinite(fireTarget) || fireTarget > MAX_SAFE_VALUE) {
       validationErrors.push('FIRE target calculation resulted in an invalid value');
@@ -114,8 +116,10 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     
     // Calculate income
     const currentLaborIncome = isWorking ? laborIncome : 0;
-    const pensionIncome = age >= inputs.retirementAge ? 
-      inputs.statePensionIncome + inputs.privatePensionIncome : 0;
+    // Pension income only starts at retirement age
+    const currentStatePension = age >= inputs.retirementAge ? inputs.statePensionIncome : 0;
+    const currentPrivatePension = age >= inputs.retirementAge ? inputs.privatePensionIncome : 0;
+    const pensionIncome = currentStatePension + currentPrivatePension;
     const otherIncomeTotal = pensionIncome + inputs.otherIncome;
     const totalIncome = currentLaborIncome + investmentYield + otherIncomeTotal;
     
@@ -146,6 +150,9 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
       portfolioValue,
       fireTarget,
       isFIRE: isFIREAchieved,
+      statePensionIncome: currentStatePension,
+      privatePensionIncome: currentPrivatePension,
+      otherIncome: inputs.otherIncome,
     });
     
     // Update portfolio for next year

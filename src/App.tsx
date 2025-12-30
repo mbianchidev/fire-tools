@@ -185,7 +185,7 @@ function FIRECalculatorPage() {
         
         {result && !hasValidationErrors && (
           <>
-            <FIREMetrics result={result} currentAge={currentAge} />
+            <FIREMetrics result={result} currentAge={currentAge} zoomYears={zoomYears} />
             
             <div className="charts-section">
               <NetWorthChart 

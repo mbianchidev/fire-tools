@@ -5,14 +5,46 @@ import { useState } from 'react';
 interface FIREMetricsProps {
   result: CalculationResult;
   currentAge: number;
+  zoomYears: number | 'all';
 }
 
-export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) => {
-  const { yearsToFIRE, fireTarget, finalPortfolioValue, validationErrors } = result;
+export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge, zoomYears }) => {
+  const { yearsToFIRE, fireTarget, validationErrors, projections } = result;
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
   
   const hasErrors = validationErrors && validationErrors.length > 0;
+
+  // Calculate final portfolio value based on zoom level
+  const getDisplayedFinalPortfolioValue = () => {
+    if (hasErrors || projections.length === 0) return 0;
+    
+    if (zoomYears === 'all') {
+      return projections[projections.length - 1]?.portfolioValue || 0;
+    }
+    
+    // Find the projection at or before the zoomed age in a single pass
+    const targetAge = currentAge + zoomYears;
+    let lastValidProjection = projections[0];
+    
+    for (const projection of projections) {
+      if (projection.age === targetAge) {
+        return projection.portfolioValue;
+      }
+      if (projection.age <= targetAge) {
+        lastValidProjection = projection;
+      } else {
+        break; // Projections are ordered by age, so we can stop early
+      }
+    }
+    
+    return lastValidProjection?.portfolioValue || 0;
+  };
+
+  const displayedFinalPortfolioValue = getDisplayedFinalPortfolioValue();
+  const displayedEndAge = zoomYears === 'all' 
+    ? projections[projections.length - 1]?.age 
+    : Math.min(currentAge + zoomYears, projections[projections.length - 1]?.age || currentAge);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -59,8 +91,8 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge }) 
         </div>
 
         <div className="metric-card" role="listitem">
-          <div className="metric-label">Final Portfolio Value</div>
-          <div className="metric-value">{hasErrors ? 'N/A' : formatCurrency(finalPortfolioValue)}</div>
+          <div className="metric-label">Portfolio Value at Age {displayedEndAge}</div>
+          <div className="metric-value">{hasErrors ? 'N/A' : formatCurrency(displayedFinalPortfolioValue)}</div>
         </div>
 
         <div className="metric-card" role="listitem">

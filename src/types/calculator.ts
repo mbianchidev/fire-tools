@@ -24,6 +24,7 @@ export interface CalculatorInputs {
   
   // FIRE Target
   desiredWithdrawalRate: number;
+  yearsOfExpenses: number; // Years of expenses needed for FIRE (default: ~33.33, equivalent to 3% withdrawal rate)
   
   // Expected Returns
   expectedStockReturn: number;
@@ -55,6 +56,10 @@ export interface YearProjection {
   portfolioValue: number;
   fireTarget: number;
   isFIRE: boolean;
+  // Additional income breakdown for chart display
+  statePensionIncome: number;
+  privatePensionIncome: number;
+  otherIncome: number;
 }
 
 export interface CalculationResult {
