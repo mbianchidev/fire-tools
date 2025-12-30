@@ -36,7 +36,6 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (editingClass && tableRef.current && !tableRef.current.contains(event.target as Node)) {
-        console.log('[Asset Classes Table] Click outside detected, saving changes');
         saveEditing();
       }
     };
@@ -87,9 +86,6 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
   const startEditing = (ac: AssetClassSummary) => {
     // Use assetClassTargets for editing values, not computed values from assets
     const classTarget = assetClassTargets[ac.assetClass];
-    console.log('[Asset Classes Table] Starting to edit:', ac.assetClass);
-    console.log('[Asset Classes Table] Current target mode from assetClassTargets:', classTarget?.targetMode);
-    console.log('[Asset Classes Table] Current target percent from assetClassTargets:', classTarget?.targetPercent);
     setEditingClass(ac.assetClass);
     setEditMode(classTarget?.targetMode || ac.targetMode);
     setEditPercent(classTarget?.targetPercent ?? ac.targetPercent ?? 0);
@@ -97,9 +93,6 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
 
   const saveEditing = () => {
     if (editingClass) {
-      console.log('[Asset Classes Table] Saving changes for:', editingClass);
-      console.log('[Asset Classes Table] New target mode:', editMode);
-      console.log('[Asset Classes Table] New target percent:', editPercent);
       onUpdateAssetClass(editingClass, {
         targetMode: editMode,
         targetPercent: editMode === 'PERCENTAGE' ? editPercent : undefined,
@@ -109,7 +102,6 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
   };
 
   const cancelEditing = () => {
-    console.log('[Asset Classes Table] Canceling edit for:', editingClass);
     setEditingClass(null);
   };
 

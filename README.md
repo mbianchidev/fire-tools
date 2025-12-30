@@ -1,69 +1,60 @@
 # 🔥 Fire Tools
 
-A comprehensive suite of financial tools for FIRE (Financial Independence Retire Early) planning, including calculators and portfolio management features.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.19.0-brightgreen)](package.json)
 
-## 🌐 Live Demo
+A comprehensive suite of financial tools for **FIRE (Financial Independence Retire Early)** planning. Track your journey to financial independence with powerful calculators, Monte Carlo simulations, and portfolio management features—all running securely in your browser with **no data ever leaving your device**.
 
-The latest version is automatically deployed to: **[https://mbianchidev.github.io/fire-tools/](https://mbianchidev.github.io/fire-tools/)**
+🌐 **[Try it live →](https://mbianchidev.github.io/fire-tools/)**
 
-## Features
+---
 
-### 🏠 Homepage
-- Overview of all available tools
-- Quick navigation to FIRE Calculator and Asset Allocation Manager
-- Clear descriptions of each tool's functionality
+## ✨ Features
 
-### 🔥 FIRE Calculator
-- **Comprehensive Input Parameters**
-  - Initial savings and asset allocation (stocks, bonds, cash)
-  - Income and expense projections
-  - Customizable FIRE targets and withdrawal rates
-  - Expected market returns and growth rates
-  - Personal information (age, retirement age, pensions)
+**🧮 FIRE Calculator**  
+Calculate your path to financial independence with detailed projections based on your savings, expenses, and expected returns. Visualize your net worth growth and see exactly when you'll reach your FIRE target.
 
-- **Visual Projections**
-  - Interactive bar chart showing income vs expenses over time
-  - Line chart displaying net worth growth towards FIRE target
-  - Key metrics including years to FIRE and portfolio value
+**🎲 Monte Carlo Simulations**  
+Run thousands of probabilistic simulations accounting for market volatility and black swan events. Understand your real probability of success and make informed decisions with confidence.
 
-- **Monte Carlo Simulations**
-  - Run thousands of simulations with randomized market returns
-  - Account for volatility and "Black Swan" events
-  - Calculate probability of successfully reaching FIRE
-  - View success/failure rates and median years to FIRE
+**📊 Asset Allocation Manager**  
+Track your portfolio allocation across stocks, bonds, real estate, commodities, and cash. Get intelligent rebalancing recommendations to maintain your target allocation.
 
-### 📊 Asset Allocation Manager
-- Portfolio allocation tracking and visualization
-- Rebalancing recommendations
-- DCA (Dollar Cost Averaging) helper
-- Import/Export functionality for portfolio data
+**💵 DCA Helper**  
+Plan your dollar-cost averaging strategy with built-in calculations that help you invest systematically and reduce market timing risk.
 
-## Getting Started
+**🔒 Privacy-First & Secure**  
+All data is encrypted with AES-256 and stored locally in your browser. No servers, no accounts, no data transmission—complete privacy guaranteed.
+
+**📥 Export & Import**  
+Back up your data anytime with CSV export. Import previously saved data to restore your settings across devices or after clearing cookies.
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js (version 18 or higher recommended)
-- npm or yarn
+- **Node.js** 20.19.0 or higher (or 22.12.0+, 24.0.0+)
+- **npm** (comes with Node.js)
 
 ### Installation
 
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/mbianchidev/fire-tools.git
+
+# Navigate to the directory
 cd fire-tools
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Start the development server:
-```bash
+# Start the development server
 npm run dev
 ```
 
-4. Open your browser to the URL shown in the terminal (typically http://localhost:5173)
+Open your browser to `http://localhost:5173` and start planning your FIRE journey!
 
 ### Building for Production
 
@@ -73,104 +64,122 @@ npm run build
 
 The built files will be in the `dist` directory.
 
-### Deployment
+---
 
-The project is automatically deployed to GitHub Pages on every push to the `main` branch using GitHub Actions.
+## 📖 Documentation
 
-**Automatic Deployment:**
-- Pushes to the `main` branch trigger the deployment workflow
-- The workflow builds the project and deploys to GitHub Pages
-- The live site is available at: https://mbianchidev.github.io/fire-tools/
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
+- **[AGENTS.md](AGENTS.md)** - Technical architecture and AI agent instructions
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community guidelines
+- **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability reporting
+- **[SUPPORT.md](SUPPORT.md)** - Getting help and support
 
-**Workflow Details:**
-- Build job: Installs dependencies, runs build, and uploads artifacts
-- Deploy job: Deploys the built files to GitHub Pages
-- The workflow configuration is in `.github/workflows/deploy.yml`
+---
 
-**Manual Deployment:**
-If you need to deploy manually or to a different environment, build the project and serve the `dist` directory.
+## 🖼️ Screenshots
 
-## Usage
+Visit the [live demo](https://mbianchidev.github.io/fire-tools/) to see Fire Tools in action!
 
-1. **Homepage**: Visit the root page to see an overview of all available tools
-   - Navigate to FIRE Calculator or Asset Allocation Manager
-   - Read about the features and capabilities
+**Features you'll find:**
+- 📈 Interactive charts showing income vs expenses over time
+- 💹 Net worth growth projections toward your FIRE target
+- 🎯 Customizable allocation targets with visual feedback
+- 📊 Success probability from Monte Carlo simulations
+- 🔄 Intelligent rebalancing recommendations
 
-2. **FIRE Calculator** (at `/fire-calculator`): Configure Your Inputs
-   - Use the left sidebar to enter your financial information
-   - Start with initial savings and asset allocation
-   - Enter your income, expenses, and savings rate
-   - Set your FIRE target withdrawal rate
-   - Configure expected market returns
+---
 
-3. **View Projections**: The main area displays:
-   - Years to FIRE and key metrics
-   - Net worth growth chart
-   - Income vs expenses breakdown
+## 🛠️ Technology Stack
 
-4. **Run Monte Carlo Simulations**: 
-   - Scroll to the Monte Carlo section
-   - Adjust simulation parameters (volatility, Black Swan probability)
-   - Click "Run Simulations" to see probability of success
-
-5. **Asset Allocation Manager** (at `/asset-allocation`):
-   - Track your portfolio allocation across different asset classes
-   - Get rebalancing recommendations
-   - Use the DCA helper for investment planning
-
-## Technology Stack
-
-- **React 19** - UI framework
-- **TypeScript** - Type safety
+- **React 19** - Modern UI framework with hooks
+- **TypeScript** - Type-safe development
 - **React Router** - Client-side routing
-- **Vite** - Build tool
-- **Recharts** - Data visualization
-- **CSS3** - Styling
+- **Vite** - Lightning-fast build tool
+- **Recharts** - Beautiful data visualizations
+- **crypto-js** - AES encryption for data security
 - **js-cookie** - Secure cookie management
-- **crypto-js** - AES encryption for sensitive data
 
-## Data Storage & Security
+---
 
-This application uses **encrypted cookies** to store your financial data securely on your device. This approach provides several benefits over traditional localStorage:
+## 🔒 Security & Privacy
 
-### Security Features
-- **AES Encryption**: All data is encrypted using AES encryption before being stored in cookies
-- **Secure Cookies**: Cookies are configured with `SameSite=Strict` and `Secure` flags (in HTTPS)
-- **Client-side Only**: Your data never leaves your browser - all calculations and storage are performed locally
-- **XSS Protection**: Encrypted storage helps protect against cross-site scripting attacks
+Fire Tools takes your privacy seriously:
 
-### What Gets Stored
-The following data is stored in encrypted cookies:
-1. **FIRE Calculator Inputs**: Your savings, income, expenses, and financial projections
-2. **Asset Allocation Data**: Your portfolio assets and target allocations
-3. **User Settings**: Display preferences and currency settings
+- ✅ **Client-side only** - No backend servers, all processing happens in your browser
+- ✅ **AES-256 encryption** - All financial data is encrypted before storage
+- ✅ **No data transmission** - Your data never leaves your device
+- ✅ **Secure cookies** - `SameSite=Strict` and `Secure` flags protect against attacks
+- ✅ **Open source** - Full transparency, audit the code yourself
 
-### Data Management
-- **Export**: Download your data as CSV files for backup or analysis
-- **Import**: Import previously exported data to restore your settings
-- **Clear Data**: Remove all stored data with a single click in the Settings page
-- **Automatic Persistence**: Your data is automatically saved as you make changes
+Learn more in our [Security Policy](SECURITY.md).
 
-### Privacy Notice
-- All data is stored locally in your browser's cookies
-- No data is transmitted to any servers
-- Clearing your browser's cookies will remove all stored data
-- Use the export feature regularly to back up your financial data
+---
 
-### Dependencies
-The secure storage implementation uses:
-- **[js-cookie](https://github.com/js-cookie/js-cookie)** (v3.x) - Lightweight JavaScript API for handling cookies
-- **[crypto-js](https://www.npmjs.com/package/crypto-js)** (v4.x) - JavaScript library of crypto standards for encryption
+## 🤝 Contributing
 
-## Disclaimer
+We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help makes Fire Tools better for everyone.
 
-These tools are for educational and planning purposes only. They make assumptions about future market returns and do not account for all real-world factors. Always consult with a qualified financial advisor before making investment decisions.
+**To get started:**
+1. Read our [Contributing Guide](CONTRIBUTING.md)
+2. Check out [open issues](https://github.com/mbianchidev/fire-tools/issues)
+3. Fork the repo and create a feature branch
+4. Submit a pull request
 
-## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+---
 
-## License
+## 📜 License
 
-ISC License - see LICENSE file for details
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
+---
+
+## 🔒 Security
+
+Found a security vulnerability? Please report it responsibly to **security@mb-consulting.dev**.  
+See [SECURITY.md](SECURITY.md) for our security policy and disclosure process.
+
+---
+
+## 💬 Support
+
+Need help? Have questions?
+
+- 📖 Check the [documentation](#-documentation) above
+- 🐛 [Open an issue](https://github.com/mbianchidev/fire-tools/issues/new) for bug reports
+- 💡 [Request a feature](https://github.com/mbianchidev/fire-tools/issues/new) with your ideas
+- 💬 See [SUPPORT.md](SUPPORT.md) for more support options
+
+---
+
+## 📋 Code of Conduct
+
+This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to security@mb-consulting.dev.
+
+---
+
+## 🙏 Acknowledgments
+
+Built with ❤️ for the FIRE community. Special thanks to:
+
+- The open source community for the amazing tools and libraries
+- All contributors who help improve Fire Tools
+- The FIRE community for inspiration and feedback
+
+---
+
+## ⚠️ Disclaimer
+
+Fire Tools is provided for **educational and planning purposes only**. The calculations and projections:
+
+- Make assumptions about future market returns
+- Do not account for all real-world factors
+- Are not financial, legal, or tax advice
+- Should not be the sole basis for financial decisions
+
+**Always consult with a qualified financial advisor before making investment decisions.**
+
+---
+
+Made with 🔥 by the Fire Tools community
