@@ -628,6 +628,59 @@ body {
   font-size: 0.9rem;
 }
 
+.app-footer p {
+  margin: 0 0 0.75rem 0;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.footer-links a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.footer-links a:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.footer-links a:focus {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+}
+
+.footer-separator {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+/* Mobile responsive for footer */
+@media (max-width: 480px) {
+  .app-footer {
+    padding: 1.25rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .footer-links {
+    gap: 0.5rem;
+  }
+
+  .footer-links a {
+    font-size: 0.85rem;
+  }
+}
+
 /* Scrollbar styling */
 .sidebar::-webkit-scrollbar,
 .main-content::-webkit-scrollbar {
