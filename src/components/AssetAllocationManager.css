@@ -1732,3 +1732,402 @@ select:disabled {
     padding-right: 2rem;
   }
 }
+
+/* ========================================
+   RESPONSIVE STYLES FOR MOBILE DEVICES
+   ======================================== */
+
+/* Mobile Small (320px) */
+@media (max-width: 374px) {
+  .asset-allocation-page {
+    padding: 0 0.75rem;
+    margin: 0.75rem auto;
+  }
+
+  .page-header {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .page-header p {
+    font-size: 0.9rem;
+  }
+
+  .asset-allocation-manager {
+    padding: 1rem 0;
+  }
+
+  .action-btn {
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+
+  .table-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .table-actions .action-btn {
+    width: 100%;
+  }
+}
+
+/* Mobile Medium (375px - 424px) */
+@media (min-width: 375px) and (max-width: 424px) {
+  .asset-allocation-page {
+    padding: 0 1rem;
+    margin: 1rem auto;
+  }
+
+  .page-header {
+    padding: 1.25rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .page-header p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile Large (425px - 767px) */
+@media (min-width: 425px) and (max-width: 767px) {
+  .asset-allocation-page {
+    padding: 0 1.25rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .table-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .table-actions .action-btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 140px;
+  }
+}
+
+/* All Mobile Devices (up to 767px) */
+@media (max-width: 767px) {
+  /* Portfolio value section */
+  .portfolio-value-section {
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .portfolio-value-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .portfolio-value {
+    font-size: 1.5rem !important;
+  }
+
+  .portfolio-value-info {
+    font-size: 0.9rem;
+  }
+
+  /* Section headers */
+  .section-header-with-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-header-with-actions h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .table-actions {
+    justify-content: stretch;
+  }
+
+  /* Charts */
+  .charts-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .chart-container {
+    padding: 1rem;
+  }
+
+  /* Tables - Horizontal scroll */
+  .allocation-table-container,
+  .asset-class-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .allocation-table,
+  .asset-class-table {
+    min-width: 600px;
+  }
+
+  .allocation-table th,
+  .allocation-table td,
+  .asset-class-table th,
+  .asset-class-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  /* Make first column sticky on mobile for better usability */
+  .allocation-table th:first-child,
+  .allocation-table td:first-child,
+  .asset-class-table th:first-child,
+  .asset-class-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: white;
+    z-index: 2;
+  }
+
+  .allocation-table th:first-child,
+  .asset-class-table th:first-child {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 3;
+  }
+
+  /* Collapsible sections */
+  .collapsible-section {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .how-to-use-content {
+    font-size: 0.9rem;
+    padding-left: 1rem;
+  }
+
+  .how-to-use-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Class selector */
+  .class-selector {
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .class-selector label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .class-select {
+    width: 100%;
+    font-size: 1rem;
+    min-height: 44px;
+  }
+
+  /* Action badges - smaller on mobile */
+  .action-badge {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .asset-class-badge {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  /* Input fields */
+  .target-input {
+    width: 70px;
+    font-size: 0.85rem;
+  }
+
+  /* Buttons in tables */
+  .btn-edit,
+  .btn-save,
+  .btn-cancel,
+  .btn-delete,
+  .btn-mass-edit {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    min-height: 36px;
+    min-width: 36px;
+  }
+
+  /* Touch-friendly minimum sizes */
+  button,
+  .action-btn,
+  select,
+  input {
+    min-height: 44px;
+  }
+
+  /* Prevent iOS zoom on input focus */
+  input[type="number"],
+  input[type="text"],
+  select {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .asset-allocation-page {
+    padding: 0 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 2.25rem;
+  }
+
+  .charts-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .allocation-table th,
+  .allocation-table td,
+  .asset-class-table th,
+  .asset-class-table td {
+    padding: 0.875rem 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .table-actions .action-btn {
+    flex: 0 1 auto;
+  }
+}
+
+/* Laptop (1024px - 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .asset-allocation-page {
+    max-width: 1400px;
+  }
+
+  .charts-row {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  }
+}
+
+/* Desktop Large (1440px - 2559px) */
+@media (min-width: 1440px) and (max-width: 2559px) {
+  .asset-allocation-page {
+    max-width: 1600px;
+  }
+
+  .page-header {
+    padding: 2.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 2.75rem;
+  }
+
+  .page-header p {
+    font-size: 1.15rem;
+  }
+}
+
+/* 4K Displays (2560px+) */
+@media (min-width: 2560px) {
+  .asset-allocation-page {
+    max-width: 2200px;
+    padding: 0 3rem;
+  }
+
+  .page-header {
+    padding: 3rem;
+  }
+
+  .page-header h1 {
+    font-size: 3.5rem;
+  }
+
+  .page-header p {
+    font-size: 1.4rem;
+  }
+
+  .asset-allocation-manager {
+    padding: 3rem 0;
+  }
+
+  .allocation-section h3 {
+    font-size: 2rem;
+  }
+
+  .action-btn {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    min-height: 56px;
+  }
+
+  .allocation-table th,
+  .allocation-table td,
+  .asset-class-table th,
+  .asset-class-table td {
+    padding: 1.5rem 1.25rem;
+    font-size: 1.15rem;
+  }
+
+  .charts-row {
+    grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    gap: 3rem;
+  }
+
+  .chart-container {
+    padding: 2rem;
+  }
+}
+
+/* Landscape orientation adjustments for mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .page-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .charts-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Print styles */
+@media print {
+  .action-btn,
+  .table-actions,
+  .collapsible-header,
+  .btn-edit,
+  .btn-delete,
+  .btn-mass-edit {
+    display: none !important;
+  }
+
+  .asset-allocation-page {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .allocation-table,
+  .asset-class-table {
+    page-break-inside: avoid;
+  }
+}
