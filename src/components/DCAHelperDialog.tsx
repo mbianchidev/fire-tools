@@ -129,6 +129,38 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     onClose();
   };
 
+  // Helper function for real-time deviation calculation
+  const updateRealTimeDeviation = (
+    assetId: string, 
+    actualShares: number | undefined, 
+    actualAmount: number | undefined
+  ) => {
+    if (!calculation) return;
+    
+    const allocation = calculation.allocations.find(a => a.assetId === assetId);
+    if (!allocation) return;
+    
+    // For shares-based, we need price. For amount-based, we don't.
+    if (actualShares !== undefined && (!allocation.currentPrice || allocation.priceError)) {
+      return;
+    }
+    
+    const value = actualShares ?? actualAmount;
+    if (value !== undefined && !isNaN(value) && value >= 0) {
+      const confirmed = confirmInvestment(allocation, actualShares, actualAmount);
+      setConfirmedAllocations(prev => ({
+        ...prev,
+        [assetId]: { ...confirmed, isConfirmed: false }, // Keep unconfirmed but show deviation
+      }));
+    } else {
+      // Clear invalid entries
+      setConfirmedAllocations(prev => {
+        const { [assetId]: _, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
   const handleActualSharesChange = (assetId: string, value: string) => {
     setActualSharesInputs(prev => ({
       ...prev,
@@ -143,25 +175,8 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     }
     
     // Real-time deviation calculation
-    if (calculation) {
-      const allocation = calculation.allocations.find(a => a.assetId === assetId);
-      if (allocation && allocation.currentPrice && !allocation.priceError) {
-        const actualShares = parseFloat(value);
-        if (!isNaN(actualShares) && actualShares >= 0) {
-          const confirmed = confirmInvestment(allocation, actualShares, undefined);
-          setConfirmedAllocations(prev => ({
-            ...prev,
-            [assetId]: { ...confirmed, isConfirmed: false }, // Keep unconfirmed but show deviation
-          }));
-        } else {
-          // Clear invalid entries
-          setConfirmedAllocations(prev => {
-            const { [assetId]: _, ...rest } = prev;
-            return rest;
-          });
-        }
-      }
-    }
+    const actualShares = parseFloat(value);
+    updateRealTimeDeviation(assetId, actualShares, undefined);
   };
 
   const handleActualAmountChange = (assetId: string, value: string) => {
@@ -178,25 +193,8 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     }
     
     // Real-time deviation calculation
-    if (calculation) {
-      const allocation = calculation.allocations.find(a => a.assetId === assetId);
-      if (allocation) {
-        const actualAmount = parseFloat(value);
-        if (!isNaN(actualAmount) && actualAmount >= 0) {
-          const confirmed = confirmInvestment(allocation, undefined, actualAmount);
-          setConfirmedAllocations(prev => ({
-            ...prev,
-            [assetId]: { ...confirmed, isConfirmed: false }, // Keep unconfirmed but show deviation
-          }));
-        } else {
-          // Clear invalid entries
-          setConfirmedAllocations(prev => {
-            const { [assetId]: _, ...rest } = prev;
-            return rest;
-          });
-        }
-      }
-    }
+    const actualAmount = parseFloat(value);
+    updateRealTimeDeviation(assetId, undefined, actualAmount);
   };
 
   const handleConfirmInvestment = (allocation: DCAAssetAllocation) => {
