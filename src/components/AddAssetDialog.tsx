@@ -3,7 +3,7 @@ import { Asset, AssetClass, SubAssetType, AllocationMode } from '../types/assetA
 import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
 import { formatAssetName } from '../utils/allocationCalculator';
 import { convertToEUR } from '../utils/currencyConverter';
-import { loadSettings } from '../utils/settings';
+import { loadSettings } from '../utils/cookieSettings';
 
 interface AddAssetDialogProps {
   isOpen: boolean;

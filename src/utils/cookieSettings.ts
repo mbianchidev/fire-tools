@@ -1,12 +1,14 @@
 /**
  * User Settings utilities
- * Handles saving/loading user preferences to/from localStorage
+ * Handles saving/loading user preferences to/from encrypted cookies
  */
 
+import Cookies from 'js-cookie';
 import {
   CurrencySettings,
   DEFAULT_CURRENCY_SETTINGS,
 } from '../types/currency';
+import { encryptData, decryptData } from './cookieEncryption';
 
 export interface UserSettings {
   accountName: string;
@@ -22,57 +24,70 @@ export const DEFAULT_SETTINGS: UserSettings = {
 
 const SETTINGS_KEY = 'fire-calculator-settings';
 
+// Cookie options
+const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+  expires: 365, // 1 year
+  sameSite: 'strict',
+  secure: window.location.protocol === 'https:',
+  path: '/',
+};
+
 /**
- * Save user settings to localStorage
+ * Save user settings to encrypted cookies
  * @param settings - The settings to save
  */
 export function saveSettings(settings: UserSettings): void {
   try {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    const settingsJson = JSON.stringify(settings);
+    const encryptedSettings = encryptData(settingsJson);
+    Cookies.set(SETTINGS_KEY, encryptedSettings, COOKIE_OPTIONS);
   } catch (error) {
-    console.error('Failed to save settings to localStorage:', error);
-    throw new Error('Failed to save settings to local storage. Storage may be full or disabled.');
+    console.error('Failed to save settings to cookies:', error);
+    throw new Error('Failed to save settings to cookies. Cookies may be disabled.');
   }
 }
 
 /**
- * Load user settings from localStorage
+ * Load user settings from encrypted cookies
  * @returns The saved settings, or DEFAULT_SETTINGS if none saved
  */
 export function loadSettings(): UserSettings {
   try {
-    const data = localStorage.getItem(SETTINGS_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      // Merge with defaults to ensure all fields exist
-      return {
-        ...DEFAULT_SETTINGS,
-        ...parsed,
-        currencySettings: {
-          ...DEFAULT_SETTINGS.currencySettings,
-          ...(parsed.currencySettings || {}),
-          fallbackRates: {
-            ...DEFAULT_SETTINGS.currencySettings.fallbackRates,
-            ...(parsed.currencySettings?.fallbackRates || {}),
+    const encryptedSettings = Cookies.get(SETTINGS_KEY);
+    if (encryptedSettings) {
+      const decryptedSettings = decryptData(encryptedSettings);
+      if (decryptedSettings) {
+        const parsed = JSON.parse(decryptedSettings);
+        // Merge with defaults to ensure all fields exist
+        return {
+          ...DEFAULT_SETTINGS,
+          ...parsed,
+          currencySettings: {
+            ...DEFAULT_SETTINGS.currencySettings,
+            ...(parsed.currencySettings || {}),
+            fallbackRates: {
+              ...DEFAULT_SETTINGS.currencySettings.fallbackRates,
+              ...(parsed.currencySettings?.fallbackRates || {}),
+            },
           },
-        },
-      };
+        };
+      }
     }
     return DEFAULT_SETTINGS;
   } catch (error) {
-    console.error('Failed to load settings from localStorage:', error);
+    console.error('Failed to load settings from cookies:', error);
     return DEFAULT_SETTINGS;
   }
 }
 
 /**
- * Clear user settings from localStorage
+ * Clear user settings from cookies
  */
 export function clearSettings(): void {
   try {
-    localStorage.removeItem(SETTINGS_KEY);
+    Cookies.remove(SETTINGS_KEY, { path: '/' });
   } catch (error) {
-    console.error('Failed to clear settings from localStorage:', error);
+    console.error('Failed to clear settings from cookies:', error);
   }
 }
 

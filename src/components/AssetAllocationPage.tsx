@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Asset, PortfolioAllocation, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { calculatePortfolioAllocation, prepareAssetClassChartData, prepareAssetChartData, formatAssetName, formatCurrency } from '../utils/allocationCalculator';
 import { DEFAULT_ASSETS, DEFAULT_PORTFOLIO_VALUE } from '../utils/defaultAssets';
-import { saveAssetAllocation, loadAssetAllocation, clearAllData } from '../utils/localStorage';
+import { saveAssetAllocation, loadAssetAllocation, clearAllData } from '../utils/cookieStorage';
 import { exportAssetAllocationToCSV, importAssetAllocationFromCSV } from '../utils/csvExport';
 import { EditableAssetClassTable } from './EditableAssetClassTable';
 import { AllocationChart } from './AllocationChart';
@@ -332,7 +332,7 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleResetData = () => {
-    if (confirm('Are you sure you want to reset all data? This will clear all saved data from localStorage and reset to defaults.')) {
+    if (confirm('Are you sure you want to reset all data? This will clear all saved data from cookies and reset to defaults.')) {
       clearAllData();
       setAssets(DEFAULT_ASSETS);
       setAssetClassTargets(defaultTargets);

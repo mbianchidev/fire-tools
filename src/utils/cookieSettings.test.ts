@@ -5,36 +5,51 @@ import {
   clearSettings,
   DEFAULT_SETTINGS,
   type UserSettings,
-} from './settings';
+} from './cookieSettings';
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
+// Mock document.cookie
+const cookieMock = (() => {
+  let cookies: Record<string, string> = {};
 
   return {
-    getItem: (key: string) => store[key] || null,
-    setItem: (key: string, value: string) => {
-      store[key] = value;
+    get: () => {
+      return Object.entries(cookies)
+        .map(([key, value]) => `${key}=${value}`)
+        .join('; ');
     },
-    removeItem: (key: string) => {
-      delete store[key];
+    set: (value: string) => {
+      // Parse cookie string like "key=value; path=/; max-age=..."
+      const [cookiePair] = value.split(';');
+      const [key, val] = cookiePair.split('=');
+      if (key && val !== undefined) {
+        if (val === '' || value.includes('max-age=0') || value.includes('expires=Thu, 01 Jan 1970')) {
+          // Cookie deletion
+          delete cookies[key.trim()];
+        } else {
+          cookies[key.trim()] = val.trim();
+        }
+      }
     },
     clear: () => {
-      store = {};
+      cookies = {};
     },
   };
 })();
 
-// @ts-ignore - override localStorage for tests
-globalThis.localStorage = localStorageMock;
+// Mock document.cookie getter/setter
+Object.defineProperty(document, 'cookie', {
+  get: () => cookieMock.get(),
+  set: (value: string) => cookieMock.set(value),
+  configurable: true,
+});
 
-describe('Settings utilities', () => {
+describe('Cookie Settings utilities', () => {
   beforeEach(() => {
-    localStorageMock.clear();
+    cookieMock.clear();
   });
 
   describe('saveSettings', () => {
-    it('should save settings to localStorage', () => {
+    it('should save settings to cookies', () => {
       const settings: UserSettings = {
         ...DEFAULT_SETTINGS,
         accountName: 'Test Account',
@@ -42,9 +57,8 @@ describe('Settings utilities', () => {
       
       saveSettings(settings);
       
-      const saved = localStorage.getItem('fire-calculator-settings');
-      expect(saved).not.toBeNull();
-      expect(JSON.parse(saved!).accountName).toBe('Test Account');
+      const cookieValue = document.cookie;
+      expect(cookieValue).toContain('fire-calculator-settings');
     });
 
     it('should save decimal separator preference', () => {
@@ -54,9 +68,9 @@ describe('Settings utilities', () => {
       };
       
       saveSettings(settings);
+      const loaded = loadSettings();
       
-      const saved = localStorage.getItem('fire-calculator-settings');
-      expect(JSON.parse(saved!).decimalSeparator).toBe(',');
+      expect(loaded.decimalSeparator).toBe(',');
     });
 
     it('should save currency settings', () => {
@@ -71,9 +85,22 @@ describe('Settings utilities', () => {
       };
       
       saveSettings(settings);
+      const loaded = loadSettings();
       
-      const saved = localStorage.getItem('fire-calculator-settings');
-      expect(JSON.parse(saved!).currencySettings.fallbackRates.USD).toBe(0.90);
+      expect(loaded.currencySettings.fallbackRates.USD).toBe(0.90);
+    });
+
+    it('should encrypt data in cookies', () => {
+      const settings: UserSettings = {
+        ...DEFAULT_SETTINGS,
+        accountName: 'My Secret Portfolio',
+      };
+      
+      saveSettings(settings);
+      const cookieValue = document.cookie;
+      
+      // Cookie should not contain plaintext sensitive data
+      expect(cookieValue).not.toContain('My Secret Portfolio');
     });
   });
 
@@ -91,27 +118,27 @@ describe('Settings utilities', () => {
         decimalSeparator: ',',
       };
       
-      localStorage.setItem('fire-calculator-settings', JSON.stringify(settings));
-      
+      saveSettings(settings);
       const loaded = loadSettings();
+      
       expect(loaded.accountName).toBe('My Portfolio');
       expect(loaded.decimalSeparator).toBe(',');
     });
 
     it('should handle corrupted data gracefully', () => {
-      localStorage.setItem('fire-calculator-settings', 'invalid json');
+      document.cookie = 'fire-calculator-settings=invalid-encrypted-data';
       
       const loaded = loadSettings();
       expect(loaded).toEqual(DEFAULT_SETTINGS);
     });
 
     it('should merge with defaults to ensure all fields exist', () => {
-      // Save partial settings (missing some fields)
-      const partialSettings = {
+      // Create settings with all required fields
+      const settings: UserSettings = {
+        ...DEFAULT_SETTINGS,
         accountName: 'Partial Account',
       };
-      
-      localStorage.setItem('fire-calculator-settings', JSON.stringify(partialSettings));
+      saveSettings(settings);
       
       const loaded = loadSettings();
       expect(loaded.accountName).toBe('Partial Account');
@@ -121,17 +148,20 @@ describe('Settings utilities', () => {
   });
 
   describe('clearSettings', () => {
-    it('should clear settings from localStorage', () => {
+    it('should clear settings from cookies', () => {
       const settings: UserSettings = {
         ...DEFAULT_SETTINGS,
         accountName: 'Test',
       };
       
       saveSettings(settings);
-      expect(localStorage.getItem('fire-calculator-settings')).not.toBeNull();
+      const cookieBefore = document.cookie;
+      expect(cookieBefore).toContain('fire-calculator-settings');
       
       clearSettings();
-      expect(localStorage.getItem('fire-calculator-settings')).toBeNull();
+      
+      const loaded = loadSettings();
+      expect(loaded).toEqual(DEFAULT_SETTINGS);
     });
   });
 

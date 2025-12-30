@@ -14,9 +14,9 @@ import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
 import { SettingsPage } from './components/SettingsPage';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
-import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData } from './utils/localStorage';
+import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
-import { loadSettings, type UserSettings } from './utils/settings';
+import { loadSettings, type UserSettings } from './utils/cookieSettings';
 import './App.css';
 import './components/AssetAllocationManager.css';
 
@@ -154,7 +154,7 @@ function FIRECalculatorPage() {
   };
 
   const handleResetData = () => {
-    if (confirm('Are you sure you want to reset all data? This will clear all saved data from localStorage and reset to defaults.')) {
+    if (confirm('Are you sure you want to reset all data? This will clear all saved data from cookies and reset to defaults.')) {
       clearAllData();
       setInputs(DEFAULT_INPUTS);
     }
