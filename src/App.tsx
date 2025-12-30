@@ -44,7 +44,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/' ? 'page' : undefined}
         >
-          <span aria-hidden="true">🏠</span> Home
+          <span aria-hidden="true" className="nav-emoji">🏠</span> Home
         </Link>
         <Link 
           to="/asset-allocation" 
@@ -52,7 +52,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/asset-allocation' ? 'page' : undefined}
         >
-          <span aria-hidden="true">📊</span> Asset Allocation
+          <span aria-hidden="true" className="nav-emoji">📊</span> Asset Allocation
         </Link>
         <Link 
           to="/fire-calculator" 
@@ -60,7 +60,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/fire-calculator' ? 'page' : undefined}
         >
-          <span aria-hidden="true">🔥</span> FIRE Calculator
+          <span aria-hidden="true" className="nav-emoji">🔥</span> FIRE Calculator
         </Link>
         <Link 
           to="/monte-carlo" 
@@ -68,7 +68,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
         >
-          <span aria-hidden="true">🎲</span> Monte Carlo
+          <span aria-hidden="true" className="nav-emoji">🎲</span> Monte Carlo
         </Link>
       </div>
       <ProfileMenu accountName={accountName} />
@@ -281,8 +281,8 @@ function App() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         
         <header className="app-header">
-          <h1>🔥 Fire Tools</h1>
-          <p>Financial Independence Retire Early - Plan Your Path to Freedom</p>
+          <h1><span className="header-emoji">💸</span> Fire Tools</h1>
+          <p>Rocket fuel for your financial planning 🚀</p>
         </header>
 
         <Navigation accountName={settings.accountName} />

@@ -95,7 +95,7 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge, zo
           <div className="metric-value">{hasErrors ? 'N/A' : formatCurrency(displayedFinalPortfolioValue)}</div>
         </div>
 
-        <div className="metric-card" role="listitem">
+        <div className="metric-card highlight" role="listitem">
           <div className="metric-label">Current Age</div>
           <div className="metric-value">{currentAge} years</div>
         </div>
