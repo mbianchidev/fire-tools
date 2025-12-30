@@ -116,8 +116,10 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     
     // Calculate income
     const currentLaborIncome = isWorking ? laborIncome : 0;
-    const pensionIncome = age >= inputs.retirementAge ? 
-      inputs.statePensionIncome + inputs.privatePensionIncome : 0;
+    // Pension income only starts at retirement age
+    const currentStatePension = age >= inputs.retirementAge ? inputs.statePensionIncome : 0;
+    const currentPrivatePension = age >= inputs.retirementAge ? inputs.privatePensionIncome : 0;
+    const pensionIncome = currentStatePension + currentPrivatePension;
     const otherIncomeTotal = pensionIncome + inputs.otherIncome;
     const totalIncome = currentLaborIncome + investmentYield + otherIncomeTotal;
     
@@ -130,8 +132,7 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
       // While working: save a percentage of labor income, plus all investment returns
       // The savings rate already accounts for expenses (if you save 30%, you spend 70%)
       const laborSavings = laborIncome * (inputs.savingsRate / 100);
-      // Include other income (side gig, pension if applicable) in savings
-      portfolioChange = laborSavings + investmentYield + otherIncomeTotal;
+      portfolioChange = laborSavings + investmentYield;
     } else {
       // Not working: live off portfolio (income - expenses, including investment returns)
       portfolioChange = totalIncome - expenses;
@@ -149,6 +150,9 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
       portfolioValue,
       fireTarget,
       isFIRE: isFIREAchieved,
+      statePensionIncome: currentStatePension,
+      privatePensionIncome: currentPrivatePension,
+      otherIncome: inputs.otherIncome,
     });
     
     // Update portfolio for next year

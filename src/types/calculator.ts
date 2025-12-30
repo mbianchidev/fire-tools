@@ -56,6 +56,10 @@ export interface YearProjection {
   portfolioValue: number;
   fireTarget: number;
   isFIRE: boolean;
+  // Additional income breakdown for chart display
+  statePensionIncome: number;
+  privatePensionIncome: number;
+  otherIncome: number;
 }
 
 export interface CalculationResult {
