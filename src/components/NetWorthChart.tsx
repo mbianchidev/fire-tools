@@ -1,6 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { YearProjection } from '../types/calculator';
 import { formatCurrency } from '../utils/allocationCalculator';
+import { calculateXAxisInterval } from '../utils/chartHelper';
 
 interface NetWorthChartProps {
   projections: YearProjection[];
@@ -137,7 +138,11 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} aria-label="Net worth growth chart over time">
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="age" label={{ value: 'Age', position: 'insideBottom', offset: -5 }} />
+          <XAxis 
+            dataKey="age" 
+            label={{ value: 'Age', position: 'insideBottom', offset: -5 }}
+            interval={calculateXAxisInterval(data.length)}
+          />
           <YAxis 
             tickFormatter={formatYAxis}
             domain={[0, 'auto']}

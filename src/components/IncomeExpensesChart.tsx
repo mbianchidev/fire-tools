@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { YearProjection } from '../types/calculator';
 import { formatCurrency } from '../utils/allocationCalculator';
+import { calculateXAxisInterval, calculateBarSize } from '../utils/chartHelper';
 
 interface IncomeExpensesChartProps {
   projections: YearProjection[];
@@ -137,9 +138,13 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
         </div>
       </div>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} aria-label="Income and expenses comparison chart over time">
+        <BarChart data={data} aria-label="Income and expenses comparison chart over time" barSize={calculateBarSize(data.length)}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="age" label={{ value: 'Age', position: 'insideBottom', offset: -5 }} />
+          <XAxis 
+            dataKey="age" 
+            label={{ value: 'Age', position: 'insideBottom', offset: -5 }}
+            interval={calculateXAxisInterval(data.length)}
+          />
           <YAxis 
             tickFormatter={formatYAxis}
             domain={[0, 'auto']}
