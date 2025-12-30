@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { calculateDCAAllocation, calculateShares, formatShares, formatDCACurrency } from './dcaCalculator';
+import { 
+  calculateDCAAllocation, 
+  calculateShares, 
+  formatShares, 
+  formatDCACurrency,
+  calculateInvestmentDeviation,
+  formatDeviation,
+  confirmInvestment
+} from './dcaCalculator';
 import { Asset, AssetClass } from '../types/assetAllocation';
 
 describe('DCA Calculator', () => {
@@ -333,6 +341,173 @@ describe('DCA Calculator', () => {
 
     it('should handle unknown currencies by using the code as symbol', () => {
       expect(formatDCACurrency(1000, 'XYZ')).toBe('XYZ1,000.00');
+    });
+  });
+
+  describe('calculateInvestmentDeviation', () => {
+    it('should calculate deviation when actual shares match suggested', () => {
+      const result = calculateInvestmentDeviation({
+        suggestedShares: 10,
+        actualShares: 10,
+        suggestedAmount: 1000,
+        currentPrice: 100,
+      });
+
+      expect(result.deviationPercent).toBe(0);
+      expect(result.deviationAmount).toBe(0);
+      expect(result.actualAmount).toBe(1000);
+      expect(result.status).toBe('exact');
+    });
+
+    it('should calculate deviation when buying more shares than suggested', () => {
+      const result = calculateInvestmentDeviation({
+        suggestedShares: 10,
+        actualShares: 11,
+        suggestedAmount: 1000,
+        currentPrice: 100,
+      });
+
+      expect(result.deviationPercent).toBeCloseTo(10, 2);
+      expect(result.deviationAmount).toBeCloseTo(100, 2);
+      expect(result.actualAmount).toBe(1100);
+      expect(result.status).toBe('over');
+    });
+
+    it('should calculate deviation when buying fewer shares than suggested', () => {
+      const result = calculateInvestmentDeviation({
+        suggestedShares: 10,
+        actualShares: 9,
+        suggestedAmount: 1000,
+        currentPrice: 100,
+      });
+
+      expect(result.deviationPercent).toBeCloseTo(-10, 2);
+      expect(result.deviationAmount).toBeCloseTo(-100, 2);
+      expect(result.actualAmount).toBe(900);
+      expect(result.status).toBe('under');
+    });
+
+    it('should handle fractional shares correctly', () => {
+      const result = calculateInvestmentDeviation({
+        suggestedShares: 5.5,
+        actualShares: 5.25,
+        suggestedAmount: 550,
+        currentPrice: 100,
+      });
+
+      expect(result.deviationPercent).toBeCloseTo(-4.55, 1);
+      expect(result.deviationAmount).toBeCloseTo(-25, 2);
+      expect(result.actualAmount).toBe(525);
+      expect(result.status).toBe('under');
+    });
+
+    it('should handle zero suggested shares', () => {
+      const result = calculateInvestmentDeviation({
+        suggestedShares: 0,
+        actualShares: 5,
+        suggestedAmount: 0,
+        currentPrice: 100,
+      });
+
+      expect(result.deviationPercent).toBe(100); // 100% deviation since nothing was suggested
+      expect(result.deviationAmount).toBe(500);
+      expect(result.actualAmount).toBe(500);
+      expect(result.status).toBe('over');
+    });
+
+    it('should handle missing current price gracefully', () => {
+      const result = calculateInvestmentDeviation({
+        suggestedShares: 10,
+        actualShares: 10,
+        suggestedAmount: 1000,
+        currentPrice: undefined,
+      });
+
+      expect(result.actualAmount).toBeUndefined();
+      expect(result.deviationAmount).toBeUndefined();
+      expect(result.deviationPercent).toBeUndefined();
+      expect(result.status).toBe('unknown');
+    });
+  });
+
+  describe('formatDeviation', () => {
+    it('should format positive deviation with plus sign', () => {
+      expect(formatDeviation(10)).toBe('+10.00%');
+      expect(formatDeviation(5.5)).toBe('+5.50%');
+    });
+
+    it('should format negative deviation with minus sign', () => {
+      expect(formatDeviation(-10)).toBe('-10.00%');
+      expect(formatDeviation(-5.5)).toBe('-5.50%');
+    });
+
+    it('should format zero deviation correctly', () => {
+      expect(formatDeviation(0)).toBe('0.00%');
+    });
+
+    it('should handle undefined deviation', () => {
+      expect(formatDeviation(undefined)).toBe('N/A');
+    });
+  });
+
+  describe('confirmInvestment', () => {
+    it('should add actual shares to an allocation', () => {
+      const allocation = {
+        assetId: 'vti',
+        assetName: 'VTI',
+        ticker: 'VTI',
+        assetClass: 'STOCKS' as AssetClass,
+        allocationPercent: 60,
+        investmentAmount: 6000,
+        currentPrice: 200,
+        shares: 30,
+      };
+
+      const result = confirmInvestment(allocation, 30);
+
+      expect(result.actualShares).toBe(30);
+      expect(result.isConfirmed).toBe(true);
+      expect(result.deviation?.status).toBe('exact');
+    });
+
+    it('should calculate deviation when confirming different amount', () => {
+      const allocation = {
+        assetId: 'vti',
+        assetName: 'VTI',
+        ticker: 'VTI',
+        assetClass: 'STOCKS' as AssetClass,
+        allocationPercent: 60,
+        investmentAmount: 6000,
+        currentPrice: 200,
+        shares: 30,
+      };
+
+      const result = confirmInvestment(allocation, 32);
+
+      expect(result.actualShares).toBe(32);
+      expect(result.isConfirmed).toBe(true);
+      expect(result.deviation?.status).toBe('over');
+      expect(result.deviation?.deviationPercent).toBeCloseTo(6.67, 1);
+    });
+
+    it('should handle confirmation with zero shares', () => {
+      const allocation = {
+        assetId: 'vti',
+        assetName: 'VTI',
+        ticker: 'VTI',
+        assetClass: 'STOCKS' as AssetClass,
+        allocationPercent: 60,
+        investmentAmount: 6000,
+        currentPrice: 200,
+        shares: 30,
+      };
+
+      const result = confirmInvestment(allocation, 0);
+
+      expect(result.actualShares).toBe(0);
+      expect(result.isConfirmed).toBe(true);
+      expect(result.deviation?.status).toBe('under');
+      expect(result.deviation?.deviationPercent).toBe(-100);
     });
   });
 });

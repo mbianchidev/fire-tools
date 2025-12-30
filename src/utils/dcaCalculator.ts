@@ -243,3 +243,127 @@ export function formatDCACurrency(amount: number, currency: string = 'EUR'): str
   
   return `${symbol}${formatted}`;
 }
+
+/**
+ * Investment Deviation Types
+ */
+export type InvestmentDeviationStatus = 'exact' | 'over' | 'under' | 'unknown';
+
+export interface InvestmentDeviationInput {
+  suggestedShares: number;
+  actualShares: number;
+  suggestedAmount: number;
+  currentPrice?: number;
+}
+
+export interface InvestmentDeviationResult {
+  actualAmount?: number;
+  deviationAmount?: number;
+  deviationPercent?: number;
+  status: InvestmentDeviationStatus;
+}
+
+export interface ConfirmedDCAAssetAllocation extends DCAAssetAllocation {
+  actualShares?: number;
+  isConfirmed?: boolean;
+  deviation?: InvestmentDeviationResult;
+}
+
+/**
+ * Calculate the deviation between actual and suggested investment.
+ * 
+ * @param input - The input containing suggested and actual values
+ * @returns The deviation result with amount, percentage, and status
+ */
+export function calculateInvestmentDeviation(
+  input: InvestmentDeviationInput
+): InvestmentDeviationResult {
+  const { actualShares, suggestedAmount, currentPrice } = input;
+  
+  // Handle missing current price
+  if (currentPrice === undefined || currentPrice === null) {
+    return {
+      status: 'unknown',
+    };
+  }
+  
+  // Calculate actual amount
+  const actualAmount = actualShares * currentPrice;
+  
+  // Calculate deviation
+  const deviationAmount = actualAmount - suggestedAmount;
+  
+  // Calculate percentage deviation
+  let deviationPercent: number;
+  if (suggestedAmount === 0) {
+    // If nothing was suggested but something was bought, it's a 100% deviation
+    deviationPercent = actualShares > 0 ? 100 : 0;
+  } else {
+    deviationPercent = (deviationAmount / suggestedAmount) * 100;
+  }
+  
+  // Determine status
+  let status: InvestmentDeviationStatus;
+  if (Math.abs(deviationPercent) < 0.01) {
+    status = 'exact';
+  } else if (deviationPercent > 0) {
+    status = 'over';
+  } else {
+    status = 'under';
+  }
+  
+  return {
+    actualAmount,
+    deviationAmount,
+    deviationPercent,
+    status,
+  };
+}
+
+/**
+ * Format deviation percentage for display.
+ * 
+ * @param deviation - The deviation percentage
+ * @returns Formatted string with sign and percentage
+ */
+export function formatDeviation(deviation: number | undefined): string {
+  if (deviation === undefined) {
+    return 'N/A';
+  }
+  
+  const formatted = Math.abs(deviation).toFixed(2);
+  
+  if (deviation === 0) {
+    return `${formatted}%`;
+  } else if (deviation > 0) {
+    return `+${formatted}%`;
+  } else {
+    return `-${formatted}%`;
+  }
+}
+
+/**
+ * Confirm an investment by adding actual shares bought.
+ * 
+ * @param allocation - The DCA asset allocation
+ * @param actualShares - The actual number of shares bought
+ * @returns The confirmed allocation with deviation calculation
+ */
+export function confirmInvestment(
+  allocation: DCAAssetAllocation,
+  actualShares: number
+): ConfirmedDCAAssetAllocation {
+  const deviation = calculateInvestmentDeviation({
+    suggestedShares: allocation.shares || 0,
+    actualShares,
+    suggestedAmount: allocation.investmentAmount,
+    currentPrice: allocation.currentPrice,
+  });
+  
+  return {
+    ...allocation,
+    actualShares,
+    isConfirmed: true,
+    deviation,
+  };
+}

@@ -6,7 +6,11 @@ import {
   calculateShares,
   formatShares,
   formatDCACurrency,
-  DCACalculation 
+  DCACalculation,
+  DCAAssetAllocation,
+  confirmInvestment,
+  formatDeviation,
+  ConfirmedDCAAssetAllocation
 } from '../utils/dcaCalculator';
 import { formatAssetName } from '../utils/allocationCalculator';
 
@@ -29,6 +33,9 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
   const [calculation, setCalculation] = useState<DCACalculation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [isConfirmMode, setIsConfirmMode] = useState(false);
+  const [confirmedAllocations, setConfirmedAllocations] = useState<Record<string, ConfirmedDCAAssetAllocation>>({});
+  const [actualSharesInputs, setActualSharesInputs] = useState<Record<string, string>>({});
 
   const handleCalculate = async () => {
     const amount = parseFloat(investmentAmount);
@@ -58,6 +65,13 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
       
       setCalculation(calcWithShares);
       
+      // Initialize actual shares inputs with suggested values
+      const initialInputs: Record<string, string> = {};
+      calcWithShares.allocations.forEach(a => {
+        initialInputs[a.assetId] = a.shares !== undefined ? formatShares(a.shares) : '';
+      });
+      setActualSharesInputs(initialInputs);
+      
       // Show a warning if no prices could be fetched
       if (successfulFetches === 0 && tickers.length > 0) {
         setError('Unable to fetch current prices from Yahoo Finance API. Price data may be unavailable due to network issues or API limitations. You can still see the investment amounts for each asset.');
@@ -74,6 +88,9 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     setInvestmentAmount('');
     setCalculation(null);
     setError('');
+    setIsConfirmMode(false);
+    setConfirmedAllocations({});
+    setActualSharesInputs({});
   };
 
   const handleClose = () => {
@@ -81,7 +98,96 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     onClose();
   };
 
+  const handleActualSharesChange = (assetId: string, value: string) => {
+    setActualSharesInputs(prev => ({
+      ...prev,
+      [assetId]: value,
+    }));
+  };
+
+  const handleConfirmInvestment = (allocation: DCAAssetAllocation) => {
+    const actualSharesStr = actualSharesInputs[allocation.assetId];
+    const actualShares = parseFloat(actualSharesStr);
+    
+    if (isNaN(actualShares) || actualShares < 0) {
+      setError(`Please enter a valid number of shares for ${allocation.assetName}`);
+      return;
+    }
+    
+    const confirmed = confirmInvestment(allocation, actualShares);
+    setConfirmedAllocations(prev => ({
+      ...prev,
+      [allocation.assetId]: confirmed,
+    }));
+    setError('');
+  };
+
+  const handleConfirmAll = () => {
+    if (!calculation) return;
+    
+    const newConfirmed: Record<string, ConfirmedDCAAssetAllocation> = {};
+    let hasError = false;
+    
+    calculation.allocations.forEach(allocation => {
+      const actualSharesStr = actualSharesInputs[allocation.assetId];
+      const actualShares = parseFloat(actualSharesStr);
+      
+      if (isNaN(actualShares) || actualShares < 0) {
+        hasError = true;
+        return;
+      }
+      
+      newConfirmed[allocation.assetId] = confirmInvestment(allocation, actualShares);
+    });
+    
+    if (hasError) {
+      setError('Please enter valid share amounts for all assets before confirming');
+      return;
+    }
+    
+    setConfirmedAllocations(newConfirmed);
+    setError('');
+  };
+
+  const getDeviationClass = (status?: string) => {
+    switch (status) {
+      case 'exact': return 'deviation-exact';
+      case 'over': return 'deviation-over';
+      case 'under': return 'deviation-under';
+      default: return '';
+    }
+  };
+
+  const calculateTotalDeviation = () => {
+    if (!calculation || Object.keys(confirmedAllocations).length === 0) return null;
+    
+    let totalSuggested = 0;
+    let totalActual = 0;
+    
+    calculation.allocations.forEach(allocation => {
+      const confirmed = confirmedAllocations[allocation.assetId];
+      if (confirmed?.deviation?.actualAmount !== undefined) {
+        totalSuggested += allocation.investmentAmount;
+        totalActual += confirmed.deviation.actualAmount;
+      }
+    });
+    
+    if (totalSuggested === 0) return null;
+    
+    const deviationPercent = ((totalActual - totalSuggested) / totalSuggested) * 100;
+    return {
+      totalSuggested,
+      totalActual,
+      deviationPercent,
+    };
+  };
+
   if (!isOpen) return null;
+
+  const totalDeviation = calculateTotalDeviation();
+  const allConfirmed = calculation && 
+    calculation.allocations.length > 0 && 
+    Object.keys(confirmedAllocations).length === calculation.allocations.length;
 
   return (
     <div className="dialog-overlay" onClick={handleClose}>
@@ -127,16 +233,22 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
           {calculation && (
             <div className="dca-results">
               <div className="dca-summary">
-                <h3>Investment Breakdown</h3>
+                <h3>{isConfirmMode ? 'Confirm Your Investments' : 'Investment Breakdown'}</h3>
                 <p>
                   <strong>Total Amount:</strong> {formatDCACurrency(calculation.totalAmount, currency)}
                 </p>
-                <p className="dca-note">
-                  💡 Prices fetched from Yahoo Finance API. 
-                  {calculation.allocations.some(a => a.priceError) && (
-                    <span className="warning-text"> Some prices could not be fetched.</span>
-                  )}
-                </p>
+                {isConfirmMode ? (
+                  <p className="dca-note">
+                    ✍️ Enter the actual shares you purchased to track how closely you followed the suggestion.
+                  </p>
+                ) : (
+                  <p className="dca-note">
+                    💡 Prices fetched from Yahoo Finance API. 
+                    {calculation.allocations.some(a => a.priceError) && (
+                      <span className="warning-text"> Some prices could not be fetched.</span>
+                    )}
+                  </p>
+                )}
               </div>
 
               <div className="dca-table-container">
@@ -148,44 +260,101 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                       <th>Allocation</th>
                       <th>Amount</th>
                       <th>Price</th>
-                      <th>Shares</th>
+                      <th>Suggested</th>
+                      {isConfirmMode && (
+                        <>
+                          <th>Actual</th>
+                          <th>Deviation</th>
+                        </>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
-                    {calculation.allocations.map((allocation) => (
-                      <tr key={allocation.assetId}>
-                        <td>
-                          <strong>{allocation.assetName}</strong>
-                          <br />
-                          <span className="ticker-label">{allocation.ticker || 'N/A'}</span>
-                        </td>
-                        <td>{formatAssetName(allocation.assetClass)}</td>
-                        <td>{allocation.allocationPercent.toFixed(2)}%</td>
-                        <td className="amount-cell">
-                          {formatDCACurrency(allocation.investmentAmount, currency)}
-                        </td>
-                        <td className="price-cell">
-                          {allocation.priceError ? (
-                            <span className="error-text" title={allocation.priceError}>
-                              N/A
-                            </span>
-                          ) : allocation.currentPrice ? (
-                            formatDCACurrency(allocation.currentPrice, currency)
-                          ) : (
-                            <span className="loading-text">Loading...</span>
+                    {calculation.allocations.map((allocation) => {
+                      const confirmed = confirmedAllocations[allocation.assetId];
+                      return (
+                        <tr key={allocation.assetId} className={confirmed?.isConfirmed ? 'confirmed-row' : ''}>
+                          <td>
+                            <strong>{allocation.assetName}</strong>
+                            <br />
+                            <span className="ticker-label">{allocation.ticker || 'N/A'}</span>
+                          </td>
+                          <td>{formatAssetName(allocation.assetClass)}</td>
+                          <td>{allocation.allocationPercent.toFixed(2)}%</td>
+                          <td className="amount-cell">
+                            {formatDCACurrency(allocation.investmentAmount, currency)}
+                          </td>
+                          <td className="price-cell">
+                            {allocation.priceError ? (
+                              <span className="error-text" title={allocation.priceError}>
+                                N/A
+                              </span>
+                            ) : allocation.currentPrice ? (
+                              formatDCACurrency(allocation.currentPrice, currency)
+                            ) : (
+                              <span className="loading-text">Loading...</span>
+                            )}
+                          </td>
+                          <td className="shares-cell">
+                            {allocation.priceError ? (
+                              <span className="error-text">-</span>
+                            ) : allocation.shares !== undefined ? (
+                              <strong>{formatShares(allocation.shares)}</strong>
+                            ) : (
+                              <span className="loading-text">-</span>
+                            )}
+                          </td>
+                          {isConfirmMode && (
+                            <>
+                              <td className="actual-shares-cell">
+                                {allocation.priceError ? (
+                                  <span className="error-text">-</span>
+                                ) : confirmed?.isConfirmed ? (
+                                  <strong>{formatShares(confirmed.actualShares || 0)}</strong>
+                                ) : (
+                                  <div className="actual-shares-input-group">
+                                    <input
+                                      type="number"
+                                      step="0.000001"
+                                      min="0"
+                                      className="actual-shares-input"
+                                      value={actualSharesInputs[allocation.assetId] || ''}
+                                      onChange={(e) => handleActualSharesChange(allocation.assetId, e.target.value)}
+                                      placeholder="Shares"
+                                      aria-label={`Actual shares for ${allocation.assetName}`}
+                                    />
+                                    <button
+                                      className="confirm-single-btn"
+                                      onClick={() => handleConfirmInvestment(allocation)}
+                                      disabled={!actualSharesInputs[allocation.assetId]}
+                                      aria-label={`Confirm ${allocation.assetName}`}
+                                    >
+                                      ✓
+                                    </button>
+                                  </div>
+                                )}
+                              </td>
+                              <td className={`deviation-cell ${getDeviationClass(confirmed?.deviation?.status)}`}>
+                                {confirmed?.isConfirmed && confirmed.deviation ? (
+                                  <div className="deviation-display">
+                                    <span className="deviation-percent">
+                                      {formatDeviation(confirmed.deviation.deviationPercent)}
+                                    </span>
+                                    {confirmed.deviation.deviationAmount !== undefined && (
+                                      <span className="deviation-amount">
+                                        ({confirmed.deviation.deviationAmount >= 0 ? '+' : ''}{formatDCACurrency(confirmed.deviation.deviationAmount, currency)})
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="pending-text">-</span>
+                                )}
+                              </td>
+                            </>
                           )}
-                        </td>
-                        <td className="shares-cell">
-                          {allocation.priceError ? (
-                            <span className="error-text">-</span>
-                          ) : allocation.shares !== undefined ? (
-                            <strong>{formatShares(allocation.shares)}</strong>
-                          ) : (
-                            <span className="loading-text">-</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                        </tr>
+                      );
+                    })}
                   </tbody>
                   <tfoot>
                     <tr className="total-row">
@@ -193,16 +362,90 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                       <td className="amount-cell">
                         <strong>{formatDCACurrency(calculation.totalAllocated, currency)}</strong>
                       </td>
-                      <td colSpan={2}></td>
+                      <td colSpan={isConfirmMode ? 2 : 2}></td>
+                      {isConfirmMode && totalDeviation && (
+                        <>
+                          <td className="amount-cell">
+                            <strong>{formatDCACurrency(totalDeviation.totalActual, currency)}</strong>
+                          </td>
+                          <td className={`deviation-cell ${totalDeviation.deviationPercent === 0 ? 'deviation-exact' : totalDeviation.deviationPercent > 0 ? 'deviation-over' : 'deviation-under'}`}>
+                            <strong>{formatDeviation(totalDeviation.deviationPercent)}</strong>
+                          </td>
+                        </>
+                      )}
+                      {isConfirmMode && !totalDeviation && (
+                        <>
+                          <td></td>
+                          <td></td>
+                        </>
+                      )}
                     </tr>
                   </tfoot>
                 </table>
               </div>
 
+              {/* Confirmation Summary */}
+              {isConfirmMode && allConfirmed && totalDeviation && (
+                <div className={`confirmation-summary ${totalDeviation.deviationPercent === 0 ? 'exact' : Math.abs(totalDeviation.deviationPercent) <= 5 ? 'close' : 'far'}`}>
+                  <h4>📊 Investment Summary</h4>
+                  <p>
+                    <strong>Suggested Total:</strong> {formatDCACurrency(totalDeviation.totalSuggested, currency)}
+                  </p>
+                  <p>
+                    <strong>Actual Total:</strong> {formatDCACurrency(totalDeviation.totalActual, currency)}
+                  </p>
+                  <p>
+                    <strong>Overall Deviation:</strong>{' '}
+                    <span className={getDeviationClass(totalDeviation.deviationPercent === 0 ? 'exact' : totalDeviation.deviationPercent > 0 ? 'over' : 'under')}>
+                      {formatDeviation(totalDeviation.deviationPercent)}
+                    </span>
+                  </p>
+                  {Math.abs(totalDeviation.deviationPercent) <= 2 && (
+                    <p className="success-message">✅ Great job! Your investments closely match the suggested allocation.</p>
+                  )}
+                  {Math.abs(totalDeviation.deviationPercent) > 2 && Math.abs(totalDeviation.deviationPercent) <= 10 && (
+                    <p className="info-message">ℹ️ Your investments are reasonably close to the suggested allocation.</p>
+                  )}
+                  {Math.abs(totalDeviation.deviationPercent) > 10 && (
+                    <p className="warning-message">⚠️ Your investments deviate significantly from the suggestion. Consider adjusting future investments.</p>
+                  )}
+                </div>
+              )}
+
               <div className="dca-actions">
-                <button className="action-btn reset-btn" onClick={handleReset}>
-                  Reset
-                </button>
+                {!isConfirmMode ? (
+                  <>
+                    <button className="action-btn reset-btn" onClick={handleReset}>
+                      Reset
+                    </button>
+                    <button 
+                      className="action-btn primary-btn"
+                      onClick={() => setIsConfirmMode(true)}
+                    >
+                      ✍️ Confirm Investments
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button className="action-btn reset-btn" onClick={() => {
+                      setIsConfirmMode(false);
+                      setConfirmedAllocations({});
+                    }}>
+                      Back to Suggestion
+                    </button>
+                    {!allConfirmed && (
+                      <button 
+                        className="action-btn primary-btn"
+                        onClick={handleConfirmAll}
+                      >
+                        ✓ Confirm All
+                      </button>
+                    )}
+                    <button className="action-btn reset-btn" onClick={handleReset}>
+                      Start Over
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -215,6 +458,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                 <li>The calculator will distribute it according to your asset allocation targets</li>
                 <li>Current prices are fetched from Yahoo Finance API</li>
                 <li>You'll see the exact number of shares (fractional) to buy for each asset</li>
+                <li><strong>NEW:</strong> After investing, click "Confirm Investments" to record actual shares purchased and track deviations</li>
               </ul>
             </div>
           )}

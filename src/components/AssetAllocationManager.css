@@ -1490,6 +1490,153 @@
   box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
 }
 
+/* DCA Investment Confirmation Styles */
+.actual-shares-cell {
+  text-align: center;
+}
+
+.actual-shares-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.actual-shares-input {
+  width: 80px;
+  padding: 0.4rem;
+  border: 2px solid #667eea;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.actual-shares-input:focus {
+  outline: none;
+  border-color: #764ba2;
+}
+
+.confirm-single-btn {
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 4px;
+  background: #4CAF50;
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.confirm-single-btn:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.confirm-single-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.confirmed-row {
+  background-color: #e8f5e9 !important;
+}
+
+.deviation-cell {
+  text-align: center;
+  font-weight: 600;
+}
+
+.deviation-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.deviation-percent {
+  font-size: 1rem;
+}
+
+.deviation-amount {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.deviation-exact {
+  color: #4CAF50;
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.deviation-over {
+  color: #FF9800;
+  background-color: rgba(255, 152, 0, 0.1);
+}
+
+.deviation-under {
+  color: #2196F3;
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.pending-text {
+  color: #999;
+  font-style: italic;
+}
+
+/* Confirmation Summary */
+.confirmation-summary {
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.confirmation-summary.exact {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border: 2px solid #4CAF50;
+}
+
+.confirmation-summary.close {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #2196F3;
+}
+
+.confirmation-summary.far {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 2px solid #FF9800;
+}
+
+.confirmation-summary h4 {
+  margin: 0 0 0.75rem 0;
+  color: #333;
+}
+
+.confirmation-summary p {
+  margin: 0.5rem 0;
+  color: #555;
+}
+
+.success-message {
+  color: #388E3C;
+  font-weight: 600;
+  margin-top: 1rem !important;
+}
+
+.info-message {
+  color: #1976D2;
+  font-weight: 600;
+  margin-top: 1rem !important;
+}
+
+.warning-message {
+  color: #F57C00;
+  font-weight: 600;
+  margin-top: 1rem !important;
+}
+
+/* Update dca-actions for multiple buttons */
+.dca-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .asset-allocation-page {
