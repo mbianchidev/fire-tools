@@ -400,25 +400,3 @@ export function calculateYearToDateAverage(monthsData: MonthData[]): CategoryBre
 
   return breakdown;
 }
-
-/**
- * Prepare pie chart data from category breakdown
- */
-export function preparePieChartData(breakdown: CategoryBreakdown[]): { name: string; value: number; percentage: number }[] {
-  return breakdown.map(item => ({
-    name: item.category,
-    value: item.totalAmount,
-    percentage: item.percentage,
-  }));
-}
-
-/**
- * Get all unique categories from expenses
- */
-export function getUniqueCategories(expenses: ExpenseEntry[]): ExpenseCategory[] {
-  const categories = new Set<ExpenseCategory>();
-  for (const expense of expenses) {
-    categories.add(expense.category);
-  }
-  return Array.from(categories);
-}
