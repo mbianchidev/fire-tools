@@ -152,7 +152,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
             formatter={(value) => formatCurrency(Number(value))} 
             labelFormatter={(label) => `Age ${label}`}
           />
-          <Legend wrapperStyle={{ paddingTop: '10px' }} />
+          <Legend wrapperStyle={{ paddingTop: '12px' }} />
           <Line type="monotone" dataKey="Net Worth" stroke="#4CAF50" strokeWidth={2} />
           <Line type="monotone" dataKey="FIRE Target" stroke="#ff9800" strokeWidth={2} strokeDasharray="5 5" />
         </LineChart>
