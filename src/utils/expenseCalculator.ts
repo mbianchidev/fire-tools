@@ -403,6 +403,10 @@ export function calculateYearToDateAverage(monthsData: MonthData[]): CategoryBre
 
 /**
  * Calculate quarterly breakdown for a specific quarter
+ * @param monthsData - Array of month data to analyze
+ * @param quarter - Quarter number (1-4). Q1=Jan-Mar, Q2=Apr-Jun, Q3=Jul-Sep, Q4=Oct-Dec.
+ *                  Invalid quarters (< 1 or > 4) will return empty results.
+ * @returns Object containing category breakdowns, total income, and total expenses for the quarter
  */
 export function calculateQuarterlyBreakdown(
   monthsData: MonthData[],
@@ -429,7 +433,11 @@ export function calculateQuarterlyBreakdown(
 }
 
 /**
- * Calculate year-to-date breakdown
+ * Calculate year-to-date breakdown up to and including a specific month
+ * @param monthsData - Array of month data to analyze
+ * @param upToMonth - Month number (1-12). 1=January, 12=December. Inclusive.
+ *                    All months from 1 up to and including this month are considered.
+ * @returns Object containing category breakdowns, totals, and monthly averages
  */
 export function calculateYearToDateBreakdown(
   monthsData: MonthData[],

@@ -196,13 +196,16 @@ export function ExpenseTrackerPage() {
         case 'quarterly': {
           const result = calculateQuarterlyBreakdown(allMonthsData, selectedQuarter);
           // Apply global budgets
-          return result.expenses.map(item => ({
-            ...item,
-            budgeted: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget,
-            remaining: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget 
-              ? data.globalBudgets.find(b => b.category === item.category)!.monthlyBudget - item.totalAmount 
-              : undefined,
-          }));
+          return result.expenses.map(item => {
+            const budget = data.globalBudgets.find(b => b.category === item.category);
+            return {
+              ...item,
+              budgeted: budget?.monthlyBudget,
+              remaining: budget?.monthlyBudget !== undefined 
+                ? budget.monthlyBudget - item.totalAmount 
+                : undefined,
+            };
+          });
         }
         case 'yearly': {
           const allExpenses = allMonthsData.flatMap(m => m.expenses);
@@ -210,13 +213,16 @@ export function ExpenseTrackerPage() {
         }
         case 'ytd': {
           const result = calculateYearToDateBreakdown(allMonthsData, selectedMonth);
-          return result.average.map(item => ({
-            ...item,
-            budgeted: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget,
-            remaining: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget 
-              ? data.globalBudgets.find(b => b.category === item.category)!.monthlyBudget - item.totalAmount 
-              : undefined,
-          }));
+          return result.average.map(item => {
+            const budget = data.globalBudgets.find(b => b.category === item.category);
+            return {
+              ...item,
+              budgeted: budget?.monthlyBudget,
+              remaining: budget?.monthlyBudget !== undefined 
+                ? budget.monthlyBudget - item.totalAmount 
+                : undefined,
+            };
+          });
         }
         default: // 'monthly'
           if (!currentMonthData) return [];
