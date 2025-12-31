@@ -293,10 +293,16 @@
   border: 2px solid #fecaca;
   border-radius: 8px;
   margin-top: 2rem;
+  padding: 1.5rem;
 }
 
 .danger-zone h3 {
   color: #ef4444;
+  margin-bottom: 0.75rem;
+}
+
+.danger-zone .setting-help {
+  margin-bottom: 1rem;
 }
 
 .import-label {
