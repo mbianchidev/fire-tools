@@ -65,6 +65,28 @@
   box-shadow: 0 4px 12px rgba(97, 97, 97, 0.4);
 }
 
+/* Back button styling - blue */
+.back-btn {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+/* Start Over button styling - orange-ish */
+.start-over-btn {
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  color: white;
+}
+
+.start-over-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
 .export-btn {
   background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
   color: white;
