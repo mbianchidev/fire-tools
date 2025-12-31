@@ -131,7 +131,7 @@
 
 .setting-item input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .setting-help {
@@ -158,7 +158,7 @@
 }
 
 .toggle-btn:hover {
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .toggle-btn.active {
@@ -212,7 +212,7 @@
 
 .rate-input-wrapper input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .rate-suffix {
@@ -257,8 +257,8 @@
 
 .secondary-btn {
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #5568d4;
+  border: 2px solid #5568d4;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-size: 0.95rem;

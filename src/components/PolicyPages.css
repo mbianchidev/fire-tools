@@ -79,7 +79,7 @@
 }
 
 .policy-section a {
-  color: #667eea;
+  color: #5568d4;
   text-decoration: underline;
   transition: color 0.2s;
 }
@@ -89,7 +89,7 @@
 }
 
 .policy-section a:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 

@@ -9,7 +9,7 @@
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   z-index: 9999;
   padding: 1.5rem;
-  border-top: 3px solid #667eea;
+  border-top: 3px solid #5568d4;
   animation: slideUp 0.4s ease-out;
 }
 
@@ -64,7 +64,7 @@
 }
 
 .cookie-banner-links a {
-  color: #667eea;
+  color: #5568d4;
   text-decoration: underline;
   font-weight: 500;
   transition: color 0.2s;
@@ -75,7 +75,7 @@
 }
 
 .cookie-banner-links a:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -106,7 +106,7 @@
 }
 
 .cookie-btn-acknowledge:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 

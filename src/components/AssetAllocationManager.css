@@ -251,7 +251,7 @@
 .target-mode-select:focus,
 .target-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .set-label,
@@ -276,7 +276,7 @@
 .total-row {
   background: #f5f5f5;
   font-weight: bold;
-  border-top: 2px solid #667eea;
+  border-top: 2px solid #5568d4;
 }
 
 /* Charts */
@@ -322,7 +322,7 @@
 
 .custom-tooltip {
   background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #667eea;
+  border: 2px solid #5568d4;
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -334,7 +334,7 @@
 }
 
 .custom-tooltip .value {
-  color: #667eea;
+  color: #5568d4;
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
@@ -366,7 +366,7 @@
 
 .class-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 /* Info Section */
@@ -526,7 +526,7 @@
 .dialog-input:focus,
 .dialog-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .dialog-actions {
@@ -678,7 +678,7 @@
 .edit-input {
   width: 80px;
   padding: 0.4rem;
-  border: 2px solid #667eea;
+  border: 2px solid #5568d4;
   border-radius: 4px;
   font-size: 0.9rem;
 }
@@ -758,7 +758,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #667eea;
+  color: #5568d4;
   padding: 0.5rem;
 }
 
@@ -799,7 +799,7 @@
 
 .nav-link {
   text-decoration: none;
-  color: #667eea;
+  color: #5568d4;
   font-weight: 600;
   font-size: 1.1rem;
   padding: 0.5rem 1rem;
@@ -957,7 +957,7 @@
 /* Edit select for asset class table */
 .edit-select-small {
   padding: 0.4rem;
-  border: 2px solid #667eea;
+  border: 2px solid #5568d4;
   border-radius: 4px;
   font-size: 0.9rem;
 }
@@ -1121,7 +1121,7 @@
 
 .mass-edit-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .percent-sign {
@@ -1215,7 +1215,7 @@
 .portfolio-value {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #5568d4;
 }
 
 .portfolio-value-edit {
@@ -1227,7 +1227,7 @@
 .portfolio-value-input {
   width: 150px;
   padding: 0.5rem;
-  border: 2px solid #667eea;
+  border: 2px solid #5568d4;
   border-radius: 4px;
   font-size: 1.1rem;
   text-align: right;
@@ -1336,7 +1336,7 @@
 .input-row input[type="number"]:focus,
 .input-row input[type="text"]:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .input-row input[type="number"]:disabled,
@@ -1452,7 +1452,7 @@
 }
 
 .dca-table .shares-cell strong {
-  color: #667eea;
+  color: #5568d4;
 }
 
 .error-text {
@@ -1466,7 +1466,7 @@
 }
 
 .dca-table tfoot {
-  border-top: 2px solid #667eea;
+  border-top: 2px solid #5568d4;
 }
 
 .dca-table .total-row {
@@ -1549,7 +1549,7 @@
 .actual-amount-input {
   width: 80px;
   padding: 0.4rem;
-  border: 2px solid #667eea;
+  border: 2px solid #5568d4;
   border-radius: 4px;
   font-size: 0.9rem;
   text-align: right;
@@ -1849,7 +1849,7 @@
   margin-left: 0.5rem;
   opacity: 0.8;
   font-size: 1em;
-  color: #667eea;
+  color: #5568d4;
   font-weight: bold;
   position: absolute;
   right: 0.5rem;
@@ -1884,13 +1884,13 @@ select {
 }
 
 select:hover {
-  border-color: #667eea;
+  border-color: #5568d4;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 
 select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #5568d4;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 

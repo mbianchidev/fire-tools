@@ -6,7 +6,7 @@
 
 /* Global focus styles for keyboard accessibility */
 *:focus-visible {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 
@@ -94,7 +94,7 @@ body {
   border: none;
   font-size: 1.75rem;
   cursor: pointer;
-  color: #667eea;
+  color: #5568d4;
   padding: 0.5rem;
   min-width: 44px;
   min-height: 44px;
@@ -108,7 +108,7 @@ body {
 }
 
 .nav-toggle:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 
@@ -148,7 +148,7 @@ body {
 }
 
 .nav-link:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 
@@ -219,7 +219,7 @@ body {
 }
 
 .collapsible-header:focus {
-  outline: 2px solid #667eea;
+  outline: 2px solid #5568d4;
   outline-offset: 2px;
 }
 
@@ -253,9 +253,9 @@ body {
 
 .form-group input[type="number"]:focus,
 .form-group input[type="text"]:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
-  border-color: #667eea;
+  border-color: #5568d4;
 }
 
 .calculated-field {
@@ -408,7 +408,7 @@ body {
 }
 
 .share-button:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 
@@ -469,7 +469,7 @@ body {
 
 .separator {
   height: 2px;
-  background: linear-gradient(90deg, transparent, #667eea, transparent);
+  background: linear-gradient(90deg, transparent, #5568d4, transparent);
   margin: 3rem 0;
 }
 
@@ -540,7 +540,7 @@ body {
 }
 
 .run-simulation-btn:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 
@@ -642,7 +642,7 @@ body {
 }
 
 .footer-links a {
-  color: #667eea;
+  color: #5568d4;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
@@ -656,7 +656,7 @@ body {
 }
 
 .footer-links a:focus {
-  outline: 3px solid #667eea;
+  outline: 3px solid #5568d4;
   outline-offset: 2px;
 }
 
