@@ -13,6 +13,9 @@ import { HomePage } from './components/HomePage';
 import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
 import { SettingsPage } from './components/SettingsPage';
+import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
+import { CookiePolicyPage } from './components/CookiePolicyPage';
+import { CookieConsent } from './components/CookieConsent';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
@@ -293,6 +296,8 @@ function App() {
           <Route path="/monte-carlo" element={<MonteCarloPage />} />
           <Route path="/asset-allocation" element={<AssetAllocationPage />} />
           <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
         </Routes>
 
         <footer className="app-footer">
@@ -300,7 +305,16 @@ function App() {
             Fire Tools - Disclaimer: This is for educational purposes only. 
             Consult with a financial advisor for professional advice.
           </p>
+          <div className="footer-links">
+            <a href="/privacy-policy">Privacy Policy</a>
+            <span className="footer-separator">•</span>
+            <a href="/cookie-policy">Cookie Policy</a>
+            <span className="footer-separator">•</span>
+            <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
         </footer>
+
+        <CookieConsent />
       </div>
     </Router>
   );
