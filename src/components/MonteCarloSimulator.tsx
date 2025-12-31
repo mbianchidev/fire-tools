@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { CalculatorInputs, MonteCarloInputs, MonteCarloResult } from '../types/calculator';
 import { runMonteCarloSimulation } from '../utils/monteCarlo';
 import { NumberInput } from './NumberInput';
@@ -6,6 +6,14 @@ import { MonteCarloChart } from './MonteCarloChart';
 
 interface MonteCarloSimulatorProps {
   inputs: CalculatorInputs;
+}
+
+interface ValidationErrors {
+  numSimulations?: string;
+  stockVolatility?: string;
+  bondVolatility?: string;
+  blackSwanProbability?: string;
+  blackSwanImpact?: string;
 }
 
 export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs }) => {
@@ -20,11 +28,51 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
   const [result, setResult] = useState<MonteCarloResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
 
+  // Validation logic
+  const validationErrors = useMemo((): ValidationErrors => {
+    const errors: ValidationErrors = {};
+    
+    // Number of simulations: must be between 1000 and 100000
+    if (mcInputs.numSimulations < 1000) {
+      errors.numSimulations = 'Minimum 1,000 simulations required for statistical significance';
+    } else if (mcInputs.numSimulations > 100000) {
+      errors.numSimulations = 'Maximum 100,000 simulations allowed for performance';
+    }
+    
+    // Stock volatility: must be positive (> 0)
+    if (mcInputs.stockVolatility <= 0) {
+      errors.stockVolatility = 'Stock volatility must be greater than 0%';
+    }
+    
+    // Bond volatility: must be positive and less than stock volatility
+    if (mcInputs.bondVolatility <= 0) {
+      errors.bondVolatility = 'Bond volatility must be greater than 0%';
+    } else if (mcInputs.bondVolatility >= mcInputs.stockVolatility) {
+      errors.bondVolatility = `Bond volatility must be less than stock volatility (${mcInputs.stockVolatility}%)`;
+    }
+    
+    // Black swan probability: must be at least 0.1%
+    if (mcInputs.blackSwanProbability < 0.1) {
+      errors.blackSwanProbability = 'Minimum probability is 0.1% per year';
+    }
+    
+    // Black swan impact: must be negative or zero (max is 0)
+    if (mcInputs.blackSwanImpact > 0) {
+      errors.blackSwanImpact = 'Impact must be negative or zero (represents loss)';
+    }
+    
+    return errors;
+  }, [mcInputs]);
+
+  const hasErrors = Object.keys(validationErrors).length > 0;
+
   const handleInputChange = (field: keyof MonteCarloInputs, value: number) => {
     setMcInputs({ ...mcInputs, [field]: value });
   };
 
   const runSimulation = () => {
+    if (hasErrors) return;
+    
     setIsRunning(true);
     // Use setTimeout to allow UI to update
     setTimeout(() => {
@@ -36,7 +84,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
 
   return (
     <section className="monte-carlo-section" aria-labelledby="monte-carlo-heading">
-      <h2 id="monte-carlo-heading"><span aria-hidden="true">🎲</span> Monte Carlo Simulations</h2>
+      <h2 id="monte-carlo-heading"><span aria-hidden="true" className="page-header-emoji">🎲</span> Monte Carlo Simulations</h2>
       <p className="section-description">
         Run multiple simulations with random market returns to assess the probability of reaching FIRE.
       </p>
@@ -50,6 +98,9 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             onChange={(value) => handleInputChange('numSimulations', value)}
             allowDecimals={false}
           />
+          {validationErrors.numSimulations && (
+            <span className="input-error-message" role="alert">{validationErrors.numSimulations}</span>
+          )}
         </div>
 
         <div className="form-group">
@@ -59,6 +110,9 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             value={mcInputs.stockVolatility}
             onChange={(value) => handleInputChange('stockVolatility', value)}
           />
+          {validationErrors.stockVolatility && (
+            <span className="input-error-message" role="alert">{validationErrors.stockVolatility}</span>
+          )}
         </div>
 
         <div className="form-group">
@@ -68,6 +122,9 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             value={mcInputs.bondVolatility}
             onChange={(value) => handleInputChange('bondVolatility', value)}
           />
+          {validationErrors.bondVolatility && (
+            <span className="input-error-message" role="alert">{validationErrors.bondVolatility}</span>
+          )}
         </div>
 
         <div className="form-group">
@@ -77,6 +134,9 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             value={mcInputs.blackSwanProbability}
             onChange={(value) => handleInputChange('blackSwanProbability', value)}
           />
+          {validationErrors.blackSwanProbability && (
+            <span className="input-error-message" role="alert">{validationErrors.blackSwanProbability}</span>
+          )}
         </div>
 
         <div className="form-group">
@@ -86,14 +146,23 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             value={mcInputs.blackSwanImpact}
             onChange={(value) => handleInputChange('blackSwanImpact', value)}
           />
+          {validationErrors.blackSwanImpact && (
+            <span className="input-error-message" role="alert">{validationErrors.blackSwanImpact}</span>
+          )}
         </div>
       </div>
+
+      {hasErrors && (
+        <div className="validation-error-banner mc-validation-errors" role="alert" aria-live="polite">
+          <strong><span aria-hidden="true">⚠️</span> Please fix validation errors before running simulations</strong>
+        </div>
+      )}
 
       <button 
         className="run-simulation-btn" 
         onClick={runSimulation}
-        disabled={isRunning}
-        aria-label={isRunning ? 'Running simulations, please wait' : 'Run Monte Carlo simulations'}
+        disabled={isRunning || hasErrors}
+        aria-label={isRunning ? 'Running simulations, please wait' : hasErrors ? 'Fix validation errors to run simulations' : 'Run Monte Carlo simulations'}
       >
         <span aria-hidden="true">{isRunning ? '⏳' : '▶️'}</span> {isRunning ? 'Running Simulations...' : 'Run Simulations'}
       </button>

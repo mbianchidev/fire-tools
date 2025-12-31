@@ -72,6 +72,10 @@ body {
   margin-right: 0.35rem;
 }
 
+.page-header-emoji {
+  margin-right: 0.5rem;
+}
+
 .app-header p {
   color: #666;
   font-size: 1.1rem;
@@ -317,6 +321,20 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Input field error message (inline below input) */
+.input-error-message {
+  display: block;
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Monte Carlo validation errors banner */
+.mc-validation-errors {
+  margin-bottom: 1rem;
 }
 
 .calculated-label {

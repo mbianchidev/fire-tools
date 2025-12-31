@@ -34,8 +34,9 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result }) => {
       return { bins: [], stats: null };
     }
 
-    const minYears = Math.min(...successfulYears);
-    const maxYears = Math.max(...successfulYears);
+    // Use reduce instead of spread to avoid stack overflow with large arrays
+    const minYears = successfulYears.reduce((min, y) => y < min ? y : min, successfulYears[0]);
+    const maxYears = successfulYears.reduce((max, y) => y > max ? y : max, successfulYears[0]);
     const range = maxYears - minYears;
     
     // Create bins for histogram (aim for about 10-15 bins)
@@ -88,8 +89,9 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result }) => {
       return null;
     }
 
-    const minPortfolio = Math.min(...portfolios);
-    const maxPortfolio = Math.max(...portfolios);
+    // Use reduce instead of spread to avoid stack overflow with large arrays
+    const minPortfolio = portfolios.reduce((min, p) => p < min ? p : min, portfolios[0]);
+    const maxPortfolio = portfolios.reduce((max, p) => p > max ? p : max, portfolios[0]);
     const medianIndex = Math.floor(portfolios.length / 2);
     const percentile10Index = Math.floor(portfolios.length * 0.1);
     const percentile90Index = Math.floor(portfolios.length * 0.9);

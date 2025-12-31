@@ -410,7 +410,7 @@ export const AssetAllocationPage: React.FC = () => {
   return (
     <div className="asset-allocation-page">
       <header className="page-header">
-        <h1><span aria-hidden="true">📊</span> Asset Allocation Manager</h1>
+        <h1><span aria-hidden="true" className="page-header-emoji">📊</span> Asset Allocation Manager</h1>
         <p>
           Manage and visualize your portfolio asset allocation. Set target allocations,
           track current positions, and see recommended actions to rebalance your portfolio.

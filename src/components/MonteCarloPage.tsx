@@ -76,7 +76,7 @@ export const MonteCarloPage: React.FC = () => {
     <div className="app-container monte-carlo-container">
       <main className="main-content" id="main-content">
         <header className="page-header">
-          <h2><span aria-hidden="true">🎲</span> Monte Carlo Simulations</h2>
+          <h2><span aria-hidden="true" className="page-header-emoji">🎲</span> Monte Carlo Simulations</h2>
           <p className="page-description">
             Run multiple simulations with random market returns to assess the probability of reaching FIRE.
             This helps you understand the range of potential outcomes and the likelihood of success under different market conditions.
