@@ -877,3 +877,53 @@
     padding: 0.5rem;
   }
 }
+
+/* Back to Current Period Button */
+.btn-current-period {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-current-period:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+}
+
+/* Analytics View Selector */
+.analytics-view-selector {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.analytics-view-selector .selector-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.analytics-view-selector select {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.analytics-view-selector select:focus {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+  border-color: #667eea;
+}

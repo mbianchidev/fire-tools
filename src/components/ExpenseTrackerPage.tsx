@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   ExpenseTrackerData,
   IncomeEntry,
@@ -24,6 +25,8 @@ import {
   calculateCategoryTrends,
   filterTransactions,
   sortTransactions,
+  calculateQuarterlyBreakdown,
+  calculateYearToDateBreakdown,
 } from '../utils/expenseCalculator';
 import {
   saveExpenseTrackerData,
@@ -72,19 +75,55 @@ function getDefaultData(): ExpenseTrackerData {
     currentYear,
     currentMonth,
     currency: 'EUR',
+    globalBudgets: [],
   };
 }
 
+// Deep clone helper for immutable state updates
+function deepCloneData(data: ExpenseTrackerData): ExpenseTrackerData {
+  return JSON.parse(JSON.stringify(data));
+}
+
 export function ExpenseTrackerPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   // State
   const [data, setData] = useState<ExpenseTrackerData>(() => {
     const saved = loadExpenseTrackerData();
-    return saved || getDefaultData();
+    if (saved) {
+      // Ensure globalBudgets exists for backward compatibility
+      if (!saved.globalBudgets) {
+        saved.globalBudgets = [];
+      }
+      return saved;
+    }
+    return getDefaultData();
   });
   
-  // View state
-  const [selectedYear, setSelectedYear] = useState(data.currentYear);
-  const [selectedMonth, setSelectedMonth] = useState(data.currentMonth);
+  // Get year/month from URL params or use current
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  
+  const urlYear = searchParams.get('year');
+  const urlMonth = searchParams.get('month');
+  
+  const [selectedYear, setSelectedYear] = useState(() => {
+    if (urlYear) {
+      const year = parseInt(urlYear, 10);
+      if (!isNaN(year) && year >= 1900 && year <= 2100) return year;
+    }
+    return currentYear;
+  });
+  
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    if (urlMonth) {
+      const month = parseInt(urlMonth, 10);
+      if (!isNaN(month) && month >= 1 && month <= 12) return month;
+    }
+    return currentMonth;
+  });
+  
   const [activeTab, setActiveTab] = useState<'transactions' | 'budgets' | 'analytics'>('transactions');
   
   // Form state
@@ -101,11 +140,33 @@ export function ExpenseTrackerPage() {
   
   // Budget rule info collapsed state
   const [isBudgetRuleInfoOpen, setIsBudgetRuleInfoOpen] = useState(true);
+  
+  // Analytics period selection state
+  const [analyticsView, setAnalyticsView] = useState<'monthly' | 'quarterly' | 'yearly' | 'ytd'>('monthly');
+  const [selectedQuarter, setSelectedQuarter] = useState(Math.ceil(currentMonth / 3));
+
+  // Sync URL params when year/month changes
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('year', selectedYear.toString());
+    newParams.set('month', selectedMonth.toString());
+    setSearchParams(newParams, { replace: true });
+  }, [selectedYear, selectedMonth, setSearchParams, searchParams]);
 
   // Save data whenever it changes
   useEffect(() => {
     saveExpenseTrackerData(data);
   }, [data]);
+  
+  // Check if we're viewing a past period
+  const isViewingPastPeriod = selectedYear < currentYear || 
+    (selectedYear === currentYear && selectedMonth < currentMonth);
+  
+  // Navigate to current period
+  const goToCurrentPeriod = useCallback(() => {
+    setSelectedYear(currentYear);
+    setSelectedMonth(currentMonth);
+  }, [currentYear, currentMonth]);
 
   // Get current month data
   const currentMonthData = useMemo(() => {
@@ -122,11 +183,50 @@ export function ExpenseTrackerPage() {
     return calculateTransactionSummary(currentMonthData.incomes, currentMonthData.expenses);
   }, [currentMonthData]);
 
-  // Calculate category breakdown
+  // Get all months data for charts
+  const allMonthsData = useMemo(() => {
+    const yearData = data.years.find(y => y.year === selectedYear);
+    return yearData?.months || [];
+  }, [data, selectedYear]);
+
+  // Calculate category breakdown based on analytics view (using global budgets)
   const categoryBreakdown = useMemo(() => {
+    if (activeTab === 'analytics') {
+      switch (analyticsView) {
+        case 'quarterly': {
+          const result = calculateQuarterlyBreakdown(allMonthsData, selectedQuarter);
+          // Apply global budgets
+          return result.expenses.map(item => ({
+            ...item,
+            budgeted: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget,
+            remaining: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget 
+              ? data.globalBudgets.find(b => b.category === item.category)!.monthlyBudget - item.totalAmount 
+              : undefined,
+          }));
+        }
+        case 'yearly': {
+          const allExpenses = allMonthsData.flatMap(m => m.expenses);
+          return calculateCategoryBreakdown(allExpenses, data.globalBudgets);
+        }
+        case 'ytd': {
+          const result = calculateYearToDateBreakdown(allMonthsData, selectedMonth);
+          return result.average.map(item => ({
+            ...item,
+            budgeted: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget,
+            remaining: data.globalBudgets.find(b => b.category === item.category)?.monthlyBudget 
+              ? data.globalBudgets.find(b => b.category === item.category)!.monthlyBudget - item.totalAmount 
+              : undefined,
+          }));
+        }
+        default: // 'monthly'
+          if (!currentMonthData) return [];
+          return calculateCategoryBreakdown(currentMonthData.expenses, data.globalBudgets);
+      }
+    }
+    // For non-analytics tabs, just use current month
     if (!currentMonthData) return [];
-    return calculateCategoryBreakdown(currentMonthData.expenses, currentMonthData.budgets);
-  }, [currentMonthData]);
+    return calculateCategoryBreakdown(currentMonthData.expenses, data.globalBudgets);
+  }, [currentMonthData, data.globalBudgets, activeTab, analyticsView, allMonthsData, selectedQuarter, selectedMonth]);
 
   // Calculate 50/30/20 breakdown
   const budgetRuleBreakdown = useMemo(() => {
@@ -142,12 +242,6 @@ export function ExpenseTrackerPage() {
     return sortTransactions(filtered, sort);
   }, [currentMonthData, filter, sort]);
 
-  // Get all months data for charts
-  const allMonthsData = useMemo(() => {
-    const yearData = data.years.find(y => y.year === selectedYear);
-    return yearData?.months || [];
-  }, [data, selectedYear]);
-
   // Monthly comparison data
   const monthlyComparisonData = useMemo(() => {
     return calculateMonthlyComparison(allMonthsData);
@@ -158,18 +252,22 @@ export function ExpenseTrackerPage() {
     return calculateCategoryTrends(allMonthsData);
   }, [allMonthsData]);
 
-  // Add or update a month
-  const ensureMonthExists = (year: number, month: number): void => {
+  // Add income - combines month creation and income addition in one update
+  const handleAddIncome = useCallback((income: Omit<IncomeEntry, 'id' | 'type'>) => {
+    const [year, month] = income.date.split('-').map(Number);
+    
     setData(prev => {
-      const newData = { ...prev };
-      let yearData = newData.years.find(y => y.year === year);
+      const newData = deepCloneData(prev);
       
+      // Ensure year exists
+      let yearData = newData.years.find(y => y.year === year);
       if (!yearData) {
         yearData = createEmptyYearData(year);
         newData.years.push(yearData);
         newData.years.sort((a, b) => a.year - b.year);
       }
       
+      // Ensure month exists
       let monthData = yearData.months.find(m => m.month === month);
       if (!monthData) {
         monthData = createEmptyMonthData(year, month);
@@ -177,60 +275,61 @@ export function ExpenseTrackerPage() {
         yearData.months.sort((a, b) => a.month - b.month);
       }
       
-      return newData;
-    });
-  };
-
-  // Add income
-  const handleAddIncome = (income: Omit<IncomeEntry, 'id' | 'type'>) => {
-    const [year, month] = income.date.split('-').map(Number);
-    ensureMonthExists(year, month);
-    
-    setData(prev => {
-      const newData = { ...prev };
-      const yearData = newData.years.find(y => y.year === year)!;
-      const monthData = yearData.months.find(m => m.month === month)!;
-      
+      // Add income
       const newIncome: IncomeEntry = {
         ...income,
         id: generateTransactionId(),
         type: 'income',
       };
-      
       monthData.incomes.push(newIncome);
+      
       return newData;
     });
     
     setShowIncomeForm(false);
-  };
+  }, []);
 
-  // Add expense
-  const handleAddExpense = (expense: Omit<ExpenseEntry, 'id' | 'type'>) => {
+  // Add expense - combines month creation and expense addition in one update
+  const handleAddExpense = useCallback((expense: Omit<ExpenseEntry, 'id' | 'type'>) => {
     const [year, month] = expense.date.split('-').map(Number);
-    ensureMonthExists(year, month);
     
     setData(prev => {
-      const newData = { ...prev };
-      const yearData = newData.years.find(y => y.year === year)!;
-      const monthData = yearData.months.find(m => m.month === month)!;
+      const newData = deepCloneData(prev);
       
+      // Ensure year exists
+      let yearData = newData.years.find(y => y.year === year);
+      if (!yearData) {
+        yearData = createEmptyYearData(year);
+        newData.years.push(yearData);
+        newData.years.sort((a, b) => a.year - b.year);
+      }
+      
+      // Ensure month exists
+      let monthData = yearData.months.find(m => m.month === month);
+      if (!monthData) {
+        monthData = createEmptyMonthData(year, month);
+        yearData.months.push(monthData);
+        yearData.months.sort((a, b) => a.month - b.month);
+      }
+      
+      // Add expense
       const newExpense: ExpenseEntry = {
         ...expense,
         id: generateTransactionId(),
         type: 'expense',
       };
-      
       monthData.expenses.push(newExpense);
+      
       return newData;
     });
     
     setShowExpenseForm(false);
-  };
+  }, []);
 
   // Update income
-  const handleUpdateIncome = (id: string, updates: Partial<IncomeEntry>) => {
+  const handleUpdateIncome = useCallback((id: string, updates: Partial<IncomeEntry>) => {
     setData(prev => {
-      const newData = { ...prev };
+      const newData = deepCloneData(prev);
       for (const yearData of newData.years) {
         for (const monthData of yearData.months) {
           const index = monthData.incomes.findIndex(i => i.id === id);
@@ -243,12 +342,12 @@ export function ExpenseTrackerPage() {
       return newData;
     });
     setEditingTransaction(null);
-  };
+  }, []);
 
   // Update expense
-  const handleUpdateExpense = (id: string, updates: Partial<ExpenseEntry>) => {
+  const handleUpdateExpense = useCallback((id: string, updates: Partial<ExpenseEntry>) => {
     setData(prev => {
-      const newData = { ...prev };
+      const newData = deepCloneData(prev);
       for (const yearData of newData.years) {
         for (const monthData of yearData.months) {
           const index = monthData.expenses.findIndex(e => e.id === id);
@@ -261,14 +360,14 @@ export function ExpenseTrackerPage() {
       return newData;
     });
     setEditingTransaction(null);
-  };
+  }, []);
 
   // Delete transaction
-  const handleDeleteTransaction = (id: string, type: 'income' | 'expense') => {
+  const handleDeleteTransaction = useCallback((id: string, type: 'income' | 'expense') => {
     if (!confirm('Are you sure you want to delete this transaction?')) return;
     
     setData(prev => {
-      const newData = { ...prev };
+      const newData = deepCloneData(prev);
       for (const yearData of newData.years) {
         for (const monthData of yearData.months) {
           if (type === 'income') {
@@ -288,31 +387,52 @@ export function ExpenseTrackerPage() {
       }
       return newData;
     });
-  };
+  }, []);
 
-  // Update budget for a category
-  const handleUpdateBudget = (category: ExpenseCategory, amount: number) => {
-    ensureMonthExists(selectedYear, selectedMonth);
-    
+  // Update global budget for a category
+  const handleUpdateBudget = useCallback((category: ExpenseCategory, amount: number) => {
     setData(prev => {
-      const newData = { ...prev };
-      const yearData = newData.years.find(y => y.year === selectedYear)!;
-      const monthData = yearData.months.find(m => m.month === selectedMonth)!;
+      const newData = deepCloneData(prev);
       
-      const existingIndex = monthData.budgets.findIndex(b => b.category === category);
+      const existingIndex = newData.globalBudgets.findIndex(b => b.category === category);
       if (existingIndex !== -1) {
         if (amount <= 0) {
-          monthData.budgets.splice(existingIndex, 1);
+          newData.globalBudgets.splice(existingIndex, 1);
         } else {
-          monthData.budgets[existingIndex].monthlyBudget = amount;
+          newData.globalBudgets[existingIndex].monthlyBudget = amount;
         }
       } else if (amount > 0) {
-        monthData.budgets.push({ category, monthlyBudget: amount });
+        newData.globalBudgets.push({ category, monthlyBudget: amount });
       }
       
       return newData;
     });
-  };
+  }, []);
+  
+  // Ensure month exists (for "Add This Month" button)
+  const handleAddMonth = useCallback(() => {
+    setData(prev => {
+      const newData = deepCloneData(prev);
+      
+      // Ensure year exists
+      let yearData = newData.years.find(y => y.year === selectedYear);
+      if (!yearData) {
+        yearData = createEmptyYearData(selectedYear);
+        newData.years.push(yearData);
+        newData.years.sort((a, b) => a.year - b.year);
+      }
+      
+      // Ensure month exists
+      let monthData = yearData.months.find(m => m.month === selectedMonth);
+      if (!monthData) {
+        monthData = createEmptyMonthData(selectedYear, selectedMonth);
+        yearData.months.push(monthData);
+        yearData.months.sort((a, b) => a.month - b.month);
+      }
+      
+      return newData;
+    });
+  }, [selectedYear, selectedMonth]);
 
   // Export data
   const handleExport = () => {
@@ -359,15 +479,28 @@ export function ExpenseTrackerPage() {
     }
   };
 
-  // Available years for selector
+  // Available years for selector - include years from data plus a range for new years
   const availableYears = useMemo(() => {
-    const years = data.years.map(y => y.year);
-    const currentYear = new Date().getFullYear();
-    if (!years.includes(currentYear)) {
-      years.push(currentYear);
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const years = new Set(data.years.map(y => y.year));
+    
+    // Add current year
+    years.add(currentYear);
+    
+    // Add 5 past years for easy selection of older data
+    for (let i = 1; i <= 5; i++) {
+      years.add(currentYear - i);
     }
-    return years.sort((a, b) => b - a);
-  }, [data]);
+    
+    // Allow next year if we're viewing December (user can add January of next year)
+    if (selectedMonth === 12) {
+      years.add(selectedYear + 1);
+    }
+    years.add(currentYear + 1); // Always allow next year
+    
+    return Array.from(years).sort((a, b) => b - a);
+  }, [data, selectedMonth, selectedYear]);
 
   // Available months for selector
   const availableMonths = useMemo(() => {
@@ -444,10 +577,18 @@ export function ExpenseTrackerPage() {
             </div>
             <button
               className="btn-add-month"
-              onClick={() => ensureMonthExists(selectedYear, selectedMonth)}
+              onClick={handleAddMonth}
             >
               <span aria-hidden="true">➕</span> Add This Month
             </button>
+            {isViewingPastPeriod && (
+              <button
+                className="btn-current-period"
+                onClick={goToCurrentPeriod}
+              >
+                <span aria-hidden="true">📅</span> Back to Current Period
+              </button>
+            )}
           </div>
         </section>
 
@@ -714,14 +855,14 @@ export function ExpenseTrackerPage() {
         {/* Budgets Tab */}
         {activeTab === 'budgets' && (
           <section className="budgets-section" role="tabpanel" aria-labelledby="budgets-tab">
-            <h3>Monthly Budgets for {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h3>
+            <h3>Monthly Budgets</h3>
             <p className="section-description">
-              Set monthly spending limits for each category. The remaining amount shows how much you can still spend.
+              Set monthly spending limits for each category. These budgets apply to all months and help you track your spending across your entire budget.
             </p>
             <div className="budgets-grid">
               {EXPENSE_CATEGORIES.map(category => {
                 const breakdown = categoryBreakdown.find(b => b.category === category.id);
-                const budget = currentMonthData?.budgets.find(b => b.category === category.id);
+                const budget = data.globalBudgets.find(b => b.category === category.id);
                 const spent = breakdown?.totalAmount || 0;
                 const budgeted = budget?.monthlyBudget || 0;
                 const remaining = budgeted - spent;
@@ -749,7 +890,7 @@ export function ExpenseTrackerPage() {
                         />
                       </div>
                       <div className="budget-stats">
-                        <span>Spent: {formatCurrency(spent, data.currency)}</span>
+                        <span>Spent (This Month): {formatCurrency(spent, data.currency)}</span>
                         {budgeted > 0 && (
                           <span className={remaining >= 0 ? 'positive' : 'negative'}>
                             Remaining: {formatCurrency(remaining, data.currency)}
@@ -777,9 +918,48 @@ export function ExpenseTrackerPage() {
           <section className="analytics-section" role="tabpanel" aria-labelledby="analytics-tab">
             <h3>Spending Analytics for {selectedYear}</h3>
             
+            {/* Analytics View Selector */}
+            <div className="analytics-view-selector">
+              <div className="selector-group">
+                <label htmlFor="analytics-view">View:</label>
+                <select
+                  id="analytics-view"
+                  value={analyticsView}
+                  onChange={(e) => setAnalyticsView(e.target.value as 'monthly' | 'quarterly' | 'yearly' | 'ytd')}
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="yearly">Yearly Total</option>
+                  <option value="ytd">Year-to-Date Average</option>
+                </select>
+              </div>
+              {analyticsView === 'quarterly' && (
+                <div className="selector-group">
+                  <label htmlFor="quarter-select">Quarter:</label>
+                  <select
+                    id="quarter-select"
+                    value={selectedQuarter}
+                    onChange={(e) => setSelectedQuarter(Number(e.target.value))}
+                  >
+                    <option value={1}>Q1 (Jan-Mar)</option>
+                    <option value={2}>Q2 (Apr-Jun)</option>
+                    <option value={3}>Q3 (Jul-Sep)</option>
+                    <option value={4}>Q4 (Oct-Dec)</option>
+                  </select>
+                </div>
+              )}
+            </div>
+            
             {/* Expense Breakdown Pie Chart */}
             <div className="chart-container">
-              <h4>Expense Breakdown - {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h4>
+              <h4>
+                Expense Breakdown - {
+                  analyticsView === 'monthly' ? `${MONTH_NAMES[selectedMonth - 1]} ${selectedYear}` :
+                  analyticsView === 'quarterly' ? `Q${selectedQuarter} ${selectedYear}` :
+                  analyticsView === 'yearly' ? `Full Year ${selectedYear}` :
+                  `YTD Average ${selectedYear}`
+                }
+              </h4>
               <ExpenseBreakdownChart 
                 data={categoryBreakdown}
                 currency={data.currency}
@@ -806,12 +986,17 @@ export function ExpenseTrackerPage() {
 
             {/* Category Breakdown Table */}
             <div className="breakdown-table-container">
-              <h4>Category Breakdown</h4>
+              <h4>Category Breakdown - {
+                analyticsView === 'monthly' ? `${MONTH_NAMES[selectedMonth - 1]} ${selectedYear}` :
+                analyticsView === 'quarterly' ? `Q${selectedQuarter} ${selectedYear}` :
+                analyticsView === 'yearly' ? `Full Year ${selectedYear}` :
+                `YTD Average ${selectedYear}`
+              }</h4>
               <table className="breakdown-table">
                 <thead>
                   <tr>
                     <th>Category</th>
-                    <th>Current Month</th>
+                    <th>{analyticsView === 'ytd' ? 'Monthly Average' : 'Total'}</th>
                     <th>% of Total</th>
                     <th>Budget</th>
                     <th>Remaining</th>

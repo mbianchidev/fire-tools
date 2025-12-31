@@ -400,3 +400,58 @@ export function calculateYearToDateAverage(monthsData: MonthData[]): CategoryBre
 
   return breakdown;
 }
+
+/**
+ * Calculate quarterly breakdown for a specific quarter
+ */
+export function calculateQuarterlyBreakdown(
+  monthsData: MonthData[],
+  quarter: number
+): { expenses: CategoryBreakdown[]; totalIncome: number; totalExpenses: number } {
+  // Filter months for the quarter
+  const quarterMonths = monthsData.filter(m => getQuarter(m.month) === quarter);
+  
+  if (quarterMonths.length === 0) {
+    return { expenses: [], totalIncome: 0, totalExpenses: 0 };
+  }
+  
+  const allExpenses = quarterMonths.flatMap(m => m.expenses);
+  const allIncomes = quarterMonths.flatMap(m => m.incomes);
+  
+  const totalIncome = allIncomes.reduce((sum, inc) => sum + inc.amount, 0);
+  const totalExpenses = allExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  
+  return {
+    expenses: calculateCategoryBreakdown(allExpenses),
+    totalIncome,
+    totalExpenses,
+  };
+}
+
+/**
+ * Calculate year-to-date breakdown
+ */
+export function calculateYearToDateBreakdown(
+  monthsData: MonthData[],
+  upToMonth: number
+): { expenses: CategoryBreakdown[]; totalIncome: number; totalExpenses: number; average: CategoryBreakdown[] } {
+  // Filter months up to and including the specified month
+  const ytdMonths = monthsData.filter(m => m.month <= upToMonth);
+  
+  if (ytdMonths.length === 0) {
+    return { expenses: [], totalIncome: 0, totalExpenses: 0, average: [] };
+  }
+  
+  const allExpenses = ytdMonths.flatMap(m => m.expenses);
+  const allIncomes = ytdMonths.flatMap(m => m.incomes);
+  
+  const totalIncome = allIncomes.reduce((sum, inc) => sum + inc.amount, 0);
+  const totalExpenses = allExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  
+  return {
+    expenses: calculateCategoryBreakdown(allExpenses),
+    totalIncome,
+    totalExpenses,
+    average: calculateYearToDateAverage(ytdMonths),
+  };
+}

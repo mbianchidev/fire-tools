@@ -18,8 +18,13 @@ export type ExpenseCategory =
   | 'PERSONAL_CARE'
   | 'EDUCATION'
   | 'DEBT_PAYMENTS'
-  | 'SAVINGS'
-  | 'INVESTMENTS'
+  | 'BUSINESS'
+  | 'FEES'
+  | 'LIFESTYLE_LEISURE'
+  | 'COLLECTIBLES'
+  | 'MUSIC'
+  | 'TRAVEL'
+  | 'HOLIDAYS'
   | 'GIFTS_DONATIONS'
   | 'SUBSCRIPTIONS'
   | 'OTHER';
@@ -185,6 +190,7 @@ export interface ExpenseTrackerData {
   currentYear: number;
   currentMonth: number;
   currency: SupportedCurrency;
+  globalBudgets: CategoryBudget[]; // Global budgets that apply to all months
 }
 
 // Category display info
@@ -209,8 +215,13 @@ export const EXPENSE_CATEGORIES: CategoryInfo[] = [
   { id: 'PERSONAL_CARE', name: 'Personal Care', icon: '💇', defaultExpenseType: 'WANT' },
   { id: 'EDUCATION', name: 'Education', icon: '📚', defaultExpenseType: 'NEED' },
   { id: 'DEBT_PAYMENTS', name: 'Debt Payments', icon: '💳', defaultExpenseType: 'NEED' },
-  { id: 'SAVINGS', name: 'Savings', icon: '🏦', defaultExpenseType: 'NEED' },
-  { id: 'INVESTMENTS', name: 'Investments', icon: '📈', defaultExpenseType: 'NEED' },
+  { id: 'BUSINESS', name: 'Business', icon: '💼', defaultExpenseType: 'NEED' },
+  { id: 'FEES', name: 'Fees', icon: '📋', defaultExpenseType: 'NEED' },
+  { id: 'LIFESTYLE_LEISURE', name: 'Lifestyle & Leisure', icon: '🎯', defaultExpenseType: 'WANT' },
+  { id: 'COLLECTIBLES', name: 'Collectibles', icon: '🏆', defaultExpenseType: 'WANT' },
+  { id: 'MUSIC', name: 'Music', icon: '🎵', defaultExpenseType: 'NEED' },
+  { id: 'TRAVEL', name: 'Travel', icon: '✈️', defaultExpenseType: 'WANT' },
+  { id: 'HOLIDAYS', name: 'Holidays', icon: '🏖️', defaultExpenseType: 'WANT' },
   { id: 'GIFTS_DONATIONS', name: 'Gifts & Donations', icon: '🎁', defaultExpenseType: 'WANT' },
   { id: 'SUBSCRIPTIONS', name: 'Subscriptions', icon: '📱', defaultExpenseType: 'WANT' },
   { id: 'OTHER', name: 'Other', icon: '📦', defaultExpenseType: 'WANT' },

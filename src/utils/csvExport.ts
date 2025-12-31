@@ -536,6 +536,7 @@ export function importExpenseTrackerFromCSV(csv: string): import('../types/expen
     currentYear: now.getFullYear(),
     currentMonth: now.getMonth() + 1,
     currency: currency as import('../types/currency').SupportedCurrency,
+    globalBudgets: [], // Initialize empty global budgets on import
   };
 }
 

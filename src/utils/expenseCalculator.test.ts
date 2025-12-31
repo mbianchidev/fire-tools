@@ -9,6 +9,8 @@ import {
   calculateMonthlyComparison,
   calculateCategoryTrends,
   calculateYearToDateAverage,
+  calculateQuarterlyBreakdown,
+  calculateYearToDateBreakdown,
 } from './expenseCalculator';
 import {
   IncomeEntry,
@@ -504,6 +506,109 @@ describe('Expense Calculator', () => {
       const groceries = averages.find(a => a.category === 'GROCERIES');
       // Average of 400 + 300 = 350
       expect(groceries?.totalAmount).toBe(350);
+    });
+  });
+
+  describe('calculateQuarterlyBreakdown', () => {
+    const monthsData: MonthData[] = [
+      {
+        year: 2024,
+        month: 1,
+        incomes: [{ id: 'i1', type: 'income', date: '2024-01-15', amount: 5000, description: 'Salary', source: 'SALARY' }],
+        expenses: [
+          { id: 'e1', type: 'expense', date: '2024-01-05', amount: 1500, description: 'Rent', category: 'HOUSING', expenseType: 'NEED' },
+        ],
+        budgets: [],
+      },
+      {
+        year: 2024,
+        month: 2,
+        incomes: [{ id: 'i2', type: 'income', date: '2024-02-15', amount: 5000, description: 'Salary', source: 'SALARY' }],
+        expenses: [
+          { id: 'e2', type: 'expense', date: '2024-02-05', amount: 1500, description: 'Rent', category: 'HOUSING', expenseType: 'NEED' },
+        ],
+        budgets: [],
+      },
+      {
+        year: 2024,
+        month: 4,
+        incomes: [{ id: 'i3', type: 'income', date: '2024-04-15', amount: 6000, description: 'Salary', source: 'SALARY' }],
+        expenses: [
+          { id: 'e3', type: 'expense', date: '2024-04-05', amount: 2000, description: 'Rent', category: 'HOUSING', expenseType: 'NEED' },
+        ],
+        budgets: [],
+      },
+    ];
+
+    it('should calculate Q1 breakdown correctly', () => {
+      const result = calculateQuarterlyBreakdown(monthsData, 1);
+      expect(result.totalIncome).toBe(10000); // 5000 + 5000
+      expect(result.totalExpenses).toBe(3000); // 1500 + 1500
+      expect(result.expenses.length).toBe(1);
+      expect(result.expenses[0].totalAmount).toBe(3000);
+    });
+
+    it('should calculate Q2 breakdown correctly', () => {
+      const result = calculateQuarterlyBreakdown(monthsData, 2);
+      expect(result.totalIncome).toBe(6000);
+      expect(result.totalExpenses).toBe(2000);
+    });
+
+    it('should return empty results for quarters with no data', () => {
+      const result = calculateQuarterlyBreakdown(monthsData, 3);
+      expect(result.totalIncome).toBe(0);
+      expect(result.totalExpenses).toBe(0);
+      expect(result.expenses.length).toBe(0);
+    });
+  });
+
+  describe('calculateYearToDateBreakdown', () => {
+    const monthsData: MonthData[] = [
+      {
+        year: 2024,
+        month: 1,
+        incomes: [{ id: 'i1', type: 'income', date: '2024-01-15', amount: 5000, description: 'Salary', source: 'SALARY' }],
+        expenses: [
+          { id: 'e1', type: 'expense', date: '2024-01-05', amount: 1000, description: 'Rent', category: 'HOUSING', expenseType: 'NEED' },
+        ],
+        budgets: [],
+      },
+      {
+        year: 2024,
+        month: 2,
+        incomes: [{ id: 'i2', type: 'income', date: '2024-02-15', amount: 5000, description: 'Salary', source: 'SALARY' }],
+        expenses: [
+          { id: 'e2', type: 'expense', date: '2024-02-05', amount: 2000, description: 'Rent', category: 'HOUSING', expenseType: 'NEED' },
+        ],
+        budgets: [],
+      },
+      {
+        year: 2024,
+        month: 3,
+        incomes: [{ id: 'i3', type: 'income', date: '2024-03-15', amount: 5000, description: 'Salary', source: 'SALARY' }],
+        expenses: [
+          { id: 'e3', type: 'expense', date: '2024-03-05', amount: 3000, description: 'Rent', category: 'HOUSING', expenseType: 'NEED' },
+        ],
+        budgets: [],
+      },
+    ];
+
+    it('should calculate YTD totals up to specified month', () => {
+      const result = calculateYearToDateBreakdown(monthsData, 2);
+      expect(result.totalIncome).toBe(10000); // Jan + Feb
+      expect(result.totalExpenses).toBe(3000); // 1000 + 2000
+    });
+
+    it('should calculate YTD averages correctly', () => {
+      const result = calculateYearToDateBreakdown(monthsData, 2);
+      const housingAvg = result.average.find(a => a.category === 'HOUSING');
+      expect(housingAvg?.totalAmount).toBe(1500); // (1000 + 2000) / 2
+    });
+
+    it('should include all months up to the specified month', () => {
+      const result = calculateYearToDateBreakdown(monthsData, 3);
+      expect(result.totalIncome).toBe(15000); // Jan + Feb + Mar
+      expect(result.totalExpenses).toBe(6000); // 1000 + 2000 + 3000
     });
   });
 });
