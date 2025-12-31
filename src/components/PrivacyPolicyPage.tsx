@@ -6,7 +6,7 @@ export function PrivacyPolicyPage() {
       <div className="policy-container">
         <h1>Privacy Policy</h1>
         <p className="last-updated">
-          <strong>Last Updated:</strong> December 30, 2024
+          <strong>Last Updated:</strong> December 31, 2025
         </p>
 
         <section className="policy-section">
