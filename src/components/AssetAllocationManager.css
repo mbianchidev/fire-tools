@@ -38,7 +38,7 @@
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
 }
 
@@ -153,7 +153,7 @@
 
 .allocation-table th,
 .asset-class-table th {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
   font-weight: 600;
   position: sticky;
@@ -557,7 +557,7 @@
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
 }
 
@@ -586,7 +586,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
   cursor: pointer;
   transition: all 0.3s;
@@ -812,7 +812,7 @@
 }
 
 .nav-link.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
 }
 
@@ -1010,7 +1010,7 @@
 
 /* Dark background text colors */
 .asset-class-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
 }
 
@@ -1415,7 +1415,7 @@
 }
 
 .dca-table th {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
   font-weight: 600;
   font-size: 0.9rem;
@@ -2170,7 +2170,7 @@ select:disabled {
 
   .allocation-table th:first-child,
   .asset-class-table th:first-child {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
     z-index: 3;
   }
 

@@ -285,7 +285,7 @@ function App() {
         
         <header className="app-header">
           <h1><span className="header-emoji">💸</span> Fire Tools</h1>
-          <p>Rocket fuel for your financial planning 🚀</p>
+          <p>Rocket fuel for your financial planning</p>
         </header>
 
         <Navigation accountName={settings.accountName} />

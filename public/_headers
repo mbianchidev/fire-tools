@@ -1,0 +1,18 @@
+# Cache control headers for static assets
+# These headers are used by Netlify, Cloudflare Pages, and similar platforms
+
+# Cache static assets for 1 year (immutable content-hashed files)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache favicon and icons for 1 week
+/*.svg
+  Cache-Control: public, max-age=604800
+
+# Cache HTML for 1 hour (allows for updates)
+/*.html
+  Cache-Control: public, max-age=3600
+
+# Default: cache for 1 day
+/*
+  Cache-Control: public, max-age=86400

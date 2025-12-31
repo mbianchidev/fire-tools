@@ -24,7 +24,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
 }
 
@@ -162,7 +162,7 @@
 }
 
 .toggle-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
   border-color: transparent;
 }
@@ -239,7 +239,7 @@
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;

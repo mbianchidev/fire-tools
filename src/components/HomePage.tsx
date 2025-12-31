@@ -34,7 +34,7 @@ export function HomePage() {
           <div className="security-warning-banner">
             <div className="warning-icon">🔒⚠️</div>
             <div className="warning-content">
-              <h3>Security Notice: GitHub Pages Deployment</h3>
+              <h2 className="warning-heading">Security Notice: GitHub Pages Deployment</h2>
               <p>
                 <strong>Warning:</strong> This application is deployed on GitHub Pages, which does not support 
                 server-side data storage or HTTP-only cookies. While data is encrypted using AES, 
@@ -68,13 +68,11 @@ export function HomePage() {
           </div>
         )}
         <h1 id="hero-title" className="hero-title"><span aria-hidden="true">💸</span> Fire Tools</h1>
-        <p className="hero-subtitle">
-          Rocket fuel for your financial planning
-        </p>
+        <p className="hero-subtitle">Rocket fuel for your financial planning</p>
       </section>
 
       <section className="info-section" aria-labelledby="about-title">
-        <h3 id="about-title">About FIRE Tools</h3>
+        <h2 id="about-title" className="info-section-title">About FIRE Tools</h2>
         <p>
           FIRE Tools is designed to help you plan and achieve Financial Independence Retire Early. 
           Our suite of calculators and tools provides data-driven insights to make informed decisions 
@@ -89,7 +87,7 @@ export function HomePage() {
       <section className="features-grid" aria-label="Available tools">
         <Link to="/asset-allocation" className="feature-card" aria-labelledby="asset-allocation-title">
           <div className="feature-icon" aria-hidden="true">📊</div>
-          <h2 id="asset-allocation-title">Asset Allocation Manager</h2>
+          <h3 id="asset-allocation-title" className="feature-card-title">Asset Allocation Manager</h3>
           <p>
             Manage your investment portfolio with intelligent asset allocation tools, 
             rebalancing strategies, and DCA helper functionality.
@@ -104,7 +102,7 @@ export function HomePage() {
 
         <Link to="/fire-calculator" className="feature-card" aria-labelledby="fire-calc-title">
           <div className="feature-icon" aria-hidden="true">🔥</div>
-          <h2 id="fire-calc-title">FIRE Calculator</h2>
+          <h3 id="fire-calc-title" className="feature-card-title">FIRE Calculator</h3>
           <p>
             Calculate your path to financial independence with comprehensive projections 
             and detailed analysis of your retirement timeline.
@@ -119,7 +117,7 @@ export function HomePage() {
 
         <Link to="/monte-carlo" className="feature-card" aria-labelledby="monte-carlo-title">
           <div className="feature-icon" aria-hidden="true">🎲</div>
-          <h2 id="monte-carlo-title">Monte Carlo Simulations</h2>
+          <h3 id="monte-carlo-title" className="feature-card-title">Monte Carlo Simulations</h3>
           <p>
             Run thousands of simulations with randomized market returns to assess the 
             probability of reaching FIRE and account for market volatility.
