@@ -18,8 +18,8 @@ interface CalculatorInputsProps {
 
 export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, onChange, assetAllocationData }) => {
   const [openSections, setOpenSections] = useState({
-    initialValues: true,
-    assetAllocation: true,
+    initialValues: !inputs.useAssetAllocationValue,
+    assetAllocation: !inputs.useAssetAllocationValue,
     income: true,
     expenses: true,
     fireParams: true,
