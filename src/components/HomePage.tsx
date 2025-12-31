@@ -1,14 +1,36 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  loadSecurityBannerDismissed,
+  saveSecurityBannerDismissed,
+} from '../utils/bannerPreferences';
 import './HomePage.css';
 
 export function HomePage() {
+  const [showSecurityBanner, setShowSecurityBanner] = useState(false);
+
   // Check if running on GitHub Pages
-  const isGitHubPages = window.location.hostname.includes('github.io');
+  const isGitHubPages =
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'github.io' ||
+      window.location.hostname.endsWith('.github.io'));
+
+  useEffect(() => {
+    if (isGitHubPages) {
+      const dismissed = loadSecurityBannerDismissed();
+      setShowSecurityBanner(!dismissed);
+    }
+  }, [isGitHubPages]);
+
+  const handleDismissSecurityBanner = () => {
+    saveSecurityBannerDismissed(true);
+    setShowSecurityBanner(false);
+  };
 
   return (
     <main className="homepage" id="main-content">
       <section className="hero-section" aria-labelledby="hero-title">
-         {isGitHubPages && (
+         {isGitHubPages && showSecurityBanner && (
           <div className="security-warning-banner">
             <div className="warning-icon">🔒⚠️</div>
             <div className="warning-content">
@@ -35,11 +57,19 @@ export function HomePage() {
                 </a>
               </div>
             </div>
+            <button
+              type="button"
+              className="warning-close"
+              aria-label="Dismiss security notice"
+              onClick={handleDismissSecurityBanner}
+            >
+              ×
+            </button>
           </div>
         )}
         <h1 id="hero-title" className="hero-title"><span aria-hidden="true">💸</span> Fire Tools</h1>
         <p className="hero-subtitle">
-          Rocket fuel for your financial planning 🚀
+          Rocket fuel for your financial planning
         </p>
       </section>
 

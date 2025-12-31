@@ -499,35 +499,6 @@ export const AssetAllocationPage: React.FC = () => {
           />
         </section>
 
-        <section className="charts-section" aria-labelledby="charts-heading">
-          <button 
-            className="collapsible-header" 
-            onClick={() => setIsChartsCollapsed(!isChartsCollapsed)}
-            aria-expanded={!isChartsCollapsed}
-            aria-controls="charts-content"
-          >
-            <h3 id="charts-heading">Portfolio Allocation by Asset Class</h3>
-            <span className="collapse-icon-small" aria-hidden="true">{isChartsCollapsed ? '▶' : '▼'}</span>
-          </button>
-          {!isChartsCollapsed && (
-            <div id="charts-content" className="charts-row">
-              <AllocationChart
-                data={assetClassChartData}
-                title=""
-                currency={currency}
-              />
-              
-              {selectedAssetClass && (
-                <AllocationChart
-                  data={assetChartData}
-                  title={`${formatAssetName(selectedAssetClass.assetClass)} Breakdown`}
-                  currency={currency}
-                />
-              )}
-            </div>
-          )}
-        </section>
-
         <div className="class-selector">
           <label htmlFor="asset-class-select">View Asset Class Details:</label>
           <select 
@@ -544,6 +515,35 @@ export const AssetAllocationPage: React.FC = () => {
             ))}
           </select>
         </div>
+
+        <section className="charts-section" aria-labelledby="charts-heading">
+          <button 
+            className="collapsible-header" 
+            onClick={() => setIsChartsCollapsed(!isChartsCollapsed)}
+            aria-expanded={!isChartsCollapsed}
+            aria-controls="charts-content"
+          >
+            <h3 id="charts-heading">Graphs</h3>
+            <span className="collapse-icon-small" aria-hidden="true">{isChartsCollapsed ? '▶' : '▼'}</span>
+          </button>
+          {!isChartsCollapsed && (
+            <div id="charts-content" className="charts-row">
+              <AllocationChart
+                data={assetClassChartData}
+                title="Portfolio allocation by asset class"
+                currency={currency}
+              />
+              
+              {selectedAssetClass && (
+                <AllocationChart
+                  data={assetChartData}
+                  title={`${formatAssetName(selectedAssetClass.assetClass)} Breakdown`}
+                  currency={currency}
+                />
+              )}
+            </div>
+          )}
+        </section>
 
         <section className="allocation-section" aria-labelledby="portfolio-details-heading">
           <div className="section-header-with-actions">
