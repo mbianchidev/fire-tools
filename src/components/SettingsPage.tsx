@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
-import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV } from '../utils/csvExport';
-import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData } from '../utils/cookieStorage';
+import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV, exportExpenseTrackerToCSV, importExpenseTrackerFromCSV } from '../utils/csvExport';
+import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData, loadExpenseTrackerData, saveExpenseTrackerData } from '../utils/cookieStorage';
 import { DEFAULT_INPUTS } from '../utils/defaults';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
 import './SettingsPage.css';
@@ -136,6 +136,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
         downloadCSV(assetCSV, `asset-allocation-data-${getDateString()}.csv`);
       }
 
+      // Export Cashflow Tracker data
+      const expenseData = loadExpenseTrackerData();
+      if (expenseData) {
+        const expenseCSV = exportExpenseTrackerToCSV(expenseData);
+        downloadCSV(expenseCSV, `cashflow-tracker-data-${getDateString()}.csv`);
+      }
+
       showMessage('success', 'Data exported successfully!');
     } catch (error) {
       showMessage('error', `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -197,6 +204,27 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     reader.readAsText(file);
     event.target.value = '';
   };
+
+  // Import Cashflow Tracker data
+  const handleImportCashflow = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const csv = e.target?.result as string;
+        const imported = importExpenseTrackerFromCSV(csv);
+        saveExpenseTrackerData(imported);
+        showMessage('success', 'Cashflow Tracker data imported successfully!');
+      } catch (error) {
+        showMessage('error', `Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  };
+
 
   // Reset all data
   const handleResetAll = () => {
@@ -333,6 +361,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               <label className="primary-btn import-label">
                 📤 Import Asset Allocation
                 <input type="file" accept=".csv" onChange={handleImportAssets} hidden />
+              </label>
+              <label className="primary-btn import-label">
+                📤 Import Cashflow Tracker
+                <input type="file" accept=".csv" onChange={handleImportCashflow} hidden />
               </label>
             </div>
           </div>

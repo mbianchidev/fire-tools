@@ -1,0 +1,177 @@
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import { CategoryBreakdown, getCategoryInfo } from '../types/expenseTracker';
+
+// Color palette for categories
+const COLORS = [
+  '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe',
+  '#00f2fe', '#43e97b', '#38f9d7', '#fa709a', '#fee140',
+  '#30cfd0', '#330867', '#a8eb12', '#fccb90', '#d57eeb',
+  '#e0c3fc', '#8fd3f4',
+];
+
+interface ExpenseBreakdownChartProps {
+  data: CategoryBreakdown[];
+  currency: string;
+}
+
+// Helper to format currency
+function formatCurrency(amount: number, currency: string): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+// Custom tooltip
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  currency: string;
+}
+
+function CustomTooltip({ active, payload, currency }: CustomTooltipProps) {
+  if (!active || !payload || !payload.length) return null;
+
+  const data = payload[0].payload;
+  const categoryInfo = getCategoryInfo(data.category);
+
+  return (
+    <div style={{
+      background: 'white',
+      padding: '0.75rem 1rem',
+      borderRadius: '8px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+      border: '1px solid #e0e0e0',
+    }}>
+      <p style={{ margin: 0, fontWeight: 600, color: '#333' }}>
+        {categoryInfo.icon} {categoryInfo.name}
+      </p>
+      <p style={{ margin: '0.25rem 0 0', color: '#666' }}>
+        {formatCurrency(data.totalAmount, currency)} ({data.percentage.toFixed(1)}%)
+      </p>
+      <p style={{ margin: '0.25rem 0 0', color: '#888', fontSize: '0.85rem' }}>
+        {data.transactionCount} transaction{data.transactionCount !== 1 ? 's' : ''}
+      </p>
+    </div>
+  );
+}
+
+// Custom label
+function renderCustomLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) {
+  if (percent < 0.05) return null; // Don't show labels for very small slices
+
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor="middle"
+      dominantBaseline="central"
+      style={{ fontSize: '0.8rem', fontWeight: 600 }}
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+}
+
+// Custom legend
+function renderLegend(props: any) {
+  const { payload } = props;
+  
+  return (
+    <ul style={{ 
+      listStyle: 'none', 
+      padding: 0, 
+      margin: '1rem 0 0',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+      gap: '0.5rem',
+    }}>
+      {payload.map((entry: any, index: number) => {
+        const categoryInfo = getCategoryInfo(entry.payload.category);
+        return (
+          <li 
+            key={`legend-${index}`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.85rem',
+            }}
+          >
+            <span style={{
+              width: '12px',
+              height: '12px',
+              borderRadius: '2px',
+              background: entry.color,
+              flexShrink: 0,
+            }} />
+            <span style={{ color: '#555' }}>
+              {categoryInfo.icon} {categoryInfo.name}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+export function ExpenseBreakdownChart({ data, currency }: ExpenseBreakdownChartProps) {
+  if (data.length === 0) {
+    return (
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '3rem', 
+        color: '#666',
+        background: '#f8f9fa',
+        borderRadius: '8px',
+      }}>
+        <p>No expense data to display. Add some expenses to see the breakdown.</p>
+      </div>
+    );
+  }
+
+  // Prepare chart data with category info
+  const chartData = data.map((item, index) => ({
+    ...item,
+    name: getCategoryInfo(item.category).name,
+    color: COLORS[index % COLORS.length],
+  }));
+
+  return (
+    <div style={{ width: '100%', height: 400 }}>
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={chartData}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={renderCustomLabel}
+            outerRadius={120}
+            dataKey="totalAmount"
+            nameKey="name"
+          >
+            {chartData.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                fill={entry.color}
+                stroke="white"
+                strokeWidth={2}
+              />
+            ))}
+          </Pie>
+          <Tooltip content={<CustomTooltip currency={currency} />} />
+          <Legend content={(props) => renderLegend(props)} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
