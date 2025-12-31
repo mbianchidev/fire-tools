@@ -217,7 +217,7 @@ function FIRECalculatorPage() {
           onExport={handleExportCSV}
           onImport={handleImportCSV}
           onReset={handleResetData}
-          defaultOpen={true}
+          defaultOpen={false}
         />
         
         <CalculatorInputsForm 
