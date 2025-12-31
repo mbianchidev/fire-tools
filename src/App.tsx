@@ -10,6 +10,7 @@ import { FIREMetrics } from './components/FIREMetrics';
 import { MonteCarloPage } from './components/MonteCarloPage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
 import { ExpenseTrackerPage } from './components/ExpenseTrackerPage';
+import { NetWorthTrackerPage } from './components/NetWorthTrackerPage';
 import { HomePage } from './components/HomePage';
 import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
@@ -25,6 +26,7 @@ import { loadSettings, type UserSettings } from './utils/cookieSettings';
 import './App.css';
 import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
+import './components/NetWorthTrackerPage.css';
 
 function Navigation({ accountName }: { accountName: string }) {
   const location = useLocation();
@@ -67,6 +69,14 @@ function Navigation({ accountName }: { accountName: string }) {
           aria-current={location.pathname === '/expense-tracker' ? 'page' : undefined}
         >
           <span aria-hidden="true">💰</span> Cashflow Tracker
+        </Link>
+        <Link 
+          to="/net-worth-tracker" 
+          className={`nav-link ${location.pathname === '/net-worth-tracker' ? 'active' : ''}`}
+          onClick={closeMenu}
+          aria-current={location.pathname === '/net-worth-tracker' ? 'page' : undefined}
+        >
+          <span aria-hidden="true">📈</span> Net Worth Tracker
         </Link>
         <Link 
           to="/fire-calculator" 
@@ -307,6 +317,7 @@ function App() {
           <Route path="/monte-carlo" element={<MonteCarloPage />} />
           <Route path="/asset-allocation" element={<AssetAllocationPage />} />
           <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
+          <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
           <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/cookie-policy" element={<CookiePolicyPage />} />

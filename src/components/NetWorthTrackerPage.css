@@ -1,0 +1,536 @@
+.net-worth-tracker-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.net-worth-tracker-page .page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.net-worth-tracker-page .page-header h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.net-worth-tracker-page .page-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.net-worth-tracker-main {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Net Worth Summary Cards */
+.net-worth-summary {
+  margin-bottom: 2rem;
+}
+
+.net-worth-summary h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.net-worth-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.net-worth-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 12px;
+  color: white;
+}
+
+.net-worth-card.assets {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.net-worth-card.cash {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.net-worth-card.pension {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.net-worth-card.total {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.net-worth-card .card-icon {
+  font-size: 2rem;
+}
+
+.net-worth-card .card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.net-worth-card .card-label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.net-worth-card .card-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.net-worth-card .card-change {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+}
+
+.net-worth-card .card-change.positive {
+  color: #90EE90;
+}
+
+.net-worth-card .card-change.negative {
+  color: #FFB6C1;
+}
+
+/* Data Entry Section */
+.data-entry-section {
+  margin-bottom: 2rem;
+}
+
+.data-entry-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.data-entry-section h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin: 0;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-entry {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-entry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-entry.asset {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.btn-entry.cash {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.btn-entry.pension {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.btn-entry.operation {
+  background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+}
+
+/* Data Tables */
+.data-tables {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.data-table-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.data-table-section h4 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.data-table th {
+  background: white;
+  font-weight: 600;
+  color: #555;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.data-table .amount-col {
+  text-align: right;
+  font-weight: 500;
+}
+
+.data-table .actions-col {
+  text-align: center;
+  width: 80px;
+}
+
+/* Historical Net Worth Chart */
+.chart-section {
+  margin-top: 2rem;
+}
+
+.chart-section h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.chart-container {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-height: 300px;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.chart-currency-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.currency-btn {
+  padding: 0.4rem 0.8rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.currency-btn:hover {
+  border-color: #667eea;
+}
+
+.currency-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+/* Monthly Breakdown Table */
+.monthly-breakdown-section {
+  margin-top: 2rem;
+}
+
+.monthly-breakdown-section h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.monthly-table-container {
+  overflow-x: auto;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.monthly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 800px;
+}
+
+.monthly-table th,
+.monthly-table td {
+  padding: 0.6rem 0.8rem;
+  text-align: right;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.monthly-table th:first-child,
+.monthly-table td:first-child {
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: inherit;
+  z-index: 1;
+}
+
+.monthly-table th {
+  background: white;
+  font-weight: 600;
+  color: #555;
+}
+
+.monthly-table .row-label {
+  font-weight: 500;
+  color: #333;
+}
+
+.monthly-table .section-header {
+  background: #e8e8e8;
+  font-weight: 600;
+  color: #333;
+}
+
+.monthly-table .ytd-col {
+  background: rgba(102, 126, 234, 0.1);
+  font-weight: 600;
+}
+
+.monthly-table .avg-col {
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.monthly-table .forecast-col {
+  background: rgba(255, 152, 0, 0.1);
+  font-style: italic;
+}
+
+.monthly-table .prev-year-col {
+  background: rgba(156, 39, 176, 0.1);
+}
+
+.monthly-table .positive {
+  color: #4CAF50;
+}
+
+.monthly-table .negative {
+  color: #f44336;
+}
+
+/* Tooltips for notes */
+.note-indicator {
+  position: relative;
+  cursor: help;
+  margin-left: 0.25rem;
+}
+
+.note-indicator::after {
+  content: attr(data-note);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem;
+  background: #333;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 100;
+}
+
+.note-indicator:hover::after {
+  opacity: 1;
+}
+
+/* FIRE Progress Section */
+.fire-progress-section {
+  margin-top: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: white;
+}
+
+.fire-progress-section h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.fire-progress-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.fire-percentage {
+  text-align: center;
+}
+
+.fire-percentage .percentage {
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.fire-percentage .label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.fire-details {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.fire-detail-item {
+  text-align: center;
+}
+
+.fire-detail-item .value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.fire-detail-item .label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.fire-progress-bar {
+  margin-top: 1rem;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.fire-progress-fill {
+  height: 100%;
+  background: white;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .net-worth-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .fire-progress-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  
+  .fire-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .net-worth-tracker-page {
+    padding: 1rem;
+  }
+
+  .net-worth-tracker-main {
+    padding: 1rem;
+  }
+
+  .net-worth-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-entry {
+    width: 100%;
+  }
+
+  .card-value {
+    font-size: 1.25rem;
+  }
+
+  .monthly-table {
+    font-size: 0.75rem;
+  }
+}
+
+/* Dialog specific styles for net worth tracker */
+.net-worth-dialog .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.net-worth-dialog .form-group.full-width {
+  grid-column: span 2;
+}
+
+@media (max-width: 600px) {
+  .net-worth-dialog .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .net-worth-dialog .form-group.full-width {
+    grid-column: span 1;
+  }
+}
