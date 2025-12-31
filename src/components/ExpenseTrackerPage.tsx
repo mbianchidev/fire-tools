@@ -191,29 +191,50 @@ export function ExpenseTrackerPage() {
   }, [data, selectedYear]);
 
   // Calculate category breakdown based on analytics view (using global budgets)
+  // For non-monthly views, multiply budget by number of months:
+  // - Quarterly: 3x budget (MONTHS_PER_QUARTER)
+  // - Yearly: 12x budget (MONTHS_PER_YEAR)
+  // - YTD Average: monthly budget (since we're comparing monthly averages)
+  const MONTHS_PER_QUARTER = 3;
+  const MONTHS_PER_YEAR = 12;
+  
   const categoryBreakdown = useMemo(() => {
     if (activeTab === 'analytics') {
       switch (analyticsView) {
         case 'quarterly': {
           const result = calculateQuarterlyBreakdown(allMonthsData, selectedQuarter);
-          // Apply global budgets
+          // Apply global budgets multiplied by quarter months
           return result.expenses.map(item => {
             const budget = data.globalBudgets.find(b => b.category === item.category);
+            const periodBudget = budget?.monthlyBudget !== undefined ? budget.monthlyBudget * MONTHS_PER_QUARTER : undefined;
             return {
               ...item,
-              budgeted: budget?.monthlyBudget,
-              remaining: budget?.monthlyBudget !== undefined 
-                ? budget.monthlyBudget - item.totalAmount 
+              budgeted: periodBudget,
+              remaining: periodBudget !== undefined 
+                ? periodBudget - item.totalAmount 
                 : undefined,
             };
           });
         }
         case 'yearly': {
           const allExpenses = allMonthsData.flatMap(m => m.expenses);
-          return calculateCategoryBreakdown(allExpenses, data.globalBudgets);
+          // Calculate breakdown without budgets first, then apply yearly budget
+          const breakdown = calculateCategoryBreakdown(allExpenses, []);
+          return breakdown.map(item => {
+            const budget = data.globalBudgets.find(b => b.category === item.category);
+            const periodBudget = budget?.monthlyBudget !== undefined ? budget.monthlyBudget * MONTHS_PER_YEAR : undefined;
+            return {
+              ...item,
+              budgeted: periodBudget,
+              remaining: periodBudget !== undefined 
+                ? periodBudget - item.totalAmount 
+                : undefined,
+            };
+          });
         }
         case 'ytd': {
           const result = calculateYearToDateBreakdown(allMonthsData, selectedMonth);
+          // For YTD average, we still compare against monthly budget since we're showing monthly average
           return result.average.map(item => {
             const budget = data.globalBudgets.find(b => b.category === item.category);
             return {
@@ -537,7 +558,7 @@ export function ExpenseTrackerPage() {
   return (
     <div className="expense-tracker-page">
       <header className="page-header">
-        <h1><span aria-hidden="true">💰</span> Expense & Income Tracker</h1>
+        <h1><span aria-hidden="true">💰</span> Cashflow Tracker</h1>
         <p>
           Track your income and expenses, set budgets, and gain insights into your spending patterns.
         </p>

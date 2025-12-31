@@ -65,7 +65,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/expense-tracker' ? 'page' : undefined}
         >
-          <span aria-hidden="true">💰</span> Expense Tracker
+          <span aria-hidden="true">💰</span> Cashflow Tracker
         </Link>
         <Link 
           to="/fire-calculator" 

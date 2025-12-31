@@ -104,7 +104,7 @@ export function HomePage() {
 
         <Link to="/expense-tracker" className="feature-card" aria-labelledby="expense-tracker-title">
           <div className="feature-icon" aria-hidden="true">💰</div>
-          <h2 id="expense-tracker-title">Expense & Income Tracker</h2>
+          <h2 id="expense-tracker-title">Cashflow Tracker</h2>
           <p>
             Track your income and expenses, set budgets per category, and gain insights 
             into your spending patterns with the 50/30/20 budgeting rule.
@@ -114,7 +114,7 @@ export function HomePage() {
             <span className="highlight-item"><span aria-hidden="true">💵</span> Budget Management</span>
             <span className="highlight-item"><span aria-hidden="true">📊</span> Spending Analytics</span>
           </div>
-          <span className="cta-link" aria-hidden="true">Track Expenses →</span>
+          <span className="cta-link" aria-hidden="true">Track Cashflow →</span>
         </Link>
 
         <Link to="/fire-calculator" className="feature-card" aria-labelledby="fire-calc-title">
