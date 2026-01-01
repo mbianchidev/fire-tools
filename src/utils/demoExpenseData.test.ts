@@ -14,6 +14,25 @@ describe('generateDemoExpenseData', () => {
     expect(data.currency).toBe('EUR');
   });
 
+  it('should generate data for a specific year when provided', () => {
+    const targetYear = 2023;
+    const data = generateDemoExpenseData(targetYear);
+    
+    expect(data.years).toHaveLength(1);
+    expect(data.years[0].year).toBe(targetYear);
+    expect(data.years[0].months).toHaveLength(12);
+    
+    // Verify all transactions are dated in the target year
+    data.years[0].months.forEach(month => {
+      month.incomes.forEach(income => {
+        expect(income.date.startsWith(`${targetYear}-`)).toBe(true);
+      });
+      month.expenses.forEach(expense => {
+        expect(expense.date.startsWith(`${targetYear}-`)).toBe(true);
+      });
+    });
+  });
+
   it('should generate a full year of data with 12 months', () => {
     const data = generateDemoExpenseData();
     

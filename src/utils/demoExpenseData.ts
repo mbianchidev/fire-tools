@@ -400,26 +400,28 @@ function generateMonthlyExpenses(year: number, month: number): ExpenseEntry[] {
 }
 
 /**
- * Generate demo expense tracker data for the current year
+ * Generate demo expense tracker data for a specific year
+ * @param targetYear - The year to generate data for (defaults to current year)
  */
-export function generateDemoExpenseData(): ExpenseTrackerData {
+export function generateDemoExpenseData(targetYear?: number): ExpenseTrackerData {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
+  const year = targetYear ?? currentYear;
 
-  // Create 12 months of data
+  // Create 12 months of data for the target year
   const months = [];
   for (let month = 1; month <= 12; month++) {
-    const monthData = createEmptyMonthData(currentYear, month);
-    monthData.incomes = generateMonthlyIncome(currentYear, month);
-    monthData.expenses = generateMonthlyExpenses(currentYear, month);
+    const monthData = createEmptyMonthData(year, month);
+    monthData.incomes = generateMonthlyIncome(year, month);
+    monthData.expenses = generateMonthlyExpenses(year, month);
     months.push(monthData);
   }
 
   return {
     years: [
       {
-        year: currentYear,
+        year,
         months,
         isArchived: false,
       },

@@ -530,11 +530,18 @@ export function ExpenseTrackerPage() {
 
   // Load demo data
   const handleLoadDemo = () => {
-    if (confirm('Load demo expense data for the current year? This will replace existing data for the current year.')) {
-      const demoData = generateDemoExpenseData();
-      setData(demoData);
-      setSelectedYear(demoData.currentYear);
-      setSelectedMonth(demoData.currentMonth);
+    if (confirm(`Load demo expense data for ${selectedYear}? This will replace existing data for ${selectedYear}.`)) {
+      const demoData = generateDemoExpenseData(selectedYear);
+      
+      // Merge demo data with existing data
+      // Remove existing year data if present, then add demo data
+      const filteredYears = data.years.filter(y => y.year !== selectedYear);
+      const mergedData: ExpenseTrackerData = {
+        ...data,
+        years: [...filteredYears, ...demoData.years].sort((a, b) => b.year - a.year),
+      };
+      
+      setData(mergedData);
     }
   };
 
