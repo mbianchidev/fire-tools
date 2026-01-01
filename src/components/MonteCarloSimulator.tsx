@@ -138,7 +138,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
                   <span className="mc-data-value highlight">{formatCurrency(fireTarget)}</span>
                 </div>
                 <div className="mc-data-item">
-                  <span className="mc-data-label">Annual Labor Income</span>
+                  <span className="mc-data-label">Annual Income</span>
                   <span className="mc-data-value">{formatCurrency(inputs.annualLaborIncome)}</span>
                 </div>
                 <div className="mc-data-item">
@@ -152,15 +152,15 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
                 <h4 className="mc-data-group-title">Asset Allocation</h4>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Stocks</span>
-                  <span className="mc-data-value">{inputs.stocksPercent}%</span>
+                  <span className="mc-data-value">{inputs.stocksPercent.toFixed(2)}%</span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Bonds</span>
-                  <span className="mc-data-value">{inputs.bondsPercent}%</span>
+                  <span className="mc-data-value">{inputs.bondsPercent.toFixed(2)}%</span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Cash</span>
-                  <span className="mc-data-value">{inputs.cashPercent}%</span>
+                  <span className="mc-data-value">{inputs.cashPercent.toFixed(2)}%</span>
                 </div>
               </div>
 
@@ -189,7 +189,11 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
                   <span className="mc-data-value">~{currentAge} years</span>
                 </div>
                 <div className="mc-data-item">
-                  <span className="mc-data-label">FIRE Annual Expenses</span>
+                  <span className="mc-data-label">Current Expenses</span>
+                  <span className="mc-data-value">{formatCurrency(inputs.currentAnnualExpenses)}</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">FIRE Expenses</span>
                   <span className="mc-data-value">{formatCurrency(inputs.fireAnnualExpenses)}</span>
                 </div>
                 <div className="mc-data-item">
