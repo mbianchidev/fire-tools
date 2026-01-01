@@ -882,7 +882,7 @@ export function NetWorthTrackerPage() {
                 </table>
               ) : (
                 <div className="empty-state">
-                  <p>No operations recorded for this month. Click "Log Operation" to record financial activity.</p>
+                  <p>No operations recorded for this month. Click "Log Operation" to start tracking.</p>
                 </div>
               )}
             </div>

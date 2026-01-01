@@ -246,10 +246,6 @@
   color: #555;
 }
 
-.chart-toggle input[type="checkbox"] {
-  margin-right: 0.25rem;
-}
-
 .chart-currency-toggle {
   display: flex;
   gap: 0.5rem;
