@@ -16,6 +16,16 @@ interface ValidationErrors {
   blackSwanImpact?: string;
 }
 
+// Format currency for display
+const formatCurrency = (value: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+};
+
 export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs }) => {
   const [mcInputs, setMcInputs] = useState<MonteCarloInputs>({
     numSimulations: 1000,
@@ -27,6 +37,12 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
 
   const [result, setResult] = useState<MonteCarloResult | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [isBaseDataExpanded, setIsBaseDataExpanded] = useState(true);
+
+  // Calculate derived values for display
+  const currentYear = new Date().getFullYear();
+  const currentAge = currentYear - inputs.yearOfBirth;
+  const fireTarget = inputs.fireAnnualExpenses / (inputs.desiredWithdrawalRate / 100);
 
   // Validation logic
   const validationErrors = useMemo((): ValidationErrors => {
@@ -88,6 +104,110 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
       <p className="section-description">
         Run multiple simulations with random market returns to assess the probability of reaching FIRE.
       </p>
+
+      {/* Base Data Section - Non-editable simulation parameters */}
+      <div className="mc-base-data-section">
+        <button
+          type="button"
+          className="mc-base-data-toggle"
+          onClick={() => setIsBaseDataExpanded(!isBaseDataExpanded)}
+          aria-expanded={isBaseDataExpanded}
+          aria-controls="mc-base-data-content"
+        >
+          <span className="mc-base-data-title">
+            <span aria-hidden="true">📊</span> Simulation Base Data
+          </span>
+          <span className="mc-base-data-subtitle">
+            Data from FIRE Calculator used in simulations
+          </span>
+          <span className="collapse-icon" aria-hidden="true">{isBaseDataExpanded ? '▼' : '▶'}</span>
+        </button>
+        
+        {isBaseDataExpanded && (
+          <div id="mc-base-data-content" className="mc-base-data-content">
+            <div className="mc-base-data-grid">
+              {/* Financial Position */}
+              <div className="mc-data-group">
+                <h4 className="mc-data-group-title">Financial Position</h4>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Initial Portfolio</span>
+                  <span className="mc-data-value">{formatCurrency(inputs.initialSavings)}</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">FIRE Target</span>
+                  <span className="mc-data-value highlight">{formatCurrency(fireTarget)}</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Annual Labor Income</span>
+                  <span className="mc-data-value">{formatCurrency(inputs.annualLaborIncome)}</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Savings Rate</span>
+                  <span className="mc-data-value">{inputs.savingsRate.toFixed(1)}%</span>
+                </div>
+              </div>
+
+              {/* Asset Allocation */}
+              <div className="mc-data-group">
+                <h4 className="mc-data-group-title">Asset Allocation</h4>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Stocks</span>
+                  <span className="mc-data-value">{inputs.stocksPercent}%</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Bonds</span>
+                  <span className="mc-data-value">{inputs.bondsPercent}%</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Cash</span>
+                  <span className="mc-data-value">{inputs.cashPercent}%</span>
+                </div>
+              </div>
+
+              {/* Expected Returns */}
+              <div className="mc-data-group">
+                <h4 className="mc-data-group-title">Expected Returns</h4>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Stock Return</span>
+                  <span className="mc-data-value">{inputs.expectedStockReturn}%</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Bond Return</span>
+                  <span className="mc-data-value">{inputs.expectedBondReturn}%</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Cash Return</span>
+                  <span className="mc-data-value">{inputs.expectedCashReturn}%</span>
+                </div>
+              </div>
+
+              {/* Personal & Expenses */}
+              <div className="mc-data-group">
+                <h4 className="mc-data-group-title">Personal & Expenses</h4>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Current Age</span>
+                  <span className="mc-data-value">{currentAge} years</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">FIRE Annual Expenses</span>
+                  <span className="mc-data-value">{formatCurrency(inputs.fireAnnualExpenses)}</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Withdrawal Rate</span>
+                  <span className="mc-data-value">{inputs.desiredWithdrawalRate}%</span>
+                </div>
+                <div className="mc-data-item">
+                  <span className="mc-data-label">Stop Working at FIRE</span>
+                  <span className="mc-data-value">{inputs.stopWorkingAtFIRE ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+            </div>
+            <p className="mc-base-data-note">
+              <span aria-hidden="true">💡</span> These values are loaded from the FIRE Calculator. To modify them, go to the <a href="/fire-calculator">FIRE Calculator</a> page.
+            </p>
+          </div>
+        )}
+      </div>
 
       <div className="mc-inputs">
         <div className="form-group">

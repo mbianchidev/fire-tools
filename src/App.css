@@ -538,6 +538,151 @@ body {
   margin-bottom: 1.5rem;
 }
 
+/* Monte Carlo Base Data Section */
+.mc-base-data-section {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.mc-base-data-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.mc-base-data-toggle:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+
+.mc-base-data-toggle:focus {
+  outline: 3px solid #5568d4;
+  outline-offset: -3px;
+}
+
+.mc-base-data-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mc-base-data-subtitle {
+  color: #666;
+  font-size: 0.85rem;
+  font-weight: normal;
+}
+
+.mc-base-data-toggle .collapse-icon {
+  color: #5568d4;
+  font-size: 0.85rem;
+}
+
+.mc-base-data-content {
+  padding: 1.25rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.mc-base-data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.mc-data-group {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.mc-data-group-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5568d4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #5568d4;
+}
+
+.mc-data-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.mc-data-item:last-child {
+  border-bottom: none;
+}
+
+.mc-data-label {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.mc-data-value {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.mc-data-value.highlight {
+  color: #5568d4;
+  font-weight: 700;
+}
+
+.mc-base-data-note {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fff8e6;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #856404;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mc-base-data-note a {
+  color: #5568d4;
+  font-weight: 500;
+}
+
+.mc-base-data-note a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .mc-base-data-toggle {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .mc-base-data-subtitle {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .mc-base-data-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .run-simulation-btn {
   background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;
