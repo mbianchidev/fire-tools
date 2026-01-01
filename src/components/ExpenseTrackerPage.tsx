@@ -170,6 +170,39 @@ export function ExpenseTrackerPage() {
     setSelectedMonth(currentMonth);
   }, [currentYear, currentMonth]);
 
+  // Auto-create month/year if it doesn't exist
+  useEffect(() => {
+    setData(prev => {
+      const yearData = prev.years.find(y => y.year === selectedYear);
+      const monthExists = yearData?.months.find(m => m.month === selectedMonth);
+      
+      // If year and month already exist, no need to update
+      if (yearData && monthExists) {
+        return prev;
+      }
+      
+      // Create new data with year/month
+      const newData = deepCloneData(prev);
+      
+      // Ensure year exists
+      let targetYear = newData.years.find(y => y.year === selectedYear);
+      if (!targetYear) {
+        targetYear = createEmptyYearData(selectedYear);
+        newData.years.push(targetYear);
+        newData.years.sort((a, b) => b.year - a.year); // Sort descending
+      }
+      
+      // Ensure month exists
+      if (!targetYear.months.find(m => m.month === selectedMonth)) {
+        const monthData = createEmptyMonthData(selectedYear, selectedMonth);
+        targetYear.months.push(monthData);
+        targetYear.months.sort((a, b) => a.month - b.month);
+      }
+      
+      return newData;
+    });
+  }, [selectedYear, selectedMonth]);
+
   // Get current month data
   const currentMonthData = useMemo(() => {
     const yearData = data.years.find(y => y.year === selectedYear);
@@ -457,31 +490,6 @@ export function ExpenseTrackerPage() {
       return newData;
     });
   }, []);
-  
-  // Ensure month exists (for "Add This Month" button)
-  const handleAddMonth = useCallback(() => {
-    setData(prev => {
-      const newData = deepCloneData(prev);
-      
-      // Ensure year exists
-      let yearData = newData.years.find(y => y.year === selectedYear);
-      if (!yearData) {
-        yearData = createEmptyYearData(selectedYear);
-        newData.years.push(yearData);
-        newData.years.sort((a, b) => a.year - b.year);
-      }
-      
-      // Ensure month exists
-      let monthData = yearData.months.find(m => m.month === selectedMonth);
-      if (!monthData) {
-        monthData = createEmptyMonthData(selectedYear, selectedMonth);
-        yearData.months.push(monthData);
-        yearData.months.sort((a, b) => a.month - b.month);
-      }
-      
-      return newData;
-    });
-  }, [selectedYear, selectedMonth]);
 
   // Export data
   const handleExport = () => {
@@ -545,7 +553,7 @@ export function ExpenseTrackerPage() {
     }
   };
 
-  // Available years for selector - include years from data plus a range for new years
+  // Available years for selector - include years from data plus unlimited past years
   const availableYears = useMemo(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -554,8 +562,8 @@ export function ExpenseTrackerPage() {
     // Add current year
     years.add(currentYear);
     
-    // Add 5 past years for easy selection of older data
-    for (let i = 1; i <= 5; i++) {
+    // Add past years: go back 30 years to allow historical data entry
+    for (let i = 1; i <= 30; i++) {
       years.add(currentYear - i);
     }
     
@@ -642,12 +650,6 @@ export function ExpenseTrackerPage() {
                 ))}
               </select>
             </div>
-            <button
-              className="btn-add-month"
-              onClick={handleAddMonth}
-            >
-              <span aria-hidden="true">➕</span> Add This Month
-            </button>
             {isViewingPastPeriod && (
               <button
                 className="btn-current-period"

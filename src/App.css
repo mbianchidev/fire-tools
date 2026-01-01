@@ -330,13 +330,15 @@ body {
   display: flex;
   align-items: center;
   cursor: pointer;
+  font-size: 1rem;
 }
 
 .checkbox-group input[type="checkbox"] {
-  margin-right: 0.5rem;
-  width: 20px;
-  height: 20px;
+  margin-right: 0.75rem;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .allocation-sum {
