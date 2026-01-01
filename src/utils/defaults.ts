@@ -31,4 +31,6 @@ export const DEFAULT_INPUTS: CalculatorInputs = {
   stopWorkingAtFIRE: true,
   maxAge: 100,
   useAssetAllocationValue: false,
+  useExpenseTrackerExpenses: false,
+  useExpenseTrackerIncome: false,
 };

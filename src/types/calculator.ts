@@ -44,6 +44,8 @@ export interface CalculatorInputs {
   stopWorkingAtFIRE: boolean;
   maxAge: number; // Maximum age for projections (default 100)
   useAssetAllocationValue: boolean; // When true, use asset allocation total as portfolio value
+  useExpenseTrackerExpenses: boolean; // When true, calculate current expenses from last 12 months of expense tracker
+  useExpenseTrackerIncome: boolean; // When true, calculate labor income from last 12 months of expense tracker
 }
 
 export interface YearProjection {

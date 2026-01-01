@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { CalculatorInputs } from '../types/calculator';
 import { NumberInput } from './NumberInput';
 import { calculateYearsOfExpenses } from '../utils/fireCalculator';
+import { 
+  calculateAnnualExpensesFromTracker, 
+  calculateAnnualIncomeFromTracker 
+} from '../utils/expenseTrackerIntegration';
 
 interface AssetAllocationData {
   totalValue: number;
@@ -88,6 +92,15 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
   const effectiveCashPercent = inputs.useAssetAllocationValue && assetAllocationData 
     ? assetAllocationData.cashPercent 
     : inputs.cashPercent;
+
+  // When using expense tracker data, calculate from last 12 months
+  const effectiveCurrentExpenses = inputs.useExpenseTrackerExpenses
+    ? calculateAnnualExpensesFromTracker(undefined, Math.abs(inputs.expectedCashReturn))
+    : inputs.currentAnnualExpenses;
+  
+  const effectiveLaborIncome = inputs.useExpenseTrackerIncome
+    ? calculateAnnualIncomeFromTracker(undefined, inputs.laborIncomeGrowthRate)
+    : inputs.annualLaborIncome;
 
   return (
     <div className="inputs-form">
@@ -228,11 +241,23 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         {openSections.income && (<div id="income-content" className="form-section-content">
         <div className="form-group">
           <label htmlFor="labor-income">Annual Labor Income (Net) (€)</label>
-          <NumberInput
-            id="labor-income"
-            value={inputs.annualLaborIncome}
-            onChange={(value) => handleChange('annualLaborIncome', value)}
-          />
+          {inputs.useExpenseTrackerIncome ? (
+            <input
+              id="labor-income"
+              type="number"
+              inputMode="decimal"
+              value={effectiveLaborIncome.toFixed(2)}
+              readOnly
+              className="calculated-field"
+              aria-readonly="true"
+            />
+          ) : (
+            <NumberInput
+              id="labor-income"
+              value={inputs.annualLaborIncome}
+              onChange={(value) => handleChange('annualLaborIncome', value)}
+            />
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="labor-income-growth">Labor Income Growth Rate (%)</label>
@@ -303,11 +328,23 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         {openSections.expenses && (<div id="expenses-content" className="form-section-content">
         <div className="form-group">
           <label htmlFor="current-expenses">Current Annual Expenses (€)</label>
-          <NumberInput
-            id="current-expenses"
-            value={inputs.currentAnnualExpenses}
-            onChange={(value) => handleChange('currentAnnualExpenses', value)}
-          />
+          {inputs.useExpenseTrackerExpenses ? (
+            <input
+              id="current-expenses"
+              type="number"
+              inputMode="decimal"
+              value={effectiveCurrentExpenses.toFixed(2)}
+              readOnly
+              className="calculated-field"
+              aria-readonly="true"
+            />
+          ) : (
+            <NumberInput
+              id="current-expenses"
+              value={inputs.currentAnnualExpenses}
+              onChange={(value) => handleChange('currentAnnualExpenses', value)}
+            />
+          )}
         </div>
         <div className="form-group">
           <label htmlFor="fire-expenses">FIRE Annual Expenses (€)</label>
@@ -439,6 +476,26 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
               onChange={(e) => handleChange('useAssetAllocationValue', e.target.checked)}
             />
             Use Asset Allocation portfolio value and allocation
+          </label>
+        </div>
+        <div className="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={inputs.useExpenseTrackerExpenses}
+              onChange={(e) => handleChange('useExpenseTrackerExpenses', e.target.checked)}
+            />
+            Calculate current expenses from last 12 months of Expense Tracker
+          </label>
+        </div>
+        <div className="form-group checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={inputs.useExpenseTrackerIncome}
+              onChange={(e) => handleChange('useExpenseTrackerIncome', e.target.checked)}
+            />
+            Calculate labor income from last 12 months of Expense Tracker
           </label>
         </div>
         </div>)}
