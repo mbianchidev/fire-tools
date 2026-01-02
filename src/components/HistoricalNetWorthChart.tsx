@@ -162,8 +162,32 @@ export function HistoricalNetWorthChart({
   // Get minimum months needed for high confidence
   const minMonthsForHighConfidence = 12;
 
-  // Custom tick formatter for "All" view mode - show only years
-  const renderYearTick = ({ x, y, payload }: { x: number; y: number; payload: { value: string } }) => {
+  // For "All" view mode - get only the indices where year changes
+  const yearChangeIndices = useMemo(() => {
+    if (viewMode !== 'all') return new Set<number>();
+    
+    const indices = new Set<number>();
+    let lastYear = '';
+    
+    combinedData.forEach((d, i) => {
+      const parts = d.month.split(' ');
+      const year = parts[1] || '';
+      if (year !== lastYear) {
+        indices.add(i);
+        lastYear = year;
+      }
+    });
+    
+    return indices;
+  }, [combinedData, viewMode]);
+
+  // Custom tick formatter for "All" view mode - show only years at year changes
+  const renderYearTick = ({ x, y, payload, index }: { x: number; y: number; payload: { value: string }; index: number }) => {
+    // Only render if this is a year change point
+    if (!yearChangeIndices.has(index)) {
+      return null;
+    }
+    
     const parts = payload.value.split(' ');
     const year = parts[1] || '';
     
@@ -212,6 +236,7 @@ export function HistoricalNetWorthChart({
             tick={tickFormatter}
             tickLine={{ stroke: '#e0e0e0' }}
             height={50}
+            interval={0}
           />
           <YAxis
             tick={{ fontSize: 12, fill: '#666' }}
