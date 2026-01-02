@@ -222,6 +222,8 @@ fire-tools/
 - **Lazy images** - Use lazy loading for images (when/if added)
 - **Optimize charts** - Limit data points in charts for large datasets
 - **Efficient rendering** - Avoid unnecessary re-renders with React.memo when beneficial
+- **Critical CSS** - Above-the-fold styles are inlined in `index.html` to prevent render-blocking and improve First Contentful Paint (FCP)
+- **Layout stability** - Conditional UI elements are positioned to avoid Cumulative Layout Shift (CLS)
 
 ## Backend Rules
 
