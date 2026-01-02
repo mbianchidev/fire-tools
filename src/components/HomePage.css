@@ -16,6 +16,8 @@
   align-items: flex-start;
   border: 3px solid #fca5a5;
   position: relative;
+  /* Prevent layout shift by containing the banner */
+  contain: layout;
 }
 
 .warning-icon {
@@ -100,6 +102,8 @@
   border-radius: 16px;
   margin-bottom: 3rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  /* Reserve minimum space to prevent layout shift when banner appears */
+  min-height: 200px;
 }
 
 .hero-title {
@@ -202,6 +206,8 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   margin-top: 2.5rem;
   margin-bottom: 3rem;
+  /* Prevent layout shift */
+  contain: layout;
 }
 
 .info-section h3 {

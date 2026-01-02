@@ -23,6 +23,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   min-height: 100vh;
+  /* Improve font loading performance */
+  font-display: swap;
 }
 
 /* Skip to main content link for keyboard accessibility */

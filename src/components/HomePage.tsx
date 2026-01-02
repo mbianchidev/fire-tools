@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   loadSecurityBannerDismissed,
@@ -7,20 +7,19 @@ import {
 import './HomePage.css';
 
 export function HomePage() {
-  const [showSecurityBanner, setShowSecurityBanner] = useState(false);
-
   // Check if running on GitHub Pages
   const isGitHubPages =
     typeof window !== 'undefined' &&
     (window.location.hostname === 'github.io' ||
       window.location.hostname.endsWith('.github.io'));
 
-  useEffect(() => {
-    if (isGitHubPages) {
-      const dismissed = loadSecurityBannerDismissed();
-      setShowSecurityBanner(!dismissed);
-    }
-  }, [isGitHubPages]);
+  // Initialize state immediately to prevent layout shift
+  const [showSecurityBanner, setShowSecurityBanner] = useState(() => {
+    if (!isGitHubPages) return false;
+    // Check dismissed status synchronously on initial render
+    const dismissed = loadSecurityBannerDismissed();
+    return !dismissed;
+  });
 
   const handleDismissSecurityBanner = () => {
     saveSecurityBannerDismissed(true);
