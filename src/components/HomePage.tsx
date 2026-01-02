@@ -15,10 +15,18 @@ export function HomePage() {
 
   // Initialize state immediately to prevent layout shift
   const [showSecurityBanner, setShowSecurityBanner] = useState(() => {
-    if (!isGitHubPages || typeof window === 'undefined') return false;
+    // Return false if not on GitHub Pages (window check already in isGitHubPages)
+    if (!isGitHubPages) return false;
+    
     // Check dismissed status synchronously on initial render
-    const dismissed = loadSecurityBannerDismissed();
-    return !dismissed;
+    try {
+      const dismissed = loadSecurityBannerDismissed();
+      return !dismissed;
+    } catch (error) {
+      // If cookie read fails, show the banner to be safe
+      console.error('Error loading security banner preference:', error);
+      return true;
+    }
   });
 
   const handleDismissSecurityBanner = () => {
