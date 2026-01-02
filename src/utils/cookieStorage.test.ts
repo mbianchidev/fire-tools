@@ -6,11 +6,15 @@ import {
   saveFireCalculatorInputs,
   loadFireCalculatorInputs,
   clearFireCalculatorInputs,
+  saveExpenseTrackerData,
+  loadExpenseTrackerData,
+  clearExpenseTrackerData,
   clearAllData,
   isCookieStorageAvailable,
 } from './cookieStorage';
 import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { CalculatorInputs } from '../types/calculator';
+import { ExpenseTrackerData, ExpenseCategory, IncomeSource } from '../types/expenseTracker';
 import { DEFAULT_INPUTS } from './defaults';
 
 // Mock document.cookie
@@ -55,6 +59,10 @@ Object.defineProperty(document, 'cookie', {
 describe('Cookie Storage utilities', () => {
   beforeEach(() => {
     cookieMock.clear();
+    // Also explicitly clear via the library to ensure clean state
+    clearAssetAllocation();
+    clearFireCalculatorInputs();
+    clearExpenseTrackerData();
   });
 
   describe('Asset Allocation', () => {
@@ -272,6 +280,265 @@ describe('Cookie Storage utilities', () => {
       if (originalDescriptor) {
         Object.defineProperty(document, 'cookie', originalDescriptor);
       }
+    });
+  });
+
+  describe('Expense Tracker Data', () => {
+    const mockExpenseTrackerData: ExpenseTrackerData = {
+      years: [
+        {
+          year: 2026,
+          months: [
+            {
+              year: 2026,
+              month: 1,
+              incomes: [
+                {
+                  id: 'income-1',
+                  type: 'income',
+                  date: '2026-01-15',
+                  amount: 5000,
+                  description: 'Salary',
+                  source: 'EMPLOYMENT' as IncomeSource,
+                },
+              ],
+              expenses: [
+                {
+                  id: 'expense-1',
+                  type: 'expense',
+                  date: '2026-01-10',
+                  amount: 100,
+                  description: 'Test expense',
+                  category: 'OTHER' as ExpenseCategory,
+                  expenseType: 'WANT',
+                },
+              ],
+              budgets: [],
+            },
+          ],
+          isArchived: false,
+        },
+      ],
+      currentYear: 2026,
+      currentMonth: 1,
+      currency: 'EUR',
+      globalBudgets: [],
+    };
+
+    it('should save and load expense tracker data', () => {
+      saveExpenseTrackerData(mockExpenseTrackerData);
+      const loaded = loadExpenseTrackerData();
+
+      expect(loaded).toEqual(mockExpenseTrackerData);
+      expect(loaded?.years[0].months[0].incomes[0].amount).toBe(5000);
+      expect(loaded?.years[0].months[0].expenses[0].amount).toBe(100);
+    });
+
+    it('should persist expense tracker data across multiple save/load cycles', () => {
+      // First save and load
+      saveExpenseTrackerData(mockExpenseTrackerData);
+      const loaded1 = loadExpenseTrackerData();
+      expect(loaded1).toEqual(mockExpenseTrackerData);
+
+      // Modify and save again
+      const modifiedData = {
+        ...mockExpenseTrackerData,
+        years: [
+          {
+            ...mockExpenseTrackerData.years[0],
+            months: [
+              {
+                ...mockExpenseTrackerData.years[0].months[0],
+                expenses: [
+                  ...mockExpenseTrackerData.years[0].months[0].expenses,
+                  {
+                    id: 'expense-2',
+                    type: 'expense' as const,
+                    date: '2026-01-20',
+                    amount: 200,
+                    description: 'Another expense',
+                    category: 'GROCERIES' as ExpenseCategory,
+                    expenseType: 'NEED' as const,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
+
+      saveExpenseTrackerData(modifiedData);
+      const loaded2 = loadExpenseTrackerData();
+
+      expect(loaded2).toEqual(modifiedData);
+      expect(loaded2?.years[0].months[0].expenses).toHaveLength(2);
+      expect(loaded2?.years[0].months[0].expenses[1].amount).toBe(200);
+    });
+
+    it('should return null when no expense tracker data is saved', () => {
+      const loaded = loadExpenseTrackerData();
+      expect(loaded).toBeNull();
+    });
+
+    it('should clear expense tracker data', () => {
+      saveExpenseTrackerData(mockExpenseTrackerData);
+      clearExpenseTrackerData();
+      const loaded = loadExpenseTrackerData();
+
+      expect(loaded).toBeNull();
+    });
+
+    it('should handle corrupted expense tracker data gracefully', () => {
+      document.cookie = 'fire-tools-expense-tracker=invalid-encrypted-data';
+      const loaded = loadExpenseTrackerData();
+
+      expect(loaded).toBeNull();
+    });
+
+    it('should encrypt expense tracker data in cookies', () => {
+      saveExpenseTrackerData(mockExpenseTrackerData);
+      const cookieValue = document.cookie;
+      
+      // Cookie should not contain plaintext sensitive data
+      expect(cookieValue).not.toContain('Salary');
+      expect(cookieValue).not.toContain('5000');
+      expect(cookieValue).not.toContain('Test expense');
+    });
+
+    it('should simulate page refresh - data persists after save and reload', () => {
+      // Simulate user adding data
+      const initialData: ExpenseTrackerData = {
+        years: [
+          {
+            year: 2026,
+            months: [
+              {
+                year: 2026,
+                month: 1,
+                incomes: [],
+                expenses: [
+                  {
+                    id: 'expense-new',
+                    type: 'expense',
+                    date: '2026-01-15',
+                    amount: 250,
+                    description: 'New expense after refresh test',
+                    category: 'GROCERIES' as ExpenseCategory,
+                    expenseType: 'NEED',
+                  },
+                ],
+                budgets: [],
+              },
+            ],
+            isArchived: false,
+          },
+        ],
+        currentYear: 2026,
+        currentMonth: 1,
+        currency: 'EUR',
+        globalBudgets: [],
+      };
+
+      // Save the data (simulates auto-save on data change)
+      saveExpenseTrackerData(initialData);
+
+      // Simulate page refresh by loading data again
+      const loadedAfterRefresh = loadExpenseTrackerData();
+
+      // Data should be exactly the same
+      expect(loadedAfterRefresh).not.toBeNull();
+      expect(loadedAfterRefresh?.years[0].months[0].expenses).toHaveLength(1);
+      expect(loadedAfterRefresh?.years[0].months[0].expenses[0].amount).toBe(250);
+      expect(loadedAfterRefresh?.years[0].months[0].expenses[0].description).toBe('New expense after refresh test');
+    });
+
+    it('should preserve data when adding new month to existing year', () => {
+      // Start with data for January
+      const dataWithJanuary: ExpenseTrackerData = {
+        years: [
+          {
+            year: 2026,
+            months: [
+              {
+                year: 2026,
+                month: 1,
+                incomes: [{
+                  id: 'income-jan',
+                  type: 'income',
+                  date: '2026-01-15',
+                  amount: 3000,
+                  description: 'January salary',
+                  source: 'EMPLOYMENT' as IncomeSource,
+                }],
+                expenses: [{
+                  id: 'expense-jan',
+                  type: 'expense',
+                  date: '2026-01-10',
+                  amount: 500,
+                  description: 'January rent',
+                  category: 'HOUSING' as ExpenseCategory,
+                  expenseType: 'NEED',
+                }],
+                budgets: [],
+              },
+            ],
+            isArchived: false,
+          },
+        ],
+        currentYear: 2026,
+        currentMonth: 1,
+        currency: 'EUR',
+        globalBudgets: [],
+      };
+
+      // Save January data
+      saveExpenseTrackerData(dataWithJanuary);
+
+      // Load it back
+      const loaded = loadExpenseTrackerData();
+      expect(loaded).not.toBeNull();
+      expect(loaded?.years[0].months).toHaveLength(1);
+      expect(loaded?.years[0].months[0].incomes[0].amount).toBe(3000);
+
+      // Now add February data (simulating user navigating to February and adding data)
+      const dataWithFebruary: ExpenseTrackerData = {
+        ...dataWithJanuary,
+        years: [
+          {
+            ...dataWithJanuary.years[0],
+            months: [
+              ...dataWithJanuary.years[0].months,
+              {
+                year: 2026,
+                month: 2,
+                incomes: [{
+                  id: 'income-feb',
+                  type: 'income',
+                  date: '2026-02-15',
+                  amount: 3000,
+                  description: 'February salary',
+                  source: 'EMPLOYMENT' as IncomeSource,
+                }],
+                expenses: [],
+                budgets: [],
+              },
+            ],
+          },
+        ],
+      };
+
+      // Save February data
+      saveExpenseTrackerData(dataWithFebruary);
+
+      // Load it back - both January and February should be there
+      const loadedWithBoth = loadExpenseTrackerData();
+      expect(loadedWithBoth).not.toBeNull();
+      expect(loadedWithBoth?.years[0].months).toHaveLength(2);
+      expect(loadedWithBoth?.years[0].months[0].month).toBe(1);
+      expect(loadedWithBoth?.years[0].months[0].incomes[0].amount).toBe(3000); // January income still there
+      expect(loadedWithBoth?.years[0].months[0].expenses[0].amount).toBe(500); // January expense still there
+      expect(loadedWithBoth?.years[0].months[1].month).toBe(2);
+      expect(loadedWithBoth?.years[0].months[1].incomes[0].amount).toBe(3000); // February income there
     });
   });
 });
