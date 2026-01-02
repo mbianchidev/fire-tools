@@ -6,6 +6,8 @@ interface DataManagementProps {
   onReset: () => void;
   onLoadDemo?: () => void; // Optional for expense tracker
   defaultOpen?: boolean;
+  /** File format for import/export - 'csv' or 'json'. Default is 'csv' */
+  fileFormat?: 'csv' | 'json';
 }
 
 export const DataManagement: React.FC<DataManagementProps> = ({
@@ -14,8 +16,12 @@ export const DataManagement: React.FC<DataManagementProps> = ({
   onReset,
   onLoadDemo,
   defaultOpen = false,
+  fileFormat = 'csv',
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  
+  const formatLabel = fileFormat.toUpperCase();
+  const acceptType = fileFormat === 'json' ? '.json' : '.csv';
 
   return (
     <div className="data-management-section collapsible-section">
@@ -51,9 +57,9 @@ export const DataManagement: React.FC<DataManagementProps> = ({
             onClick={onExport} 
             className="action-btn export-btn" 
             style={{ width: '100%', marginBottom: '8px', justifyContent: 'center' }}
-            aria-label="Export calculator data to CSV file"
+            aria-label={`Export calculator data to ${formatLabel} file`}
           >
-            <span aria-hidden="true">📥</span> Export CSV
+            <span aria-hidden="true">📥</span> Export {formatLabel}
           </button>
           <label 
             className="action-btn import-btn" 
@@ -66,13 +72,13 @@ export const DataManagement: React.FC<DataManagementProps> = ({
               }
             }}
           >
-            <span aria-hidden="true">📤</span> Import CSV
+            <span aria-hidden="true">📤</span> Import {formatLabel}
             <input
               type="file"
-              accept=".csv"
+              accept={acceptType}
               onChange={onImport}
               style={{ display: 'none' }}
-              aria-label="Import calculator data from CSV file"
+              aria-label={`Import calculator data from ${formatLabel} file`}
             />
           </label>
           <button 

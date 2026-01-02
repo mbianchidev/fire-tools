@@ -708,6 +708,7 @@ export function NetWorthTrackerPage() {
           onImport={handleImport}
           onReset={handleResetData}
           defaultOpen={false}
+          fileFormat="json"
         />
 
         {/* Month/Year Selector */}
@@ -742,7 +743,7 @@ export function NetWorthTrackerPage() {
               className="btn-add-month"
               onClick={handleAddMonth}
             >
-              <span aria-hidden="true">➕</span> Log This Month
+              <span aria-hidden="true">➕</span> Start Month Log
             </button>
             {isViewingPastPeriod && (
               <button

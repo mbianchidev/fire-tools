@@ -108,10 +108,16 @@ export function HistoricalNetWorthChart({
       ];
     }
     
-    // Add the last actual point as bridge to forecast
+    // Modify the last actual point to also have forecast value for continuity
+    // instead of adding a duplicate data point
+    const actualWithBridge = actualData.map((d, i) => 
+      i === actualData.length - 1 
+        ? { ...d, forecast: d.netWorth }
+        : d
+    );
+    
     return [
-      ...actualData,
-      { ...lastActual, forecast: lastActual.netWorth },
+      ...actualWithBridge,
       ...forecastData.map(f => ({ 
         month: f.month, 
         netWorth: undefined, 
