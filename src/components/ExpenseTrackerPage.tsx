@@ -94,10 +94,10 @@ export function ExpenseTrackerPage() {
     const saved = loadExpenseTrackerData();
     if (saved) {
       // Ensure globalBudgets exists for backward compatibility
-      if (!saved.globalBudgets) {
-        saved.globalBudgets = [];
-      }
-      return saved;
+      return {
+        ...saved,
+        globalBudgets: saved.globalBudgets || []
+      };
     }
     return getDefaultData();
   });
