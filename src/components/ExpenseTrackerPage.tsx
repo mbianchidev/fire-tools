@@ -1255,6 +1255,7 @@ function TransactionFormDialog({
         amount: parsedAmount,
         description,
         source,
+        currency,
       });
     } else {
       onSubmit({
@@ -1264,6 +1265,7 @@ function TransactionFormDialog({
         category,
         subCategory: subCategory || undefined,
         expenseType,
+        currency,
       });
     }
   };
