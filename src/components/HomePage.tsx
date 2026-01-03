@@ -104,7 +104,7 @@ export function HomePage() {
 
         <Link to="/expense-tracker" className="feature-card" aria-labelledby="expense-tracker-title">
           <div className="feature-icon" aria-hidden="true">💰</div>
-          <h2 id="expense-tracker-title">Cashflow Tracker</h2>
+          <h3 id="expense-tracker-title" className="feature-card-title">Cashflow Tracker</h3>
           <p>
             Track your income and expenses, set budgets per category, and gain insights 
             into your spending patterns with the 50/30/20 budgeting rule.
@@ -115,6 +115,21 @@ export function HomePage() {
             <span className="highlight-item"><span aria-hidden="true">📊</span> Spending Analytics</span>
           </div>
           <span className="cta-link" aria-hidden="true">Track Cashflow →</span>
+        </Link>
+
+        <Link to="/net-worth-tracker" className="feature-card" aria-labelledby="net-worth-title">
+          <div className="feature-icon" aria-hidden="true">📈</div>
+          <h3 id="net-worth-title" className="feature-card-title">Net Worth Tracker</h3>
+          <p>
+            Track your financial operations and net worth on a monthly basis. Monitor assets, 
+            cash, pensions, and progress toward FIRE.
+          </p>
+          <div className="feature-highlights">
+            <span className="highlight-item"><span aria-hidden="true">💼</span> Assets & Holdings</span>
+            <span className="highlight-item"><span aria-hidden="true">💵</span> Cash & Liquidity</span>
+            <span className="highlight-item"><span aria-hidden="true">🧓</span> Pension Tracking</span>
+          </div>
+          <span className="cta-link" aria-hidden="true">Track Net Worth →</span>
         </Link>
 
         <Link to="/fire-calculator" className="feature-card" aria-labelledby="fire-calc-title">
