@@ -27,6 +27,7 @@ import {
   saveNetWorthTrackerData,
   loadNetWorthTrackerData,
 } from '../utils/cookieStorage';
+import { getDemoNetWorthData } from '../utils/defaults';
 import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import './NetWorthTrackerPage.css';
@@ -654,6 +655,16 @@ export function NetWorthTrackerPage() {
     }
   };
 
+  // Load demo data
+  const handleLoadDemo = () => {
+    if (confirm('This will replace your current net worth tracker data with demo data. Continue?')) {
+      const demoData = getDemoNetWorthData();
+      setData(demoData);
+      setSelectedYear(demoData.currentYear);
+      setSelectedMonth(demoData.currentMonth);
+    }
+  };
+
   // Available years for selector
   const availableYears = useMemo(() => {
     const years = new Set(data.years.map(y => y.year));
@@ -708,6 +719,7 @@ export function NetWorthTrackerPage() {
           onExport={handleExport}
           onImport={handleImport}
           onReset={handleResetData}
+          onLoadDemo={handleLoadDemo}
           defaultOpen={false}
           fileFormat="json"
         />
