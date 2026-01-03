@@ -406,26 +406,43 @@ function isValidNetWorthTrackerData(obj: unknown): obj is NetWorthTrackerData {
 }
 
 /**
- * Save Net Worth Tracker data to encrypted cookies
+ * Save Net Worth Tracker data to encrypted localStorage
+ * Note: Uses localStorage instead of cookies due to 4KB cookie size limit.
+ * Net worth tracker data can easily exceed this limit with realistic asset history.
  */
 export function saveNetWorthTrackerData(data: NetWorthTrackerData): void {
   try {
     const dataJson = JSON.stringify(data);
     const encryptedData = encryptData(dataJson);
     
-    Cookies.set(NET_WORTH_TRACKER_KEY, encryptedData, COOKIE_OPTIONS);
+    localStorage.setItem(NET_WORTH_TRACKER_KEY, encryptedData);
   } catch (error) {
-    console.error('Failed to save net worth tracker data to cookies:', error);
-    throw new Error('Failed to save data to cookies. Cookies may be disabled.');
+    console.error('Failed to save net worth tracker data to localStorage:', error);
+    throw new Error('Failed to save data to localStorage. Storage may be full or disabled.');
   }
 }
 
 /**
- * Load Net Worth Tracker data from encrypted cookies
+ * Load Net Worth Tracker data from encrypted localStorage
  */
 export function loadNetWorthTrackerData(): NetWorthTrackerData | null {
   try {
-    const encryptedData = Cookies.get(NET_WORTH_TRACKER_KEY);
+    // Try localStorage first
+    let encryptedData = localStorage.getItem(NET_WORTH_TRACKER_KEY);
+    
+    // Migration: If not in localStorage, try to load from cookie and migrate
+    if (!encryptedData) {
+      const cookieData = Cookies.get(NET_WORTH_TRACKER_KEY);
+      if (cookieData) {
+        console.log('Migrating net worth tracker data from cookies to localStorage...');
+        // Save to localStorage
+        localStorage.setItem(NET_WORTH_TRACKER_KEY, cookieData);
+        // Remove from cookie
+        Cookies.remove(NET_WORTH_TRACKER_KEY, { path: '/' });
+        encryptedData = cookieData;
+      }
+    }
+    
     if (encryptedData) {
       const decryptedData = decryptData(encryptedData);
       if (decryptedData) {
@@ -437,19 +454,21 @@ export function loadNetWorthTrackerData(): NetWorthTrackerData | null {
     }
     return null;
   } catch (error) {
-    console.error('Failed to load net worth tracker data from cookies:', error);
+    console.error('Failed to load net worth tracker data from localStorage:', error);
     return null;
   }
 }
 
 /**
- * Clear Net Worth Tracker data from cookies
+ * Clear Net Worth Tracker data from localStorage
  */
 export function clearNetWorthTrackerData(): void {
   try {
+    localStorage.removeItem(NET_WORTH_TRACKER_KEY);
+    // Also remove from cookies in case there's legacy data
     Cookies.remove(NET_WORTH_TRACKER_KEY, { path: '/' });
   } catch (error) {
-    console.error('Failed to clear net worth tracker data from cookies:', error);
+    console.error('Failed to clear net worth tracker data from localStorage:', error);
   }
 }
 
