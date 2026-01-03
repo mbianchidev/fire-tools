@@ -247,26 +247,43 @@ function isValidExpenseTrackerData(obj: any): obj is ExpenseTrackerData {
 }
 
 /**
- * Save Expense Tracker data to encrypted cookies
+ * Save Expense Tracker data to encrypted localStorage
+ * Note: Uses localStorage instead of cookies due to 4KB cookie size limit.
+ * Expense tracker data can easily exceed this limit with realistic transaction history.
  */
 export function saveExpenseTrackerData(data: ExpenseTrackerData): void {
   try {
     const dataJson = JSON.stringify(data);
     const encryptedData = encryptData(dataJson);
     
-    Cookies.set(EXPENSE_TRACKER_KEY, encryptedData, COOKIE_OPTIONS);
+    localStorage.setItem(EXPENSE_TRACKER_KEY, encryptedData);
   } catch (error) {
-    console.error('Failed to save expense tracker data to cookies:', error);
-    throw new Error('Failed to save data to cookies. Cookies may be disabled.');
+    console.error('Failed to save expense tracker data to localStorage:', error);
+    throw new Error('Failed to save data to localStorage. Storage may be full or disabled.');
   }
 }
 
 /**
- * Load Expense Tracker data from encrypted cookies
+ * Load Expense Tracker data from encrypted localStorage
  */
 export function loadExpenseTrackerData(): ExpenseTrackerData | null {
   try {
-    const encryptedData = Cookies.get(EXPENSE_TRACKER_KEY);
+    // Try localStorage first
+    let encryptedData = localStorage.getItem(EXPENSE_TRACKER_KEY);
+    
+    // Migration: If not in localStorage, try to load from cookie and migrate
+    if (!encryptedData) {
+      const cookieData = Cookies.get(EXPENSE_TRACKER_KEY);
+      if (cookieData) {
+        console.log('Migrating expense tracker data from cookies to localStorage...');
+        // Save to localStorage
+        localStorage.setItem(EXPENSE_TRACKER_KEY, cookieData);
+        // Remove from cookie
+        Cookies.remove(EXPENSE_TRACKER_KEY, { path: '/' });
+        encryptedData = cookieData;
+      }
+    }
+    
     if (encryptedData) {
       const decryptedData = decryptData(encryptedData);
       if (decryptedData) {
@@ -278,25 +295,25 @@ export function loadExpenseTrackerData(): ExpenseTrackerData | null {
     }
     return null;
   } catch (error) {
-    console.error('Failed to load expense tracker data from cookies:', error);
+    console.error('Failed to load expense tracker data from localStorage:', error);
     return null;
   }
 }
 
 /**
- * Clear Expense Tracker data from cookies
+ * Clear Expense Tracker data from localStorage
  */
 export function clearExpenseTrackerData(): void {
   try {
-    Cookies.remove(EXPENSE_TRACKER_KEY, { path: '/' });
+    localStorage.removeItem(EXPENSE_TRACKER_KEY);
   } catch (error) {
-    console.error('Failed to clear expense tracker data from cookies:', error);
+    console.error('Failed to clear expense tracker data from localStorage:', error);
   }
 }
 
 /**
- * Clear all FIRE Calculator data from cookies
- * This includes both Asset Allocation and FIRE Calculator inputs
+ * Clear all FIRE Calculator data from cookies and localStorage
+ * This includes Asset Allocation, FIRE Calculator inputs, and Expense Tracker data
  */
 export function clearAllData(): void {
   clearAssetAllocation();
@@ -306,6 +323,8 @@ export function clearAllData(): void {
 
 /**
  * Check if cookie storage is available and working
+ * Note: Expense Tracker uses localStorage instead due to size limits.
+ * localStorage availability is checked implicitly via try-catch in save/load functions.
  */
 export function isCookieStorageAvailable(): boolean {
   try {

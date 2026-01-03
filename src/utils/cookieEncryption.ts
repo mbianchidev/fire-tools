@@ -43,11 +43,27 @@ export function decryptData(ciphertext: string): string | null {
     }
     
     const decrypted = CryptoJS.AES.decrypt(ciphertext, ENCRYPTION_KEY);
+    
+    // Check if decryption produced valid output
+    // Invalid ciphertext results in empty WordArray or malformed data
+    if (!decrypted || decrypted.sigBytes <= 0) {
+      return null;
+    }
+    
     const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
     
     // If decryption results in an empty string, it likely failed
-    // Also check if the result contains only non-printable characters
-    if (plaintext === '' || /^[\x00-\x1F\x7F-\x9F]+$/.test(plaintext)) {
+    // Also check if the result contains only non-printable characters or is suspiciously short
+    if (plaintext === '' || plaintext.length < 1) {
+      return null;
+    }
+    
+    // Check for common indicators of failed decryption:
+    // - Single character results are likely invalid decryption
+    // - Contains only non-printable ASCII control characters
+    // - Contains replacement characters indicating encoding failure
+    // - Contains mostly null bytes or other unusual patterns
+    if (plaintext.length <= 2 || /^[\x00-\x1F\x7F-\x9F]+$/.test(plaintext) || /\uFFFD/.test(plaintext)) {
       return null;
     }
     

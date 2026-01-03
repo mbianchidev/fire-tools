@@ -54,6 +54,8 @@ describe('FIRE Calculator', () => {
     stopWorkingAtFIRE: true,
     maxAge: 100,
     useAssetAllocationValue: false,
+    useExpenseTrackerExpenses: false,
+    useExpenseTrackerIncome: false,
   };
 
   describe('Projection timeline', () => {

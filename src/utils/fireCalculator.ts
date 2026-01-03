@@ -1,4 +1,33 @@
 import { CalculatorInputs, YearProjection, CalculationResult } from '../types/calculator';
+import { 
+  calculateAnnualExpensesFromTracker, 
+  calculateAnnualIncomeFromTracker 
+} from './expenseTrackerIntegration';
+
+/**
+ * Get effective calculator inputs with values from expense tracker if enabled
+ */
+export function getEffectiveInputs(inputs: CalculatorInputs): CalculatorInputs {
+  const effectiveInputs = { ...inputs };
+  
+  // Replace currentAnnualExpenses if using expense tracker
+  if (inputs.useExpenseTrackerExpenses) {
+    effectiveInputs.currentAnnualExpenses = calculateAnnualExpensesFromTracker(
+      undefined,
+      Math.abs(inputs.expectedCashReturn)
+    );
+  }
+  
+  // Replace annualLaborIncome if using expense tracker
+  if (inputs.useExpenseTrackerIncome) {
+    effectiveInputs.annualLaborIncome = calculateAnnualIncomeFromTracker(
+      undefined,
+      inputs.laborIncomeGrowthRate
+    );
+  }
+  
+  return effectiveInputs;
+}
 
 /**
  * Calculate years of expenses from withdrawal rate
@@ -18,49 +47,52 @@ export function calculateYearsOfExpenses(withdrawalRate: number): number {
  * Calculate FIRE projection based on inputs
  */
 export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
+  // Get effective inputs with expense tracker values if enabled
+  const effectiveInputs = getEffectiveInputs(inputs);
+  
   const currentYear = new Date().getFullYear();
-  const currentAge = currentYear - inputs.yearOfBirth;
+  const currentAge = currentYear - effectiveInputs.yearOfBirth;
   const projections: YearProjection[] = [];
   const validationErrors: string[] = [];
   
   // Validate asset allocation
-  const allocationSum = inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent;
+  const allocationSum = effectiveInputs.stocksPercent + effectiveInputs.bondsPercent + effectiveInputs.cashPercent;
   if (Math.abs(allocationSum - 100) > 0.01) {
     validationErrors.push(`Asset allocation must sum to 100%, currently ${allocationSum.toFixed(2)}%`);
   }
   
   // Validate withdrawal rate (must not be negative)
-  if (inputs.desiredWithdrawalRate < 0) {
+  if (effectiveInputs.desiredWithdrawalRate < 0) {
     validationErrors.push('Withdrawal rate cannot be negative');
   }
   
   // Validate reasonable ranges for inputs to prevent calculation errors
-  if (inputs.currentAnnualExpenses < 0) {
+  if (effectiveInputs.currentAnnualExpenses < 0) {
     validationErrors.push('Current annual expenses cannot be negative');
   }
   
-  if (inputs.fireAnnualExpenses < 0) {
+  if (effectiveInputs.fireAnnualExpenses < 0) {
     validationErrors.push('FIRE annual expenses cannot be negative');
   }
   
-  if (inputs.annualLaborIncome < 0) {
+  if (effectiveInputs.annualLaborIncome < 0) {
     validationErrors.push('Annual labor income cannot be negative');
   }
   
-  if (inputs.maxAge < currentAge) {
+  if (effectiveInputs.maxAge < currentAge) {
     validationErrors.push('Maximum age must be greater than or equal to current age');
   }
   
-  if (inputs.maxAge > 150) {
+  if (effectiveInputs.maxAge > 150) {
     validationErrors.push('Maximum age must be 150 or less');
   }
   
   // Check for extreme values that could cause calculation issues
   const MAX_SAFE_VALUE = Number.MAX_SAFE_INTEGER / 1000; // Conservative limit
-  if (inputs.initialSavings > MAX_SAFE_VALUE || 
-      inputs.currentAnnualExpenses > MAX_SAFE_VALUE ||
-      inputs.fireAnnualExpenses > MAX_SAFE_VALUE ||
-      inputs.annualLaborIncome > MAX_SAFE_VALUE) {
+  if (effectiveInputs.initialSavings > MAX_SAFE_VALUE || 
+      effectiveInputs.currentAnnualExpenses > MAX_SAFE_VALUE ||
+      effectiveInputs.fireAnnualExpenses > MAX_SAFE_VALUE ||
+      effectiveInputs.annualLaborIncome > MAX_SAFE_VALUE) {
     validationErrors.push('Input values are too large for calculation');
   }
   
@@ -79,11 +111,11 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
   // Special case: if withdrawal rate is 0, FIRE is achieved immediately (no savings needed)
   // Otherwise, FIRE target = annual expenses × years of expenses needed
   let fireTarget: number;
-  if (inputs.desiredWithdrawalRate === 0) {
+  if (effectiveInputs.desiredWithdrawalRate === 0) {
     fireTarget = 0; // FIRE is achieved with any amount if withdrawal rate is 0
   } else {
     // Use yearsOfExpenses directly to calculate FIRE target
-    fireTarget = inputs.fireAnnualExpenses * inputs.yearsOfExpenses;
+    fireTarget = effectiveInputs.fireAnnualExpenses * effectiveInputs.yearsOfExpenses;
     // Check if fireTarget is reasonable
     if (!isFinite(fireTarget) || fireTarget > MAX_SAFE_VALUE) {
       validationErrors.push('FIRE target calculation resulted in an invalid value');
@@ -97,13 +129,13 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     }
   }
   
-  let portfolioValue = inputs.initialSavings;
-  let laborIncome = inputs.annualLaborIncome;
-  let isFIREAchieved = inputs.desiredWithdrawalRate === 0; // FIRE achieved immediately if withdrawal rate is 0
-  let yearsToFIRE = inputs.desiredWithdrawalRate === 0 ? 0 : -1;
+  let portfolioValue = effectiveInputs.initialSavings;
+  let laborIncome = effectiveInputs.annualLaborIncome;
+  let isFIREAchieved = effectiveInputs.desiredWithdrawalRate === 0; // FIRE achieved immediately if withdrawal rate is 0
+  let yearsToFIRE = effectiveInputs.desiredWithdrawalRate === 0 ? 0 : -1;
   
   // Project from current age to maxAge
-  const maxYears = Math.max(0, inputs.maxAge - currentAge + 1);
+  const maxYears = Math.max(0, effectiveInputs.maxAge - currentAge + 1);
   
   for (let i = 0; i < maxYears; i++) {
     const year = currentYear + i;
@@ -118,34 +150,34 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     
     // If stopWorkingAtFIRE is enabled, stop working once FIRE is achieved.
     // Otherwise, keep working regardless of FIRE status.
-    const isWorking = inputs.stopWorkingAtFIRE ? !isFIREAchieved : true;
+    const isWorking = effectiveInputs.stopWorkingAtFIRE ? !isFIREAchieved : true;
     
     // Calculate investment yield based on asset allocation
     const portfolioReturn = (
-      (inputs.stocksPercent / 100) * (inputs.expectedStockReturn / 100) +
-      (inputs.bondsPercent / 100) * (inputs.expectedBondReturn / 100) +
-      (inputs.cashPercent / 100) * (inputs.expectedCashReturn / 100)
+      (effectiveInputs.stocksPercent / 100) * (effectiveInputs.expectedStockReturn / 100) +
+      (effectiveInputs.bondsPercent / 100) * (effectiveInputs.expectedBondReturn / 100) +
+      (effectiveInputs.cashPercent / 100) * (effectiveInputs.expectedCashReturn / 100)
     );
     const investmentYield = portfolioValue * portfolioReturn;
     
     // Calculate income
     const currentLaborIncome = isWorking ? laborIncome : 0;
     // Pension income only starts at retirement age
-    const currentStatePension = age >= inputs.retirementAge ? inputs.statePensionIncome : 0;
-    const currentPrivatePension = age >= inputs.retirementAge ? inputs.privatePensionIncome : 0;
+    const currentStatePension = age >= effectiveInputs.retirementAge ? effectiveInputs.statePensionIncome : 0;
+    const currentPrivatePension = age >= effectiveInputs.retirementAge ? effectiveInputs.privatePensionIncome : 0;
     const pensionIncome = currentStatePension + currentPrivatePension;
-    const otherIncomeTotal = pensionIncome + inputs.otherIncome;
+    const otherIncomeTotal = pensionIncome + effectiveInputs.otherIncome;
     const totalIncome = currentLaborIncome + investmentYield + otherIncomeTotal;
     
     // Calculate expenses
-    const expenses = isFIREAchieved ? inputs.fireAnnualExpenses : inputs.currentAnnualExpenses;
+    const expenses = isFIREAchieved ? effectiveInputs.fireAnnualExpenses : effectiveInputs.currentAnnualExpenses;
     
     // Calculate net change in portfolio
     let portfolioChange: number;
     if (isWorking) {
       // While working: save a percentage of labor income, plus all investment returns
       // The savings rate already accounts for expenses (if you save 30%, you spend 70%)
-      const laborSavings = laborIncome * (inputs.savingsRate / 100);
+      const laborSavings = laborIncome * (effectiveInputs.savingsRate / 100);
       portfolioChange = laborSavings + investmentYield;
     } else {
       // Not working: live off portfolio (income - expenses, including investment returns)
@@ -166,7 +198,7 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
       isFIRE: isFIREAchieved,
       statePensionIncome: currentStatePension,
       privatePensionIncome: currentPrivatePension,
-      otherIncome: inputs.otherIncome,
+      otherIncome: effectiveInputs.otherIncome,
     });
     
     // Update portfolio for next year
@@ -180,7 +212,7 @@ export function calculateFIRE(inputs: CalculatorInputs): CalculationResult {
     
     // Grow labor income
     if (isWorking) {
-      laborIncome = laborIncome * (1 + inputs.laborIncomeGrowthRate / 100);
+      laborIncome = laborIncome * (1 + effectiveInputs.laborIncomeGrowthRate / 100);
       // Safety check for labor income growth
       if (!isFinite(laborIncome) || laborIncome > MAX_SAFE_VALUE) {
         laborIncome = MAX_SAFE_VALUE;

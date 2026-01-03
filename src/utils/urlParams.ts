@@ -49,6 +49,8 @@ export function serializeInputsToURL(inputs: CalculatorInputs): URLSearchParams 
   params.set('stopWorkingAtFIRE', inputs.stopWorkingAtFIRE.toString());
   params.set('maxAge', inputs.maxAge.toString());
   params.set('useAssetAllocationValue', inputs.useAssetAllocationValue.toString());
+  params.set('useExpenseTrackerExpenses', inputs.useExpenseTrackerExpenses.toString());
+  params.set('useExpenseTrackerIncome', inputs.useExpenseTrackerIncome.toString());
 
   return params;
 }
@@ -117,6 +119,8 @@ export function deserializeInputsFromURL(params: URLSearchParams): CalculatorInp
     stopWorkingAtFIRE: parseBoolean(params.get('stopWorkingAtFIRE'), DEFAULT_INPUTS.stopWorkingAtFIRE),
     maxAge: parseInt(params.get('maxAge'), DEFAULT_INPUTS.maxAge),
     useAssetAllocationValue: parseBoolean(params.get('useAssetAllocationValue'), DEFAULT_INPUTS.useAssetAllocationValue),
+    useExpenseTrackerExpenses: parseBoolean(params.get('useExpenseTrackerExpenses'), DEFAULT_INPUTS.useExpenseTrackerExpenses),
+    useExpenseTrackerIncome: parseBoolean(params.get('useExpenseTrackerIncome'), DEFAULT_INPUTS.useExpenseTrackerIncome),
   };
 }
 

@@ -36,6 +36,8 @@ import {
   exportExpenseTrackerToCSV,
   importExpenseTrackerFromCSV,
 } from '../utils/csvExport';
+import { generateDemoExpenseData } from '../utils/demoExpenseData';
+import { useTableSort } from '../utils/useTableSort';
 import { DataManagement } from './DataManagement';
 import { ExpenseBreakdownChart } from './ExpenseBreakdownChart';
 import { SpendingTrendChart } from './SpendingTrendChart';
@@ -93,10 +95,10 @@ export function ExpenseTrackerPage() {
     const saved = loadExpenseTrackerData();
     if (saved) {
       // Ensure globalBudgets exists for backward compatibility
-      if (!saved.globalBudgets) {
-        saved.globalBudgets = [];
-      }
-      return saved;
+      return {
+        ...saved,
+        globalBudgets: saved.globalBudgets || []
+      };
     }
     return getDefaultData();
   });
@@ -168,6 +170,39 @@ export function ExpenseTrackerPage() {
     setSelectedYear(currentYear);
     setSelectedMonth(currentMonth);
   }, [currentYear, currentMonth]);
+
+  // Auto-create month/year if it doesn't exist
+  useEffect(() => {
+    setData(prev => {
+      const yearData = prev.years.find(y => y.year === selectedYear);
+      const monthExists = yearData?.months.find(m => m.month === selectedMonth);
+      
+      // If year and month already exist, no need to update
+      if (yearData && monthExists) {
+        return prev;
+      }
+      
+      // Create new data with year/month
+      const newData = deepCloneData(prev);
+      
+      // Ensure year exists
+      let targetYear = newData.years.find(y => y.year === selectedYear);
+      if (!targetYear) {
+        targetYear = createEmptyYearData(selectedYear);
+        newData.years.push(targetYear);
+        newData.years.sort((a, b) => b.year - a.year); // Sort descending
+      }
+      
+      // Ensure month exists
+      if (!targetYear.months.find(m => m.month === selectedMonth)) {
+        const monthData = createEmptyMonthData(selectedYear, selectedMonth);
+        targetYear.months.push(monthData);
+        targetYear.months.sort((a, b) => a.month - b.month);
+      }
+      
+      return newData;
+    });
+  }, [selectedYear, selectedMonth]);
 
   // Get current month data
   const currentMonthData = useMemo(() => {
@@ -255,6 +290,13 @@ export function ExpenseTrackerPage() {
     if (!currentMonthData) return [];
     return calculateCategoryBreakdown(currentMonthData.expenses, data.globalBudgets);
   }, [currentMonthData, data.globalBudgets, activeTab, analyticsView, allMonthsData, selectedQuarter, selectedMonth]);
+
+  // Add table sorting for category breakdown
+  const { 
+    sortedData: sortedCategoryBreakdown, 
+    requestSort: requestCategorySort, 
+    getSortIndicator: getCategorySortIndicator 
+  } = useTableSort(categoryBreakdown, 'totalAmount');
 
   // Calculate 50/30/20 breakdown
   const budgetRuleBreakdown = useMemo(() => {
@@ -456,31 +498,6 @@ export function ExpenseTrackerPage() {
       return newData;
     });
   }, []);
-  
-  // Ensure month exists (for "Add This Month" button)
-  const handleAddMonth = useCallback(() => {
-    setData(prev => {
-      const newData = deepCloneData(prev);
-      
-      // Ensure year exists
-      let yearData = newData.years.find(y => y.year === selectedYear);
-      if (!yearData) {
-        yearData = createEmptyYearData(selectedYear);
-        newData.years.push(yearData);
-        newData.years.sort((a, b) => a.year - b.year);
-      }
-      
-      // Ensure month exists
-      let monthData = yearData.months.find(m => m.month === selectedMonth);
-      if (!monthData) {
-        monthData = createEmptyMonthData(selectedYear, selectedMonth);
-        yearData.months.push(monthData);
-        yearData.months.sort((a, b) => a.month - b.month);
-      }
-      
-      return newData;
-    });
-  }, [selectedYear, selectedMonth]);
 
   // Export data
   const handleExport = () => {
@@ -527,7 +544,24 @@ export function ExpenseTrackerPage() {
     }
   };
 
-  // Available years for selector - include years from data plus a range for new years
+  // Load demo data
+  const handleLoadDemo = () => {
+    if (confirm(`Load demo expense data for ${selectedYear}? This will replace existing data for ${selectedYear}.`)) {
+      const demoData = generateDemoExpenseData(selectedYear);
+      
+      // Merge demo data with existing data
+      // Remove existing year data if present, then add demo data
+      const filteredYears = data.years.filter(y => y.year !== selectedYear);
+      const mergedData: ExpenseTrackerData = {
+        ...data,
+        years: [...filteredYears, ...demoData.years].sort((a, b) => b.year - a.year),
+      };
+      
+      setData(mergedData);
+    }
+  };
+
+  // Available years for selector - include years from data plus unlimited past years
   const availableYears = useMemo(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -536,8 +570,8 @@ export function ExpenseTrackerPage() {
     // Add current year
     years.add(currentYear);
     
-    // Add 5 past years for easy selection of older data
-    for (let i = 1; i <= 5; i++) {
+    // Add past years: go back 30 years to allow historical data entry
+    for (let i = 1; i <= 30; i++) {
       years.add(currentYear - i);
     }
     
@@ -592,6 +626,7 @@ export function ExpenseTrackerPage() {
           onExport={handleExport}
           onImport={handleImport}
           onReset={handleResetData}
+          onLoadDemo={handleLoadDemo}
           defaultOpen={false}
         />
 
@@ -623,12 +658,6 @@ export function ExpenseTrackerPage() {
                 ))}
               </select>
             </div>
-            <button
-              className="btn-add-month"
-              onClick={handleAddMonth}
-            >
-              <span aria-hidden="true">➕</span> Add This Month
-            </button>
             {isViewingPastPeriod && (
               <button
                 className="btn-current-period"
@@ -1041,21 +1070,57 @@ export function ExpenseTrackerPage() {
               <table className="breakdown-table">
                 <thead>
                   <tr>
-                    <th>Category</th>
-                    <th>{analyticsView === 'ytd' ? 'Monthly Average' : 'Total'}</th>
-                    <th>% of Total</th>
-                    <th>Budget</th>
-                    <th>Remaining</th>
-                    <th>Transactions</th>
+                    <th 
+                      onClick={() => requestCategorySort('category')}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      title="Click to sort"
+                    >
+                      Category {getCategorySortIndicator('category')}
+                    </th>
+                    <th 
+                      onClick={() => requestCategorySort('totalAmount')}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      title="Click to sort"
+                    >
+                      {analyticsView === 'ytd' ? 'Monthly Average' : 'Total'} {getCategorySortIndicator('totalAmount')}
+                    </th>
+                    <th 
+                      onClick={() => requestCategorySort('percentage')}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      title="Click to sort"
+                    >
+                      % of Total {getCategorySortIndicator('percentage')}
+                    </th>
+                    <th 
+                      onClick={() => requestCategorySort('budgeted')}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      title="Click to sort"
+                    >
+                      Budget {getCategorySortIndicator('budgeted')}
+                    </th>
+                    <th 
+                      onClick={() => requestCategorySort('remaining')}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      title="Click to sort"
+                    >
+                      Remaining {getCategorySortIndicator('remaining')}
+                    </th>
+                    <th 
+                      onClick={() => requestCategorySort('transactionCount')}
+                      style={{ cursor: 'pointer', userSelect: 'none' }}
+                      title="Click to sort"
+                    >
+                      Transactions {getCategorySortIndicator('transactionCount')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {categoryBreakdown.length === 0 ? (
+                  {sortedCategoryBreakdown.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="empty-state">No expenses recorded for this period</td>
                     </tr>
                   ) : (
-                    categoryBreakdown.map(item => (
+                    sortedCategoryBreakdown.map(item => (
                       <tr key={item.category}>
                         <td>
                           <span className="category-icon" aria-hidden="true">

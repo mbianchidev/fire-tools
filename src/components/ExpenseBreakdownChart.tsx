@@ -89,7 +89,7 @@ function renderLegend(props: any) {
     <ul style={{ 
       listStyle: 'none', 
       padding: 0, 
-      margin: '1rem 0 0',
+      margin: '1.5rem 0 0',
       display: 'grid',
       gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
       gap: '0.5rem',
@@ -146,13 +146,13 @@ export function ExpenseBreakdownChart({ data, currency }: ExpenseBreakdownChartP
   }));
 
   return (
-    <div style={{ width: '100%', height: 400 }}>
+    <div style={{ width: '100%', height: 450, paddingTop: '1rem' }}>
       <ResponsiveContainer>
         <PieChart>
           <Pie
             data={chartData}
             cx="50%"
-            cy="50%"
+            cy="45%"
             labelLine={false}
             label={renderCustomLabel}
             outerRadius={120}

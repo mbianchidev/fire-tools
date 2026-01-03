@@ -4,6 +4,7 @@ interface DataManagementProps {
   onExport: () => void;
   onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onReset: () => void;
+  onLoadDemo?: () => void; // Optional for expense tracker
   defaultOpen?: boolean;
 }
 
@@ -11,6 +12,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({
   onExport,
   onImport,
   onReset,
+  onLoadDemo,
   defaultOpen = false,
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -29,6 +31,22 @@ export const DataManagement: React.FC<DataManagementProps> = ({
       </button>
       {isOpen && (
         <div id="data-management-content" className="data-management-content">
+          {onLoadDemo && (
+            <button 
+              onClick={onLoadDemo} 
+              className="action-btn" 
+              style={{ 
+                width: '100%', 
+                marginBottom: '8px', 
+                justifyContent: 'center',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: 'white'
+              }}
+              aria-label="Load demo expense data for the current year"
+            >
+              <span aria-hidden="true">🎲</span> Load Demo Data
+            </button>
+          )}
           <button 
             onClick={onExport} 
             className="action-btn export-btn" 
