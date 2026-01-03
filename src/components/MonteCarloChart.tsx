@@ -11,6 +11,8 @@ import {
   Legend
 } from 'recharts';
 import { MonteCarloResult } from '../types/calculator';
+import { loadSettings } from '../utils/cookieSettings';
+import { getCurrencySymbol } from '../utils/currencyConverter';
 
 interface MonteCarloChartProps {
   result: MonteCarloResult;
@@ -105,13 +107,19 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result }) => {
     };
   }, [result]);
 
+  // Get currency symbol from settings
+  const currencySymbol = useMemo(() => {
+    const settings = loadSettings();
+    return getCurrencySymbol(settings.currencySettings.defaultCurrency);
+  }, []);
+
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {
-      return `€${(value / 1000000).toFixed(1)}M`;
+      return `${currencySymbol}${(value / 1000000).toFixed(1)}M`;
     } else if (value >= 1000) {
-      return `€${(value / 1000).toFixed(0)}K`;
+      return `${currencySymbol}${(value / 1000).toFixed(0)}K`;
     }
-    return `€${value.toFixed(0)}`;
+    return `${currencySymbol}${value.toFixed(0)}`;
   };
 
   if (!distributionData.stats || distributionData.bins.length === 0) {

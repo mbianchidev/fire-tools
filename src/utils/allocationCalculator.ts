@@ -8,6 +8,8 @@ import {
   AllocationMode,
   ChartData,
 } from '../types/assetAllocation';
+import { loadSettings } from './cookieSettings';
+import { getCurrencySymbol } from './currencyConverter';
 
 /**
  * Calculate the total portfolio value
@@ -408,9 +410,13 @@ export function prepareAssetChartData(
 
 /**
  * Format currency value
+ * @param value - The numeric value to format
+ * @param currency - Optional currency code. If not provided, uses the default currency from settings.
  */
-export function formatCurrency(value: number, currency: string = 'EUR'): string {
-  const symbol = currency === 'EUR' ? '€' : '$';
+export function formatCurrency(value: number, currency?: string): string {
+  // If no currency provided, get from settings
+  const currencyCode = currency ?? loadSettings().currencySettings.defaultCurrency;
+  const symbol = getCurrencySymbol(currencyCode as Parameters<typeof getCurrencySymbol>[0]);
   const absValue = Math.abs(value);
   return `${symbol}${absValue.toLocaleString('en-US', { 
     minimumFractionDigits: 0,

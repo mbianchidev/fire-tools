@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Asset, AssetClass, SubAssetType, AllocationMode } from '../types/assetAllocation';
 import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
 import { formatAssetName } from '../utils/allocationCalculator';
-import { convertToEUR } from '../utils/currencyConverter';
+import { convertAmount } from '../utils/currencyConverter';
 import { loadSettings } from '../utils/cookieSettings';
 
 interface AddAssetDialogProps {
@@ -100,11 +100,11 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
     const generatedTicker = ticker.trim().toUpperCase() || 
       `${name.trim().substring(0, 4).toUpperCase()}${Date.now().toString().slice(-4)}`;
 
-    // Convert value to EUR if entered in another currency
+    // Convert value to the default currency if entered in another currency
     const originalValue = parseFloat(currentValue) || 0;
-    const valueInEUR = currency === 'EUR' 
+    const valueInDefaultCurrency = currency === defaultCurrency 
       ? originalValue 
-      : convertToEUR(originalValue, currency, settings.currencySettings.fallbackRates);
+      : convertAmount(originalValue, currency, defaultCurrency, settings.currencySettings.fallbackRates);
 
     const newAsset: Asset = {
       id: `asset-${Date.now()}`,
@@ -113,12 +113,12 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
       isin: ISIN_REQUIRED.includes(subAssetType) ? isin.trim().toUpperCase() : undefined,
       assetClass,
       subAssetType,
-      currentValue: valueInEUR,
-      originalCurrency: currency !== 'EUR' ? currency : undefined,
-      originalValue: currency !== 'EUR' ? originalValue : undefined,
+      currentValue: valueInDefaultCurrency,
+      originalCurrency: currency !== defaultCurrency ? currency : undefined,
+      originalValue: currency !== defaultCurrency ? originalValue : undefined,
       targetMode,
       targetPercent: targetMode === 'PERCENTAGE' ? (parseFloat(targetPercent) || 0) : undefined,
-      targetValue: targetMode === 'SET' ? valueInEUR : undefined,
+      targetValue: targetMode === 'SET' ? valueInDefaultCurrency : undefined,
     };
 
     onAdd(newAsset);
@@ -247,11 +247,11 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
             </div>
           </div>
 
-          {currency !== 'EUR' && (
+          {currency !== defaultCurrency && (
             <div className="currency-conversion-note">
-              💱 Value will be converted to EUR using the current exchange rate.
+              💱 Value will be converted to {defaultCurrency} using the current exchange rate.
               <br />
-              <small>Rate: 1 {currency} = {settings.currencySettings.fallbackRates[currency]} EUR</small>
+              <small>Rate: 1 {currency} = {settings.currencySettings.fallbackRates[currency]} {defaultCurrency}</small>
             </div>
           )}
 

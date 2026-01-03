@@ -143,3 +143,65 @@ export function getExchangeRate(
   // X EUR / toRate = Y toCurrency
   return fromRate / toRate;
 }
+
+/**
+ * Convert an amount from one currency to another
+ * @param amount - The amount to convert
+ * @param fromCurrency - Source currency
+ * @param toCurrency - Target currency
+ * @param rates - Exchange rates (rates are relative to the base currency in the rates object)
+ * @returns The converted amount
+ */
+export function convertAmount(
+  amount: number,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates = DEFAULT_FALLBACK_RATES
+): number {
+  if (fromCurrency === toCurrency) {
+    return amount;
+  }
+  
+  const rate = getExchangeRate(fromCurrency, toCurrency, rates);
+  return amount * rate;
+}
+
+/**
+ * Recalculate fallback rates when the default currency changes
+ * All rates are recalculated relative to the new default currency
+ * @param currentRates - Current exchange rates
+ * @param fromDefaultCurrency - The previous default currency
+ * @param toDefaultCurrency - The new default currency
+ * @returns New exchange rates relative to the new default currency
+ */
+export function recalculateFallbackRates(
+  currentRates: ExchangeRates,
+  fromDefaultCurrency: SupportedCurrency,
+  toDefaultCurrency: SupportedCurrency
+): ExchangeRates {
+  if (fromDefaultCurrency === toDefaultCurrency) {
+    return { ...currentRates };
+  }
+  
+  const newRates: ExchangeRates = {};
+  
+  // Get the conversion rate from old default to new default
+  // This tells us how much 1 unit of old default is in new default
+  const conversionRate = getExchangeRate(fromDefaultCurrency, toDefaultCurrency, currentRates);
+  
+  // For each currency, recalculate its rate relative to the new default
+  SUPPORTED_CURRENCIES.forEach(currency => {
+    const code = currency.code;
+    if (code === toDefaultCurrency) {
+      // The new default currency has a rate of 1
+      newRates[code] = 1;
+    } else {
+      // Get how much 1 unit of this currency is in the old default
+      const oldRate = currentRates[code] ?? DEFAULT_FALLBACK_RATES[code] ?? 1;
+      // Convert to new default: oldRate * conversionRate
+      newRates[code] = oldRate * conversionRate;
+    }
+  });
+  
+  return newRates;
+}

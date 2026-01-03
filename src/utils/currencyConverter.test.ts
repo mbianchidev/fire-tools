@@ -5,6 +5,8 @@ import {
   getCurrencySymbol,
   formatCurrencyValue,
   isValidCurrency,
+  convertAmount,
+  recalculateFallbackRates,
 } from './currencyConverter';
 import { DEFAULT_FALLBACK_RATES } from '../types/currency';
 
@@ -157,6 +159,65 @@ describe('Currency Converter', () => {
       expect(isValidCurrency('XYZ')).toBe(false);
       expect(isValidCurrency('')).toBe(false);
       expect(isValidCurrency('eur')).toBe(false); // Case sensitive
+    });
+  });
+
+  describe('convertAmount', () => {
+    it('should convert USD to EUR', () => {
+      // 100 USD = 100 * 0.85 = 85 EUR
+      expect(convertAmount(100, 'USD', 'EUR', DEFAULT_FALLBACK_RATES)).toBeCloseTo(85, 2);
+    });
+
+    it('should convert EUR to USD', () => {
+      // 85 EUR = 85 / 0.85 = 100 USD
+      expect(convertAmount(85, 'EUR', 'USD', DEFAULT_FALLBACK_RATES)).toBeCloseTo(100, 2);
+    });
+
+    it('should convert between two non-EUR currencies', () => {
+      // USD to GBP: 100 USD -> EUR -> GBP
+      // 100 USD = 85 EUR, 85 EUR = 85/1.15 = 73.91 GBP
+      expect(convertAmount(100, 'USD', 'GBP', DEFAULT_FALLBACK_RATES)).toBeCloseTo(73.91, 1);
+    });
+
+    it('should return same amount for same currency', () => {
+      expect(convertAmount(100, 'USD', 'USD', DEFAULT_FALLBACK_RATES)).toBe(100);
+    });
+  });
+
+  describe('recalculateFallbackRates', () => {
+    it('should recalculate rates when default currency changes from EUR to USD', () => {
+      const newRates = recalculateFallbackRates(DEFAULT_FALLBACK_RATES, 'EUR', 'USD');
+      
+      // USD becomes base (1), EUR becomes 1/0.85 = 1.176
+      expect(newRates['USD']).toBeCloseTo(1, 2);
+      expect(newRates['EUR']).toBeCloseTo(1 / 0.85, 2);
+      // GBP: was 1.15 EUR, now in USD terms: 1.15 / 0.85 = 1.353
+      expect(newRates['GBP']).toBeCloseTo(1.15 / 0.85, 2);
+    });
+
+    it('should recalculate rates when default currency changes from USD to EUR', () => {
+      // Starting from USD-based rates
+      const usdBasedRates = {
+        USD: 1,
+        EUR: 1 / 0.85,  // ~1.176
+        GBP: 1.15 / 0.85, // ~1.353
+        CHF: 1.08 / 0.85,
+        JPY: 0.0054 / 0.85,
+        AUD: 0.57 / 0.85,
+        CAD: 0.62 / 0.85,
+      };
+      
+      const newRates = recalculateFallbackRates(usdBasedRates, 'USD', 'EUR');
+      
+      // EUR becomes base (1), USD becomes ~0.85
+      expect(newRates['EUR']).toBeCloseTo(1, 2);
+      expect(newRates['USD']).toBeCloseTo(0.85, 2);
+      expect(newRates['GBP']).toBeCloseTo(1.15, 2);
+    });
+
+    it('should return same rates when currency does not change', () => {
+      const newRates = recalculateFallbackRates(DEFAULT_FALLBACK_RATES, 'EUR', 'EUR');
+      expect(newRates).toEqual(DEFAULT_FALLBACK_RATES);
     });
   });
 });
