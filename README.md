@@ -14,6 +14,9 @@ A comprehensive suite of financial tools for **FIRE (Financial Independence Reti
 **🧮 FIRE Calculator**  
 Calculate your path to financial independence with detailed projections based on your savings, expenses, and expected returns. Visualize your net worth growth and see exactly when you'll reach your FIRE target.
 
+**📈 Net Worth Tracker**  
+Visualize your net worth growth over time with interactive charts. Track progress toward your FIRE target, compare projections at different time horizons (20, 30, 40 years or custom), and see how your investments compound over your journey to financial independence.
+
 **🎲 Monte Carlo Simulations**  
 Run thousands of probabilistic simulations accounting for market volatility and black swan events. Understand your real probability of success and make informed decisions with confidence.
 
