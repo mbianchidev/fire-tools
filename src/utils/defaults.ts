@@ -46,42 +46,47 @@ export const DEFAULT_INPUTS: CalculatorInputs = {
   useExpenseTrackerIncome: false,
 };
 
-// Demo data for Net Worth Tracker - generates 12 months of data for current year with randomized variations
-export function getDemoNetWorthData(): NetWorthTrackerData {
-  const currentYear = new Date().getFullYear();
+// Base values coherent with Asset Allocation demo data
+const NET_WORTH_DEMO_BASE = {
+  vwceShares: 85,
+  vwcePrice: 110,
+  agghShares: 50,
+  agghPrice: 45,
+  emergencyFund: 12000,
+  checking: 3000,
+  pension: 25000,
+};
+
+// Seeded random for consistent demo data (using seed value)
+function seededRandom(seed: number, min: number, max: number): number {
+  const x = Math.sin(seed * 9999) * 10000;
+  return min + (x - Math.floor(x)) * (max - min);
+}
+
+/**
+ * Generate demo net worth data for a specific year
+ * @param targetYear - The year to generate demo data for
+ * @returns Array of MonthlySnapshot for all 12 months
+ */
+export function generateDemoNetWorthDataForYear(targetYear: number): MonthlySnapshot[] {
   const currentMonth = new Date().getMonth() + 1; // 1-12
+  const currentYear = new Date().getFullYear();
   
-  // Base values coherent with Asset Allocation demo data
-  const baseVWCEShares = 85;
-  const baseVWCEPrice = 110;
-  const baseAGGHShares = 50;
-  const baseAGGHPrice = 45;
-  const baseEmergencyFund = 12000;
-  const baseChecking = 3000;
-  const basePension = 25000;
-  
-  // Seeded random for consistent demo data (using month as seed)
-  const seededRandom = (seed: number, min: number, max: number) => {
-    const x = Math.sin(seed * 9999) * 10000;
-    return min + (x - Math.floor(x)) * (max - min);
-  };
-  
-  // Generate 12 months of data with gradual growth and random variations
   const months: MonthlySnapshot[] = [];
   for (let month = 1; month <= 12; month++) {
-    const monthSeed = currentYear * 100 + month;
+    const monthSeed = targetYear * 100 + month;
     
     // Monthly DCA adds ~5 shares of VWCE per month
     const vwceSharesGrowth = (month - 1) * 5;
     // Price fluctuates ±8% around base with upward trend
     const vwcePriceVariation = seededRandom(monthSeed, -0.08, 0.12);
-    const vwcePrice = Math.round((baseVWCEPrice * (1 + vwcePriceVariation + month * 0.005)) * 100) / 100;
+    const vwcePrice = Math.round((NET_WORTH_DEMO_BASE.vwcePrice * (1 + vwcePriceVariation + month * 0.005)) * 100) / 100;
     
     // Bond shares grow slower (~2 per month)
     const agghSharesGrowth = Math.floor((month - 1) * 2);
     // Bond prices more stable, ±3% variation
     const agghPriceVariation = seededRandom(monthSeed + 1, -0.03, 0.03);
-    const agghPrice = Math.round((baseAGGHPrice * (1 + agghPriceVariation)) * 100) / 100;
+    const agghPrice = Math.round((NET_WORTH_DEMO_BASE.agghPrice * (1 + agghPriceVariation)) * 100) / 100;
     
     // Cash grows with monthly savings, but fluctuates due to expenses
     const emergencyFundGrowth = (month - 1) * 300;
@@ -92,23 +97,24 @@ export function getDemoNetWorthData(): NetWorthTrackerData {
     const pensionGrowth = (month - 1) * 400;
     const pensionVariation = Math.round(seededRandom(monthSeed + 4, -200, 200));
     
-    const isFrozen = month < currentMonth;
+    // Only freeze months if target year is current year and month is in the past
+    const isFrozen = targetYear === currentYear && month < currentMonth;
     
     const assets: AssetHolding[] = [
       { 
-        id: `demo-asset-${month}-1`, 
+        id: `demo-asset-${targetYear}-${month}-1`, 
         ticker: 'VWCE', 
         name: 'Vanguard FTSE All-World', 
-        shares: baseVWCEShares + vwceSharesGrowth, 
+        shares: NET_WORTH_DEMO_BASE.vwceShares + vwceSharesGrowth, 
         pricePerShare: vwcePrice, 
         currency: 'EUR' as SupportedCurrency, 
         assetClass: 'ETF' as const
       },
       { 
-        id: `demo-asset-${month}-2`, 
+        id: `demo-asset-${targetYear}-${month}-2`, 
         ticker: 'AGGH', 
         name: 'iShares Global Agg Bond', 
-        shares: baseAGGHShares + agghSharesGrowth, 
+        shares: NET_WORTH_DEMO_BASE.agghShares + agghSharesGrowth, 
         pricePerShare: agghPrice, 
         currency: 'EUR' as SupportedCurrency, 
         assetClass: 'BONDS' as const
@@ -117,40 +123,40 @@ export function getDemoNetWorthData(): NetWorthTrackerData {
     
     const cashEntries: CashEntry[] = [
       { 
-        id: `demo-cash-${month}-1`, 
+        id: `demo-cash-${targetYear}-${month}-1`, 
         accountName: 'Emergency Fund', 
         accountType: 'SAVINGS' as const, 
-        balance: Math.max(10000, baseEmergencyFund + emergencyFundGrowth + emergencyFundVariation), 
+        balance: Math.max(10000, NET_WORTH_DEMO_BASE.emergencyFund + emergencyFundGrowth + emergencyFundVariation), 
         currency: 'EUR' as SupportedCurrency 
       },
       { 
-        id: `demo-cash-${month}-2`, 
+        id: `demo-cash-${targetYear}-${month}-2`, 
         accountName: 'Main Checking', 
         accountType: 'CHECKING' as const, 
-        balance: Math.max(500, baseChecking + checkingVariation), 
+        balance: Math.max(500, NET_WORTH_DEMO_BASE.checking + checkingVariation), 
         currency: 'EUR' as SupportedCurrency 
       },
     ];
     
     const pensions: PensionEntry[] = [
       { 
-        id: `demo-pension-${month}`, 
+        id: `demo-pension-${targetYear}-${month}`, 
         name: 'State Pension', 
         pensionType: 'STATE' as const, 
-        currentValue: basePension + pensionGrowth + pensionVariation, 
+        currentValue: NET_WORTH_DEMO_BASE.pension + pensionGrowth + pensionVariation, 
         currency: 'EUR' as SupportedCurrency 
       },
     ];
     
     const operations: FinancialOperation[] = month % 3 === 0 ? [
-      { id: `demo-op-${month}-1`, date: `${currentYear}-${String(month).padStart(2, '0')}-15`, type: 'PURCHASE' as const, description: 'Monthly DCA - VWCE', amount: 500, currency: 'EUR' as SupportedCurrency },
-      { id: `demo-op-${month}-2`, date: `${currentYear}-${String(month).padStart(2, '0')}-20`, type: 'DIVIDEND' as const, description: 'VWCE Dividend', amount: Math.round(seededRandom(monthSeed + 5, 80, 150)), currency: 'EUR' as SupportedCurrency },
+      { id: `demo-op-${targetYear}-${month}-1`, date: `${targetYear}-${String(month).padStart(2, '0')}-15`, type: 'PURCHASE' as const, description: 'Monthly DCA - VWCE', amount: 500, currency: 'EUR' as SupportedCurrency },
+      { id: `demo-op-${targetYear}-${month}-2`, date: `${targetYear}-${String(month).padStart(2, '0')}-20`, type: 'DIVIDEND' as const, description: 'VWCE Dividend', amount: Math.round(seededRandom(monthSeed + 5, 80, 150)), currency: 'EUR' as SupportedCurrency },
     ] : [
-      { id: `demo-op-${month}-1`, date: `${currentYear}-${String(month).padStart(2, '0')}-15`, type: 'PURCHASE' as const, description: 'Monthly DCA - VWCE', amount: 500, currency: 'EUR' as SupportedCurrency },
+      { id: `demo-op-${targetYear}-${month}-1`, date: `${targetYear}-${String(month).padStart(2, '0')}-15`, type: 'PURCHASE' as const, description: 'Monthly DCA - VWCE', amount: 500, currency: 'EUR' as SupportedCurrency },
     ];
     
     months.push({
-      year: currentYear,
+      year: targetYear,
       month,
       assets,
       cashEntries,
@@ -159,6 +165,16 @@ export function getDemoNetWorthData(): NetWorthTrackerData {
       isFrozen,
     });
   }
+  
+  return months;
+}
+
+// Demo data for Net Worth Tracker - generates 12 months of data for current year with randomized variations
+export function getDemoNetWorthData(): NetWorthTrackerData {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1; // 1-12
+  
+  const months = generateDemoNetWorthDataForYear(currentYear);
   
   return {
     years: [

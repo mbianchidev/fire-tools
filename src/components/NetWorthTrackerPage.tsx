@@ -27,7 +27,7 @@ import {
   saveNetWorthTrackerData,
   loadNetWorthTrackerData,
 } from '../utils/cookieStorage';
-import { getDemoNetWorthData } from '../utils/defaults';
+import { generateDemoNetWorthDataForYear } from '../utils/defaults';
 import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import './NetWorthTrackerPage.css';
@@ -655,15 +655,38 @@ export function NetWorthTrackerPage() {
     }
   };
 
-  // Load demo data
-  const handleLoadDemo = () => {
-    if (confirm('This will replace your current net worth tracker data with demo data. Continue?')) {
-      const demoData = getDemoNetWorthData();
-      setData(demoData);
-      setSelectedYear(demoData.currentYear);
-      setSelectedMonth(demoData.currentMonth);
+  // Load demo data for the currently selected year
+  const handleLoadDemo = useCallback(() => {
+    if (confirm(`This will add demo data for ${selectedYear} to your net worth tracker. Any existing data for ${selectedYear} will be replaced. Continue?`)) {
+      setData(prev => {
+        const newData = deepCloneData(prev);
+        
+        // Generate demo data for the selected year
+        const demoMonths = generateDemoNetWorthDataForYear(selectedYear);
+        
+        // Find or create the year entry
+        const existingYearIndex = newData.years.findIndex(y => y.year === selectedYear);
+        
+        if (existingYearIndex !== -1) {
+          // Replace existing year's months with demo data
+          newData.years[existingYearIndex].months = demoMonths;
+        } else {
+          // Add new year with demo data
+          newData.years.push({
+            year: selectedYear,
+            months: demoMonths,
+            isArchived: false,
+          });
+          // Sort years chronologically
+          newData.years.sort((a, b) => a.year - b.year);
+        }
+        
+        return newData;
+      });
+      // Navigate to January of the selected year to show the demo data
+      setSelectedMonth(1);
     }
-  };
+  }, [selectedYear]);
 
   // Available years for selector
   const availableYears = useMemo(() => {
