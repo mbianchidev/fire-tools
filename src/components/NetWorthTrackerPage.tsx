@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   NetWorthTrackerData,
@@ -140,6 +140,9 @@ export function NetWorthTrackerPage() {
   
   // Chart view mode (YTD or All historical data)
   const [chartViewMode, setChartViewMode] = useState<ChartViewMode>('ytd');
+  
+  // Track if we're currently syncing to prevent infinite loops
+  const isSyncingRef = useRef(false);
 
   // Sync URL params when year/month changes
   useEffect(() => {
@@ -151,6 +154,11 @@ export function NetWorthTrackerPage() {
 
   // Save data whenever it changes, and sync if enabled
   useEffect(() => {
+    // Prevent sync loop - don't sync if we're already syncing
+    if (isSyncingRef.current) {
+      return;
+    }
+    
     saveNetWorthTrackerData(data);
     
     // If sync is enabled and we're viewing the current month, sync to Asset Allocation
@@ -162,9 +170,14 @@ export function NetWorthTrackerPage() {
       
       if (monthData) {
         // Sync Net Worth → Asset Allocation
+        isSyncingRef.current = true;
         const syncedAssets = syncNetWorthToAssetAllocation(data);
         const { assetClassTargets } = loadAssetAllocation();
         saveAssetAllocation(syncedAssets, assetClassTargets || DEFAULT_ASSET_CLASS_TARGETS);
+        // Reset flag after a brief delay to allow other component to process
+        setTimeout(() => {
+          isSyncingRef.current = false;
+        }, 100);
       }
     }
   }, [data, selectedYear, selectedMonth, currentYear, currentMonth]);

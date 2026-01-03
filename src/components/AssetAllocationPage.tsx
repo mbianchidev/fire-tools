@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Asset, PortfolioAllocation, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { calculatePortfolioAllocation, prepareAssetClassChartData, prepareAssetChartData, formatAssetName, formatCurrency } from '../utils/allocationCalculator';
 import { DEFAULT_ASSETS, DEFAULT_PORTFOLIO_VALUE } from '../utils/defaultAssets';
@@ -91,9 +91,17 @@ export const AssetAllocationPage: React.FC = () => {
   const [isDCADialogOpen, setIsDCADialogOpen] = useState(false);
   // Charts collapse state
   const [isChartsCollapsed, setIsChartsCollapsed] = useState(false);
+  
+  // Track if we're currently syncing to prevent infinite loops
+  const isSyncingRef = useRef(false);
 
   // Auto-save to localStorage when assets or targets change
   useEffect(() => {
+    // Prevent sync loop - don't sync if we're already syncing
+    if (isSyncingRef.current) {
+      return;
+    }
+    
     saveAssetAllocation(assets, assetClassTargets);
     
     // If Net Worth Tracker has sync enabled, sync Asset Allocation → Net Worth
@@ -105,8 +113,13 @@ export const AssetAllocationPage: React.FC = () => {
       
       // Only sync if Net Worth Tracker is viewing the current month
       if (netWorthData.currentYear === currentYear && netWorthData.currentMonth === currentMonth) {
+        isSyncingRef.current = true;
         const synced = syncAssetAllocationToNetWorth(assets, netWorthData);
         saveNetWorthTrackerData(synced);
+        // Reset flag after a brief delay to allow other component to process
+        setTimeout(() => {
+          isSyncingRef.current = false;
+        }, 100);
       }
     }
   }, [assets, assetClassTargets]);
