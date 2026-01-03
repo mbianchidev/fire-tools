@@ -23,6 +23,12 @@ Track your portfolio allocation across stocks, bonds, real estate, commodities, 
 **💵 DCA Helper**  
 Plan your dollar-cost averaging strategy with built-in calculations that help you invest systematically and reduce market timing risk.
 
+**💰 Cashflow Tracker**  
+Track your income and expenses with detailed categorization, set monthly budgets per category, and monitor your spending patterns. Includes the 50/30/20 budgeting rule analysis and comprehensive spending analytics with trends and comparisons.
+
+**📈 Net Worth Tracker**  
+Track your complete financial picture on a monthly basis. Log assets (stocks, ETFs, bonds), cash & liquidity (bank accounts, credit cards), and pensions (state, private, employer). Record financial operations like dividends, purchases, sales, and taxes. View historical net worth charts with YTD and all-time views, plus forecasts with confidence indicators.
+
 **🔒 Privacy-First & Secure**  
 All data is encrypted with AES-256 and stored locally in your browser. No servers, no accounts, no data transmission—complete privacy guaranteed.
 
@@ -86,6 +92,8 @@ Visit the [live demo](https://mbianchidev.github.io/fire-tools/) to see Fire Too
 - 🎯 Customizable allocation targets with visual feedback
 - 📊 Success probability from Monte Carlo simulations
 - 🔄 Intelligent rebalancing recommendations
+- 💰 Cashflow tracking with budget management and spending analytics
+- 📊 Monthly net worth snapshots with historical trends and forecasts
 
 ---
 
