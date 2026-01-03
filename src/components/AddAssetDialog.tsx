@@ -46,6 +46,8 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
   const [ticker, setTicker] = useState('');
   const [isin, setIsin] = useState('');
   const [currentValue, setCurrentValue] = useState<string>('0');
+  const [shares, setShares] = useState<string>('');
+  const [pricePerShare, setPricePerShare] = useState<string>('');
   const [currency, setCurrency] = useState<SupportedCurrency>('EUR');
   const [targetMode, setTargetMode] = useState<AllocationMode>('PERCENTAGE');
   const [targetPercent, setTargetPercent] = useState<string>('0');
@@ -70,6 +72,36 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
     setIsin('');
     if (NO_TICKER_REQUIRED.includes(newType)) {
       setTicker('');
+    }
+  };
+
+  // Handle shares input and calculate currentValue
+  const handleSharesChange = (value: string) => {
+    setShares(value);
+    const sharesNum = parseFloat(value) || 0;
+    const priceNum = parseFloat(pricePerShare) || 0;
+    if (sharesNum > 0 && priceNum > 0) {
+      setCurrentValue((sharesNum * priceNum).toFixed(2));
+    }
+  };
+
+  // Handle pricePerShare input and calculate currentValue
+  const handlePricePerShareChange = (value: string) => {
+    setPricePerShare(value);
+    const sharesNum = parseFloat(shares) || 0;
+    const priceNum = parseFloat(value) || 0;
+    if (sharesNum > 0 && priceNum > 0) {
+      setCurrentValue((sharesNum * priceNum).toFixed(2));
+    }
+  };
+
+  // Handle currentValue input and calculate pricePerShare if shares is provided
+  const handleCurrentValueChange = (value: string) => {
+    setCurrentValue(value);
+    const sharesNum = parseFloat(shares) || 0;
+    const valueNum = parseFloat(value) || 0;
+    if (sharesNum > 0 && valueNum > 0) {
+      setPricePerShare((valueNum / sharesNum).toFixed(2));
     }
   };
 
@@ -105,6 +137,10 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
       ? originalValue 
       : convertToEUR(originalValue, currency, settings.currencySettings.fallbackRates);
 
+    // Parse shares and pricePerShare
+    const sharesNum = shares.trim() ? parseFloat(shares) : undefined;
+    const priceNum = pricePerShare.trim() ? parseFloat(pricePerShare) : undefined;
+
     const newAsset: Asset = {
       id: `asset-${Date.now()}`,
       name: name.trim(),
@@ -113,6 +149,8 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
       assetClass,
       subAssetType,
       currentValue: valueInEUR,
+      shares: sharesNum && sharesNum > 0 ? sharesNum : undefined,
+      pricePerShare: priceNum && priceNum > 0 ? priceNum : undefined,
       originalCurrency: currency !== 'EUR' ? currency : undefined,
       originalValue: currency !== 'EUR' ? originalValue : undefined,
       targetMode,
@@ -127,6 +165,8 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
     setTicker('');
     setIsin('');
     setCurrentValue('0');
+    setShares('');
+    setPricePerShare('');
     setCurrency('EUR');
     setTargetPercent('0');
     onClose();
@@ -224,7 +264,7 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
               <input
                 type="text"
                 value={currentValue}
-                onChange={(e) => setCurrentValue(e.target.value)}
+                onChange={(e) => handleCurrentValueChange(e.target.value)}
                 className="dialog-input"
                 required
               />
@@ -245,6 +285,39 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
               </select>
             </div>
           </div>
+
+          {/* Shares and Price Per Share - only for non-cash assets */}
+          {assetClass !== 'CASH' && (
+            <div className="form-row">
+              <div className="form-group">
+                <label>Number of Shares (optional)</label>
+                <input
+                  type="text"
+                  value={shares}
+                  onChange={(e) => handleSharesChange(e.target.value)}
+                  placeholder="e.g., 85"
+                  className="dialog-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Price Per Share (optional)</label>
+                <input
+                  type="text"
+                  value={pricePerShare}
+                  onChange={(e) => handlePricePerShareChange(e.target.value)}
+                  placeholder="e.g., 112.50"
+                  className="dialog-input"
+                />
+              </div>
+            </div>
+          )}
+
+          {shares && pricePerShare && assetClass !== 'CASH' && (
+            <div className="shares-info-note">
+              💡 Shares × Price = Current Value: {shares} × {pricePerShare} = {currentValue}
+            </div>
+          )}
 
           {currency !== 'EUR' && (
             <div className="currency-conversion-note">
