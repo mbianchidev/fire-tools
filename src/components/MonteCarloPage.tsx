@@ -9,14 +9,23 @@ import { MonteCarloSimulator } from './MonteCarloSimulator';
 export const MonteCarloPage: React.FC = () => {
   const location = useLocation();
   
-  // Load inputs from location state, cookies, or defaults (only once on mount)
-  const [baseInputs] = useState<CalculatorInputs>(() => {
+  // Load inputs from location state, cookies, or defaults.
+  // Uses location.key as dependency to reload inputs when navigating back to this page.
+  // ESLint warning suppressed because location.key is intentionally used instead of
+  // location.state?.inputs - we want to reload from cookies on every navigation,
+  // not just when location.state changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const baseInputs = useMemo<CalculatorInputs>(() => {
     return location.state?.inputs || loadFireCalculatorInputs() || DEFAULT_INPUTS;
-  });
+  }, [location.key]);
   
   const [result, setResult] = useState<CalculationResult | null>(null);
 
-  // Load asset allocation data for use when useAssetAllocationValue is enabled
+  // Load asset allocation data for use when useAssetAllocationValue is enabled.
+  // Uses location.key as dependency to reload data when navigating back to this page.
+  // ESLint warning suppressed because location.key is intentionally used to trigger
+  // reload from cookies on every navigation.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const assetAllocationData = useMemo(() => {
     const saved = loadAssetAllocation();
     if (!saved.assets || saved.assets.length === 0) {
@@ -49,7 +58,7 @@ export const MonteCarloPage: React.FC = () => {
       bondsPercent: (bondsValue / totalValue) * 100,
       cashPercent: (cashValue / totalValue) * 100,
     };
-  }, []);
+  }, [location.key]);
 
   // Apply asset allocation data if useAssetAllocationValue is enabled
   const inputs: CalculatorInputs = useMemo(() => {
