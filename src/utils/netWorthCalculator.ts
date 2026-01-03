@@ -279,9 +279,9 @@ export function calculateNetWorthForecast(
   const coefficientOfVariation = avgChange !== 0 ? Math.abs(stdDev / avgChange) : 1;
 
   let confidenceLevel: 'HIGH' | 'MEDIUM' | 'LOW';
-  if (coefficientOfVariation < 0.3 && snapshots.length >= 6) {
+  if (coefficientOfVariation < 0.3 && snapshots.length >= 24) {
     confidenceLevel = 'HIGH';
-  } else if (coefficientOfVariation < 0.6 && snapshots.length >= 3) {
+  } else if (snapshots.length >= 6) {
     confidenceLevel = 'MEDIUM';
   } else {
     confidenceLevel = 'LOW';

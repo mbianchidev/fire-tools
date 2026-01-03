@@ -698,6 +698,7 @@ export function NetWorthTrackerPage() {
               <li><strong>Log Operations:</strong> Record dividends, purchases, sales, taxes, etc.</li>
               <li><strong>Monthly Snapshot:</strong> Update values at month end for historical tracking</li>
               <li><strong>View History:</strong> Navigate between months to see historical data</li>
+              <li><strong>Forecast Confidence:</strong> LOW (1-5 months), MEDIUM (6-23 months), HIGH (24+ months of data with stable growth)</li>
             </ul>
           )}
         </section>
@@ -720,7 +721,10 @@ export function NetWorthTrackerPage() {
               <select
                 id="year-select"
                 value={selectedYear}
-                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                onChange={(e) => {
+                  setSelectedYear(Number(e.target.value));
+                  setSelectedMonth(1); // Reset to January when changing year
+                }}
               >
                 {availableYears.map(year => (
                   <option key={year} value={year}>{year}</option>

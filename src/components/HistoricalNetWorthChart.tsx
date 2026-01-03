@@ -127,6 +127,29 @@ export function HistoricalNetWorthChart({
     ];
   }, [actualData, forecastData]);
 
+  // Get minimum months needed for high confidence
+  const minMonthsForHighConfidence = 24;
+  const minMonthsForMediumConfidence = 6;
+
+  // For "All" view mode - get only the indices where year changes
+  const yearChangeIndices = useMemo(() => {
+    if (viewMode !== 'all') return new Set<number>();
+    
+    const indices = new Set<number>();
+    let lastYear = '';
+    
+    combinedData.forEach((d, i) => {
+      const parts = d.month.split(' ');
+      const year = parts[1] || '';
+      if (year !== lastYear) {
+        indices.add(i);
+        lastYear = year;
+      }
+    });
+    
+    return indices;
+  }, [combinedData, viewMode]);
+
   if (variations.length === 0) {
     return (
       <div className="chart-container">
@@ -158,28 +181,6 @@ export function HistoricalNetWorthChart({
       </g>
     );
   };
-
-  // Get minimum months needed for high confidence
-  const minMonthsForHighConfidence = 12;
-
-  // For "All" view mode - get only the indices where year changes
-  const yearChangeIndices = useMemo(() => {
-    if (viewMode !== 'all') return new Set<number>();
-    
-    const indices = new Set<number>();
-    let lastYear = '';
-    
-    combinedData.forEach((d, i) => {
-      const parts = d.month.split(' ');
-      const year = parts[1] || '';
-      if (year !== lastYear) {
-        indices.add(i);
-        lastYear = year;
-      }
-    });
-    
-    return indices;
-  }, [combinedData, viewMode]);
 
   // Custom tick formatter for "All" view mode - show only years at year changes
   const renderYearTick = ({ x, y, payload, index }: { x: number; y: number; payload: { value: string }; index: number }) => {
@@ -320,7 +321,9 @@ export function HistoricalNetWorthChart({
           <span className="forecast-confidence-text">
             <strong>Forecast confidence: {forecast[0]?.confidenceLevel}</strong>
             {' '}(based on {forecast[0]?.basedOnMonths} months of data
-            {forecast[0]?.basedOnMonths && forecast[0].basedOnMonths < minMonthsForHighConfidence && 
+            {forecast[0]?.basedOnMonths && forecast[0].basedOnMonths < minMonthsForMediumConfidence && 
+              `, ${minMonthsForMediumConfidence - forecast[0].basedOnMonths} more needed for medium confidence`}
+            {forecast[0]?.basedOnMonths && forecast[0].basedOnMonths >= minMonthsForMediumConfidence && forecast[0].basedOnMonths < minMonthsForHighConfidence && 
               `, ${minMonthsForHighConfidence - forecast[0].basedOnMonths} more needed for high confidence`})
           </span>
         </div>
