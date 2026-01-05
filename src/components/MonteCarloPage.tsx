@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { CalculationResult, CalculatorInputs } from '../types/calculator';
 import { DEFAULT_INPUTS } from '../utils/defaults';
-import { calculateFIRE } from '../utils/fireCalculator';
+import { calculateFIRE, getEffectiveInputs } from '../utils/fireCalculator';
 import { loadFireCalculatorInputs, loadAssetAllocation } from '../utils/cookieStorage';
 import { MonteCarloSimulator } from './MonteCarloSimulator';
 
@@ -60,18 +60,27 @@ export const MonteCarloPage: React.FC = () => {
     };
   }, [location.key]);
 
-  // Apply asset allocation data if useAssetAllocationValue is enabled
+  // Apply asset allocation data if useAssetAllocationValue is enabled,
+  // and apply expense tracker values if those options are enabled
   const inputs: CalculatorInputs = useMemo(() => {
+    let effectiveInputs = baseInputs;
+    
+    // Apply asset allocation overrides if enabled
     if (baseInputs.useAssetAllocationValue && assetAllocationData) {
-      return {
-        ...baseInputs,
+      effectiveInputs = {
+        ...effectiveInputs,
         initialSavings: assetAllocationData.totalValue,
         stocksPercent: assetAllocationData.stocksPercent,
         bondsPercent: assetAllocationData.bondsPercent,
         cashPercent: assetAllocationData.cashPercent,
       };
     }
-    return baseInputs;
+    
+    // Apply expense tracker values (income and expenses) if enabled
+    // This uses getEffectiveInputs which calculates values from expense tracker data
+    effectiveInputs = getEffectiveInputs(effectiveInputs);
+    
+    return effectiveInputs;
   }, [baseInputs, assetAllocationData]);
 
   useEffect(() => {
