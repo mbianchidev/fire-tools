@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
+import { formatDisplayPercent } from '../utils/numberFormatter';
 
 interface MassEditDialogProps {
   isOpen: boolean;
@@ -68,7 +69,7 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
 
   const handleSubmit = () => {
     if (!isValid) {
-      setError(`Total must equal 100%. Current total: ${total.toFixed(2)}%`);
+      setError(`Total must equal 100%. Current total: ${formatDisplayPercent(total)}`);
       return;
     }
     onSave(editValues);
@@ -150,7 +151,7 @@ export const MassEditDialog: React.FC<MassEditDialogProps> = ({
 
           <div className={`mass-edit-total ${isValid ? 'valid' : 'invalid'}`}>
             <span>Total:</span>
-            <span className="total-value">{total.toFixed(2)}%</span>
+            <span className="total-value">{formatDisplayPercent(total)}</span>
             {isValid ? (
               <span className="valid-icon">✓</span>
             ) : (

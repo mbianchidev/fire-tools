@@ -13,6 +13,7 @@ import {
   ConfirmedDCAAssetAllocation
 } from '../utils/dcaCalculator';
 import { formatAssetName } from '../utils/allocationCalculator';
+import { formatDisplayPercent } from '../utils/numberFormatter';
 
 // Constants for deviation feedback thresholds
 const DEVIATION_CLOSE_THRESHOLD = 2; // Deviation <= 2% is considered "close"
@@ -435,7 +436,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                             <span className="ticker-label">{allocation.ticker || 'N/A'}</span>
                           </td>
                           <td>{formatAssetName(allocation.assetClass)}</td>
-                          <td>{allocation.allocationPercent.toFixed(2)}%</td>
+                          <td>{formatDisplayPercent(allocation.allocationPercent)}</td>
                           <td className="amount-cell">
                             {formatDCACurrency(allocation.investmentAmount, currency)}
                           </td>

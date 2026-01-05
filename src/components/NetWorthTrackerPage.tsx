@@ -29,6 +29,7 @@ import {
 } from '../utils/cookieStorage';
 import { loadSettings } from '../utils/cookieSettings';
 import { generateDemoNetWorthDataForYear } from '../utils/defaults';
+import { formatDisplayCurrency, formatDisplayNumber } from '../utils/numberFormatter';
 import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import './NetWorthTrackerPage.css';
@@ -44,20 +45,24 @@ const SHORT_MONTH_NAMES = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
-// Helper to format currency
-function formatCurrency(amount: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+// Helper to format currency (using centralized formatter)
+function formatCurrency(amount: number, _currency: string): string {
+  return formatDisplayCurrency(amount);
 }
 
-// Helper to format percentage
+// Helper to format percentage (with sign for variations)
 function formatPercent(value: number): string {
+  const settings = loadSettings();
+  const decimalSeparator = settings.decimalSeparator;
+  const decimalPlaces = settings.decimalPlaces ?? 2;
   const sign = value >= 0 ? '+' : '';
-  return `${sign}${value.toFixed(1)}%`;
+  const absValue = Math.abs(value);
+  const roundedValue = Math.round(absValue * Math.pow(10, decimalPlaces)) / Math.pow(10, decimalPlaces);
+  let formatted = roundedValue.toFixed(decimalPlaces);
+  if (decimalSeparator === ',') {
+    formatted = formatted.replace('.', ',');
+  }
+  return `${sign}${value < 0 ? '-' : ''}${formatted}%`;
 }
 
 // Get default data
@@ -907,7 +912,7 @@ export function NetWorthTrackerPage() {
                         <td>{asset.name}</td>
                         <td>{asset.ticker}</td>
                         <td>{ASSET_CLASSES.find(c => c.id === asset.assetClass)?.name || asset.assetClass}</td>
-                        <td>{asset.shares.toLocaleString()}</td>
+                        <td>{formatDisplayNumber(asset.shares)}</td>
                         <td className="amount-col">{formatCurrency(asset.pricePerShare, asset.currency)}</td>
                         <td className="amount-col">{formatCurrency(asset.shares * asset.pricePerShare, asset.currency)}</td>
                         <td className="actions-col">

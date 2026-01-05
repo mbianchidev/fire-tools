@@ -4,6 +4,7 @@ import { runMonteCarloSimulation } from '../utils/monteCarlo';
 import { loadSettings } from '../utils/cookieSettings';
 import { NumberInput } from './NumberInput';
 import { MonteCarloChart } from './MonteCarloChart';
+import { formatDisplayCurrency, formatDisplayPercent } from '../utils/numberFormatter';
 
 interface MonteCarloSimulatorProps {
   inputs: CalculatorInputs;
@@ -17,14 +18,9 @@ interface ValidationErrors {
   blackSwanImpact?: string;
 }
 
-// Format currency for display
+// Format currency for display (using centralized formatter)
 const formatCurrency = (value: number, currency: string): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+  return formatDisplayCurrency(value, currency);
 };
 
 export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs }) => {
@@ -150,7 +146,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Savings Rate</span>
-                  <span className="mc-data-value">{inputs.savingsRate.toFixed(1)}%</span>
+                  <span className="mc-data-value">{formatDisplayPercent(inputs.savingsRate)}</span>
                 </div>
               </div>
 
@@ -159,15 +155,15 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
                 <h4 className="mc-data-group-title">Asset Allocation</h4>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Stocks</span>
-                  <span className="mc-data-value">{inputs.stocksPercent.toFixed(2)}%</span>
+                  <span className="mc-data-value">{formatDisplayPercent(inputs.stocksPercent)}</span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Bonds</span>
-                  <span className="mc-data-value">{inputs.bondsPercent.toFixed(2)}%</span>
+                  <span className="mc-data-value">{formatDisplayPercent(inputs.bondsPercent)}</span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Cash</span>
-                  <span className="mc-data-value">{inputs.cashPercent.toFixed(2)}%</span>
+                  <span className="mc-data-value">{formatDisplayPercent(inputs.cashPercent)}</span>
                 </div>
               </div>
 
@@ -176,15 +172,15 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
                 <h4 className="mc-data-group-title">Expected Returns</h4>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Stock Return</span>
-                  <span className="mc-data-value">{inputs.expectedStockReturn}%</span>
+                  <span className="mc-data-value">{formatDisplayPercent(inputs.expectedStockReturn)}</span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Bond Return</span>
-                  <span className="mc-data-value">{inputs.expectedBondReturn}%</span>
+                  <span className="mc-data-value">{formatDisplayPercent(inputs.expectedBondReturn)}</span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Cash Return</span>
-                  <span className="mc-data-value">{inputs.expectedCashReturn}%</span>
+                  <span className="mc-data-value">{formatDisplayPercent(inputs.expectedCashReturn)}</span>
                 </div>
               </div>
 
@@ -304,7 +300,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
           <div className="results-grid" role="list">
             <div className="result-card success" role="listitem">
               <div className="result-label">Success Rate</div>
-              <div className="result-value">{result.successRate.toFixed(2)}%</div>
+              <div className="result-value">{formatDisplayPercent(result.successRate)}</div>
               <div className="result-subtitle">
                 {result.successCount} / {result.successCount + result.failureCount} simulations
               </div>
@@ -328,9 +324,9 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             </div>
           </div>
 
-          <div className="success-bar" role="progressbar" aria-valuenow={result.successRate} aria-valuemin={0} aria-valuemax={100} aria-label={`Success rate: ${result.successRate.toFixed(2)}%`}>
+          <div className="success-bar" role="progressbar" aria-valuenow={result.successRate} aria-valuemin={0} aria-valuemax={100} aria-label={`Success rate: ${formatDisplayPercent(result.successRate)}`}>
             <div className="success-bar-fill" style={{ width: `${result.successRate}%` }}>
-              {result.successRate > 10 && `${result.successRate.toFixed(2)}%`}
+              {result.successRate > 10 && formatDisplayPercent(result.successRate)}
             </div>
           </div>
 
