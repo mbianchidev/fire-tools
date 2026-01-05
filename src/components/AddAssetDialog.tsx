@@ -258,34 +258,6 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
             )}
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Current Value *</label>
-              <input
-                type="text"
-                value={currentValue}
-                onChange={(e) => handleCurrentValueChange(e.target.value)}
-                className="dialog-input"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Currency</label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-                className="dialog-select"
-              >
-                {SUPPORTED_CURRENCIES.map(c => (
-                  <option key={c.code} value={c.code}>
-                    {c.code} ({c.symbol})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
           {/* Shares and Price Per Share - only for non-cash assets */}
           {assetClass !== 'CASH' && (
             <div className="form-row">
@@ -318,6 +290,40 @@ export const AddAssetDialog: React.FC<AddAssetDialogProps> = ({ isOpen, onClose,
               💡 Shares × Price = Current Value: {shares} × {pricePerShare} = {currentValue}
             </div>
           )}
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Current Value *</label>
+              <input
+                type="text"
+                value={currentValue}
+                onChange={(e) => handleCurrentValueChange(e.target.value)}
+                className="dialog-input"
+                disabled={assetClass !== 'CASH' && !!shares && !!pricePerShare}
+                style={assetClass !== 'CASH' && !!shares && !!pricePerShare ? {
+                  backgroundColor: '#f0f0f0',
+                  cursor: 'not-allowed',
+                  color: '#666'
+                } : {}}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Currency</label>
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
+                className="dialog-select"
+              >
+                {SUPPORTED_CURRENCIES.map(c => (
+                  <option key={c.code} value={c.code}>
+                    {c.code} ({c.symbol})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           {currency !== 'EUR' && (
             <div className="currency-conversion-note">
