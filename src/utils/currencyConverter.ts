@@ -10,6 +10,8 @@ import {
   SUPPORTED_CURRENCIES,
 } from '../types/currency';
 import { Asset } from '../types/assetAllocation';
+import { NetWorthTrackerData, AssetHolding, CashEntry, PensionEntry, FinancialOperation } from '../types/netWorthTracker';
+import { ExpenseTrackerData, IncomeEntry, ExpenseEntry } from '../types/expenseTracker';
 
 /**
  * Convert an amount from a given currency to EUR
@@ -247,4 +249,194 @@ export function convertAssetsToNewCurrency(
       originalValue: asset.originalValue ?? preConversionValue,
     };
   });
+}
+
+/**
+ * Convert Net Worth Tracker asset holding to new currency
+ */
+function convertNetWorthAssetHolding(
+  asset: AssetHolding,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates
+): AssetHolding {
+  const convertedPrice = convertAmount(asset.pricePerShare, fromCurrency, toCurrency, rates);
+  return {
+    ...asset,
+    pricePerShare: convertedPrice,
+    currency: toCurrency,
+  };
+}
+
+/**
+ * Convert Net Worth Tracker cash entry to new currency
+ */
+function convertNetWorthCashEntry(
+  cash: CashEntry,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates
+): CashEntry {
+  const convertedBalance = convertAmount(cash.balance, fromCurrency, toCurrency, rates);
+  return {
+    ...cash,
+    balance: convertedBalance,
+    currency: toCurrency,
+  };
+}
+
+/**
+ * Convert Net Worth Tracker pension entry to new currency
+ */
+function convertNetWorthPensionEntry(
+  pension: PensionEntry,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates
+): PensionEntry {
+  const convertedValue = convertAmount(pension.currentValue, fromCurrency, toCurrency, rates);
+  return {
+    ...pension,
+    currentValue: convertedValue,
+    currency: toCurrency,
+  };
+}
+
+/**
+ * Convert Net Worth Tracker financial operation to new currency
+ */
+function convertNetWorthOperation(
+  operation: FinancialOperation,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates
+): FinancialOperation {
+  const convertedAmount = convertAmount(operation.amount, fromCurrency, toCurrency, rates);
+  return {
+    ...operation,
+    amount: convertedAmount,
+    currency: toCurrency,
+  };
+}
+
+/**
+ * Convert all Net Worth Tracker data to a new currency
+ * @param data - The Net Worth Tracker data to convert
+ * @param fromCurrency - The previous default currency
+ * @param toCurrency - The new default currency
+ * @param rates - Exchange rates (relative to fromCurrency)
+ * @returns Net Worth Tracker data with all values converted
+ */
+export function convertNetWorthDataToNewCurrency(
+  data: NetWorthTrackerData,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates = DEFAULT_FALLBACK_RATES
+): NetWorthTrackerData {
+  if (fromCurrency === toCurrency) {
+    return data;
+  }
+
+  return {
+    ...data,
+    defaultCurrency: toCurrency,
+    years: data.years.map(year => ({
+      ...year,
+      months: year.months.map(month => ({
+        ...month,
+        assets: month.assets.map(asset => 
+          convertNetWorthAssetHolding(asset, fromCurrency, toCurrency, rates)
+        ),
+        cashEntries: month.cashEntries.map(cash => 
+          convertNetWorthCashEntry(cash, fromCurrency, toCurrency, rates)
+        ),
+        pensions: month.pensions.map(pension => 
+          convertNetWorthPensionEntry(pension, fromCurrency, toCurrency, rates)
+        ),
+        operations: month.operations.map(op => 
+          convertNetWorthOperation(op, fromCurrency, toCurrency, rates)
+        ),
+      })),
+    })),
+  };
+}
+
+/**
+ * Convert income entry to new currency
+ */
+function convertIncomeEntry(
+  income: IncomeEntry,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates
+): IncomeEntry {
+  const convertedAmount = convertAmount(income.amount, fromCurrency, toCurrency, rates);
+  return {
+    ...income,
+    amount: convertedAmount,
+    currency: toCurrency,
+  };
+}
+
+/**
+ * Convert expense entry to new currency
+ */
+function convertExpenseEntry(
+  expense: ExpenseEntry,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates
+): ExpenseEntry {
+  const convertedAmount = convertAmount(expense.amount, fromCurrency, toCurrency, rates);
+  return {
+    ...expense,
+    amount: convertedAmount,
+    currency: toCurrency,
+  };
+}
+
+/**
+ * Convert all Expense Tracker data to a new currency
+ * @param data - The Expense Tracker data to convert
+ * @param fromCurrency - The previous default currency
+ * @param toCurrency - The new default currency
+ * @param rates - Exchange rates (relative to fromCurrency)
+ * @returns Expense Tracker data with all values converted
+ */
+export function convertExpenseDataToNewCurrency(
+  data: ExpenseTrackerData,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates = DEFAULT_FALLBACK_RATES
+): ExpenseTrackerData {
+  if (fromCurrency === toCurrency) {
+    return data;
+  }
+
+  return {
+    ...data,
+    currency: toCurrency,
+    years: data.years.map(year => ({
+      ...year,
+      months: year.months.map(month => ({
+        ...month,
+        incomes: month.incomes.map(income => 
+          convertIncomeEntry(income, fromCurrency, toCurrency, rates)
+        ),
+        expenses: month.expenses.map(expense => 
+          convertExpenseEntry(expense, fromCurrency, toCurrency, rates)
+        ),
+        budgets: month.budgets.map(budget => ({
+          ...budget,
+          monthlyBudget: convertAmount(budget.monthlyBudget, fromCurrency, toCurrency, rates),
+          currency: toCurrency,
+        })),
+      })),
+    })),
+    globalBudgets: data.globalBudgets.map(budget => ({
+      ...budget,
+      monthlyBudget: convertAmount(budget.monthlyBudget, fromCurrency, toCurrency, rates),
+      currency: toCurrency,
+    })),
+  };
 }

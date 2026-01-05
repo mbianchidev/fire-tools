@@ -8,9 +8,13 @@ import {
   convertAmount,
   recalculateFallbackRates,
   convertAssetsToNewCurrency,
+  convertNetWorthDataToNewCurrency,
+  convertExpenseDataToNewCurrency,
 } from './currencyConverter';
 import { DEFAULT_FALLBACK_RATES } from '../types/currency';
 import { Asset } from '../types/assetAllocation';
+import { NetWorthTrackerData } from '../types/netWorthTracker';
+import { ExpenseTrackerData } from '../types/expenseTracker';
 
 describe('Currency Converter', () => {
   describe('convertToEUR', () => {
@@ -340,6 +344,259 @@ describe('Currency Converter', () => {
       
       // Should convert 1000 EUR to USD
       expect(converted[0].currentValue).toBeCloseTo(1176.47, 0);
+    });
+  });
+
+  describe('convertNetWorthDataToNewCurrency', () => {
+    // Helper to create mock Net Worth data
+    const createMockNetWorthData = (): NetWorthTrackerData => ({
+      years: [
+        {
+          year: 2024,
+          months: [
+            {
+              year: 2024,
+              month: 1,
+              assets: [
+                {
+                  id: 'asset1',
+                  ticker: 'VWCE',
+                  name: 'Vanguard FTSE All-World',
+                  shares: 100,
+                  pricePerShare: 100,
+                  currency: 'EUR',
+                  assetClass: 'ETF',
+                },
+              ],
+              cashEntries: [
+                {
+                  id: 'cash1',
+                  accountName: 'Savings',
+                  accountType: 'SAVINGS',
+                  balance: 5000,
+                  currency: 'EUR',
+                },
+              ],
+              pensions: [
+                {
+                  id: 'pension1',
+                  name: 'State Pension',
+                  currentValue: 20000,
+                  currency: 'EUR',
+                  pensionType: 'STATE',
+                },
+              ],
+              operations: [
+                {
+                  id: 'op1',
+                  date: '2024-01-15',
+                  type: 'DIVIDEND',
+                  description: 'Dividend payment',
+                  amount: 50,
+                  currency: 'EUR',
+                },
+              ],
+              isFrozen: false,
+            },
+          ],
+        },
+      ],
+      currentYear: 2024,
+      currentMonth: 1,
+      defaultCurrency: 'EUR',
+      settings: {
+        showPensionInNetWorth: true,
+        includeUnrealizedGains: true,
+      },
+    });
+
+    it('should return same data when currencies are identical', () => {
+      const data = createMockNetWorthData();
+      const converted = convertNetWorthDataToNewCurrency(data, 'EUR', 'EUR', DEFAULT_FALLBACK_RATES);
+      
+      expect(converted.years[0].months[0].assets[0].pricePerShare).toBe(100);
+      expect(converted.years[0].months[0].cashEntries[0].balance).toBe(5000);
+      expect(converted.years[0].months[0].pensions[0].currentValue).toBe(20000);
+      expect(converted.years[0].months[0].operations[0].amount).toBe(50);
+    });
+
+    it('should convert all values from EUR to USD', () => {
+      const data = createMockNetWorthData();
+      const converted = convertNetWorthDataToNewCurrency(data, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      // EUR to USD rate: 1 EUR = 1/0.85 USD ≈ 1.1765 USD
+      const expectedRate = 1 / 0.85;
+      
+      expect(converted.defaultCurrency).toBe('USD');
+      expect(converted.years[0].months[0].assets[0].pricePerShare).toBeCloseTo(100 * expectedRate, 0);
+      expect(converted.years[0].months[0].assets[0].currency).toBe('USD');
+      expect(converted.years[0].months[0].cashEntries[0].balance).toBeCloseTo(5000 * expectedRate, 0);
+      expect(converted.years[0].months[0].cashEntries[0].currency).toBe('USD');
+      expect(converted.years[0].months[0].pensions[0].currentValue).toBeCloseTo(20000 * expectedRate, 0);
+      expect(converted.years[0].months[0].pensions[0].currency).toBe('USD');
+      expect(converted.years[0].months[0].operations[0].amount).toBeCloseTo(50 * expectedRate, 0);
+      expect(converted.years[0].months[0].operations[0].currency).toBe('USD');
+    });
+
+    it('should convert from USD back to EUR with acceptable rounding error', () => {
+      const originalData = createMockNetWorthData();
+      
+      // First convert EUR to USD
+      const toUSD = convertNetWorthDataToNewCurrency(originalData, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      // Recalculate rates as would happen in settings page
+      const usdRates = recalculateFallbackRates(DEFAULT_FALLBACK_RATES, 'EUR', 'USD');
+      
+      // Then convert back to EUR
+      const backToEUR = convertNetWorthDataToNewCurrency(toUSD, 'USD', 'EUR', usdRates);
+      
+      // Values should be approximately the same as original (within 1% rounding error)
+      expect(backToEUR.defaultCurrency).toBe('EUR');
+      expect(backToEUR.years[0].months[0].assets[0].pricePerShare).toBeCloseTo(100, 0);
+      expect(backToEUR.years[0].months[0].cashEntries[0].balance).toBeCloseTo(5000, 0);
+      expect(backToEUR.years[0].months[0].pensions[0].currentValue).toBeCloseTo(20000, 0);
+      expect(backToEUR.years[0].months[0].operations[0].amount).toBeCloseTo(50, 0);
+    });
+  });
+
+  describe('convertExpenseDataToNewCurrency', () => {
+    // Helper to create mock Expense Tracker data
+    const createMockExpenseData = (): ExpenseTrackerData => ({
+      years: [
+        {
+          year: 2024,
+          months: [
+            {
+              year: 2024,
+              month: 1,
+              incomes: [
+                {
+                  id: 'income1',
+                  date: '2024-01-01',
+                  amount: 5000,
+                  description: 'Salary',
+                  type: 'income',
+                  source: 'SALARY',
+                  currency: 'EUR',
+                },
+              ],
+              expenses: [
+                {
+                  id: 'expense1',
+                  date: '2024-01-15',
+                  amount: 1500,
+                  description: 'Rent',
+                  type: 'expense',
+                  category: 'HOUSING',
+                  expenseType: 'NEED',
+                  currency: 'EUR',
+                },
+              ],
+              budgets: [
+                {
+                  category: 'HOUSING',
+                  monthlyBudget: 2000,
+                  currency: 'EUR',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      currentYear: 2024,
+      currentMonth: 1,
+      currency: 'EUR',
+      globalBudgets: [
+        {
+          category: 'GROCERIES',
+          monthlyBudget: 500,
+          currency: 'EUR',
+        },
+      ],
+    });
+
+    it('should return same data when currencies are identical', () => {
+      const data = createMockExpenseData();
+      const converted = convertExpenseDataToNewCurrency(data, 'EUR', 'EUR', DEFAULT_FALLBACK_RATES);
+      
+      expect(converted.years[0].months[0].incomes[0].amount).toBe(5000);
+      expect(converted.years[0].months[0].expenses[0].amount).toBe(1500);
+      expect(converted.years[0].months[0].budgets[0].monthlyBudget).toBe(2000);
+      expect(converted.globalBudgets[0].monthlyBudget).toBe(500);
+    });
+
+    it('should convert all values from EUR to USD', () => {
+      const data = createMockExpenseData();
+      const converted = convertExpenseDataToNewCurrency(data, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      // EUR to USD rate: 1 EUR = 1/0.85 USD ≈ 1.1765 USD
+      const expectedRate = 1 / 0.85;
+      
+      expect(converted.currency).toBe('USD');
+      expect(converted.years[0].months[0].incomes[0].amount).toBeCloseTo(5000 * expectedRate, 0);
+      expect(converted.years[0].months[0].incomes[0].currency).toBe('USD');
+      expect(converted.years[0].months[0].expenses[0].amount).toBeCloseTo(1500 * expectedRate, 0);
+      expect(converted.years[0].months[0].expenses[0].currency).toBe('USD');
+      expect(converted.years[0].months[0].budgets[0].monthlyBudget).toBeCloseTo(2000 * expectedRate, 0);
+      expect(converted.globalBudgets[0].monthlyBudget).toBeCloseTo(500 * expectedRate, 0);
+    });
+
+    it('should convert from USD back to EUR with acceptable rounding error', () => {
+      const originalData = createMockExpenseData();
+      
+      // First convert EUR to USD
+      const toUSD = convertExpenseDataToNewCurrency(originalData, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      // Recalculate rates as would happen in settings page
+      const usdRates = recalculateFallbackRates(DEFAULT_FALLBACK_RATES, 'EUR', 'USD');
+      
+      // Then convert back to EUR
+      const backToEUR = convertExpenseDataToNewCurrency(toUSD, 'USD', 'EUR', usdRates);
+      
+      // Values should be approximately the same as original (within 1% rounding error)
+      expect(backToEUR.currency).toBe('EUR');
+      expect(backToEUR.years[0].months[0].incomes[0].amount).toBeCloseTo(5000, 0);
+      expect(backToEUR.years[0].months[0].expenses[0].amount).toBeCloseTo(1500, 0);
+      expect(backToEUR.years[0].months[0].budgets[0].monthlyBudget).toBeCloseTo(2000, 0);
+      expect(backToEUR.globalBudgets[0].monthlyBudget).toBeCloseTo(500, 0);
+    });
+  });
+
+  describe('Full conversion workflow: EUR → USD → EUR roundtrip', () => {
+    it('should maintain data integrity through currency conversions', () => {
+      // This test simulates: Load demo data (EUR) → Change to USD → Change back to EUR
+      const originalEUR = 10000;
+      
+      // Step 1: Convert EUR to USD
+      const toUSD = convertAmount(originalEUR, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      // Step 2: Recalculate rates for USD as base
+      const usdRates = recalculateFallbackRates(DEFAULT_FALLBACK_RATES, 'EUR', 'USD');
+      
+      // Step 3: Convert USD back to EUR using new rates
+      const backToEUR = convertAmount(toUSD, 'USD', 'EUR', usdRates);
+      
+      // Should be approximately the same (within 0.01% due to floating point)
+      expect(backToEUR).toBeCloseTo(originalEUR, 1);
+    });
+
+    it('should handle multiple currency changes accurately', () => {
+      // EUR → USD → GBP → EUR
+      const originalEUR = 10000;
+      
+      // EUR to USD
+      const toUSD = convertAmount(originalEUR, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      const usdRates = recalculateFallbackRates(DEFAULT_FALLBACK_RATES, 'EUR', 'USD');
+      
+      // USD to GBP
+      const toGBP = convertAmount(toUSD, 'USD', 'GBP', usdRates);
+      const gbpRates = recalculateFallbackRates(usdRates, 'USD', 'GBP');
+      
+      // GBP back to EUR
+      const backToEUR = convertAmount(toGBP, 'GBP', 'EUR', gbpRates);
+      
+      // Should be approximately the same
+      expect(backToEUR).toBeCloseTo(originalEUR, 0);
     });
   });
 });

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
-import { recalculateFallbackRates, convertAssetsToNewCurrency } from '../utils/currencyConverter';
+import { recalculateFallbackRates, convertAssetsToNewCurrency, convertNetWorthDataToNewCurrency, convertExpenseDataToNewCurrency } from '../utils/currencyConverter';
 import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV, exportExpenseTrackerToCSV, importExpenseTrackerFromCSV, exportNetWorthTrackerToJSON, importNetWorthTrackerFromJSON } from '../utils/csvExport';
 import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData, loadExpenseTrackerData, saveExpenseTrackerData, loadNetWorthTrackerData, saveNetWorthTrackerData } from '../utils/cookieStorage';
 import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from '../utils/defaults';
@@ -365,6 +365,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   saveAssetAllocation(convertedAssets, assetClassTargets);
                 }
                 
+                // Convert Net Worth Tracker data
+                const netWorthData = loadNetWorthTrackerData();
+                if (netWorthData) {
+                  const convertedNetWorth = convertNetWorthDataToNewCurrency(netWorthData, oldCurrency, newCurrency, currentRates);
+                  saveNetWorthTrackerData(convertedNetWorth);
+                }
+                
+                // Convert Expense Tracker data
+                const expenseData = loadExpenseTrackerData();
+                if (expenseData) {
+                  const convertedExpense = convertExpenseDataToNewCurrency(expenseData, oldCurrency, newCurrency, currentRates);
+                  saveExpenseTrackerData(convertedExpense);
+                }
+                
                 // Recalculate fallback rates relative to the new default currency
                 const newFallbackRates = recalculateFallbackRates(
                   currentRates,
@@ -383,7 +397,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 setSettings(newSettings);
                 saveSettings(newSettings);
                 onSettingsChange?.(newSettings);
-                showMessage('success', `Default currency changed to ${newCurrency}! Asset values and rates converted.`);
+                showMessage('success', `Default currency changed to ${newCurrency}! All values converted.`);
               }}
             >
               {SUPPORTED_CURRENCIES.map((currency) => (
