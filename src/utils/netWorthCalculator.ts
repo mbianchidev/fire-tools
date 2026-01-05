@@ -10,7 +10,7 @@ import {
   NetWorthForecast,
   FIREProgress,
 } from '../types/netWorthTracker';
-import { DEFAULT_FALLBACK_RATES, SupportedCurrency } from '../types/currency';
+import { SupportedCurrency } from '../types/currency';
 
 // Options for net worth calculation
 export interface NetWorthCalculationOptions {
@@ -28,16 +28,9 @@ export interface MonthlyNetWorthResult {
 }
 
 /**
- * Convert amount from one currency to EUR
- */
-function convertToEUR(amount: number, currency: SupportedCurrency): number {
-  if (currency === 'EUR') return amount;
-  const rate = DEFAULT_FALLBACK_RATES[currency] || 1;
-  return amount * rate;
-}
-
-/**
  * Calculate net worth for a single monthly snapshot
+ * All values are summed directly as they are already in the same currency
+ * (converted by the Settings page when the default currency is changed)
  */
 export function calculateMonthlyNetWorth(
   snapshot: MonthlySnapshot,
@@ -45,28 +38,29 @@ export function calculateMonthlyNetWorth(
 ): MonthlyNetWorthResult {
   const { includePension = true } = options;
 
-  // Calculate total asset value (shares * price, converted to EUR)
+  // Calculate total asset value (shares * price)
+  // Values are already in the default currency (converted when user changes currency in Settings)
   const totalAssetValue = snapshot.assets.reduce((sum, asset) => {
-    const valueInOriginalCurrency = asset.shares * asset.pricePerShare;
-    return sum + convertToEUR(valueInOriginalCurrency, asset.currency);
+    const valueInCurrency = asset.shares * asset.pricePerShare;
+    return sum + valueInCurrency;
   }, 0);
 
-  // Calculate total cash (converted to EUR)
+  // Calculate total cash
   const totalCash = snapshot.cashEntries.reduce((sum, entry) => {
-    return sum + convertToEUR(entry.balance, entry.currency);
+    return sum + entry.balance;
   }, 0);
 
-  // Calculate total pension (converted to EUR)
+  // Calculate total pension
   const totalPension = includePension
     ? snapshot.pensions.reduce((sum, pension) => {
-        return sum + convertToEUR(pension.currentValue, pension.currency);
+        return sum + pension.currentValue;
       }, 0)
     : 0;
 
   // Calculate total taxes paid from operations
   const totalTaxesPaid = snapshot.operations
     .filter((op) => op.type === 'TAX_PAID')
-    .reduce((sum, op) => sum + convertToEUR(op.amount, op.currency), 0);
+    .reduce((sum, op) => sum + op.amount, 0);
 
   // Net worth = assets + cash + pension - taxes
   // Note: Taxes are typically already deducted from cash/income, so we don't subtract again
@@ -133,12 +127,13 @@ export function calculateYTDSummary(
     firstNetWorth > 0 ? (netWorthChange / firstNetWorth) * 100 : 0;
 
   // Calculate income/expenses from operations (simplified)
+  // Values are already in the default currency (converted when user changes currency in Settings)
   let totalIncome = 0;
   let totalExpenses = 0;
 
   for (const snapshot of relevantSnapshots) {
     for (const op of snapshot.operations) {
-      const amount = convertToEUR(op.amount, op.currency);
+      const amount = op.amount;
       if (
         op.type === 'DIVIDEND' ||
         op.type === 'SALE' ||

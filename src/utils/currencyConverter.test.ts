@@ -10,6 +10,7 @@ import {
   convertAssetsToNewCurrency,
   convertNetWorthDataToNewCurrency,
   convertExpenseDataToNewCurrency,
+  convertFireCalculatorInputsToNewCurrency,
 } from './currencyConverter';
 import { DEFAULT_FALLBACK_RATES } from '../types/currency';
 import { Asset } from '../types/assetAllocation';
@@ -597,6 +598,108 @@ describe('Currency Converter', () => {
       
       // Should be approximately the same
       expect(backToEUR).toBeCloseTo(originalEUR, 0);
+    });
+  });
+
+  describe('convertFireCalculatorInputsToNewCurrency', () => {
+    const createMockFireInputs = (): Parameters<typeof convertFireCalculatorInputsToNewCurrency>[0] => ({
+      initialSavings: 50000,
+      currentAnnualExpenses: 40000,
+      fireAnnualExpenses: 40000,
+      annualLaborIncome: 60000,
+      statePensionIncome: 12000,
+      privatePensionIncome: 6000,
+      otherIncome: 2000,
+      // Non-monetary fields
+      stocksPercent: 70,
+      bondsPercent: 20,
+      cashPercent: 10,
+      savingsRate: 33.33,
+      desiredWithdrawalRate: 3,
+      yearsOfExpenses: 33.33,
+      laborIncomeGrowthRate: 2,
+      expectedStockReturn: 7,
+      expectedBondReturn: 3,
+      expectedCashReturn: -2,
+      yearOfBirth: 1990,
+      retirementAge: 67,
+      stopWorkingAtFIRE: true,
+      maxAge: 100,
+      useAssetAllocationValue: false,
+      useExpenseTrackerExpenses: false,
+      useExpenseTrackerIncome: false,
+    });
+
+    it('should return same inputs when currencies are identical', () => {
+      const inputs = createMockFireInputs();
+      const converted = convertFireCalculatorInputsToNewCurrency(inputs, 'EUR', 'EUR', DEFAULT_FALLBACK_RATES);
+      
+      expect(converted.initialSavings).toBe(50000);
+      expect(converted.currentAnnualExpenses).toBe(40000);
+      expect(converted.annualLaborIncome).toBe(60000);
+    });
+
+    it('should convert all monetary values from EUR to USD', () => {
+      const inputs = createMockFireInputs();
+      const converted = convertFireCalculatorInputsToNewCurrency(inputs, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      // EUR to USD rate: 1 EUR = 1/0.85 USD = 1.176 USD
+      const rate = 1 / DEFAULT_FALLBACK_RATES.USD;
+      
+      expect(converted.initialSavings).toBeCloseTo(50000 * rate, 0);
+      expect(converted.currentAnnualExpenses).toBeCloseTo(40000 * rate, 0);
+      expect(converted.fireAnnualExpenses).toBeCloseTo(40000 * rate, 0);
+      expect(converted.annualLaborIncome).toBeCloseTo(60000 * rate, 0);
+      expect(converted.statePensionIncome).toBeCloseTo(12000 * rate, 0);
+      expect(converted.privatePensionIncome).toBeCloseTo(6000 * rate, 0);
+      expect(converted.otherIncome).toBeCloseTo(2000 * rate, 0);
+    });
+
+    it('should convert all monetary values from EUR to JPY', () => {
+      const inputs = createMockFireInputs();
+      const converted = convertFireCalculatorInputsToNewCurrency(inputs, 'EUR', 'JPY', DEFAULT_FALLBACK_RATES);
+      
+      // EUR to JPY rate: 1 EUR = 1/0.0054 JPY = 185.18 JPY
+      const rate = 1 / DEFAULT_FALLBACK_RATES.JPY;
+      
+      expect(converted.initialSavings).toBeCloseTo(50000 * rate, 0);
+      expect(converted.currentAnnualExpenses).toBeCloseTo(40000 * rate, 0);
+      expect(converted.fireAnnualExpenses).toBeCloseTo(40000 * rate, 0);
+      expect(converted.annualLaborIncome).toBeCloseTo(60000 * rate, 0);
+    });
+
+    it('should not modify non-monetary fields', () => {
+      const inputs = createMockFireInputs();
+      const converted = convertFireCalculatorInputsToNewCurrency(inputs, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      expect(converted.stocksPercent).toBe(70);
+      expect(converted.bondsPercent).toBe(20);
+      expect(converted.cashPercent).toBe(10);
+      expect(converted.savingsRate).toBe(33.33);
+      expect(converted.desiredWithdrawalRate).toBe(3);
+      expect(converted.yearsOfExpenses).toBe(33.33);
+    });
+
+    it('should convert from USD back to EUR with acceptable rounding error', () => {
+      const originalInputs = createMockFireInputs();
+      
+      // First convert EUR to USD
+      const toUSD = convertFireCalculatorInputsToNewCurrency(originalInputs, 'EUR', 'USD', DEFAULT_FALLBACK_RATES);
+      
+      // Recalculate rates as would happen in settings page
+      const usdRates = recalculateFallbackRates(DEFAULT_FALLBACK_RATES, 'EUR', 'USD');
+      
+      // Then convert back to EUR
+      const backToEUR = convertFireCalculatorInputsToNewCurrency(toUSD, 'USD', 'EUR', usdRates);
+      
+      // Values should be approximately the same as original (within 1% rounding error)
+      expect(backToEUR.initialSavings).toBeCloseTo(50000, 0);
+      expect(backToEUR.currentAnnualExpenses).toBeCloseTo(40000, 0);
+      expect(backToEUR.fireAnnualExpenses).toBeCloseTo(40000, 0);
+      expect(backToEUR.annualLaborIncome).toBeCloseTo(60000, 0);
+      expect(backToEUR.statePensionIncome).toBeCloseTo(12000, 0);
+      expect(backToEUR.privatePensionIncome).toBeCloseTo(6000, 0);
+      expect(backToEUR.otherIncome).toBeCloseTo(2000, 0);
     });
   });
 });

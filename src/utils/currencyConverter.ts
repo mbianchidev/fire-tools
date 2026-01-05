@@ -12,6 +12,7 @@ import {
 import { Asset } from '../types/assetAllocation';
 import { NetWorthTrackerData, AssetHolding, CashEntry, PensionEntry, FinancialOperation } from '../types/netWorthTracker';
 import { ExpenseTrackerData, IncomeEntry, ExpenseEntry } from '../types/expenseTracker';
+import { CalculatorInputs } from '../types/calculator';
 
 /**
  * Convert an amount from a given currency to EUR
@@ -438,5 +439,40 @@ export function convertExpenseDataToNewCurrency(
       monthlyBudget: convertAmount(budget.monthlyBudget, fromCurrency, toCurrency, rates),
       currency: toCurrency,
     })),
+  };
+}
+
+/**
+ * Convert FIRE Calculator inputs to a new currency
+ * Converts all monetary values: initialSavings, expenses, income, pensions, etc.
+ * Non-monetary fields like percentages, rates, and flags are preserved unchanged.
+ * 
+ * @param inputs - The FIRE Calculator inputs to convert
+ * @param fromCurrency - The previous default currency
+ * @param toCurrency - The new default currency
+ * @param rates - Exchange rates (relative to fromCurrency)
+ * @returns FIRE Calculator inputs with all monetary values converted.
+ *          Returns the original inputs unchanged if fromCurrency equals toCurrency.
+ */
+export function convertFireCalculatorInputsToNewCurrency(
+  inputs: CalculatorInputs,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates = DEFAULT_FALLBACK_RATES
+): CalculatorInputs {
+  // Early return if currencies are the same - no conversion needed
+  if (fromCurrency === toCurrency) {
+    return inputs;
+  }
+
+  return {
+    ...inputs,
+    initialSavings: convertAmount(inputs.initialSavings, fromCurrency, toCurrency, rates),
+    currentAnnualExpenses: convertAmount(inputs.currentAnnualExpenses, fromCurrency, toCurrency, rates),
+    fireAnnualExpenses: convertAmount(inputs.fireAnnualExpenses, fromCurrency, toCurrency, rates),
+    annualLaborIncome: convertAmount(inputs.annualLaborIncome, fromCurrency, toCurrency, rates),
+    statePensionIncome: convertAmount(inputs.statePensionIncome, fromCurrency, toCurrency, rates),
+    privatePensionIncome: convertAmount(inputs.privatePensionIncome, fromCurrency, toCurrency, rates),
+    otherIncome: convertAmount(inputs.otherIncome, fromCurrency, toCurrency, rates),
   };
 }

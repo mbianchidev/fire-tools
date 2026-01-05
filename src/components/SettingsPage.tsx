@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
-import { recalculateFallbackRates, convertAssetsToNewCurrency, convertNetWorthDataToNewCurrency, convertExpenseDataToNewCurrency } from '../utils/currencyConverter';
+import { recalculateFallbackRates, convertAssetsToNewCurrency, convertNetWorthDataToNewCurrency, convertExpenseDataToNewCurrency, convertFireCalculatorInputsToNewCurrency } from '../utils/currencyConverter';
 import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV, exportExpenseTrackerToCSV, importExpenseTrackerFromCSV, exportNetWorthTrackerToJSON, importNetWorthTrackerFromJSON } from '../utils/csvExport';
 import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData, loadExpenseTrackerData, saveExpenseTrackerData, loadNetWorthTrackerData, saveNetWorthTrackerData } from '../utils/cookieStorage';
 import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from '../utils/defaults';
@@ -377,6 +377,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 if (expenseData) {
                   const convertedExpense = convertExpenseDataToNewCurrency(expenseData, oldCurrency, newCurrency, currentRates);
                   saveExpenseTrackerData(convertedExpense);
+                }
+                
+                // Convert FIRE Calculator inputs
+                const fireInputs = loadFireCalculatorInputs();
+                if (fireInputs) {
+                  const convertedFireInputs = convertFireCalculatorInputsToNewCurrency(fireInputs, oldCurrency, newCurrency, currentRates);
+                  saveFireCalculatorInputs(convertedFireInputs);
                 }
                 
                 // Recalculate fallback rates relative to the new default currency
