@@ -49,11 +49,11 @@ export const DEFAULT_INPUTS: CalculatorInputs = {
 // Base values coherent with Asset Allocation demo data
 const NET_WORTH_DEMO_BASE = {
   vwceShares: 85,
-  vwcePrice: 110,
+  vwcePrice: 112.50, // Updated to match Asset Allocation demo
   agghShares: 50,
-  agghPrice: 45,
-  emergencyFund: 12000,
-  checking: 3000,
+  agghPrice: 45.75, // Updated to match Asset Allocation demo
+  emergencyFund: 4000, // Updated to match Asset Allocation demo
+  checking: 1500, // Updated to match Asset Allocation demo
   pension: 25000,
 };
 
@@ -126,7 +126,7 @@ export function generateDemoNetWorthDataForYear(targetYear: number): MonthlySnap
         id: `demo-cash-${targetYear}-${month}-1`, 
         accountName: 'Emergency Fund', 
         accountType: 'SAVINGS' as const, 
-        balance: Math.max(10000, NET_WORTH_DEMO_BASE.emergencyFund + emergencyFundGrowth + emergencyFundVariation), 
+        balance: Math.max(3000, NET_WORTH_DEMO_BASE.emergencyFund + emergencyFundGrowth + emergencyFundVariation), 
         currency: 'EUR' as SupportedCurrency 
       },
       { 
@@ -261,13 +261,15 @@ export function getDemoAssetAllocationData(): {
   const currentMonth = new Date().getMonth() + 1; // 1-12
   const currentYear = new Date().getFullYear();
   
-  // Use same calculation logic as getDemoNetWorthData for consistency
+  // Base values for calculations - using realistic share quantities
+  // VWCE @ €112.50: 85 shares = €9,562.50
+  // AGGH @ €45.75: 50 shares = €2,287.50  
   const baseVWCEShares = 85;
-  const baseVWCEPrice = 110;
+  const baseVWCEPrice = 112.50;
   const baseAGGHShares = 50;
-  const baseAGGHPrice = 45;
-  const baseEmergencyFund = 12000;
-  const baseChecking = 3000;
+  const baseAGGHPrice = 45.75;
+  const baseEmergencyFund = 4000;
+  const baseChecking = 1500;
   
   const seededRandom = (seed: number, min: number, max: number) => {
     const x = Math.sin(seed * 9999) * 10000;
@@ -276,16 +278,16 @@ export function getDemoAssetAllocationData(): {
   
   const monthSeed = currentYear * 100 + currentMonth;
   
-  // Calculate current month values
+  // Calculate current month values with growth
   const vwceSharesGrowth = (currentMonth - 1) * 5;
   const vwcePriceVariation = seededRandom(monthSeed, -0.08, 0.12);
   const vwcePrice = Math.round((baseVWCEPrice * (1 + vwcePriceVariation + currentMonth * 0.005)) * 100) / 100;
-  const vwceShares = baseVWCEShares + vwceSharesGrowth;
+  const vwceShares = Math.round((baseVWCEShares + vwceSharesGrowth) * 1000) / 1000; // Allow fractional shares
   
   const agghSharesGrowth = Math.floor((currentMonth - 1) * 2);
   const agghPriceVariation = seededRandom(monthSeed + 1, -0.03, 0.03);
   const agghPrice = Math.round((baseAGGHPrice * (1 + agghPriceVariation)) * 100) / 100;
-  const agghShares = baseAGGHShares + agghSharesGrowth;
+  const agghShares = Math.round((baseAGGHShares + agghSharesGrowth) * 1000) / 1000;
   
   const emergencyFundGrowth = (currentMonth - 1) * 300;
   const emergencyFundVariation = Math.round(seededRandom(monthSeed + 2, -500, 500));
@@ -303,7 +305,7 @@ export function getDemoAssetAllocationData(): {
         shares: vwceShares,
         pricePerShare: vwcePrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 70, // Main stock holding
+        targetPercent: 100, // 100% of STOCKS allocation (only stock asset in demo)
       },
       {
         id: 'demo-aa-2',
@@ -315,7 +317,7 @@ export function getDemoAssetAllocationData(): {
         shares: agghShares,
         pricePerShare: agghPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 20, // Bond allocation
+        targetPercent: 100, // 100% of BONDS allocation (only bond asset in demo)
       },
       {
         id: 'demo-aa-3',
@@ -323,9 +325,9 @@ export function getDemoAssetAllocationData(): {
         ticker: '',
         assetClass: 'CASH' as AssetClass,
         subAssetType: 'SAVINGS_ACCOUNT' as SubAssetType,
-        currentValue: Math.max(10000, baseEmergencyFund + emergencyFundGrowth + emergencyFundVariation),
+        currentValue: Math.max(3000, baseEmergencyFund + emergencyFundGrowth + emergencyFundVariation),
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 8, // Most of cash allocation
+        targetPercent: 70, // 70% of CASH allocation
       },
       {
         id: 'demo-aa-4',
@@ -335,7 +337,7 @@ export function getDemoAssetAllocationData(): {
         subAssetType: 'CHECKING_ACCOUNT' as SubAssetType,
         currentValue: Math.max(500, baseChecking + checkingVariation),
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 2, // Remainder of cash allocation
+        targetPercent: 30, // 30% of CASH allocation
       },
     ],
     assetClassTargets: {
