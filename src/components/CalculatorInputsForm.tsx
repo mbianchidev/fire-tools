@@ -108,6 +108,17 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
     ? calculateAnnualIncomeFromTracker(undefined, inputs.laborIncomeGrowthRate)
     : inputs.annualLaborIncome;
 
+  // Calculate effective savings rate based on whether expense tracker flags are enabled
+  const effectiveSavingsRate = (() => {
+    const income = effectiveLaborIncome;
+    const expenses = effectiveCurrentExpenses;
+    if (income > 0) {
+      const rate = ((income - expenses) / income) * 100;
+      return Math.min(100, rate);
+    }
+    return 0;
+  })();
+
   return (
     <div className="inputs-form">
       <h2>FIRE Calculator Inputs</h2>
@@ -366,7 +377,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
             id="savings-rate"
             type="number"
             inputMode="decimal"
-            value={(inputs.savingsRate ?? 0).toFixed(2)}
+            value={effectiveSavingsRate.toFixed(2)}
             readOnly
             className="calculated-field"
             aria-readonly="true"

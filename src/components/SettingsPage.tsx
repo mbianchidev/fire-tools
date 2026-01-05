@@ -5,7 +5,8 @@ import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } 
 import { recalculateFallbackRates } from '../utils/currencyConverter';
 import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV, exportExpenseTrackerToCSV, importExpenseTrackerFromCSV, exportNetWorthTrackerToJSON, importNetWorthTrackerFromJSON } from '../utils/csvExport';
 import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData, loadExpenseTrackerData, saveExpenseTrackerData, loadNetWorthTrackerData, saveNetWorthTrackerData } from '../utils/cookieStorage';
-import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoCashflowData, getDemoAssetAllocationData } from '../utils/defaults';
+import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from '../utils/defaults';
+import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
 import './SettingsPage.css';
 
@@ -265,22 +266,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const handleLoadDemoData = () => {
     if (confirm('This will overwrite your current data with demo data. Are you sure you want to continue?')) {
       try {
-        // Load demo FIRE Calculator data
-        saveFireCalculatorInputs(DEFAULT_INPUTS);
-        
-        // Load demo Asset Allocation data
-        const { assets, assetClassTargets } = getDemoAssetAllocationData();
-        saveAssetAllocation(assets, assetClassTargets);
-        
-        // Load demo Cashflow Tracker data
-        const cashflowData = getDemoCashflowData();
-        saveExpenseTrackerData(cashflowData);
-        
-        // Load demo Net Worth Tracker data
-        const netWorthData = getDemoNetWorthData();
-        saveNetWorthTrackerData(netWorthData);
-        
-        // Reset default currency to EUR since demo data is in EUR
+        // First, reset default currency to EUR and fallback rates BEFORE loading demo data
+        // This ensures all demo data is loaded with EUR as the default currency
         const newSettings = {
           ...settings,
           currencySettings: {
@@ -292,6 +279,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
         setSettings(newSettings);
         saveSettings(newSettings);
         onSettingsChange?.(newSettings);
+        
+        // Load demo FIRE Calculator data
+        saveFireCalculatorInputs(DEFAULT_INPUTS);
+        
+        // Load demo Asset Allocation data
+        const { assets, assetClassTargets } = getDemoAssetAllocationData();
+        saveAssetAllocation(assets, assetClassTargets);
+        
+        // Load demo Cashflow Tracker data with full year of randomized data
+        const cashflowData = generateDemoExpenseData();
+        saveExpenseTrackerData(cashflowData);
+        
+        // Load demo Net Worth Tracker data
+        const netWorthData = getDemoNetWorthData();
+        saveNetWorthTrackerData(netWorthData);
         
         showMessage('success', 'Demo data loaded successfully! Refresh the page to see the changes.');
       } catch (error) {

@@ -26,6 +26,17 @@ export function getEffectiveInputs(inputs: CalculatorInputs): CalculatorInputs {
     );
   }
   
+  // Recalculate savings rate if either expense tracker flag is enabled
+  if (inputs.useExpenseTrackerExpenses || inputs.useExpenseTrackerIncome) {
+    const income = effectiveInputs.annualLaborIncome;
+    const expenses = effectiveInputs.currentAnnualExpenses;
+    if (income > 0) {
+      effectiveInputs.savingsRate = Math.min(100, ((income - expenses) / income) * 100);
+    } else {
+      effectiveInputs.savingsRate = 0;
+    }
+  }
+  
   return effectiveInputs;
 }
 
