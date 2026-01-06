@@ -142,17 +142,24 @@ export function syncAssetAllocationToNetWorth(
   // Process each asset from Asset Allocation
   for (const asset of assetAllocationData) {
     if (asset.assetClass === 'CASH' || isCashAsset(asset.subAssetType)) {
-      // Convert to cash entry
+      // Convert to cash entry with sync metadata preserved
       const cashEntry: CashEntry = {
         id: generateNetWorthId(),
         accountName: asset.name,
         accountType: mapSubAssetTypeToCashAccountType(asset.subAssetType),
         balance: asset.currentValue,
         currency: (asset.originalCurrency || 'EUR') as SupportedCurrency,
+        // Preserve sync metadata (hidden from UI)
+        shares: asset.shares,
+        pricePerShare: asset.pricePerShare,
+        targetMode: asset.targetMode,
+        targetPercent: asset.targetPercent,
+        targetValue: asset.targetValue,
+        syncSubAssetType: asset.subAssetType,
       };
       newCashEntries.push(cashEntry);
     } else {
-      // Convert to asset holding
+      // Convert to asset holding with sync metadata preserved
       // Use provided shares and pricePerShare if available, otherwise default to shares=1, price=currentValue
       const shares = asset.shares !== undefined && asset.shares > 0 ? asset.shares : 1;
       const pricePerShare = asset.pricePerShare !== undefined && asset.pricePerShare > 0 
@@ -167,6 +174,13 @@ export function syncAssetAllocationToNetWorth(
         pricePerShare,
         currency: (asset.originalCurrency || 'EUR') as SupportedCurrency,
         assetClass: mapAssetClassToNetWorth(asset.assetClass),
+        // Preserve sync metadata (hidden from UI)
+        targetMode: asset.targetMode,
+        targetPercent: asset.targetPercent,
+        targetValue: asset.targetValue,
+        syncAssetClass: asset.assetClass,
+        syncSubAssetType: asset.subAssetType,
+        isin: asset.isin,
       };
       newAssets.push(assetHolding);
     }
@@ -209,31 +223,35 @@ export function syncNetWorthToAssetAllocation(
   
   const assets: Asset[] = [];
   
-  // Convert asset holdings to assets
+  // Convert asset holdings to assets (restore sync metadata)
   for (const holding of monthData.assets) {
     const asset: Asset = {
       id: holding.id,
       name: holding.name,
       ticker: holding.ticker,
-      assetClass: mapNetWorthAssetClassToAllocation(holding.assetClass),
-      subAssetType: 'ETF' as SubAssetType, // Default to ETF for non-cash
+      assetClass: holding.syncAssetClass || mapNetWorthAssetClassToAllocation(holding.assetClass),
+      subAssetType: (holding.syncSubAssetType as SubAssetType) || 'ETF' as SubAssetType,
       currentValue: holding.shares * holding.pricePerShare,
       shares: holding.shares,
       pricePerShare: holding.pricePerShare,
       originalCurrency: holding.currency as SupportedCurrency,
       originalValue: holding.shares * holding.pricePerShare,
-      targetMode: 'OFF', // Default to OFF, user must configure
+      isin: holding.isin,
+      // Restore target metadata from sync metadata
+      targetMode: holding.targetMode || 'OFF',
+      targetPercent: holding.targetPercent,
+      targetValue: holding.targetValue,
     };
     assets.push(asset);
   }
   
-  // Convert cash entries to assets
+  // Convert cash entries to assets (restore sync metadata)
   for (const cashEntry of monthData.cashEntries) {
-    const subAssetType: SubAssetType = 
-      cashEntry.accountType === 'SAVINGS' ? 'SAVINGS_ACCOUNT' :
+    const subAssetType: SubAssetType = cashEntry.syncSubAssetType as SubAssetType ||
+      (cashEntry.accountType === 'SAVINGS' ? 'SAVINGS_ACCOUNT' :
       cashEntry.accountType === 'CHECKING' ? 'CHECKING_ACCOUNT' :
       cashEntry.accountType === 'BROKERAGE' ? 'BROKERAGE_ACCOUNT' :
-      'SAVINGS_ACCOUNT';
+      'SAVINGS_ACCOUNT');
     
     const asset: Asset = {
       id: cashEntry.id,
@@ -242,9 +260,14 @@ export function syncNetWorthToAssetAllocation(
       assetClass: 'CASH',
       subAssetType,
       currentValue: cashEntry.balance,
+      shares: cashEntry.shares,
+      pricePerShare: cashEntry.pricePerShare,
       originalCurrency: cashEntry.currency as SupportedCurrency,
       originalValue: cashEntry.balance,
-      targetMode: 'OFF', // Default to OFF, user must configure
+      // Restore target metadata from sync metadata
+      targetMode: cashEntry.targetMode || 'OFF',
+      targetPercent: cashEntry.targetPercent,
+      targetValue: cashEntry.targetValue,
     };
     assets.push(asset);
   }

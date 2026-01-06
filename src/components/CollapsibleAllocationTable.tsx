@@ -606,11 +606,16 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         </td>
                         <td className="currency-value">
                           {isEditing ? (
-                            <NumberInput
-                              value={editValues.currentValue}
-                              onChange={handleEditCurrentValueChange}
-                              className="edit-input"
-                            />
+                            <div className="calculated-value-container">
+                              <NumberInput
+                                value={editValues.currentValue}
+                                onChange={handleEditCurrentValueChange}
+                                className="edit-input"
+                                disabled={true}
+                                title="Current value is calculated from shares × price per share"
+                              />
+                              <span className="calculated-label">(Calculated)</span>
+                            </div>
                           ) : (
                             formatCurrency(delta.currentValue, currency)
                           )}

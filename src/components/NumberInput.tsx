@@ -6,8 +6,10 @@ interface NumberInputProps {
   className?: string;
   placeholder?: string;
   readOnly?: boolean;
+  disabled?: boolean;
   allowDecimals?: boolean;
   id?: string;
+  title?: string;
 }
 
 /**
@@ -20,8 +22,10 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   className,
   placeholder,
   readOnly = false,
+  disabled = false,
   allowDecimals = true,
   id,
+  title,
 }) => {
   const [stringValue, setStringValue] = useState(value.toString());
   const [isFocused, setIsFocused] = useState(false);
@@ -77,7 +81,10 @@ export const NumberInput: React.FC<NumberInputProps> = ({
       className={className}
       placeholder={placeholder}
       readOnly={readOnly}
+      disabled={disabled}
+      title={title}
       aria-readonly={readOnly}
+      aria-disabled={disabled}
     />
   );
 };

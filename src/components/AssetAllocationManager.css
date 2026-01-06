@@ -2428,3 +2428,25 @@ select:disabled {
   gap: 0.5rem;
   box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
 }
+
+/* Calculated Value Container */
+.calculated-value-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.calculated-value-container input:disabled {
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.calculated-label {
+  font-size: 0.7rem;
+  color: #666;
+  font-style: italic;
+}
+

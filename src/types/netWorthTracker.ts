@@ -15,6 +15,13 @@ export interface AssetHolding {
   currency: SupportedCurrency;
   assetClass: 'STOCKS' | 'BONDS' | 'ETF' | 'CRYPTO' | 'REAL_ESTATE' | 'OTHER';
   note?: string;
+  // Sync metadata (hidden from UI, preserved during sync)
+  targetMode?: 'PERCENTAGE' | 'OFF' | 'SET';
+  targetPercent?: number;
+  targetValue?: number;
+  syncAssetClass?: 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE';
+  syncSubAssetType?: string;
+  isin?: string;
 }
 
 // Cash/liquidity entry
@@ -25,6 +32,13 @@ export interface CashEntry {
   balance: number;
   currency: SupportedCurrency;
   note?: string;
+  // Sync metadata (hidden from UI, preserved during sync)
+  shares?: number; // For cash treated as "1 share @ balance per share"
+  pricePerShare?: number;
+  targetMode?: 'PERCENTAGE' | 'OFF' | 'SET';
+  targetPercent?: number;
+  targetValue?: number;
+  syncSubAssetType?: string;
 }
 
 // Pension entry
