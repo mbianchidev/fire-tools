@@ -39,6 +39,7 @@ import {
 import { loadSettings } from '../utils/cookieSettings';
 import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { useTableSort } from '../utils/useTableSort';
+import { formatDisplayCurrency, formatDisplayPercent } from '../utils/numberFormatter';
 import { DataManagement } from './DataManagement';
 import { ExpenseBreakdownChart } from './ExpenseBreakdownChart';
 import { SpendingTrendChart } from './SpendingTrendChart';
@@ -52,14 +53,9 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
-// Helper to format currency
+// Helper to format currency (using centralized formatter)
 function formatCurrency(amount: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+  return formatDisplayCurrency(amount, currency);
 }
 
 // Get default data
@@ -709,7 +705,7 @@ export function ExpenseTrackerPage() {
               <span className="card-icon" aria-hidden="true">🏦</span>
               <div className="card-content">
                 <span className="card-label">Savings Rate</span>
-                <span className="card-value">{summary.savingsRate.toFixed(1)}%</span>
+                <span className="card-value">{formatDisplayPercent(summary.savingsRate)}</span>
               </div>
             </div>
           </div>
@@ -737,7 +733,7 @@ export function ExpenseTrackerPage() {
                   <div className="rule-bar">
                     <div className="rule-bar-label">
                       <span>Needs (50%)</span>
-                      <span>{budgetRuleBreakdown.needs.percentage.toFixed(1)}%</span>
+                      <span>{formatDisplayPercent(budgetRuleBreakdown.needs.percentage)}</span>
                     </div>
                     <div className="rule-bar-track">
                       <div 
@@ -751,7 +747,7 @@ export function ExpenseTrackerPage() {
                   <div className="rule-bar">
                     <div className="rule-bar-label">
                       <span>Wants (30%)</span>
-                      <span>{budgetRuleBreakdown.wants.percentage.toFixed(1)}%</span>
+                      <span>{formatDisplayPercent(budgetRuleBreakdown.wants.percentage)}</span>
                     </div>
                     <div className="rule-bar-track">
                       <div 
@@ -765,7 +761,7 @@ export function ExpenseTrackerPage() {
                   <div className="rule-bar">
                     <div className="rule-bar-label">
                       <span>Savings (20%)</span>
-                      <span>{budgetRuleBreakdown.savings.percentage.toFixed(1)}%</span>
+                      <span>{formatDisplayPercent(budgetRuleBreakdown.savings.percentage)}</span>
                     </div>
                     <div className="rule-bar-track">
                       <div 
@@ -1140,7 +1136,7 @@ export function ExpenseTrackerPage() {
                           {getCategoryInfo(item.category).name}
                         </td>
                         <td>{formatCurrency(item.totalAmount, data.currency)}</td>
-                        <td>{item.percentage.toFixed(1)}%</td>
+                        <td>{formatDisplayPercent(item.percentage)}</td>
                         <td>{item.budgeted ? formatCurrency(item.budgeted, data.currency) : '-'}</td>
                         <td className={item.remaining !== undefined ? (item.remaining >= 0 ? 'positive' : 'negative') : ''}>
                           {item.remaining !== undefined ? formatCurrency(item.remaining, data.currency) : '-'}

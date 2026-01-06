@@ -432,6 +432,21 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               </button>
             </div>
           </div>
+          <div className="setting-item">
+            <label htmlFor="decimalPlaces">Decimal Places</label>
+            <select
+              id="decimalPlaces"
+              value={settings.decimalPlaces ?? 2}
+              onChange={(e) => handleSettingChange('decimalPlaces', parseInt(e.target.value, 10))}
+            >
+              <option value={0}>0 (e.g., 123)</option>
+              <option value={1}>1 (e.g., 123.4)</option>
+              <option value={2}>2 (e.g., 123.45)</option>
+              <option value={3}>3 (e.g., 123.456)</option>
+              <option value={4}>4 (e.g., 123.4567)</option>
+            </select>
+            <span className="setting-help">Number of decimal places shown for values below 1,000. Values at or above 1,000 show no decimals.</span>
+          </div>
         </section>
 
         {/* Currency Disclaimer - Moved before currency settings */}

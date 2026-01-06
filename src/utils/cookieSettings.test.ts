@@ -208,6 +208,7 @@ describe('Cookie Settings utilities', () => {
     it('should have correct default values', () => {
       expect(DEFAULT_SETTINGS.accountName).toBe('My Portfolio');
       expect(DEFAULT_SETTINGS.decimalSeparator).toBe('.');
+      expect(DEFAULT_SETTINGS.decimalPlaces).toBe(2);
       expect(DEFAULT_SETTINGS.currencySettings.defaultCurrency).toBe('EUR');
       expect(DEFAULT_SETTINGS.currencySettings.useApiRates).toBe(true);
     });
@@ -222,6 +223,25 @@ describe('Cookie Settings utilities', () => {
       expect(fallbackRates.JPY).toBe(0.0054);
       expect(fallbackRates.AUD).toBe(0.57);
       expect(fallbackRates.CAD).toBe(0.62);
+    });
+  });
+
+  describe('decimalPlaces setting', () => {
+    it('should save and load decimal places setting', () => {
+      const settings: UserSettings = {
+        ...DEFAULT_SETTINGS,
+        decimalPlaces: 3,
+      };
+      
+      saveSettings(settings);
+      const loaded = loadSettings();
+      
+      expect(loaded.decimalPlaces).toBe(3);
+    });
+
+    it('should default to 2 decimal places when not set', () => {
+      const loaded = loadSettings();
+      expect(loaded.decimalPlaces).toBe(2);
     });
   });
 });
