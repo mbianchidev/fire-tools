@@ -20,7 +20,7 @@ const defaultSavingsRate = ((defaultIncome - defaultExpenses) / defaultIncome) *
 const defaultYearsOfExpenses = 100 / 3; // ~33.33 years
 
 export const DEFAULT_INPUTS: CalculatorInputs = {
-  initialSavings: 50000,
+  initialSavings: 70000, // Consistent with Asset Allocation demo (~€70k portfolio)
   stocksPercent: 70,
   bondsPercent: 20,
   cashPercent: 10,
