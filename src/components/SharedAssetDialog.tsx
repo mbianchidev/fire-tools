@@ -206,23 +206,30 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       return;
     }
 
-    // Shares and pricePerShare are required (not optional)
-    if (!shares.trim() || parseFloat(shares) <= 0) {
-      alert('Please enter a valid number of shares');
-      return;
-    }
-    if (!pricePerShare.trim() || parseFloat(pricePerShare) <= 0) {
-      alert('Please enter a valid price per share');
-      return;
+    // Shares and pricePerShare are required (not optional) EXCEPT for cash in assetAllocation mode
+    const isCashAllocation = mode === 'assetAllocation' && assetClass === 'CASH';
+    
+    if (!isCashAllocation) {
+      if (!shares.trim() || parseFloat(shares) <= 0) {
+        alert('Please enter a valid number of shares');
+        return;
+      }
+      if (!pricePerShare.trim() || parseFloat(pricePerShare) <= 0) {
+        alert('Please enter a valid price per share');
+        return;
+      }
     }
 
     // Generate ticker if not provided
     const generatedTicker = ticker.trim().toUpperCase() || 
       `${name.trim().substring(0, 4).toUpperCase()}${Date.now().toString().slice(-4)}`;
 
-    const sharesNum = parseFloat(shares);
-    const priceNum = parseFloat(pricePerShare);
-    const valueNum = sharesNum * priceNum;
+    // Calculate value differently for cash assets
+    const sharesNum = parseFloat(shares) || 1;
+    const priceNum = parseFloat(pricePerShare) || 0;
+    
+    // For cash in Asset Allocation, value is directly entered (not shares × price)
+    const valueNum = isCashAllocation && priceNum === 0 ? sharesNum : sharesNum * priceNum;
 
     // Convert to EUR if needed
     const valueInEUR = currency === 'EUR'
@@ -395,15 +402,22 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
           <div className="form-row">
             <div className="form-group">
-              <label>Current Value (Calculated)</label>
+              <label>Current Value {assetClass !== 'CASH' || mode === 'netWorthTracker' ? '(Calculated)' : ''}</label>
               <input
-                type="text"
+                type={assetClass === 'CASH' && mode === 'assetAllocation' ? 'number' : 'text'}
                 value={currentValue}
+                onChange={assetClass === 'CASH' && mode === 'assetAllocation' ? (e) => {
+                  setShares(e.target.value);
+                  setPricePerShare('1');
+                } : undefined}
                 className="dialog-input"
-                disabled
-                style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+                disabled={assetClass !== 'CASH' || mode === 'netWorthTracker'}
+                style={assetClass !== 'CASH' || mode === 'netWorthTracker' ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
+                placeholder={assetClass === 'CASH' && mode === 'assetAllocation' ? 'Enter cash amount' : ''}
+                min={assetClass === 'CASH' && mode === 'assetAllocation' ? '0' : undefined}
+                step={assetClass === 'CASH' && mode === 'assetAllocation' ? 'any' : undefined}
               />
-              {parseFloat(currentValue) > 0 && (
+              {parseFloat(currentValue) > 0 && assetClass !== 'CASH' && (
                 <small className="shares-info-note">
                   💡 {shares} × {pricePerShare} = {currentValue}
                 </small>

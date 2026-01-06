@@ -436,7 +436,7 @@ export function getDemoAssetAllocationData(): {
         shares: spyShares,
         pricePerShare: spyPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 20, // 20% of STOCKS allocation
+        targetPercent: 40, // 40% of STOCKS allocation (€14,000 of €35,000)
         originalCurrency: 'USD' as SupportedCurrency,
       },
       {
@@ -450,7 +450,7 @@ export function getDemoAssetAllocationData(): {
         shares: vtiShares,
         pricePerShare: vtiPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 20, // 20% of STOCKS allocation
+        targetPercent: 27, // 27% of STOCKS allocation (€9,450 of €35,000)
         originalCurrency: 'USD' as SupportedCurrency,
       },
       {
@@ -464,7 +464,7 @@ export function getDemoAssetAllocationData(): {
         shares: vxusShares,
         pricePerShare: vxusPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 20, // 20% of STOCKS allocation
+        targetPercent: 17, // 17% of STOCKS allocation (€5,950 of €35,000)
         originalCurrency: 'USD' as SupportedCurrency,
       },
       {
@@ -478,7 +478,7 @@ export function getDemoAssetAllocationData(): {
         shares: vwoShares,
         pricePerShare: vwoPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 20, // 20% of STOCKS allocation
+        targetPercent: 10, // 10% of STOCKS allocation (€3,500 of €35,000)
         originalCurrency: 'USD' as SupportedCurrency,
       },
       {
@@ -492,7 +492,7 @@ export function getDemoAssetAllocationData(): {
         shares: vbrShares,
         pricePerShare: vbrPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 20, // 20% of STOCKS allocation
+        targetPercent: 6, // 6% of STOCKS allocation (€2,100 of €35,000)
         originalCurrency: 'USD' as SupportedCurrency,
       },
       // BONDS (3 ETFs)
@@ -507,7 +507,7 @@ export function getDemoAssetAllocationData(): {
         shares: bndShares,
         pricePerShare: bndPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 33.33, // 33.33% of BONDS allocation
+        targetPercent: 50, // 50% of BONDS allocation (€15,000 of €30,000)
         originalCurrency: 'USD' as SupportedCurrency,
       },
       {
@@ -521,7 +521,7 @@ export function getDemoAssetAllocationData(): {
         shares: tipShares,
         pricePerShare: tipPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 33.33, // 33.33% of BONDS allocation
+        targetPercent: 30, // 30% of BONDS allocation (€9,000 of €30,000)
       },
       {
         id: 'demo-aa-8',
@@ -534,12 +534,11 @@ export function getDemoAssetAllocationData(): {
         shares: bndxShares,
         pricePerShare: bndxPrice,
         targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 33.34, // 33.34% of BONDS allocation (rounding adjustment)
+        targetPercent: 20, // 20% of BONDS allocation (€6,000 of €30,000)
         originalCurrency: 'USD' as SupportedCurrency,
       },
-      // CASH (2 accounts) - now with shares and price
+      // CASH (2 accounts) - now with SET mode for fixed amounts
       // Emergency Fund: €3,500 (70% of cash)
-      // Treating as 1 "unit" @ €3,500/unit for compatibility
       {
         id: 'demo-aa-9',
         name: 'Emergency Fund',
@@ -547,13 +546,12 @@ export function getDemoAssetAllocationData(): {
         assetClass: 'CASH' as AssetClass,
         subAssetType: 'SAVINGS_ACCOUNT' as SubAssetType,
         currentValue: 3500,
-        shares: 1,
-        pricePerShare: 3500,
-        targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 70, // 70% of CASH allocation
+        shares: 3500, // Value stored as shares for cash
+        pricePerShare: 1, // Price is 1 for cash
+        targetMode: 'SET' as AllocationMode,
+        targetValue: 3500, // Fixed amount target
       },
       // Main Checking: €1,500 (30% of cash)
-      // Treating as 1 "unit" @ €1,500/unit for compatibility
       {
         id: 'demo-aa-10',
         name: 'Main Checking',
@@ -561,10 +559,10 @@ export function getDemoAssetAllocationData(): {
         assetClass: 'CASH' as AssetClass,
         subAssetType: 'CHECKING_ACCOUNT' as SubAssetType,
         currentValue: 1500,
-        shares: 1,
-        pricePerShare: 1500,
-        targetMode: 'PERCENTAGE' as AllocationMode,
-        targetPercent: 30, // 30% of CASH allocation
+        shares: 1500, // Value stored as shares for cash
+        pricePerShare: 1, // Price is 1 for cash
+        targetMode: 'SET' as AllocationMode,
+        targetValue: 1500, // Fixed amount target
       },
     ],
     assetClassTargets: {
