@@ -229,7 +229,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     const priceNum = parseFloat(pricePerShare) || 0;
     
     // For cash accounts (not MONEY_ETF) in Asset Allocation, value is directly entered (not shares × price)
-    const isCashAccount = mode === 'assetAllocation' && assetClass === 'CASH' && subAssetType !== 'MONEY_ETF';
+    // Note: isCashAccount is already declared above in validation section
     const valueNum = isCashAccount && priceNum === 0 ? sharesNum : sharesNum * priceNum;
 
     // Convert to EUR if needed
