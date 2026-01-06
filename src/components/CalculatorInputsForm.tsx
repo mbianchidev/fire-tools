@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CalculatorInputs } from '../types/calculator';
 import { NumberInput } from './NumberInput';
+import { SliderInput } from './SliderInput';
 import { calculateYearsOfExpenses } from '../utils/fireCalculator';
 import { 
   calculateAnnualExpensesFromTracker, 
@@ -440,26 +441,35 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         {openSections.expectedReturns && (<div id="expected-returns-content" className="form-section-content">
         <div className="form-group">
           <label htmlFor="stock-return">Expected Stock Return (%)</label>
-          <NumberInput
+          <SliderInput
             id="stock-return"
             value={inputs.expectedStockReturn}
             onChange={(value) => handleChange('expectedStockReturn', value)}
+            min={-10}
+            max={20}
+            step={0.5}
           />
         </div>
         <div className="form-group">
           <label htmlFor="bond-return">Expected Bond Return (%)</label>
-          <NumberInput
+          <SliderInput
             id="bond-return"
             value={inputs.expectedBondReturn}
             onChange={(value) => handleChange('expectedBondReturn', value)}
+            min={-5}
+            max={15}
+            step={0.5}
           />
         </div>
         <div className="form-group">
           <label htmlFor="cash-return">Cash / Inflation Rate (%)</label>
-          <NumberInput
+          <SliderInput
             id="cash-return"
             value={inputs.expectedCashReturn}
             onChange={(value) => handleChange('expectedCashReturn', value)}
+            min={-10}
+            max={5}
+            step={0.5}
           />
         </div>
         </div>)}
