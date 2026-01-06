@@ -1205,42 +1205,10 @@
   font-size: 1.1rem;
 }
 
-.portfolio-value-display {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
 .portfolio-value {
   font-size: 1.5rem;
   font-weight: bold;
   color: #5568d4;
-}
-
-.portfolio-value-edit {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.portfolio-value-input {
-  width: 150px;
-  padding: 0.5rem;
-  border: 2px solid #5568d4;
-  border-radius: 4px;
-  font-size: 1.1rem;
-  text-align: right;
-}
-
-.portfolio-value-input:focus {
-  outline: none;
-  border-color: #764ba2;
-}
-
-.currency-symbol {
-  color: #666;
-  font-size: 1rem;
 }
 
 .portfolio-value-info {
@@ -1522,18 +1490,6 @@
   justify-content: flex-end;
 }
 
-/* DCA Button styling - more prominent color */
-.dca-btn {
-  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-  color: white;
-  font-weight: 600;
-}
-
-.dca-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
-}
-
 /* DCA Investment Confirmation Styles */
 .actual-shares-cell {
   text-align: center;
@@ -1675,14 +1631,6 @@
   margin-top: 1rem !important;
 }
 
-/* Apply to Portfolio button in confirmation summary */
-.apply-to-portfolio-btn {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  width: 100%;
-}
-
 /* Update dca-actions for multiple buttons */
 .dca-actions {
   display: flex;
@@ -1711,12 +1659,6 @@
   .page-header p {
     font-size: 0.9rem;
     line-height: 1.5;
-  }
-
-  .portfolio-summary {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
   }
 
   .manager-actions {
@@ -1904,43 +1846,6 @@ select:disabled {
   min-width: 70px;
   padding: 0.4rem 2rem 0.4rem 0.6rem;
   font-size: 0.9rem;
-}
-
-/* Currency conversion note */
-.currency-conversion-note {
-  background: #e3f2fd;
-  border: 1px solid #90caf9;
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
-  font-size: 0.9rem;
-  color: #1565c0;
-  margin-top: -0.5rem;
-}
-
-.currency-conversion-note small {
-  color: #1976d2;
-  font-weight: 500;
-}
-
-/* Shares info note - similar to currency conversion note */
-.shares-info-note {
-  background: #f3e5f5;
-  border: 1px solid #ce93d8;
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
-  font-size: 0.9rem;
-  color: #6a1b9a;
-  margin-top: -0.5rem;
-  font-weight: 500;
-}
-
-/* Currency indicator in tables */
-.currency-indicator {
-  font-size: 0.75rem;
-  color: #666;
-  font-style: italic;
-  display: block;
-  margin-top: 2px;
 }
 
 /* Override for Firefox */

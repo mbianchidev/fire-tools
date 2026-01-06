@@ -11,7 +11,11 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { MonthlyVariation, NetWorthForecast } from '../types/netWorthTracker';
-import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
+import { SupportedCurrency, SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES } from '../types/currency';
+import { 
+  convertMonthlyVariationsToDisplayCurrency, 
+  convertNetWorthForecastToDisplayCurrency,
+} from '../utils/currencyConverter';
 
 export type ChartViewMode = 'ytd' | 'all';
 
@@ -44,6 +48,17 @@ function getCurrencySymbol(currency: SupportedCurrency): string {
   return currencyInfo?.symbol || currency;
 }
 
+// Colors for additional currency lines
+const ADDITIONAL_CURRENCY_COLORS: Record<SupportedCurrency, string> = {
+  EUR: '#4CAF50',
+  USD: '#2196F3',
+  GBP: '#9C27B0',
+  CHF: '#FF5722',
+  JPY: '#E91E63',
+  AUD: '#00BCD4',
+  CAD: '#795548',
+};
+
 export function HistoricalNetWorthChart({
   variations,
   forecast,
@@ -53,25 +68,120 @@ export function HistoricalNetWorthChart({
   onViewModeChange,
 }: HistoricalNetWorthChartProps) {
   const [showForecast, setShowForecast] = useState(true);
+  const [additionalCurrencies, setAdditionalCurrencies] = useState<SupportedCurrency[]>([]);
 
-  // Combine actual and forecast data
-  const chartData = useMemo(() => {
-    const actual = variations.map(v => ({
-      month: v.month,
-      netWorth: v.netWorth,
-      type: 'actual' as const,
-    }));
+  // Toggle additional currency for display
+  const toggleCurrency = (curr: SupportedCurrency) => {
+    if (curr === currency) return; // Can't toggle primary currency
+    setAdditionalCurrencies(prev => 
+      prev.includes(curr) 
+        ? prev.filter(c => c !== curr)
+        : [...prev, curr]
+    );
+  };
 
-    const forecastData = showForecast
-      ? forecast.map(f => ({
-          month: f.month,
-          netWorth: f.projectedNetWorth,
-          type: 'forecast' as const,
-        }))
-      : [];
+  // Available currencies for selection (excluding primary)
+  const availableCurrencies = useMemo(() => 
+    SUPPORTED_CURRENCIES.filter(c => c.code !== currency),
+    [currency]
+  );
 
-    return [...actual, ...forecastData];
-  }, [variations, forecast, showForecast]);
+  // Convert variations for each additional currency
+  const convertedVariationsMap = useMemo(() => {
+    const map = new Map<SupportedCurrency, MonthlyVariation[]>();
+    for (const curr of additionalCurrencies) {
+      map.set(curr, convertMonthlyVariationsToDisplayCurrency(
+        variations, 
+        currency, 
+        curr, 
+        DEFAULT_FALLBACK_RATES
+      ));
+    }
+    return map;
+  }, [variations, currency, additionalCurrencies]);
+
+  // Convert forecast for each additional currency
+  const convertedForecastMap = useMemo(() => {
+    const map = new Map<SupportedCurrency, NetWorthForecast[]>();
+    for (const curr of additionalCurrencies) {
+      map.set(curr, convertNetWorthForecastToDisplayCurrency(
+        forecast, 
+        currency, 
+        curr, 
+        DEFAULT_FALLBACK_RATES
+      ));
+    }
+    return map;
+  }, [forecast, currency, additionalCurrencies]);
+
+  // Define chart data point type
+  type ChartDataPoint = {
+    month: string;
+    type: 'actual' | 'forecast';
+    netWorth?: number;
+    forecast?: number;
+    [key: string]: string | number | undefined;
+  };
+
+  // Combine actual and forecast data with additional currencies
+  const chartData = useMemo((): ChartDataPoint[] => {
+    // Create base data structure with primary currency
+    const dataPoints: Record<string, ChartDataPoint> = {};
+    
+    // Add primary currency actual data
+    for (const v of variations) {
+      dataPoints[v.month] = {
+        month: v.month,
+        netWorth: v.netWorth,
+        type: 'actual',
+      };
+    }
+    
+    // Add primary currency forecast data
+    if (showForecast) {
+      for (const f of forecast) {
+        if (!dataPoints[f.month]) {
+          dataPoints[f.month] = { month: f.month, type: 'forecast' };
+        }
+        dataPoints[f.month].forecast = f.projectedNetWorth;
+      }
+    }
+    
+    // Add additional currency data
+    for (const curr of additionalCurrencies) {
+      const convertedVariations = convertedVariationsMap.get(curr) || [];
+      const convertedForecast = convertedForecastMap.get(curr) || [];
+      
+      // Add converted actual data
+      for (const v of convertedVariations) {
+        if (dataPoints[v.month]) {
+          dataPoints[v.month][`netWorth_${curr}`] = v.netWorth;
+        }
+      }
+      
+      // Add converted forecast data
+      if (showForecast) {
+        for (const f of convertedForecast) {
+          if (dataPoints[f.month]) {
+            dataPoints[f.month][`forecast_${curr}`] = f.projectedNetWorth;
+          }
+        }
+      }
+    }
+    
+    // Convert to array and sort by month
+    return Object.values(dataPoints).sort((a, b) => {
+      // Extract year and month from "Jan 2024" format
+      const parseMonth = (str: string) => {
+        const parts = str.split(' ');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthIdx = monthNames.indexOf(parts[0]);
+        const year = parseInt(parts[1] || '0', 10);
+        return year * 12 + monthIdx;
+      };
+      return parseMonth(a.month) - parseMonth(b.month);
+    });
+  }, [variations, forecast, showForecast, additionalCurrencies, convertedVariationsMap, convertedForecastMap]);
 
   // Separate lines for actual and forecast
   const actualData = useMemo(() => 
@@ -100,9 +210,9 @@ export function HistoricalNetWorthChart({
       return [
         ...actualData,
         ...forecastData.map(f => ({ 
-          month: f.month, 
+          ...f,
           netWorth: f.month === lastActual.month ? lastActual.netWorth : undefined, 
-          forecast: f.netWorth,
+          forecast: f.forecast,
           type: 'forecast' as const 
         })),
       ];
@@ -119,9 +229,9 @@ export function HistoricalNetWorthChart({
     return [
       ...actualWithBridge,
       ...forecastData.map(f => ({ 
-        month: f.month, 
+        ...f,
         netWorth: undefined, 
-        forecast: f.netWorth,
+        forecast: f.forecast,
         type: 'forecast' as const 
       })),
     ];
@@ -149,6 +259,51 @@ export function HistoricalNetWorthChart({
     
     return indices;
   }, [combinedData, viewMode]);
+
+  // Calculate Y-axis domain with extra padding at the top
+  const yAxisDomain = useMemo((): [number, number] => {
+    // Find the maximum value across all data points
+    let maxValue = 0;
+    
+    for (const point of combinedData) {
+      // Check primary currency values
+      if (point.netWorth !== undefined && point.netWorth > maxValue) {
+        maxValue = point.netWorth;
+      }
+      if (point.forecast !== undefined && point.forecast > maxValue) {
+        maxValue = point.forecast;
+      }
+      
+      // Check additional currency values
+      for (const curr of additionalCurrencies) {
+        const netWorthKey = `netWorth_${curr}` as keyof typeof point;
+        const forecastKey = `forecast_${curr}` as keyof typeof point;
+        const netWorthVal = point[netWorthKey];
+        const forecastVal = point[forecastKey];
+        
+        if (typeof netWorthVal === 'number' && netWorthVal > maxValue) {
+          maxValue = netWorthVal;
+        }
+        if (typeof forecastVal === 'number' && forecastVal > maxValue) {
+          maxValue = forecastVal;
+        }
+      }
+    }
+    
+    // Also check previousYearEnd reference line
+    if (previousYearEnd !== null && previousYearEnd > maxValue) {
+      maxValue = previousYearEnd;
+    }
+    
+    // Add 15% padding to the top of the chart for better visualization
+    const paddedMax = maxValue * 1.15;
+    
+    // Round up to a nice number for cleaner tick marks
+    const magnitude = Math.pow(10, Math.floor(Math.log10(paddedMax)));
+    const roundedMax = Math.ceil(paddedMax / magnitude) * magnitude;
+    
+    return [0, roundedMax];
+  }, [combinedData, additionalCurrencies, previousYearEnd]);
 
   if (variations.length === 0) {
     return (
@@ -229,6 +384,31 @@ export function HistoricalNetWorthChart({
         </label>
       </div>
 
+      {/* Additional Currencies Selector */}
+      <div className="chart-currency-selector">
+        <span className="currency-selector-label">Compare in:</span>
+        <div className="currency-buttons">
+          {availableCurrencies.map(curr => (
+            <button
+              key={curr.code}
+              className={`currency-btn ${additionalCurrencies.includes(curr.code) ? 'active' : ''}`}
+              onClick={() => toggleCurrency(curr.code)}
+              style={{
+                borderColor: additionalCurrencies.includes(curr.code) 
+                  ? ADDITIONAL_CURRENCY_COLORS[curr.code] 
+                  : undefined,
+                backgroundColor: additionalCurrencies.includes(curr.code) 
+                  ? ADDITIONAL_CURRENCY_COLORS[curr.code] 
+                  : undefined,
+              }}
+              aria-pressed={additionalCurrencies.includes(curr.code)}
+            >
+              {curr.symbol} {curr.code}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <ResponsiveContainer width="100%" height={350}>
         <LineChart data={combinedData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -244,13 +424,34 @@ export function HistoricalNetWorthChart({
             tickLine={{ stroke: '#e0e0e0' }}
             tickFormatter={(value) => `${symbol}${formatChartCurrency(value)}`}
             width={80}
+            domain={yAxisDomain}
           />
           <Tooltip
             formatter={(value, name) => {
               if (value === undefined || value === null) return ['-', name];
+              
+              // Determine which currency this value belongs to
+              const nameStr = String(name);
+              let currencySymbol = symbol;
+              let displayName = 'Net Worth';
+              
+              if (nameStr === 'netWorth') {
+                displayName = `Net Worth (${currency})`;
+              } else if (nameStr === 'forecast') {
+                displayName = `Forecast (${currency})`;
+              } else if (nameStr.startsWith('netWorth_')) {
+                const curr = nameStr.replace('netWorth_', '') as SupportedCurrency;
+                currencySymbol = getCurrencySymbol(curr);
+                displayName = `Net Worth (${curr})`;
+              } else if (nameStr.startsWith('forecast_')) {
+                const curr = nameStr.replace('forecast_', '') as SupportedCurrency;
+                currencySymbol = getCurrencySymbol(curr);
+                displayName = `Forecast (${curr})`;
+              }
+              
               return [
-                `${symbol}${Number(value).toLocaleString()}`,
-                name === 'netWorth' ? 'Net Worth' : 'Forecast',
+                `${currencySymbol}${Number(value).toLocaleString()}`,
+                displayName,
               ];
             }}
             labelStyle={{ color: '#333', fontWeight: 'bold' }}
@@ -263,11 +464,20 @@ export function HistoricalNetWorthChart({
           />
           <Legend
             wrapperStyle={{ paddingTop: '20px' }}
-            formatter={(value) => (
-              <span style={{ color: '#666', fontSize: '12px' }}>
-                {value === 'netWorth' ? 'Actual Net Worth' : 'Forecast'}
-              </span>
-            )}
+            formatter={(value) => {
+              const valueStr = String(value);
+              if (valueStr === 'netWorth') return <span style={{ color: '#666', fontSize: '12px' }}>{`Net Worth (${currency})`}</span>;
+              if (valueStr === 'forecast') return <span style={{ color: '#666', fontSize: '12px' }}>{`Forecast (${currency})`}</span>;
+              if (valueStr.startsWith('netWorth_')) {
+                const curr = valueStr.replace('netWorth_', '');
+                return <span style={{ color: '#666', fontSize: '12px' }}>{`Net Worth (${curr})`}</span>;
+              }
+              if (valueStr.startsWith('forecast_')) {
+                const curr = valueStr.replace('forecast_', '');
+                return <span style={{ color: '#666', fontSize: '12px' }}>{`Forecast (${curr})`}</span>;
+              }
+              return <span style={{ color: '#666', fontSize: '12px' }}>{value}</span>;
+            }}
           />
           
           {/* Previous year end reference line */}
@@ -285,7 +495,7 @@ export function HistoricalNetWorthChart({
             />
           )}
 
-          {/* Actual net worth line */}
+          {/* Actual net worth line (primary currency) */}
           <Line
             type="monotone"
             dataKey="netWorth"
@@ -297,7 +507,7 @@ export function HistoricalNetWorthChart({
             connectNulls={false}
           />
 
-          {/* Forecast line */}
+          {/* Forecast line (primary currency) */}
           {showForecast && forecastData.length > 0 && (
             <Line
               type="monotone"
@@ -311,6 +521,37 @@ export function HistoricalNetWorthChart({
               connectNulls={true}
             />
           )}
+
+          {/* Additional currency lines */}
+          {additionalCurrencies.map(curr => (
+            <Line
+              key={`netWorth_${curr}`}
+              type="monotone"
+              dataKey={`netWorth_${curr}`}
+              stroke={ADDITIONAL_CURRENCY_COLORS[curr]}
+              strokeWidth={2}
+              dot={{ fill: ADDITIONAL_CURRENCY_COLORS[curr], strokeWidth: 2, r: 3 }}
+              activeDot={{ r: 5, fill: ADDITIONAL_CURRENCY_COLORS[curr] }}
+              name={`netWorth_${curr}`}
+              connectNulls={false}
+            />
+          ))}
+
+          {/* Additional currency forecast lines */}
+          {showForecast && additionalCurrencies.map(curr => (
+            <Line
+              key={`forecast_${curr}`}
+              type="monotone"
+              dataKey={`forecast_${curr}`}
+              stroke={ADDITIONAL_CURRENCY_COLORS[curr]}
+              strokeWidth={1}
+              strokeDasharray="5 5"
+              strokeOpacity={0.6}
+              dot={false}
+              name={`forecast_${curr}`}
+              connectNulls={true}
+            />
+          ))}
         </LineChart>
       </ResponsiveContainer>
 

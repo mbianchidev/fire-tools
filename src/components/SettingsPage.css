@@ -238,6 +238,13 @@
   flex-wrap: wrap;
 }
 
+.export-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
 .primary-btn {
   background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
   color: white;

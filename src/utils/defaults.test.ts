@@ -1,5 +1,68 @@
 import { describe, expect, it } from 'vitest';
-import { getDemoNetWorthData, generateDemoNetWorthDataForYear } from './defaults';
+import { DEFAULT_INPUTS, getDemoNetWorthData, generateDemoNetWorthDataForYear, getDemoAssetAllocationData, getDemoCashflowData } from './defaults';
+
+describe('DEFAULT_INPUTS', () => {
+  it('should have initialSavings consistent with Asset Allocation demo (~€70k)', () => {
+    // The FIRE Calculator initial savings should match the Asset Allocation portfolio value
+    expect(DEFAULT_INPUTS.initialSavings).toBe(70000);
+  });
+
+  it('should have consistent income and expenses for ~33% savings rate', () => {
+    // Income: €60,000, Expenses: €40,000, Savings: €20,000 (33.33%)
+    expect(DEFAULT_INPUTS.annualLaborIncome).toBe(60000);
+    expect(DEFAULT_INPUTS.currentAnnualExpenses).toBe(40000);
+    const expectedSavingsRate = ((60000 - 40000) / 60000) * 100;
+    expect(DEFAULT_INPUTS.savingsRate).toBeCloseTo(expectedSavingsRate, 2);
+  });
+});
+
+describe('getDemoAssetAllocationData', () => {
+  it('should have total portfolio value of ~€70,000', () => {
+    const { assets } = getDemoAssetAllocationData();
+    const totalValue = assets.reduce((sum, asset) => sum + asset.currentValue, 0);
+    // Should be approximately €70,000 (€35k stocks + €30k bonds + €5k cash)
+    expect(totalValue).toBeGreaterThan(69000);
+    expect(totalValue).toBeLessThan(71000);
+  });
+
+  it('should have stocks worth ~€35,000', () => {
+    const { assets } = getDemoAssetAllocationData();
+    const stocksValue = assets
+      .filter(a => a.assetClass === 'STOCKS')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    expect(stocksValue).toBeGreaterThan(34000);
+    expect(stocksValue).toBeLessThan(36000);
+  });
+
+  it('should have bonds worth ~€30,000', () => {
+    const { assets } = getDemoAssetAllocationData();
+    const bondsValue = assets
+      .filter(a => a.assetClass === 'BONDS')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    expect(bondsValue).toBeGreaterThan(29000);
+    expect(bondsValue).toBeLessThan(31000);
+  });
+
+  it('should have cash worth ~€5,000', () => {
+    const { assets } = getDemoAssetAllocationData();
+    const cashValue = assets
+      .filter(a => a.assetClass === 'CASH')
+      .reduce((sum, a) => sum + a.currentValue, 0);
+    expect(cashValue).toBe(5000);
+  });
+});
+
+describe('getDemoCashflowData', () => {
+  it('should have monthly income of €5,000 (annual €60,000)', () => {
+    const data = getDemoCashflowData();
+    const currentYearData = data.years.find(y => y.year === data.currentYear);
+    if (currentYearData && currentYearData.months.length > 0) {
+      const monthIncome = currentYearData.months[0].incomes.reduce((sum, i) => sum + i.amount, 0);
+      // Monthly income should be around €5,000 (some months may have freelance bonuses)
+      expect(monthIncome).toBeGreaterThanOrEqual(5000);
+    }
+  });
+});
 
 describe('getDemoNetWorthData', () => {
   it('should generate net worth data for the current year', () => {

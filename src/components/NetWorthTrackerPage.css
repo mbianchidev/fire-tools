@@ -322,6 +322,30 @@
   font-size: 0.85rem;
 }
 
+/* Currency selector for additional currencies in chart */
+.chart-currency-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.currency-selector-label {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.currency-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .chart-currency-toggle {
   display: flex;
   gap: 0.5rem;
@@ -339,125 +363,12 @@
 
 .currency-btn:hover {
   border-color: #667eea;
+  transform: translateY(-1px);
 }
 
 .currency-btn.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-color: transparent;
-}
-
-/* Monthly Breakdown Table */
-.monthly-breakdown-section {
-  margin-top: 2rem;
-}
-
-.monthly-breakdown-section h3 {
-  font-size: 1.3rem;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.monthly-table-container {
-  overflow-x: auto;
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 1rem;
-}
-
-.monthly-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  min-width: 800px;
-}
-
-.monthly-table th,
-.monthly-table td {
-  padding: 0.6rem 0.8rem;
-  text-align: right;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.monthly-table th:first-child,
-.monthly-table td:first-child {
-  text-align: left;
-  position: sticky;
-  left: 0;
-  background: inherit;
-  z-index: 1;
-}
-
-.monthly-table th {
-  background: white;
-  font-weight: 600;
-  color: #555;
-}
-
-.monthly-table .row-label {
-  font-weight: 500;
-  color: #333;
-}
-
-.monthly-table .section-header {
-  background: #e8e8e8;
-  font-weight: 600;
-  color: #333;
-}
-
-.monthly-table .ytd-col {
-  background: rgba(102, 126, 234, 0.1);
-  font-weight: 600;
-}
-
-.monthly-table .avg-col {
-  background: rgba(76, 175, 80, 0.1);
-}
-
-.monthly-table .forecast-col {
-  background: rgba(255, 152, 0, 0.1);
-  font-style: italic;
-}
-
-.monthly-table .prev-year-col {
-  background: rgba(156, 39, 176, 0.1);
-}
-
-.monthly-table .positive {
-  color: #4CAF50;
-}
-
-.monthly-table .negative {
-  color: #f44336;
-}
-
-/* Tooltips for notes */
-.note-indicator {
-  position: relative;
-  cursor: help;
-  margin-left: 0.25rem;
-}
-
-.note-indicator::after {
-  content: attr(data-note);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 0.5rem;
-  background: #333;
-  color: white;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-  z-index: 100;
-}
-
-.note-indicator:hover::after {
-  opacity: 1;
 }
 
 /* FIRE Progress Section */
@@ -592,10 +503,6 @@
 
   .card-value {
     font-size: 1.25rem;
-  }
-
-  .monthly-table {
-    font-size: 0.75rem;
   }
 }
 

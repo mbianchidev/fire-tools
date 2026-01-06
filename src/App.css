@@ -487,12 +487,6 @@ body {
   font-size: 1.3rem;
 }
 
-.separator {
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #5568d4, transparent);
-  margin: 3rem 0;
-}
-
 .monte-carlo-section {
   margin-top: 2rem;
 }

@@ -10,7 +10,7 @@ import {
   SUPPORTED_CURRENCIES,
 } from '../types/currency';
 import { Asset } from '../types/assetAllocation';
-import { NetWorthTrackerData, AssetHolding, CashEntry, PensionEntry, FinancialOperation } from '../types/netWorthTracker';
+import { NetWorthTrackerData, AssetHolding, CashEntry, PensionEntry, FinancialOperation, MonthlyVariation, NetWorthForecast } from '../types/netWorthTracker';
 import { ExpenseTrackerData, IncomeEntry, ExpenseEntry } from '../types/expenseTracker';
 import { CalculatorInputs } from '../types/calculator';
 
@@ -475,4 +475,59 @@ export function convertFireCalculatorInputsToNewCurrency(
     privatePensionIncome: convertAmount(inputs.privatePensionIncome, fromCurrency, toCurrency, rates),
     otherIncome: convertAmount(inputs.otherIncome, fromCurrency, toCurrency, rates),
   };
+}
+
+/**
+ * Convert MonthlyVariation data to a different display currency for chart visualization
+ * @param variations - Array of monthly variations to convert
+ * @param fromCurrency - The source currency of the data
+ * @param toCurrency - The target display currency
+ * @param rates - Exchange rates to use for conversion
+ * @returns Array of MonthlyVariation with converted monetary values
+ */
+export function convertMonthlyVariationsToDisplayCurrency(
+  variations: MonthlyVariation[],
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates = DEFAULT_FALLBACK_RATES
+): MonthlyVariation[] {
+  if (fromCurrency === toCurrency) {
+    return variations;
+  }
+
+  return variations.map(variation => ({
+    month: variation.month,
+    netWorth: convertAmount(variation.netWorth, fromCurrency, toCurrency, rates),
+    changeFromPrevMonth: convertAmount(variation.changeFromPrevMonth, fromCurrency, toCurrency, rates),
+    changePercent: variation.changePercent, // Percentage values stay the same
+    assetValueChange: convertAmount(variation.assetValueChange, fromCurrency, toCurrency, rates),
+    cashChange: convertAmount(variation.cashChange, fromCurrency, toCurrency, rates),
+    pensionChange: convertAmount(variation.pensionChange, fromCurrency, toCurrency, rates),
+  }));
+}
+
+/**
+ * Convert NetWorthForecast data to a different display currency for chart visualization
+ * @param forecast - Array of net worth forecasts to convert
+ * @param fromCurrency - The source currency of the data
+ * @param toCurrency - The target display currency
+ * @param rates - Exchange rates to use for conversion
+ * @returns Array of NetWorthForecast with converted monetary values
+ */
+export function convertNetWorthForecastToDisplayCurrency(
+  forecast: NetWorthForecast[],
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency,
+  rates: ExchangeRates = DEFAULT_FALLBACK_RATES
+): NetWorthForecast[] {
+  if (fromCurrency === toCurrency) {
+    return forecast;
+  }
+
+  return forecast.map(f => ({
+    month: f.month,
+    projectedNetWorth: convertAmount(f.projectedNetWorth, fromCurrency, toCurrency, rates),
+    confidenceLevel: f.confidenceLevel,
+    basedOnMonths: f.basedOnMonths,
+  }));
 }

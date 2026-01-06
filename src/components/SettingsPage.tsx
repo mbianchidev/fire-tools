@@ -9,6 +9,7 @@ import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from 
 import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
 import { clearTourPreference } from '../utils/tourPreferences';
+import { exportAllDataAsJSON, importAllDataFromJSON, serializeAllDataExport } from '../utils/dataExportImport';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -124,7 +125,33 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     showMessage('success', 'Fallback rates reset to defaults!');
   };
 
-  // Export all data
+  // Export all data as a single JSON file
+  const handleExportAllJSON = () => {
+    try {
+      const fireInputs = loadFireCalculatorInputs();
+      const { assets, assetClassTargets } = loadAssetAllocation();
+      const expenseData = loadExpenseTrackerData();
+      const netWorthData = loadNetWorthTrackerData();
+      
+      const exportData = exportAllDataAsJSON(
+        fireInputs,
+        assets,
+        assetClassTargets,
+        expenseData,
+        netWorthData,
+        settings.currencySettings.defaultCurrency
+      );
+      
+      const jsonString = serializeAllDataExport(exportData);
+      downloadFile(jsonString, `fire-tools-all-data-${getDateString()}.json`, 'application/json');
+      
+      showMessage('success', 'All data exported as JSON successfully!');
+    } catch (error) {
+      showMessage('error', `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  // Export all data as separate CSV/JSON files (legacy behavior)
   const handleExportAll = () => {
     try {
       // Export FIRE Calculator data
@@ -153,10 +180,48 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
         downloadFile(netWorthJSON, `net-worth-tracker-data-${getDateString()}.json`, 'application/json');
       }
 
-      showMessage('success', 'Data exported successfully!');
+      showMessage('success', 'Data exported as separate files successfully!');
     } catch (error) {
       showMessage('error', `Export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  };
+
+  // Import all data from a JSON file
+  const handleImportAllJSON = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = e.target?.result as string;
+        const imported = importAllDataFromJSON(
+          json,
+          settings.currencySettings.defaultCurrency,
+          settings.currencySettings.fallbackRates
+        );
+        
+        // Save all imported data
+        if (imported.fireCalculator) {
+          saveFireCalculatorInputs(imported.fireCalculator);
+        }
+        if (imported.assetAllocation.assets && imported.assetAllocation.assetClassTargets) {
+          saveAssetAllocation(imported.assetAllocation.assets, imported.assetAllocation.assetClassTargets);
+        }
+        if (imported.expenseTracker) {
+          saveExpenseTrackerData(imported.expenseTracker);
+        }
+        if (imported.netWorthTracker) {
+          saveNetWorthTrackerData(imported.netWorthTracker);
+        }
+        
+        showMessage('success', 'All data imported successfully! Refresh pages to see changes.');
+      } catch (error) {
+        showMessage('error', `Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
   };
 
   // Helper to download file
@@ -500,30 +565,44 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           <h2>💾 Data Management</h2>
           
           <div className="data-management-group">
-            <h3>Export Data</h3>
-            <p className="setting-help">Download your data as CSV/JSON files</p>
-            <button className="primary-btn" onClick={handleExportAll}>
-              📥 Export All Data
-            </button>
+            <h3>Export All Data</h3>
+            <p className="setting-help">Export all your data in a single file or as separate files</p>
+            <div className="export-buttons">
+              <button className="primary-btn" onClick={handleExportAllJSON}>
+                📥 Export as JSON (Single File)
+              </button>
+              <button className="secondary-btn" onClick={handleExportAll}>
+                📥 Export as Separate Files
+              </button>
+            </div>
           </div>
 
           <div className="data-management-group">
-            <h3>Import Data</h3>
-            <p className="setting-help">Import data from CSV/JSON files. Make sure the files are in the correct format.</p>
+            <h3>Import All Data</h3>
+            <p className="setting-help">Import all data from a single JSON file. Data will be converted to your current currency.</p>
+            <label className="primary-btn import-label">
+              📤 Import All Data (JSON)
+              <input type="file" accept=".json" onChange={handleImportAllJSON} hidden />
+            </label>
+          </div>
+
+          <div className="data-management-group">
+            <h3>Import Individual Files</h3>
+            <p className="setting-help">Import data from individual CSV/JSON files for each tool.</p>
             <div className="import-buttons">
-              <label className="primary-btn import-label">
+              <label className="secondary-btn import-label">
                 📤 Import FIRE Calculator
                 <input type="file" accept=".csv" onChange={handleImportFire} hidden />
               </label>
-              <label className="primary-btn import-label">
+              <label className="secondary-btn import-label">
                 📤 Import Asset Allocation
                 <input type="file" accept=".csv" onChange={handleImportAssets} hidden />
               </label>
-              <label className="primary-btn import-label">
+              <label className="secondary-btn import-label">
                 📤 Import Cashflow Tracker
                 <input type="file" accept=".csv" onChange={handleImportCashflow} hidden />
               </label>
-              <label className="primary-btn import-label">
+              <label className="secondary-btn import-label">
                 📤 Import Net Worth Tracker
                 <input type="file" accept=".json" onChange={handleImportNetWorth} hidden />
               </label>

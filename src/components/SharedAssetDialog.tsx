@@ -422,11 +422,6 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                 step={(assetClass === 'CASH' && subAssetType !== 'MONEY_ETF' && mode === 'assetAllocation') ? 'any' : undefined}
                 required
               />
-              {parseFloat(currentValue) > 0 && (assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && (
-                <small className="shares-info-note">
-                  💡 {shares} × {pricePerShare} = {currentValue}
-                </small>
-              )}
             </div>
 
             <div className="form-group">
