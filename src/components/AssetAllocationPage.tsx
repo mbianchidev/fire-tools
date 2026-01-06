@@ -218,7 +218,54 @@ export const AssetAllocationPage: React.FC = () => {
       }
     };
     
-    // If updating a percentage-based asset class, redistribute other percentage-based classes
+    // Check if we're changing TO or FROM SET mode - requires redistribution
+    const oldMode = assetClassTargets[assetClass]?.targetMode;
+    const newMode = updatedTargets[assetClass].targetMode;
+    const modeChanged = oldMode !== newMode;
+    
+    // If changing an asset class to SET mode, redistribute its percentage to other PERCENTAGE classes
+    if (modeChanged && newMode === 'SET' && oldMode === 'PERCENTAGE') {
+      const oldPercent = assetClassTargets[assetClass]?.targetPercent || 0;
+      
+      // Get all other percentage-based asset classes
+      const otherPercentageClasses = Object.keys(updatedTargets).filter(
+        (key) => key !== assetClass && updatedTargets[key as AssetClass].targetMode === 'PERCENTAGE'
+      ) as AssetClass[];
+      
+      if (otherPercentageClasses.length > 0 && oldPercent > 0) {
+        // Get total of other classes' current percentages
+        const otherClassesTotal = otherPercentageClasses.reduce(
+          (sum, cls) => sum + (updatedTargets[cls].targetPercent || 0),
+          0
+        );
+        
+        if (otherClassesTotal === 0) {
+          // Distribute the freed percentage equally
+          const equalPercent = oldPercent / otherPercentageClasses.length;
+          otherPercentageClasses.forEach((cls) => {
+            updatedTargets[cls] = {
+              ...updatedTargets[cls],
+              targetPercent: (updatedTargets[cls].targetPercent || 0) + equalPercent,
+            };
+          });
+        } else {
+          // Distribute the freed percentage proportionally
+          otherPercentageClasses.forEach((cls) => {
+            const proportion = (updatedTargets[cls].targetPercent || 0) / otherClassesTotal;
+            const additionalPercent = proportion * oldPercent;
+            updatedTargets[cls] = {
+              ...updatedTargets[cls],
+              targetPercent: (updatedTargets[cls].targetPercent || 0) + additionalPercent,
+            };
+          });
+        }
+      }
+      
+      // Clear the targetPercent for the SET class
+      updatedTargets[assetClass].targetPercent = undefined;
+    }
+    
+    // If updating a percentage-based asset class percentage value, redistribute other percentage-based classes
     if (updates.targetMode === 'PERCENTAGE' || (!updates.targetMode && assetClassTargets[assetClass]?.targetMode === 'PERCENTAGE')) {
       if (updates.targetPercent !== undefined) {
         // Get all percentage-based asset classes except the one being edited
@@ -372,8 +419,34 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleResetData = () => {
-    if (confirm('Are you sure you want to reset all Asset Allocation data? This will clear all saved assets.')) {
+    // Check if sync is enabled and warn accordingly
+    const netWorthData = loadNetWorthTrackerData();
+    const syncEnabled = netWorthData?.settings.syncWithAssetAllocation || false;
+    
+    const warningMessage = syncEnabled
+      ? 'Are you sure you want to reset all Asset Allocation data?\n\n⚠️ WARNING: With sync enabled, this will also clear the Net Worth Tracker data for the current month (assets and cash).\n\nHistorical Net Worth data will NOT be affected.'
+      : 'Are you sure you want to reset all Asset Allocation data? This will clear all saved assets.';
+    
+    if (confirm(warningMessage)) {
       clearAssetAllocation();
+      
+      // If sync is enabled, also clear current month in Net Worth
+      if (syncEnabled && netWorthData) {
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth(); // 0-indexed
+        
+        // Find current year data
+        const yearData = netWorthData.years.find(y => y.year === currentYear);
+        if (yearData && yearData.months[currentMonth]) {
+          // Clear assets and cash for current month only
+          yearData.months[currentMonth].assets = [];
+          yearData.months[currentMonth].cash = [];
+          
+          // Save updated Net Worth data
+          saveNetWorthTrackerData(netWorthData);
+        }
+      }
+      
       setAssets([]);
       setAssetClassTargets(defaultTargets);
       updateAllocation([], defaultTargets);
