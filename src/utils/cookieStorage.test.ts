@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import {
   saveAssetAllocation,
   loadAssetAllocation,
@@ -389,10 +389,15 @@ describe('Cookie Storage utilities', () => {
     });
 
     it('should handle corrupted expense tracker data gracefully', () => {
+      // Suppress console.log for migration message during this test
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      
       document.cookie = 'fire-tools-expense-tracker=invalid-encrypted-data';
       const loaded = loadExpenseTrackerData();
 
       expect(loaded).toBeNull();
+      
+      consoleSpy.mockRestore();
     });
 
     it('should encrypt expense tracker data in cookies', () => {
