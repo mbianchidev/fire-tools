@@ -8,6 +8,7 @@ import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs
 import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from '../utils/defaults';
 import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
+import { clearTourPreference } from '../utils/tourPreferences';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -527,6 +528,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 <input type="file" accept=".json" onChange={handleImportNetWorth} hidden />
               </label>
             </div>
+          </div>
+
+          <div className="data-management-group">
+            <h3>🎓 Guided Tour</h3>
+            <p className="setting-help">Restart the guided tour to learn about Fire Tools features</p>
+            <button className="secondary-btn" onClick={() => {
+              clearTourPreference();
+              showMessage('success', 'Tour reset! Refresh the page to start the guided tour.');
+            }}>
+              🔄 Restart Tour
+            </button>
           </div>
 
           <div className="data-management-group">
