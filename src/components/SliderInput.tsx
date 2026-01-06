@@ -9,6 +9,7 @@ interface SliderInputProps {
   id?: string;
   showValue?: boolean;
   formatValue?: (value: number) => string;
+  unit?: string;
   className?: string;
   disabled?: boolean;
 }
@@ -26,6 +27,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
   id,
   showValue = true,
   formatValue = (v) => `${v}%`,
+  unit = '%',
   className = '',
   disabled = false,
 }) => {
@@ -114,7 +116,7 @@ export const SliderInput: React.FC<SliderInputProps> = ({
               disabled={disabled}
               aria-label={`Value input for ${id || 'slider'}`}
             />
-            <span className="slider-value-unit">%</span>
+            <span className="slider-value-unit">{unit}</span>
           </div>
         )}
       </div>

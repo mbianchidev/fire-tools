@@ -1380,7 +1380,7 @@ body {
   .slider-text-input {
     width: 60px;
     min-height: 44px;
-    font-size: max(16px, 0.9rem);
+    font-size: 1rem;
   }
 
   .slider-input {
