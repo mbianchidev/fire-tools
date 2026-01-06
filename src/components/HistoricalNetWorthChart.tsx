@@ -260,6 +260,51 @@ export function HistoricalNetWorthChart({
     return indices;
   }, [combinedData, viewMode]);
 
+  // Calculate Y-axis domain with extra padding at the top
+  const yAxisDomain = useMemo((): [number, number] => {
+    // Find the maximum value across all data points
+    let maxValue = 0;
+    
+    for (const point of combinedData) {
+      // Check primary currency values
+      if (point.netWorth !== undefined && point.netWorth > maxValue) {
+        maxValue = point.netWorth;
+      }
+      if (point.forecast !== undefined && point.forecast > maxValue) {
+        maxValue = point.forecast;
+      }
+      
+      // Check additional currency values
+      for (const curr of additionalCurrencies) {
+        const netWorthKey = `netWorth_${curr}` as keyof typeof point;
+        const forecastKey = `forecast_${curr}` as keyof typeof point;
+        const netWorthVal = point[netWorthKey];
+        const forecastVal = point[forecastKey];
+        
+        if (typeof netWorthVal === 'number' && netWorthVal > maxValue) {
+          maxValue = netWorthVal;
+        }
+        if (typeof forecastVal === 'number' && forecastVal > maxValue) {
+          maxValue = forecastVal;
+        }
+      }
+    }
+    
+    // Also check previousYearEnd reference line
+    if (previousYearEnd !== null && previousYearEnd > maxValue) {
+      maxValue = previousYearEnd;
+    }
+    
+    // Add 15% padding to the top of the chart for better visualization
+    const paddedMax = maxValue * 1.15;
+    
+    // Round up to a nice number for cleaner tick marks
+    const magnitude = Math.pow(10, Math.floor(Math.log10(paddedMax)));
+    const roundedMax = Math.ceil(paddedMax / magnitude) * magnitude;
+    
+    return [0, roundedMax];
+  }, [combinedData, additionalCurrencies, previousYearEnd]);
+
   if (variations.length === 0) {
     return (
       <div className="chart-container">
@@ -379,6 +424,7 @@ export function HistoricalNetWorthChart({
             tickLine={{ stroke: '#e0e0e0' }}
             tickFormatter={(value) => `${symbol}${formatChartCurrency(value)}`}
             width={80}
+            domain={yAxisDomain}
           />
           <Tooltip
             formatter={(value, name) => {
