@@ -11,10 +11,12 @@ import {
   convertNetWorthDataToNewCurrency,
   convertExpenseDataToNewCurrency,
   convertFireCalculatorInputsToNewCurrency,
+  convertMonthlyVariationsToDisplayCurrency,
+  convertNetWorthForecastToDisplayCurrency,
 } from './currencyConverter';
 import { DEFAULT_FALLBACK_RATES } from '../types/currency';
 import { Asset } from '../types/assetAllocation';
-import { NetWorthTrackerData } from '../types/netWorthTracker';
+import { NetWorthTrackerData, MonthlyVariation, NetWorthForecast } from '../types/netWorthTracker';
 import { ExpenseTrackerData } from '../types/expenseTracker';
 
 describe('Currency Converter', () => {
@@ -700,6 +702,181 @@ describe('Currency Converter', () => {
       expect(backToEUR.statePensionIncome).toBeCloseTo(12000, 0);
       expect(backToEUR.privatePensionIncome).toBeCloseTo(6000, 0);
       expect(backToEUR.otherIncome).toBeCloseTo(2000, 0);
+    });
+  });
+
+  describe('convertMonthlyVariationsToDisplayCurrency', () => {
+    const createMockVariations = (): MonthlyVariation[] => [
+      {
+        month: 'Jan 2024',
+        netWorth: 100000,
+        changeFromPrevMonth: 0,
+        changePercent: 0,
+        assetValueChange: 0,
+        cashChange: 0,
+        pensionChange: 0,
+      },
+      {
+        month: 'Feb 2024',
+        netWorth: 105000,
+        changeFromPrevMonth: 5000,
+        changePercent: 5,
+        assetValueChange: 3000,
+        cashChange: 1500,
+        pensionChange: 500,
+      },
+    ];
+
+    it('should return same values when converting to the same currency', () => {
+      const variations = createMockVariations();
+      const converted = convertMonthlyVariationsToDisplayCurrency(
+        variations,
+        'EUR',
+        'EUR',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      expect(converted[0].netWorth).toBe(100000);
+      expect(converted[1].netWorth).toBe(105000);
+      expect(converted[1].changeFromPrevMonth).toBe(5000);
+    });
+
+    it('should convert net worth values from EUR to USD', () => {
+      const variations = createMockVariations();
+      // EUR to USD rate: 1 EUR = 1/0.85 USD ≈ 1.1765 USD
+      const converted = convertMonthlyVariationsToDisplayCurrency(
+        variations,
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      const expectedRate = 1 / 0.85;
+      expect(converted[0].netWorth).toBeCloseTo(100000 * expectedRate, 0);
+      expect(converted[1].netWorth).toBeCloseTo(105000 * expectedRate, 0);
+      expect(converted[1].changeFromPrevMonth).toBeCloseTo(5000 * expectedRate, 0);
+    });
+
+    it('should preserve percentage values without conversion', () => {
+      const variations = createMockVariations();
+      const converted = convertMonthlyVariationsToDisplayCurrency(
+        variations,
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      // Percentage values should not be converted
+      expect(converted[1].changePercent).toBe(5);
+    });
+
+    it('should convert all monetary fields', () => {
+      const variations = createMockVariations();
+      const converted = convertMonthlyVariationsToDisplayCurrency(
+        variations,
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      const expectedRate = 1 / 0.85;
+      expect(converted[1].assetValueChange).toBeCloseTo(3000 * expectedRate, 0);
+      expect(converted[1].cashChange).toBeCloseTo(1500 * expectedRate, 0);
+      expect(converted[1].pensionChange).toBeCloseTo(500 * expectedRate, 0);
+    });
+
+    it('should handle empty variations array', () => {
+      const converted = convertMonthlyVariationsToDisplayCurrency(
+        [],
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      expect(converted).toEqual([]);
+    });
+
+    it('should preserve month labels', () => {
+      const variations = createMockVariations();
+      const converted = convertMonthlyVariationsToDisplayCurrency(
+        variations,
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      expect(converted[0].month).toBe('Jan 2024');
+      expect(converted[1].month).toBe('Feb 2024');
+    });
+  });
+
+  describe('convertNetWorthForecastToDisplayCurrency', () => {
+    const createMockForecast = (): NetWorthForecast[] => [
+      {
+        month: 'Mar 2024',
+        projectedNetWorth: 110000,
+        confidenceLevel: 'MEDIUM',
+        basedOnMonths: 6,
+      },
+      {
+        month: 'Apr 2024',
+        projectedNetWorth: 115000,
+        confidenceLevel: 'MEDIUM',
+        basedOnMonths: 6,
+      },
+    ];
+
+    it('should return same values when converting to the same currency', () => {
+      const forecast = createMockForecast();
+      const converted = convertNetWorthForecastToDisplayCurrency(
+        forecast,
+        'EUR',
+        'EUR',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      expect(converted[0].projectedNetWorth).toBe(110000);
+      expect(converted[1].projectedNetWorth).toBe(115000);
+    });
+
+    it('should convert projected net worth values from EUR to USD', () => {
+      const forecast = createMockForecast();
+      // EUR to USD rate: 1 EUR = 1/0.85 USD ≈ 1.1765 USD
+      const converted = convertNetWorthForecastToDisplayCurrency(
+        forecast,
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      const expectedRate = 1 / 0.85;
+      expect(converted[0].projectedNetWorth).toBeCloseTo(110000 * expectedRate, 0);
+      expect(converted[1].projectedNetWorth).toBeCloseTo(115000 * expectedRate, 0);
+    });
+
+    it('should preserve non-monetary fields', () => {
+      const forecast = createMockForecast();
+      const converted = convertNetWorthForecastToDisplayCurrency(
+        forecast,
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      expect(converted[0].month).toBe('Mar 2024');
+      expect(converted[0].confidenceLevel).toBe('MEDIUM');
+      expect(converted[0].basedOnMonths).toBe(6);
+    });
+
+    it('should handle empty forecast array', () => {
+      const converted = convertNetWorthForecastToDisplayCurrency(
+        [],
+        'EUR',
+        'USD',
+        DEFAULT_FALLBACK_RATES
+      );
+      
+      expect(converted).toEqual([]);
     });
   });
 });
