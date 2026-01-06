@@ -32,6 +32,7 @@ import {
 import { loadSettings } from '../utils/cookieSettings';
 import { generateDemoNetWorthDataForYear } from '../utils/defaults';
 import { syncAssetAllocationToNetWorth, syncNetWorthToAssetAllocation, DEFAULT_ASSET_CLASS_TARGETS } from '../utils/dataSync';
+import { formatDisplayCurrency, formatDisplayPercent, formatDisplayNumber } from '../utils/numberFormatter';
 import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import { SharedAssetDialog } from './SharedAssetDialog';
@@ -48,20 +49,14 @@ const SHORT_MONTH_NAMES = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
-// Helper to format currency
-function formatCurrency(amount: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
+// Helper to format currency (using centralized formatter)
+function formatCurrency(amount: number, _currency: string): string {
+  return formatDisplayCurrency(amount);
 }
 
-// Helper to format percentage
+// Helper to format percentage with sign (for variations)
 function formatPercent(value: number): string {
-  const sign = value >= 0 ? '+' : '';
-  return `${sign}${value.toFixed(1)}%`;
+  return formatDisplayPercent(value, true);
 }
 
 // Get default data
@@ -987,7 +982,7 @@ export function NetWorthTrackerPage() {
                         <td>{asset.name}</td>
                         <td>{asset.ticker}</td>
                         <td>{ASSET_CLASSES.find(c => c.id === asset.assetClass)?.name || asset.assetClass}</td>
-                        <td>{asset.shares.toLocaleString()}</td>
+                        <td>{formatDisplayNumber(asset.shares)}</td>
                         <td className="amount-col">{formatCurrency(asset.pricePerShare, asset.currency)}</td>
                         <td className="amount-col">{formatCurrency(asset.shares * asset.pricePerShare, asset.currency)}</td>
                         <td className="actions-col">

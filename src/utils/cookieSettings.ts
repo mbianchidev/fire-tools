@@ -13,12 +13,14 @@ import { encryptData, decryptData } from './cookieEncryption';
 export interface UserSettings {
   accountName: string;
   decimalSeparator: '.' | ',';
+  decimalPlaces: number;
   currencySettings: CurrencySettings;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
   accountName: 'My Portfolio',
   decimalSeparator: '.',
+  decimalPlaces: 2,
   currencySettings: DEFAULT_CURRENCY_SETTINGS,
 };
 
@@ -134,6 +136,14 @@ export function validateSettings(settings: Partial<UserSettings>): { isValid: bo
   if (settings.decimalSeparator !== undefined) {
     if (settings.decimalSeparator !== '.' && settings.decimalSeparator !== ',') {
       errors.push('Decimal separator must be "." or ","');
+    }
+  }
+
+  if (settings.decimalPlaces !== undefined) {
+    if (typeof settings.decimalPlaces !== 'number' || !Number.isInteger(settings.decimalPlaces)) {
+      errors.push('Decimal places must be an integer');
+    } else if (settings.decimalPlaces < 0 || settings.decimalPlaces > 4) {
+      errors.push('Decimal places must be between 0 and 4');
     }
   }
 
