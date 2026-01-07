@@ -607,7 +607,7 @@ export function ExpenseTrackerPage() {
 
       <main className="expense-tracker-main" id="main-content">
         {/* How to Use Section */}
-        <section className="allocation-info collapsible-section">
+        <section className="allocation-info collapsible-section" data-tour="fire-integration">
           <button 
             className="collapsible-header" 
             onClick={() => setIsHowToUseOpen(!isHowToUseOpen)}
@@ -713,7 +713,7 @@ export function ExpenseTrackerPage() {
 
         {/* 50/30/20 Budget Rule */}
         {budgetRuleBreakdown && (
-          <section className="budget-rule-section">
+          <section className="budget-rule-section" data-tour="budget-analysis">
             <button 
               className="collapsible-header" 
               onClick={() => setIsBudgetRuleInfoOpen(!isBudgetRuleInfoOpen)}
@@ -811,7 +811,7 @@ export function ExpenseTrackerPage() {
           <section className="transactions-section" role="tabpanel" aria-labelledby="transactions-tab">
             <div className="section-header">
               <h3>Transactions</h3>
-              <div className="transaction-actions">
+              <div className="transaction-actions" data-tour="transaction-actions">
                 <button className="btn-add income" onClick={() => setShowIncomeForm(true)}>
                   <span aria-hidden="true">➕</span> Add Income
                 </button>

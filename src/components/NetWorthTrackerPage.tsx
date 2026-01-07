@@ -802,7 +802,7 @@ export function NetWorthTrackerPage() {
 
         {/* Sync Configuration */}
         {isViewingCurrentPeriod && (
-          <section className="sync-config-section" aria-labelledby="sync-config-heading">
+          <section className="sync-config-section" aria-labelledby="sync-config-heading" data-tour="sync-options">
             <h3 id="sync-config-heading" className="visually-hidden">Asset Allocation Sync</h3>
             <div className="sync-config-content">
               <label className="sync-toggle-label">
@@ -939,7 +939,7 @@ export function NetWorthTrackerPage() {
         </section>
 
         {/* Data Entry Section */}
-        <section className="data-entry-section">
+        <section className="data-entry-section" data-tour="assets-section">
           <div className="section-header">
             <h3>Monthly Data Entry</h3>
             <div className="entry-actions">
@@ -1153,7 +1153,7 @@ export function NetWorthTrackerPage() {
         </section>
 
         {/* Historical Net Worth Chart */}
-        <section className="chart-section">
+        <section className="chart-section" data-tour="historical-chart">
           <h3><span aria-hidden="true">📈</span> Historical Net Worth</h3>
           <HistoricalNetWorthChart
             variations={monthlyVariations}

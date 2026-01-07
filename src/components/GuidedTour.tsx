@@ -22,6 +22,7 @@ interface InteractiveStep {
   elementSelector?: string; // CSS selector to highlight specific element
   inputSelector?: string; // CSS selector for input to validate (required when starting fresh)
   inputLabel?: string; // Label for the input field for validation message
+  allowZero?: boolean; // Whether zero is a valid value for this field
 }
 
 type TourPhase = 'overview' | 'data-choice' | 'interactive-prompt' | 'interactive' | 'end';
@@ -155,7 +156,11 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     const input = document.querySelector(currentInteractiveStep.inputSelector) as HTMLInputElement;
     if (input) {
       const value = input.value?.trim();
-      if (!value || value === '0' || value === '') {
+      const isZero = value === '0' || parseFloat(value) === 0;
+      const isEmpty = !value || value === '';
+      
+      // Allow zero if the step specifies allowZero: true
+      if (isEmpty || (isZero && !currentInteractiveStep.allowZero)) {
         setValidationError(`Please enter a value for ${currentInteractiveStep.inputLabel || 'this field'} to continue`);
         input.focus();
         return false;
@@ -318,8 +323,9 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       description: 'Enter your current savings or portfolio value. This is your starting point for FIRE calculations.',
       position: 'center',
       elementSelector: '[data-tour="initial-savings"]',
-      inputSelector: 'input[name="initialSavings"], input[aria-label*="Initial Savings"]',
+      inputSelector: '#initial-savings',
       inputLabel: 'Initial Savings',
+      allowZero: true, // Zero is valid for someone just starting
     },
     {
       page: '/fire-calculator',
@@ -327,7 +333,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       description: 'Enter your annual net labor income. This determines how much you can save each year toward FIRE.',
       position: 'center',
       elementSelector: '[data-tour="income-section"]',
-      inputSelector: 'input[name="annualLaborIncome"], input[aria-label*="Labor Income"]',
+      inputSelector: '#labor-income',
       inputLabel: 'Annual Income',
     },
     {
@@ -336,7 +342,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       description: 'Set your current annual expenses. Lower expenses mean a faster path to FIRE!',
       position: 'center',
       elementSelector: '[data-tour="expenses-section"]',
-      inputSelector: 'input[name="currentAnnualExpenses"], input[aria-label*="Current Annual Expenses"]',
+      inputSelector: '#current-expenses',
       inputLabel: 'Annual Expenses',
     },
     {
@@ -345,7 +351,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       description: 'The withdrawal rate (typically 3-4%) determines your FIRE target. A 4% rate means you need 25x your annual expenses.',
       position: 'center',
       elementSelector: '[data-tour="fire-params"]',
-      inputSelector: 'input[name="desiredWithdrawalRate"], input[aria-label*="Withdrawal Rate"]',
+      inputSelector: '#withdrawal-rate',
       inputLabel: 'Withdrawal Rate',
     },
     {

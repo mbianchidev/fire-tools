@@ -604,7 +604,7 @@ export const AssetAllocationPage: React.FC = () => {
           </div>
         )}
 
-        <section className="allocation-section" aria-labelledby="asset-classes-heading">
+        <section className="allocation-section" aria-labelledby="asset-classes-heading" data-tour="target-allocations">
           <div className="section-header-with-actions">
             <h3 id="asset-classes-heading">Asset Classes</h3>
             <button 
@@ -673,10 +673,10 @@ export const AssetAllocationPage: React.FC = () => {
           )}
         </section>
 
-        <section className="allocation-section" aria-labelledby="portfolio-details-heading">
+        <section className="allocation-section" aria-labelledby="portfolio-details-heading" data-tour="asset-list">
           <div className="section-header-with-actions">
             <h3 id="portfolio-details-heading">Portfolio Details by Asset Class</h3>
-            <div className="table-actions">
+            <div className="table-actions" data-tour="dca-helper">
               <button 
                 onClick={() => setIsDCADialogOpen(true)} 
                 className="action-btn" 
