@@ -119,8 +119,8 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     setDemoDataLoaded(true);
   }, [demoDataLoaded]);
 
-  // Load demo data when entering the "how tools work together" step
-  // BUT only if user doesn't already have existing data
+  // Load demo data when entering the "how tools work together" step,
+  // but only if user doesn't already have existing data
   useEffect(() => {
     if (currentStep >= 2 && !demoDataLoaded && !hadExistingData) {
       loadDemoData();

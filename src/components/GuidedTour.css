@@ -862,7 +862,7 @@ body.tour-interactive-mode [data-tour].tour-highlight button.primary-btn {
 
 /* Ultra-high specificity for any button inside ANY element with tour-highlight class */
 body.tour-interactive-mode *[data-tour].tour-highlight button,
-body.tour-interactive-mode [data-tour].tour-highlight *,
+body.tour-interactive-mode [data-tour].tour-highlight button,
 body.tour-interactive-mode div.tour-highlight button,
 body.tour-interactive-mode section.tour-highlight button {
   pointer-events: auto !important;
