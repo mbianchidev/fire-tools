@@ -30,10 +30,13 @@
   border-radius: 16px;
   max-width: 550px;
   width: 100%;
+  min-height: 450px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.4s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -105,6 +108,10 @@
 .tour-body {
   padding: 2rem 1.5rem;
   text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .tour-icon-large {

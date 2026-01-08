@@ -102,7 +102,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
   };
 
   return (
-    <section className="monte-carlo-section" aria-labelledby="monte-carlo-heading">
+    <section className="monte-carlo-section" aria-labelledby="monte-carlo-heading" data-tour="monte-carlo-overview">
       <h2 id="monte-carlo-heading"><span aria-hidden="true" className="page-header-emoji">🎲</span> Monte Carlo Simulations</h2>
       <p className="section-description">
         Run multiple simulations with random market returns to assess the probability of reaching FIRE.
@@ -216,7 +216,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         )}
       </div>
 
-      <div className="mc-inputs">
+      <div className="mc-inputs" data-tour="monte-carlo-params">
         <div className="form-group">
           <label htmlFor="num-simulations">Number of Simulations</label>
           <NumberInput
@@ -295,7 +295,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
       </button>
 
       {result && (
-        <div className="mc-results" role="region" aria-labelledby="simulation-results-heading" aria-live="polite">
+        <div className="mc-results" role="region" aria-labelledby="simulation-results-heading" aria-live="polite" data-tour="monte-carlo-results">
           <h3 id="simulation-results-heading">Simulation Results</h3>
           <div className="results-grid" role="list">
             <div className="result-card success" role="listitem">

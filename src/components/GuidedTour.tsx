@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadTourCompleted, saveTourCompleted } from '../utils/tourPreferences';
-import { saveFireCalculatorInputs, saveAssetAllocation, saveExpenseTrackerData, saveNetWorthTrackerData, clearAllData } from '../utils/cookieStorage';
+import { saveFireCalculatorInputs, saveAssetAllocation, saveExpenseTrackerData, saveNetWorthTrackerData, clearAllData, loadFireCalculatorInputs, loadAssetAllocation } from '../utils/cookieStorage';
 import { saveSettings, loadSettings, DEFAULT_SETTINGS } from '../utils/cookieSettings';
 import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from '../utils/defaults';
 import { generateDemoExpenseData } from '../utils/demoExpenseData';
@@ -23,6 +23,8 @@ interface InteractiveStep {
   inputSelector?: string; // CSS selector for input to validate (required when starting fresh)
   inputLabel?: string; // Label for the input field for validation message
   allowZero?: boolean; // Whether zero is a valid value for this field
+  clickAction?: string; // CSS selector for button to click to open dialog
+  dialogSelector?: string; // CSS selector for dialog to wait for
 }
 
 type TourPhase = 'overview' | 'data-choice' | 'interactive-prompt' | 'interactive' | 'end';
@@ -44,12 +46,18 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   const [keepDemoData, setKeepDemoData] = useState(true);
   const [highlightedElement, setHighlightedElement] = useState<HTMLElement | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [hadExistingData, setHadExistingData] = useState(false);
 
   // Check if tour should be shown on mount
   useEffect(() => {
     const tourCompleted = loadTourCompleted();
     if (!tourCompleted) {
       setIsVisible(true);
+      // Check if user already has data (for first visit, they won't)
+      const existingFireData = loadFireCalculatorInputs();
+      const existingAssetData = loadAssetAllocation();
+      const hasExistingData = !!(existingFireData || existingAssetData?.assets?.length);
+      setHadExistingData(hasExistingData);
     }
   }, []);
 
@@ -370,10 +378,24 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     },
     {
       page: '/fire-calculator',
-      title: '📈 Results & Charts',
-      description: 'See your projected timeline! The charts show your net worth growth and when you\'ll reach financial independence.',
+      title: '⚙️ Integration Options',
+      description: 'These options connect tools together: sync portfolio values from Asset Allocation, or use actual income/expenses from Cashflow Tracker for more accurate calculations.',
+      position: 'center',
+      elementSelector: '[data-tour="options-section"]',
+    },
+    {
+      page: '/fire-calculator',
+      title: '🎯 FIRE Metrics',
+      description: 'See your FIRE target, years to FIRE, and projected portfolio value. These are your key milestones!',
       position: 'center',
       elementSelector: '[data-tour="results-section"]',
+    },
+    {
+      page: '/fire-calculator',
+      title: '📈 Growth Charts',
+      description: 'Visualize your journey! The Net Worth Growth chart shows your portfolio over time, and Income vs Expenses shows your cash flow.',
+      position: 'center',
+      elementSelector: '[data-tour="charts-section"]',
     },
   ];
 
@@ -395,7 +417,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     {
       page: '/asset-allocation',
       title: '💹 DCA Helper',
-      description: 'Use the Dollar Cost Averaging helper to see how to allocate your regular investment contributions across asset classes.',
+      description: 'Click the DCA Helper button to calculate how to split your regular investment contributions across asset classes. Great for dollar-cost averaging!',
       position: 'center',
       elementSelector: '[data-tour="dca-helper"]',
     },
@@ -415,13 +437,6 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       description: 'See your spending breakdown by category and compare to the 50/30/20 budgeting rule (needs/wants/savings).',
       position: 'center',
       elementSelector: '[data-tour="budget-analysis"]',
-    },
-    {
-      page: '/expense-tracker',
-      title: '🔗 FIRE Integration',
-      description: 'Your income and expenses can automatically sync to the FIRE Calculator for accurate savings rate calculations!',
-      position: 'center',
-      elementSelector: '[data-tour="fire-integration"]',
     },
   ];
 
@@ -449,11 +464,37 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     },
   ];
 
-  const pageTours: Record<string, { steps: InteractiveStep[]; nextPage: string | null; pageName: string }> = {
-    '/fire-calculator': { steps: fireCalculatorSteps, nextPage: '/asset-allocation', pageName: 'Asset Allocation' },
-    '/asset-allocation': { steps: assetAllocationSteps, nextPage: '/expense-tracker', pageName: 'Cashflow Tracker' },
-    '/expense-tracker': { steps: expenseTrackerSteps, nextPage: '/net-worth-tracker', pageName: 'Net Worth Tracker' },
-    '/net-worth-tracker': { steps: netWorthSteps, nextPage: null, pageName: '' },
+  // Monte Carlo Simulation steps
+  const monteCarloSteps: InteractiveStep[] = [
+    {
+      page: '/monte-carlo',
+      title: '🎲 Monte Carlo Overview',
+      description: 'Monte Carlo simulations run thousands of possible market scenarios to show the probability of reaching your FIRE goals. This accounts for market volatility and uncertainty.',
+      position: 'center',
+      elementSelector: '[data-tour="monte-carlo-overview"]',
+    },
+    {
+      page: '/monte-carlo',
+      title: '⚙️ Simulation Parameters',
+      description: 'Adjust the simulation settings: number of simulations, stock/bond volatility, and black swan event probability. These affect how conservative or optimistic your projections are.',
+      position: 'center',
+      elementSelector: '[data-tour="monte-carlo-params"]',
+    },
+    {
+      page: '/monte-carlo',
+      title: '📊 Results & Success Rate',
+      description: 'After running simulations, see your success probability, median outcome, and the range of possible results. Green means high probability of success!',
+      position: 'center',
+      elementSelector: '[data-tour="monte-carlo-results"]',
+    },
+  ];
+
+  const pageTours: Record<string, { steps: InteractiveStep[]; nextPage: string | null; previousPage: string | null; pageName: string }> = {
+    '/fire-calculator': { steps: fireCalculatorSteps, nextPage: '/asset-allocation', previousPage: null, pageName: 'Asset Allocation' },
+    '/asset-allocation': { steps: assetAllocationSteps, nextPage: '/expense-tracker', previousPage: '/fire-calculator', pageName: 'Cashflow Tracker' },
+    '/expense-tracker': { steps: expenseTrackerSteps, nextPage: '/net-worth-tracker', previousPage: '/asset-allocation', pageName: 'Net Worth Tracker' },
+    '/net-worth-tracker': { steps: netWorthSteps, nextPage: '/monte-carlo', previousPage: '/expense-tracker', pageName: 'Monte Carlo' },
+    '/monte-carlo': { steps: monteCarloSteps, nextPage: null, previousPage: '/net-worth-tracker', pageName: '' },
   };
 
   const handleNext = () => {
@@ -515,6 +556,13 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     setTourPhase('interactive-prompt');
   };
 
+  // Handle keeping current user data (when restarting tour)
+  const handleKeepCurrentDataAndContinue = () => {
+    setKeepDemoData(true);
+    // Don't load demo data or clear anything - just proceed
+    setTourPhase('interactive-prompt');
+  };
+
   // Finish tour without interactive walkthrough
   const finishWithoutInteractive = () => {
     saveTourCompleted(true);
@@ -560,10 +608,23 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   };
 
   // Handle previous step in interactive tour
+  // Handle previous step in interactive tour
   const handleInteractivePrev = () => {
     if (interactiveStep > 0) {
       setInteractiveStep(interactiveStep - 1);
       setValidationError(null);
+    } else if (currentPageTour) {
+      // At start of page - go to previous page's last step
+      const currentTour = pageTours[currentPageTour];
+      if (currentTour?.previousPage) {
+        const prevPageTour = pageTours[currentTour.previousPage];
+        if (prevPageTour) {
+          setCurrentPageTour(currentTour.previousPage);
+          setInteractiveStep(prevPageTour.steps.length - 1);
+          setValidationError(null);
+          navigate(currentTour.previousPage);
+        }
+      }
     }
   };
 
@@ -585,22 +646,50 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
 
   // Finish the interactive tour
   const finishInteractiveTour = () => {
+    // Clean up tour state
     setShowContinuePrompt(false);
     saveTourCompleted(true);
     setIsVisible(false);
     setShowEndDialog(false);
+    setTourPhase('overview');
+    setCurrentPageTour(null);
+    
+    // Remove tour-interactive-mode class to restore all inputs
+    document.body.classList.remove('tour-interactive-mode');
+    
+    // Remove any highlight from elements
+    if (highlightedElement) {
+      highlightedElement.classList.remove('tour-highlight');
+      setHighlightedElement(null);
+    }
+    
     onTourComplete?.();
     navigate('/');
   };
 
   // Skip interactive tour and go to end
   const skipInteractiveTour = () => {
+    // Clean up tour state
     setShowContinuePrompt(false);
     saveTourCompleted(true);
     setIsVisible(false);
     setShowEndDialog(false);
+    setTourPhase('overview');
+    setCurrentPageTour(null);
+    
+    // Remove tour-interactive-mode class to restore all inputs
+    document.body.classList.remove('tour-interactive-mode');
+    
+    // Remove any highlight from elements
+    if (highlightedElement) {
+      highlightedElement.classList.remove('tour-highlight');
+      setHighlightedElement(null);
+    }
+    
     onTourComplete?.();
-    navigate('/');
+    
+    // Force page refresh to ensure all inputs are clickable again
+    window.location.href = '/';
   };
 
   if (!isVisible) return null;
@@ -701,7 +790,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
                 <button
                   className="tour-btn tour-btn-secondary tour-btn-small"
                   onClick={handleInteractivePrev}
-                  disabled={interactiveStep === 0}
+                  disabled={interactiveStep === 0 && !currentTour.previousPage}
                 >
                   ← Back
                 </button>
@@ -734,29 +823,40 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
             </div>
             <div className="tour-end-content">
               <p>
-                Great! You've seen an overview of Fire Tools. We've loaded demo data so you can explore.
+                Great! You've seen an overview of Fire Tools. {hadExistingData ? 'You have existing data in the app.' : 'We\'ve loaded demo data so you can explore.'}
               </p>
               <p className="tour-end-question">
-                <strong>What would you like to do with the demo data?</strong>
+                <strong>What would you like to do?</strong>
               </p>
             </div>
-            <div className="tour-end-actions">
+            <div className={`tour-end-actions ${hadExistingData ? 'tour-end-actions-three' : ''}`}>
               <button 
                 className="tour-btn tour-btn-secondary"
                 onClick={handleClearDataAndContinue}
               >
                 <span className="tour-btn-icon">🗑️</span>
                 Start Fresh
-                <span className="tour-btn-hint">Clear all demo data</span>
+                <span className="tour-btn-hint">Clear all data</span>
               </button>
-              <button 
-                className="tour-btn tour-btn-primary"
-                onClick={handleKeepDataAndContinue}
-              >
-                <span className="tour-btn-icon">✨</span>
-                Keep Demo Data
-                <span className="tour-btn-hint">Explore with sample data</span>
-              </button>
+              {hadExistingData ? (
+                <button 
+                  className="tour-btn tour-btn-primary"
+                  onClick={handleKeepCurrentDataAndContinue}
+                >
+                  <span className="tour-btn-icon">📁</span>
+                  Keep My Data
+                  <span className="tour-btn-hint">Keep your current data</span>
+                </button>
+              ) : (
+                <button 
+                  className="tour-btn tour-btn-primary"
+                  onClick={handleKeepDataAndContinue}
+                >
+                  <span className="tour-btn-icon">✨</span>
+                  Keep Demo Data
+                  <span className="tour-btn-hint">Explore with sample data</span>
+                </button>
+              )}
             </div>
             <p className="tour-end-note">
               <span className="tour-note-icon">💡</span>

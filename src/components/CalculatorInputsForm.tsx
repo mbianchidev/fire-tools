@@ -465,7 +465,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section">
+      <div className="form-section collapsible-section" data-tour="options-section">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('options')}

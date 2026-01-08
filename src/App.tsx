@@ -264,7 +264,7 @@ function FIRECalculatorPage() {
           <>
             <FIREMetrics result={result} currentAge={currentAge} zoomYears={zoomYears} />
             
-            <div className="charts-section">
+            <div className="charts-section" data-tour="charts-section">
               <NetWorthChart 
                 projections={result.projections} 
                 fireTarget={result.fireTarget} 
