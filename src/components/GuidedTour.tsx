@@ -120,11 +120,12 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   }, [demoDataLoaded]);
 
   // Load demo data when entering the "how tools work together" step
+  // BUT only if user doesn't already have existing data
   useEffect(() => {
-    if (currentStep >= 2 && !demoDataLoaded) {
+    if (currentStep >= 2 && !demoDataLoaded && !hadExistingData) {
       loadDemoData();
     }
-  }, [currentStep, demoDataLoaded, loadDemoData]);
+  }, [currentStep, demoDataLoaded, loadDemoData, hadExistingData]);
 
   // Add/remove tour-interactive-mode class on body during interactive tour
   useEffect(() => {
@@ -1114,6 +1115,57 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     window.location.href = '/';
   };
 
+  // Skip just the current step (not the entire tour)
+  const skipCurrentStep = () => {
+    if (!currentPageTour) return;
+    
+    const currentTour = pageTours[currentPageTour];
+    if (!currentTour) return;
+
+    const currentInteractiveStep = currentTour.steps[interactiveStep];
+
+    // Reset validation and waiting states
+    setValidationError(null);
+    setWaitingForUserClick(false);
+    setActionCompleted(false);
+
+    // If current step has closeDialogAfter or is a dialog step, close any dialog
+    if ((currentInteractiveStep?.closeDialogAfter || currentInteractiveStep?.isDialogStep) && dialogOpen) {
+      closeAnyOpenDialog();
+      setDialogOpen(false);
+    }
+
+    // Move to next step
+    const nextStepIndex = interactiveStep + 1;
+    if (nextStepIndex < currentTour.steps.length) {
+      // If next step is a dialog step but dialog is closed, skip to the non-dialog step
+      let targetStep = nextStepIndex;
+      while (targetStep < currentTour.steps.length) {
+        const nextStep = currentTour.steps[targetStep];
+        if (nextStep.isDialogStep && !dialogOpen) {
+          targetStep++;
+        } else {
+          break;
+        }
+      }
+      
+      if (targetStep < currentTour.steps.length) {
+        const nextStep = currentTour.steps[targetStep];
+        // If target step wants user to click, set waiting state
+        if (nextStep.waitForUserClick) {
+          setWaitingForUserClick(true);
+        }
+        setInteractiveStep(targetStep);
+      } else {
+        // No more steps on this page, show continue prompt
+        setShowContinuePrompt(true);
+      }
+    } else {
+      // No more steps on this page, show continue prompt
+      setShowContinuePrompt(true);
+    }
+  };
+
   if (!isVisible) return null;
 
   // Interactive tour - show continue prompt
@@ -1187,13 +1239,24 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
             <div className="tour-tooltip">
               <div className="tour-tooltip-header">
                 <h3>{currentInteractiveStep.title}</h3>
-                <button 
-                  className="tour-tooltip-skip"
-                  onClick={skipInteractiveTour}
-                  aria-label="Skip interactive tour"
-                >
-                  Skip
-                </button>
+                <div className="tour-tooltip-skip-options">
+                  <button 
+                    className="tour-tooltip-skip tour-tooltip-skip-step"
+                    onClick={skipCurrentStep}
+                    aria-label="Skip this step"
+                    title="Skip this step"
+                  >
+                    Skip Step
+                  </button>
+                  <button 
+                    className="tour-tooltip-skip"
+                    onClick={skipInteractiveTour}
+                    aria-label="Skip entire tour"
+                    title="Skip entire tour"
+                  >
+                    Skip Tour
+                  </button>
+                </div>
               </div>
               <p>{currentInteractiveStep.description}</p>
               {hasInputValidation && (

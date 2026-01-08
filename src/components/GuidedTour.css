@@ -555,6 +555,11 @@
   font-weight: 600;
 }
 
+.tour-tooltip-skip-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .tour-tooltip-skip {
   background: transparent;
   border: none;
@@ -564,6 +569,15 @@
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   transition: all 0.2s;
+}
+
+.tour-tooltip-skip-step {
+  color: #5568d4;
+}
+
+.tour-tooltip-skip-step:hover {
+  background: #f0f2ff;
+  color: #4454b8;
 }
 
 .tour-tooltip-skip:hover {
@@ -839,6 +853,28 @@ body.tour-interactive-mode .tour-highlight > button,
 body.tour-interactive-mode [data-tour].tour-highlight button,
 body.tour-interactive-mode [data-tour].tour-highlight button.action-btn,
 body.tour-interactive-mode [data-tour].tour-highlight button.primary-btn {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+  z-index: 10002 !important;
+  position: relative !important;
+}
+
+/* Ultra-high specificity for any button inside ANY element with tour-highlight class */
+body.tour-interactive-mode *[data-tour].tour-highlight button,
+body.tour-interactive-mode [data-tour].tour-highlight *,
+body.tour-interactive-mode div.tour-highlight button,
+body.tour-interactive-mode section.tour-highlight button {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+
+/* Specifically target action-btn and primary-btn inside any tour-highlight container */
+body.tour-interactive-mode .tour-highlight .action-btn,
+body.tour-interactive-mode .tour-highlight .primary-btn,
+body.tour-interactive-mode .tour-highlight button.action-btn,
+body.tour-interactive-mode .tour-highlight button.primary-btn {
   pointer-events: auto !important;
   opacity: 1 !important;
   cursor: pointer !important;
