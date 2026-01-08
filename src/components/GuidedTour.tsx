@@ -29,6 +29,7 @@ interface InteractiveStep {
   closeDialogAfter?: boolean; // Whether to close the dialog after this step
   waitForUserClick?: boolean; // Whether to wait for user to click the button themselves
   requiresAction?: boolean; // Whether the user must perform an action (like clicking "Run") before proceeding
+  actionCompletedSelector?: string; // CSS selector to detect action completion (for requiresAction steps)
 }
 
 type TourPhase = 'overview' | 'data-choice' | 'interactive-prompt' | 'interactive' | 'end';
@@ -42,6 +43,7 @@ const DIALOG_WAIT_INTERVAL_MS = 100; // How often to check for dialog appearance
 const DIALOG_WAIT_TIMEOUT_MS = 3000; // Maximum time to wait for dialog
 const DIALOG_TRANSITION_DELAY_MS = 300; // Delay for dialog opening animation
 const UI_UPDATE_DELAY_MS = 200; // Delay to allow UI to update before clicking
+const ACTION_CHECK_INTERVAL_MS = 200; // How often to check for action completion
 
 // Helper function to close any open dialog
 function closeAnyOpenDialog(): boolean {
@@ -175,17 +177,17 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     const currentTour = pageTours[currentPageTour];
     const currentInteractiveStep = currentTour?.steps[interactiveStep];
     
-    if (!currentInteractiveStep?.requiresAction) return;
+    if (!currentInteractiveStep?.requiresAction || !currentInteractiveStep?.actionCompletedSelector) return;
 
-    // For Monte Carlo, check if results appear
+    // Check if the action result element appears
     const checkResults = () => {
-      const results = document.querySelector('[data-tour="monte-carlo-results"]');
+      const results = document.querySelector(currentInteractiveStep.actionCompletedSelector!);
       if (results) {
         setActionCompleted(true);
       }
     };
 
-    const intervalId = setInterval(checkResults, 500);
+    const intervalId = setInterval(checkResults, ACTION_CHECK_INTERVAL_MS);
     checkResults(); // Check immediately
     
     return () => clearInterval(intervalId);
@@ -736,6 +738,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       position: 'center',
       elementSelector: '.run-simulation-btn',
       requiresAction: true,
+      actionCompletedSelector: '[data-tour="monte-carlo-results"]',
     },
     {
       page: '/monte-carlo',
@@ -871,12 +874,17 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       setDialogOpen(false);
     }
 
-    // If current step requires waiting for user to click (user already did), just proceed
-    if (currentInteractiveStep?.waitForUserClick && !dialogOpen) {
+    // If current step requires waiting for user to click a button to open dialog
+    // and the dialog isn't open yet, set waiting state and return
+    if (currentInteractiveStep?.waitForUserClick && !dialogOpen && currentInteractiveStep?.dialogSelector) {
       // User hasn't clicked yet, set waiting state
       setWaitingForUserClick(true);
       return;
     }
+
+    // If current step is a waitForUserClick step without dialog (like tab clicks),
+    // just proceed since the step description tells user what to do
+    // The actual click will be detected in the useEffect
 
     // If current step requires an action (like clicking Run), check if action was completed
     if (currentInteractiveStep?.requiresAction && !actionCompleted) {
