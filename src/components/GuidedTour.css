@@ -753,7 +753,7 @@
 .tour-interactive-mode input:not(.tour-highlight input),
 .tour-interactive-mode select:not(.tour-highlight select),
 .tour-interactive-mode textarea:not(.tour-highlight textarea),
-.tour-interactive-mode button:not(.tour-highlight button):not(.tour-tooltip button):not(.tour-tooltip-skip):not(.tour-btn):not(.dialog-close) {
+.tour-interactive-mode button:not(.tour-highlight button):not(.tour-tooltip button):not(.tour-tooltip-skip):not(.tour-btn):not(.dialog-close):not(.dialog button):not(.dca-dialog button):not(.net-worth-dialog button) {
   pointer-events: none !important;
   opacity: 0.5 !important;
   cursor: not-allowed !important;
@@ -802,6 +802,39 @@
 
 /* Keep dialog close buttons enabled during tour */
 .tour-interactive-mode .dialog-close {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+
+/* Keep ALL dialog inputs enabled when dialog is highlighted (isDialogStep) */
+.tour-interactive-mode .dialog.tour-highlight input,
+.tour-interactive-mode .dialog.tour-highlight select,
+.tour-interactive-mode .dialog.tour-highlight textarea,
+.tour-interactive-mode .dialog.tour-highlight button,
+.tour-interactive-mode .dca-dialog.tour-highlight input,
+.tour-interactive-mode .dca-dialog.tour-highlight select,
+.tour-interactive-mode .dca-dialog.tour-highlight textarea,
+.tour-interactive-mode .dca-dialog.tour-highlight button,
+.tour-interactive-mode .net-worth-dialog.tour-highlight input,
+.tour-interactive-mode .net-worth-dialog.tour-highlight select,
+.tour-interactive-mode .net-worth-dialog.tour-highlight textarea,
+.tour-interactive-mode .net-worth-dialog.tour-highlight button {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: auto !important;
+}
+
+/* Keep tab buttons clickable when they are highlighted for user click */
+.tour-interactive-mode button.tour-highlight,
+.tour-interactive-mode [data-tour].tour-highlight button {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+
+/* Keep run-simulation button enabled when highlighted */
+.tour-interactive-mode .run-simulation-btn.tour-highlight {
   pointer-events: auto !important;
   opacity: 1 !important;
   cursor: pointer !important;

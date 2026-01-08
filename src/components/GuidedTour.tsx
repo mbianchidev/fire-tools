@@ -27,6 +27,8 @@ interface InteractiveStep {
   dialogSelector?: string; // CSS selector for dialog to wait for
   isDialogStep?: boolean; // Whether this step is inside a dialog
   closeDialogAfter?: boolean; // Whether to close the dialog after this step
+  waitForUserClick?: boolean; // Whether to wait for user to click the button themselves
+  requiresAction?: boolean; // Whether the user must perform an action (like clicking "Run") before proceeding
 }
 
 type TourPhase = 'overview' | 'data-choice' | 'interactive-prompt' | 'interactive' | 'end';
@@ -66,6 +68,8 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [hadExistingData, setHadExistingData] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [waitingForUserClick, setWaitingForUserClick] = useState(false);
+  const [actionCompleted, setActionCompleted] = useState(false);
 
   // Check if tour should be shown on mount
   useEffect(() => {
@@ -133,6 +137,59 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       document.body.classList.remove('tour-interactive-mode');
     };
   }, [tourPhase, currentPageTour]);
+
+  // Detect dialog opening for waitForUserClick steps
+  useEffect(() => {
+    if (!waitingForUserClick || tourPhase !== 'interactive' || !currentPageTour) return;
+
+    const currentTour = pageTours[currentPageTour];
+    const currentInteractiveStep = currentTour?.steps[interactiveStep];
+    
+    if (!currentInteractiveStep?.dialogSelector) return;
+
+    // Poll for dialog to appear
+    const checkDialog = () => {
+      const dialog = document.querySelector(currentInteractiveStep.dialogSelector!);
+      if (dialog) {
+        setDialogOpen(true);
+        setWaitingForUserClick(false);
+        // Move to next step (first dialog step)
+        setTimeout(() => {
+          setInteractiveStep(interactiveStep + 1);
+        }, DIALOG_TRANSITION_DELAY_MS);
+      }
+    };
+
+    const intervalId = setInterval(checkDialog, DIALOG_WAIT_INTERVAL_MS);
+    
+    // Also check immediately
+    checkDialog();
+    
+    return () => clearInterval(intervalId);
+  }, [waitingForUserClick, tourPhase, currentPageTour, interactiveStep]);
+
+  // Detect action completion for requiresAction steps (e.g., Monte Carlo results appearing)
+  useEffect(() => {
+    if (tourPhase !== 'interactive' || !currentPageTour) return;
+
+    const currentTour = pageTours[currentPageTour];
+    const currentInteractiveStep = currentTour?.steps[interactiveStep];
+    
+    if (!currentInteractiveStep?.requiresAction) return;
+
+    // For Monte Carlo, check if results appear
+    const checkResults = () => {
+      const results = document.querySelector('[data-tour="monte-carlo-results"]');
+      if (results) {
+        setActionCompleted(true);
+      }
+    };
+
+    const intervalId = setInterval(checkResults, 500);
+    checkResults(); // Check immediately
+    
+    return () => clearInterval(intervalId);
+  }, [tourPhase, currentPageTour, interactiveStep]);
 
   // Highlight elements during interactive tour
   useEffect(() => {
@@ -429,10 +486,10 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     {
       page: '/asset-allocation',
       title: '➕ Add New Assets',
-      description: 'Click "Add Asset" to add a new holding to your portfolio. Let\'s open the dialog to see how it works!',
+      description: 'Click the "Add Asset" button to add a new holding to your portfolio. Go ahead, click it now!',
       position: 'center',
       elementSelector: '[data-tour="add-asset-button"]',
-      clickAction: '[data-tour="add-asset-button"] button',
+      waitForUserClick: true,
       dialogSelector: '.dialog',
     },
     // Add Asset Dialog steps
@@ -471,10 +528,10 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     {
       page: '/asset-allocation',
       title: '💹 DCA Helper',
-      description: 'The DCA (Dollar Cost Averaging) Helper calculates how to split a lump sum investment. Let\'s see how it works!',
+      description: 'The DCA (Dollar Cost Averaging) Helper calculates how to split a lump sum investment. Click the "DCA Helper" button to see how it works!',
       position: 'center',
       elementSelector: '[data-tour="dca-helper"]',
-      clickAction: '[data-tour="dca-helper"] button',
+      waitForUserClick: true,
       dialogSelector: '.dca-dialog',
     },
     // DCA Helper Dialog steps
@@ -508,11 +565,11 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   const expenseTrackerSteps: InteractiveStep[] = [
     {
       page: '/expense-tracker',
-      title: '📝 Add Transactions',
-      description: 'Track your income and expenses here. Let\'s see how to add income first!',
+      title: '📝 Add Income',
+      description: 'Track your income and expenses here. Click "Add Income" to see how to add income!',
       position: 'center',
       elementSelector: '[data-tour="transaction-actions"]',
-      clickAction: '.btn-add.income',
+      waitForUserClick: true,
       dialogSelector: '.dialog',
     },
     // Add Income Dialog steps
@@ -536,10 +593,10 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     {
       page: '/expense-tracker',
       title: '💸 Add Expense',
-      description: 'Now let\'s see how to add an expense. Click "Add Expense" to record your spending.',
+      description: 'Now click "Add Expense" to see how to record your spending.',
       position: 'center',
       elementSelector: '[data-tour="transaction-actions"]',
-      clickAction: '.btn-add.expense',
+      waitForUserClick: true,
       dialogSelector: '.dialog',
     },
     // Add Expense Dialog steps
@@ -570,27 +627,29 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     {
       page: '/expense-tracker',
       title: '💵 Set Budgets',
-      description: 'Go to the Budgets tab to set monthly spending limits for each category. Track your progress with visual indicators.',
+      description: 'Click the Budgets tab to set monthly spending limits for each category. Track your progress with visual indicators.',
       position: 'center',
       elementSelector: '[data-tour="budgets-tab"]',
+      waitForUserClick: true,
     },
     {
       page: '/expense-tracker',
       title: '📈 Analytics',
-      description: 'The Analytics tab shows spending trends, category breakdowns, and monthly comparisons to help you understand your financial habits.',
+      description: 'Click the Analytics tab to see spending trends, category breakdowns, and monthly comparisons to help you understand your financial habits.',
       position: 'center',
       elementSelector: '[data-tour="analytics-tab"]',
+      waitForUserClick: true,
     },
   ];
 
   const netWorthSteps: InteractiveStep[] = [
     {
       page: '/net-worth-tracker',
-      title: '💰 Monthly Data Entry',
-      description: 'Log your assets, cash, pensions, and financial operations. Let\'s see how to log an asset!',
+      title: '💰 Log Asset Button',
+      description: 'Click the "Log Asset" button to record your asset holdings.',
       position: 'center',
       elementSelector: '[data-tour="assets-section"]',
-      clickAction: '.btn-entry.asset',
+      waitForUserClick: true,
       dialogSelector: '.dialog',
     },
     // Log Asset Dialog steps
@@ -614,10 +673,10 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     {
       page: '/net-worth-tracker',
       title: '📝 Log Operations',
-      description: 'Track financial operations like dividends, purchases, and sales. Let\'s see how!',
+      description: 'Click "Log Operation" to track financial operations like dividends, purchases, and sales.',
       position: 'center',
       elementSelector: '[data-tour="assets-section"]',
-      clickAction: '.btn-entry.operation',
+      waitForUserClick: true,
       dialogSelector: '.net-worth-dialog',
     },
     // Log Operation Dialog steps
@@ -672,8 +731,16 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     },
     {
       page: '/monte-carlo',
+      title: '▶️ Run Simulation',
+      description: 'Click the "Run Simulations" button to run the Monte Carlo analysis. This will generate thousands of scenarios based on your parameters.',
+      position: 'center',
+      elementSelector: '.run-simulation-btn',
+      requiresAction: true,
+    },
+    {
+      page: '/monte-carlo',
       title: '📊 Results & Success Rate',
-      description: 'After running simulations, see your success probability, median outcome, and the range of possible results. Green means high probability of success!',
+      description: 'See your success probability, median outcome, and the range of possible results. Green means high probability of success!',
       position: 'center',
       elementSelector: '[data-tour="monte-carlo-results"]',
     },
@@ -773,6 +840,8 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     setCurrentPageTour('/fire-calculator');
     setInteractiveStep(0);
     setValidationError(null);
+    setWaitingForUserClick(false);
+    setActionCompleted(false);
     navigate('/fire-calculator');
   };
 
@@ -792,13 +861,30 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     const nextStepIndex = interactiveStep + 1;
     const nextStep = nextStepIndex < currentTour.steps.length ? currentTour.steps[nextStepIndex] : null;
 
+    // Reset action states
+    setActionCompleted(false);
+    setWaitingForUserClick(false);
+
     // If current step has closeDialogAfter, close the dialog first
     if (currentInteractiveStep?.closeDialogAfter && dialogOpen) {
       closeAnyOpenDialog();
       setDialogOpen(false);
     }
 
-    // If next step has clickAction (needs to open a dialog), handle it
+    // If current step requires waiting for user to click (user already did), just proceed
+    if (currentInteractiveStep?.waitForUserClick && !dialogOpen) {
+      // User hasn't clicked yet, set waiting state
+      setWaitingForUserClick(true);
+      return;
+    }
+
+    // If current step requires an action (like clicking Run), check if action was completed
+    if (currentInteractiveStep?.requiresAction && !actionCompleted) {
+      setValidationError('Please complete the action (click the button) before continuing');
+      return;
+    }
+
+    // If next step has clickAction (needs to auto-click to open a dialog), handle it
     if (nextStep?.clickAction) {
       // Move to next step first
       setInteractiveStep(nextStepIndex);
@@ -835,6 +921,14 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       return;
     }
 
+    // If next step requires waiting for user click, set the waiting state
+    if (nextStep?.waitForUserClick) {
+      setInteractiveStep(nextStepIndex);
+      setValidationError(null);
+      setWaitingForUserClick(true);
+      return;
+    }
+
     if (nextStepIndex < currentTour.steps.length) {
       setInteractiveStep(nextStepIndex);
       setValidationError(null);
@@ -854,6 +948,11 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     const currentTour = currentPageTour ? pageTours[currentPageTour] : null;
     const currentInteractiveStep = currentTour?.steps[interactiveStep];
     
+    // Reset waiting states
+    setWaitingForUserClick(false);
+    setActionCompleted(false);
+    setValidationError(null);
+    
     // If we're in a dialog, going back should stay in dialog or close it
     if (currentInteractiveStep?.isDialogStep) {
       // Check if previous step is also a dialog step
@@ -861,21 +960,52 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       if (prevStep?.isDialogStep) {
         // Stay in dialog, go to previous step
         setInteractiveStep(interactiveStep - 1);
-        setValidationError(null);
         return;
-      } else if (prevStep?.clickAction) {
+      } else if (prevStep?.waitForUserClick || prevStep?.clickAction) {
         // Previous step is the one that opened the dialog, close dialog and go back
         closeAnyOpenDialog();
         setDialogOpen(false);
         setInteractiveStep(interactiveStep - 1);
-        setValidationError(null);
+        return;
+      }
+    }
+    
+    // If previous step was a dialog step (from current non-dialog step), we need to reopen the dialog
+    const prevStep = interactiveStep > 0 ? currentTour?.steps[interactiveStep - 1] : null;
+    if (prevStep?.closeDialogAfter) {
+      // Find the step that opened the dialog
+      let dialogOpenerIndex = interactiveStep - 1;
+      while (dialogOpenerIndex > 0) {
+        const step = currentTour?.steps[dialogOpenerIndex - 1];
+        if (step?.waitForUserClick || step?.clickAction) {
+          break;
+        }
+        dialogOpenerIndex--;
+      }
+      
+      // Go back to the last dialog step and reopen dialog
+      const openerStep = currentTour?.steps[dialogOpenerIndex - 1];
+      if (openerStep?.clickAction) {
+        // Auto-click to open dialog
+        setInteractiveStep(interactiveStep - 1);
+        setTimeout(() => {
+          const button = document.querySelector(openerStep.clickAction!) as HTMLElement;
+          if (button) {
+            button.click();
+            setDialogOpen(true);
+          }
+        }, UI_UPDATE_DELAY_MS);
+        return;
+      } else if (openerStep?.waitForUserClick && openerStep?.dialogSelector) {
+        // For waitForUserClick steps, we need to tell user to click again
+        setInteractiveStep(dialogOpenerIndex - 1);
+        setWaitingForUserClick(true);
         return;
       }
     }
     
     if (interactiveStep > 0) {
       setInteractiveStep(interactiveStep - 1);
-      setValidationError(null);
     } else if (currentPageTour) {
       // At start of page - go to previous page's last step
       if (currentTour?.previousPage) {
@@ -888,7 +1018,6 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
           }
           setCurrentPageTour(currentTour.previousPage);
           setInteractiveStep(prevPageTour.steps.length - 1);
-          setValidationError(null);
           navigate(currentTour.previousPage);
         }
       }
@@ -1063,6 +1192,18 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
                 <p className="tour-tooltip-hint">
                   <span className="tour-hint-icon">✏️</span>
                   Enter a value in the highlighted field to continue
+                </p>
+              )}
+              {waitingForUserClick && (
+                <p className="tour-tooltip-hint">
+                  <span className="tour-hint-icon">👆</span>
+                  Click the highlighted button to continue
+                </p>
+              )}
+              {currentInteractiveStep?.requiresAction && !actionCompleted && (
+                <p className="tour-tooltip-hint">
+                  <span className="tour-hint-icon">▶️</span>
+                  Click the button to run the action, then click Next
                 </p>
               )}
               {validationError && (
