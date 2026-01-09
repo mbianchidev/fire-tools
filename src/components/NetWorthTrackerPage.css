@@ -22,7 +22,7 @@
 
 .net-worth-tracker-main {
   background: white;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -49,7 +49,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   color: white;
 }
 
@@ -66,7 +66,7 @@
 }
 
 .net-worth-card.total {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-neutral-900);
 }
 
 .net-worth-card .card-icon {
@@ -129,11 +129,11 @@
 .btn-entry {
   padding: 0.5rem 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 0.9rem;
   transition: transform 0.2s, box-shadow 0.2s;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--color-neutral-900);
   color: white;
 }
 
@@ -166,7 +166,7 @@
 
 .data-table-section {
   background: #f8f9fa;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 1rem;
 }
 
@@ -189,7 +189,7 @@
 .data-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .data-table th {
@@ -225,7 +225,7 @@
 
 .chart-container {
   background: #f8f9fa;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   min-height: 300px;
 }
@@ -252,8 +252,8 @@
 
 .view-mode-select {
   padding: 0.4rem 0.8rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
   background: white;
   font-size: 0.85rem;
   cursor: pointer;
@@ -261,12 +261,12 @@
 }
 
 .view-mode-select:hover {
-  border-color: #667eea;
+  border-color: var(--color-neutral-900);
 }
 
 .view-mode-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--color-neutral-900);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -286,7 +286,7 @@
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   margin-top: 1rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 0.9rem;
 }
 
@@ -330,7 +330,7 @@
   margin-bottom: 1rem;
   padding: 0.75rem;
   background: white;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   flex-wrap: wrap;
 }
 
@@ -353,8 +353,8 @@
 
 .currency-btn {
   padding: 0.4rem 0.8rem;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
   background: white;
   cursor: pointer;
   font-size: 0.85rem;
@@ -362,7 +362,7 @@
 }
 
 .currency-btn:hover {
-  border-color: #667eea;
+  border-color: var(--color-neutral-900);
   transform: translateY(-1px);
 }
 
@@ -374,8 +374,8 @@
 /* FIRE Progress Section */
 .fire-progress-section {
   margin-top: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
+  background: var(--color-neutral-900);
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   color: white;
 }
@@ -430,14 +430,14 @@
   margin-top: 1rem;
   height: 12px;
   background: rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .fire-progress-fill {
   height: 100%;
   background: white;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   transition: width 0.5s ease;
 }
 
@@ -543,7 +543,7 @@
 /* Sync Configuration Section */
 .sync-config-section {
   background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 1.5rem;
   margin-bottom: 2rem;
   border: 1px solid #2196F3;
@@ -580,7 +580,7 @@
 
 .sync-info {
   background: white;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 1rem;
   margin: 0;
   font-size: 0.9rem;
