@@ -377,7 +377,6 @@ body {
   border: 2px solid var(--border-light);
   border-radius: var(--radius-md);
   font-size: 1rem;
-  font-family: var(--font-mono);
   transition: all var(--transition-normal);
   background: var(--surface-secondary);
 }

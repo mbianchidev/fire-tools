@@ -249,7 +249,6 @@
 .target-input {
   width: 80px;
   text-align: right;
-  font-family: var(--font-mono);
 }
 
 .target-mode-select:focus,
@@ -700,7 +699,6 @@
   border: 2px solid var(--color-accent-500);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
-  font-family: var(--font-mono);
 }
 
 .edit-input:focus {
