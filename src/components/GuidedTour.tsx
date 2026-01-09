@@ -493,7 +493,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       position: 'center',
       elementSelector: '[data-tour="add-asset-button"]',
       waitForUserClick: true,
-      dialogSelector: '.dialog',
+      dialogSelector: '.dialog-content',
     },
     // Add Asset Dialog steps
     {
@@ -501,7 +501,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       title: '📝 Asset Class Selection',
       description: 'First, choose the asset class (Stocks, Bonds, Cash, Crypto, or Real Estate). This determines how the asset is categorized in your portfolio.',
       position: 'center',
-      elementSelector: '.dialog',
+      elementSelector: '.dialog-content',
       isDialogStep: true,
     },
     {
@@ -509,7 +509,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       title: '🏷️ Asset Details',
       description: 'Enter the asset name, ticker symbol (e.g., AAPL, VTI), number of shares you own, and the price per share. The total value is calculated automatically.',
       position: 'center',
-      elementSelector: '.dialog',
+      elementSelector: '.dialog-content',
       isDialogStep: true,
     },
     {
@@ -517,7 +517,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       title: '🎯 Target Allocation',
       description: 'Set your target allocation mode: "%" for percentage of the asset class, "SET" for a fixed amount, or "OFF" to exclude from rebalancing.',
       position: 'center',
-      elementSelector: '.dialog',
+      elementSelector: '.dialog-content',
       isDialogStep: true,
       closeDialogAfter: true,
     },
@@ -637,11 +637,25 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     },
     {
       page: '/expense-tracker',
+      title: '💵 Budget Categories',
+      description: 'Here you can set monthly budget limits for each expense category. The progress bars show how much you\'ve spent vs. your budget. Edit the amounts to customize your spending goals.',
+      position: 'center',
+      elementSelector: '[data-tour="budgets-content"]',
+    },
+    {
+      page: '/expense-tracker',
       title: '📈 Analytics',
       description: 'Click the Analytics tab to see spending trends, category breakdowns, and monthly comparisons to help you understand your financial habits.',
       position: 'center',
       elementSelector: '[data-tour="analytics-tab"]',
       waitForUserClick: true,
+    },
+    {
+      page: '/expense-tracker',
+      title: '📊 Spending Insights',
+      description: 'View detailed charts and analytics: spending trends over time, category breakdowns, and monthly comparisons. Use the view selector to switch between monthly, quarterly, and yearly perspectives.',
+      position: 'center',
+      elementSelector: '[data-tour="analytics-content"]',
     },
   ];
 
@@ -728,7 +742,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     {
       page: '/monte-carlo',
       title: '⚙️ Simulation Parameters',
-      description: 'Adjust the simulation settings: number of simulations, stock/bond volatility, and black swan event probability. These affect how conservative or optimistic your projections are.',
+      description: 'Adjust the simulation settings: number of simulations, stock/bond volatility, and black swan event probability. These affect how conservative or optimistic your projections are. Try changing some values!',
       position: 'center',
       elementSelector: '[data-tour="monte-carlo-params"]',
     },
@@ -737,7 +751,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       title: '▶️ Run Simulation',
       description: 'Click the "Run Simulations" button to run the Monte Carlo analysis. This will generate thousands of scenarios based on your parameters.',
       position: 'center',
-      elementSelector: '.run-simulation-btn',
+      elementSelector: '[data-tour="monte-carlo-run-btn"]',
       requiresAction: true,
       actionCompletedSelector: '[data-tour="monte-carlo-results"]',
     },

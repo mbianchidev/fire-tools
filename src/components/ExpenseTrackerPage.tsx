@@ -940,7 +940,7 @@ export function ExpenseTrackerPage() {
 
         {/* Budgets Tab */}
         {activeTab === 'budgets' && (
-          <section className="budgets-section" role="tabpanel" aria-labelledby="budgets-tab">
+          <section className="budgets-section" role="tabpanel" aria-labelledby="budgets-tab" data-tour="budgets-content">
             <h3>Monthly Budgets</h3>
             <p className="section-description">
               Set monthly spending limits for each category. These budgets apply to all months and help you track your spending across your entire budget.
@@ -999,7 +999,7 @@ export function ExpenseTrackerPage() {
 
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
-          <section className="analytics-section" role="tabpanel" aria-labelledby="analytics-tab">
+          <section className="analytics-section" role="tabpanel" aria-labelledby="analytics-tab" data-tour="analytics-content">
             <h3>Spending Analytics for {selectedYear}</h3>
             
             {/* Analytics View Selector */}
