@@ -763,45 +763,37 @@
   pointer-events: auto;
 }
 
-/* Disable all inputs on the page during interactive tour except highlighted ones */
-.tour-interactive-mode input:not(.tour-highlight input),
-.tour-interactive-mode select:not(.tour-highlight select),
-.tour-interactive-mode textarea:not(.tour-highlight textarea),
-.tour-interactive-mode button:not(.tour-highlight button):not(.tour-tooltip button):not(.tour-tooltip-skip):not(.tour-btn):not(.dialog-close):not(.dialog button):not(.dca-dialog button):not(.net-worth-dialog button) {
-  pointer-events: none !important;
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
+/* 
+ * Strategy: During interactive tour mode, we disable inputs/buttons that are NOT in:
+ * - The highlighted section (.tour-highlight)
+ * - The tour tooltip (.tour-tooltip)
+ * - Dialogs (.dialog, .dca-dialog, .net-worth-dialog)
+ * 
+ * We use a two-step approach:
+ * 1. First disable elements in non-highlighted data-tour sections
+ * 2. Then explicitly re-enable elements in highlighted sections (with higher specificity)
+ */
 
-/* More specific selectors for inputs outside of highlighted sections */
+/* Disable inputs in non-highlighted data-tour sections */
 .tour-interactive-mode [data-tour]:not(.tour-highlight) input,
 .tour-interactive-mode [data-tour]:not(.tour-highlight) select,
 .tour-interactive-mode [data-tour]:not(.tour-highlight) textarea,
-.tour-interactive-mode [data-tour]:not(.tour-highlight) button:not(.tour-btn):not(.dialog-close) {
+.tour-interactive-mode [data-tour]:not(.tour-highlight) button {
   pointer-events: none !important;
   opacity: 0.5 !important;
   cursor: not-allowed !important;
 }
 
-/* Ensure inputs outside data-tour sections are also disabled */
-.tour-interactive-mode aside input:not(.tour-highlight input),
-.tour-interactive-mode aside select:not(.tour-highlight select),
-.tour-interactive-mode aside textarea:not(.tour-highlight textarea),
-.tour-interactive-mode main input:not(.tour-highlight input):not(.dialog input):not(.dca-dialog input):not(.net-worth-dialog input),
-.tour-interactive-mode main select:not(.tour-highlight select):not(.dialog select):not(.dca-dialog select):not(.net-worth-dialog select),
-.tour-interactive-mode main textarea:not(.tour-highlight textarea):not(.dialog textarea):not(.dca-dialog textarea):not(.net-worth-dialog textarea) {
-  pointer-events: none !important;
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-}
-
-/* Keep highlighted section inputs enabled */
+/* Keep highlighted section inputs AND buttons enabled (this rule enables buttons too!) */
 .tour-interactive-mode .tour-highlight input,
 .tour-interactive-mode .tour-highlight select,
-.tour-interactive-mode .tour-highlight textarea {
+.tour-interactive-mode .tour-highlight textarea,
+.tour-interactive-mode .tour-highlight button {
   pointer-events: auto !important;
   opacity: 1 !important;
-  cursor: auto !important;
+  cursor: pointer !important;
+  z-index: 10002 !important;
+  position: relative !important;
 }
 
 /* Keep tour tooltip buttons enabled */
@@ -838,12 +830,14 @@
   cursor: auto !important;
 }
 
-/* Keep run-simulation button enabled when highlighted */
-.tour-interactive-mode .run-simulation-btn.tour-highlight {
+/* Keep run-simulation button and any button with tour-highlight enabled */
+.tour-interactive-mode .run-simulation-btn.tour-highlight,
+.tour-interactive-mode button.tour-highlight {
   pointer-events: auto !important;
   opacity: 1 !important;
   cursor: pointer !important;
   z-index: 10002 !important;
+  position: relative !important;
 }
 
 /* Ensure ALL buttons inside highlighted sections are fully clickable (consolidated rule with high specificity) */
