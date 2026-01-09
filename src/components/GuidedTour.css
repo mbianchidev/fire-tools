@@ -856,3 +856,12 @@ body.tour-interactive-mode .tour-highlight .primary-btn {
   z-index: 10002 !important;
   position: relative !important;
 }
+
+/* When data-tour is directly on a button (like tabs), make it clickable when highlighted */
+body.tour-interactive-mode button[data-tour].tour-highlight {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+  z-index: 10002 !important;
+  position: relative !important;
+}

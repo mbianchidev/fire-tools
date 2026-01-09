@@ -889,6 +889,13 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       setDialogOpen(false);
     }
 
+    // Also close dialog if moving from a dialog step to a non-dialog step
+    // This handles the case where closeDialogAfter might not be set but the dialog should still close
+    if (currentInteractiveStep?.isDialogStep && nextStep && !nextStep.isDialogStep && dialogOpen) {
+      closeAnyOpenDialog();
+      setDialogOpen(false);
+    }
+
     // If current step requires waiting for user to click a button to open dialog
     // and the dialog isn't open yet, set waiting state and return
     if (currentInteractiveStep?.waitForUserClick && !dialogOpen && currentInteractiveStep?.dialogSelector) {
