@@ -4,17 +4,20 @@
   padding: 2rem;
 }
 
+/* ============================================
+   SECURITY BANNER - Fintech Professional
+   ============================================ */
 .security-warning-banner {
-  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
   color: white;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 8px 30px rgba(220, 38, 38, 0.3);
+  box-shadow: 0 8px 30px rgba(153, 27, 27, 0.3);
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
-  border: 3px solid #fca5a5;
+  border: 1px solid rgba(252, 165, 165, 0.3);
   position: relative;
 }
 
@@ -70,57 +73,76 @@
 }
 
 .warning-close:hover {
-  color: #fee2e2;
+  color: #fecaca;
 }
 
 .warning-button {
   background: white;
-  color: #dc2626;
+  color: #991b1b;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-weight: 600;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-md);
 }
 
 .warning-button:hover {
   background: #fef2f2;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-lg);
 }
 
+/* ============================================
+   HERO SECTION - Fintech Professional
+   ============================================ */
 .hero-section {
   text-align: center;
-  padding: 3rem 2rem;
-  background: white;
-  border-radius: 16px;
+  padding: 4rem 2rem;
+  background: var(--surface-primary);
+  border-radius: var(--radius-xl);
   margin-bottom: 3rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  /* Prevent CLS by reserving minimum height based on content */
-  min-height: 180px;
+  box-shadow: var(--shadow-card);
+  min-height: 200px;
+  border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-accent);
 }
 
 .hero-title {
   font-size: 3.5rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1rem;
-  font-weight: bold;
-  /* Prevent CLS from font loading by reserving line height */
+  font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.025em;
 }
 
 .hero-subtitle {
   font-size: 1.3rem;
-  color: #666;
+  color: var(--color-accent-500);
   max-width: 700px;
   margin: 0 auto;
   line-height: 1.6;
+  font-weight: 500;
 }
 
+/* ============================================
+   FEATURE CARDS - Fintech Professional
+   ============================================ */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -129,20 +151,41 @@
 }
 
 .feature-card {
-  background: white;
-  border-radius: 16px;
+  background: var(--surface-primary);
+  border-radius: var(--radius-xl);
   padding: 2.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: all var(--transition-normal);
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-normal);
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-glow), var(--shadow-xl);
+  border-color: var(--color-accent-400);
+}
+
+.feature-card:hover::before {
+  transform: scaleX(1);
 }
 
 .feature-icon {
@@ -151,21 +194,23 @@
 }
 
 .feature-card h2 {
-  font-size: 1.8rem;
-  color: #333;
+  font-size: 1.5rem;
+  color: var(--text-primary);
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 /* Maintain visual style for feature card headings when using h3 */
 .feature-card .feature-card-title {
-  font-size: 1.8rem;
-  color: #333;
+  font-size: 1.5rem;
+  color: var(--text-primary);
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .feature-card p {
   font-size: 1rem;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 1.5rem;
   flex-grow: 1;
@@ -179,61 +224,68 @@
 }
 
 .highlight-item {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
+  background: var(--gradient-accent);
   color: white;
   padding: 0.4rem 0.8rem;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   font-size: 0.85rem;
   font-weight: 500;
 }
 
 .cta-link {
-  color: #5568d4;
-  font-weight: bold;
+  color: var(--color-accent-500);
+  font-weight: 600;
   font-size: 1.1rem;
   display: inline-block;
-  transition: transform 0.2s;
+  transition: transform var(--transition-fast);
 }
 
 .feature-card:hover .cta-link {
   transform: translateX(5px);
+  color: var(--color-accent-600);
 }
 
+/* ============================================
+   INFO SECTION - Fintech Professional
+   ============================================ */
 .info-section {
-  background: white;
-  border-radius: 16px;
+  background: var(--surface-primary);
+  border-radius: var(--radius-xl);
   padding: 2.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
   margin-top: 2.5rem;
   margin-bottom: 3rem;
+  border: 1px solid var(--border-light);
 }
 
 .info-section h3 {
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 /* Maintain visual style for info section heading when using h2 */
 .info-section .info-section-title {
   font-size: 1.8rem;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .info-section p {
   font-size: 1.1rem;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.8;
   margin-bottom: 1.5rem;
 }
 
 .disclaimer {
-  background: #fff3cd;
-  border: 2px solid #ffc107;
-  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 2px solid var(--color-warning-500);
+  border-radius: var(--radius-md);
   padding: 1rem;
-  color: #856404;
+  color: var(--color-warning-600);
   font-size: 0.95rem;
   line-height: 1.5;
 }

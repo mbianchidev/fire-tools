@@ -1,15 +1,15 @@
-/* Cookie consent banner */
+/* Cookie consent banner - Fintech Theme */
 .cookie-banner {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--surface-dark);
   backdrop-filter: blur(10px);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
   z-index: 9999;
   padding: 1.5rem;
-  border-top: 3px solid #5568d4;
+  border-top: 3px solid var(--color-accent-500);
   animation: slideUp 0.4s ease-out;
 }
 
@@ -41,41 +41,41 @@
 .cookie-banner-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.2rem;
-  color: #333;
+  color: var(--text-inverse);
   font-weight: 600;
 }
 
 .cookie-banner-description {
   margin: 0 0 0.5rem 0;
-  color: #555;
+  color: var(--color-primary-300);
   line-height: 1.6;
   font-size: 0.95rem;
 }
 
 .cookie-banner-description strong {
-  color: #333;
+  color: var(--text-inverse);
   font-weight: 600;
 }
 
 .cookie-banner-links {
   margin: 0;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--color-primary-400);
 }
 
 .cookie-banner-links a {
-  color: #5568d4;
+  color: var(--color-accent-400);
   text-decoration: underline;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color var(--transition-fast);
 }
 
 .cookie-banner-links a:hover {
-  color: #764ba2;
+  color: var(--color-accent-300);
 }
 
 .cookie-banner-links a:focus {
-  outline: 3px solid #5568d4;
+  outline: 3px solid var(--color-accent-500);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -85,16 +85,16 @@
 }
 
 .cookie-btn-acknowledge {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
+  background: var(--gradient-accent);
   color: white;
   border: none;
   padding: 0.875rem 2rem;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-glow);
   min-height: 44px;
   min-width: 100px;
   white-space: nowrap;
@@ -102,17 +102,17 @@
 
 .cookie-btn-acknowledge:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 0 30px rgba(20, 184, 166, 0.3);
 }
 
 .cookie-btn-acknowledge:focus {
-  outline: 3px solid #5568d4;
+  outline: 3px solid var(--color-accent-400);
   outline-offset: 2px;
 }
 
 .cookie-btn-acknowledge:active {
   transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
 /* Mobile responsive - Tablet portrait and below */
