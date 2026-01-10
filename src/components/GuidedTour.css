@@ -661,25 +661,19 @@
 /* Element highlight styles */
 .tour-highlight {
   position: relative;
-  z-index: 10000 !important;
+  z-index: 10001 !important;
   box-shadow: 0 0 0 4px rgba(85, 104, 212, 0.6), 0 0 20px rgba(85, 104, 212, 0.4) !important;
   border-radius: 8px;
   animation: tourPulse 2s ease-in-out infinite;
   isolation: isolate;
   opacity: 1 !important;
-}
-
-/* For non-button elements with tour-highlight, use white background to prevent dark appearance */
-div.tour-highlight,
-section.tour-highlight,
-[data-tour].tour-highlight:not(button) {
   background-color: white !important;
 }
 
-/* For buttons with data-tour that are highlighted, preserve their original styling */
+/* For buttons with data-tour that are highlighted, preserve their original background but keep glow */
 button.tour-highlight,
 button[data-tour].tour-highlight {
-  background-color: inherit !important;
+  background-color: var(--primary-color, #5568d4) !important;
 }
 
 @keyframes tourPulse {

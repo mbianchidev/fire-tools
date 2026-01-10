@@ -111,7 +111,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
       </div>
 
       {/* Base Data Section - Non-editable simulation parameters */}
-      <div className="mc-base-data-section">
+      <div className="mc-base-data-section" data-tour="monte-carlo-base-data">
         <button
           type="button"
           className="mc-base-data-toggle"

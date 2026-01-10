@@ -745,10 +745,10 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   const monteCarloSteps: InteractiveStep[] = [
     {
       page: '/monte-carlo',
-      title: '🎲 Monte Carlo Overview',
-      description: 'Monte Carlo simulations run thousands of possible market scenarios to show the probability of reaching your FIRE goals. This accounts for market volatility and uncertainty.',
+      title: '📊 Simulation Base Data',
+      description: 'This section shows the FIRE Calculator data used for simulations: your portfolio value, FIRE target, income, savings rate, and expected returns. These values come from your FIRE Calculator inputs.',
       position: 'center',
-      elementSelector: '[data-tour="monte-carlo-overview"]',
+      elementSelector: '[data-tour="monte-carlo-base-data"]',
     },
     {
       page: '/monte-carlo',
