@@ -665,13 +665,18 @@
   box-shadow: 0 0 0 4px rgba(85, 104, 212, 0.6), 0 0 20px rgba(85, 104, 212, 0.4) !important;
   border-radius: 8px;
   animation: tourPulse 2s ease-in-out infinite;
-  /* Ensure highlighted element has solid white background - prevents dark appearance */
-  background-color: white !important;
   isolation: isolate;
   opacity: 1 !important;
 }
 
-/* For buttons with data-tour that are highlighted, use their original background */
+/* For non-button elements with tour-highlight, use white background to prevent dark appearance */
+div.tour-highlight,
+section.tour-highlight,
+[data-tour].tour-highlight:not(button) {
+  background-color: white !important;
+}
+
+/* For buttons with data-tour that are highlighted, preserve their original styling */
 button.tour-highlight,
 button[data-tour].tour-highlight {
   background-color: inherit !important;
@@ -793,7 +798,11 @@ button[data-tour].tour-highlight {
   cursor: not-allowed !important;
 }
 
-/* Disable buttons inside non-highlighted data-tour sections (but NOT the data-tour element itself if it's a button) */
+/* 
+ * Disable buttons inside non-highlighted data-tour sections.
+ * The :not([data-tour]) ensures we don't disable buttons that ARE themselves the data-tour element
+ * (like budget/analytics tabs which have data-tour directly on the button).
+ */
 .tour-interactive-mode [data-tour]:not(.tour-highlight) button:not([data-tour]) {
   pointer-events: none !important;
   opacity: 0.5 !important;
@@ -818,7 +827,7 @@ body.tour-interactive-mode button[data-tour].tour-highlight {
   cursor: pointer !important;
   z-index: 10002 !important;
   position: relative !important;
-  background-color: inherit;
+  background-color: inherit !important;
 }
 
 /* Keep highlighted section inputs AND buttons enabled (this rule enables buttons too!) */
