@@ -666,15 +666,22 @@
   border-radius: 8px;
   animation: tourPulse 2s ease-in-out infinite;
   isolation: isolate;
-}
-
-/* Non-button highlighted elements get white background */
-.tour-highlight:not(button) {
-  background-color: white !important;
   opacity: 1 !important;
 }
 
-/* For buttons with data-tour that are highlighted, preserve their original background but keep glow */
+/* Non-button highlighted sections get white background, but NOT wrapper divs containing buttons */
+section.tour-highlight,
+.tour-highlight:not(button):not(div):not([data-tour="add-asset-button"]):not([data-tour="dca-helper"]) {
+  background-color: white !important;
+}
+
+/* Button wrappers (like add-asset-button, dca-helper) should be transparent so button shows through */
+div.tour-highlight[data-tour="add-asset-button"],
+div.tour-highlight[data-tour="dca-helper"] {
+  background-color: transparent !important;
+}
+
+/* For buttons with data-tour directly on them, preserve their original background */
 button.tour-highlight,
 button[data-tour].tour-highlight {
   background-color: inherit !important;
@@ -812,12 +819,13 @@ button[data-tour].tour-highlight {
  * Dim non-highlighted data-tour sections using a pseudo-element overlay
  * to avoid opacity inheritance issues with child elements.
  * This makes highlighted buttons inside remain fully visible.
+ * Note: This ONLY applies to [data-tour] elements that do NOT have .tour-highlight
  */
-.tour-interactive-mode [data-tour]:not(.tour-highlight) {
+.tour-interactive-mode [data-tour]:not(.tour-highlight):not(button) {
   position: relative;
 }
 
-.tour-interactive-mode [data-tour]:not(.tour-highlight)::after {
+.tour-interactive-mode [data-tour]:not(.tour-highlight):not(button)::after {
   content: '';
   position: absolute;
   top: 0;
@@ -830,13 +838,19 @@ button[data-tour].tour-highlight {
   border-radius: inherit;
 }
 
+/* Ensure buttons with data-tour that are NOT highlighted still work but appear dimmed */
+.tour-interactive-mode button[data-tour]:not(.tour-highlight) {
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+
 /* Keep the highlighted section and ALL its contents at full opacity */
 .tour-interactive-mode .tour-highlight,
 .tour-interactive-mode [data-tour].tour-highlight {
   opacity: 1 !important;
 }
 
-/* Special rule for buttons that ARE the data-tour element (like budget/analytics tabs) */
+/* Ensure highlighted buttons with data-tour (like budget/analytics tabs) are fully visible and clickable */
 body.tour-interactive-mode button[data-tour].tour-highlight {
   pointer-events: auto !important;
   opacity: 1 !important;
