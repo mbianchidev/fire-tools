@@ -669,19 +669,21 @@
   opacity: 1 !important;
 }
 
-/* Non-button highlighted sections get white background, but NOT wrapper divs containing buttons */
-section.tour-highlight,
-.tour-highlight:not(button):not(div):not([data-tour="add-asset-button"]):not([data-tour="dca-helper"]) {
+/* 
+ * Section highlights get white background.
+ * Div wrappers should be transparent to let buttons inside show their colors.
+ * Buttons preserve their original background.
+ */
+section.tour-highlight {
   background-color: white !important;
 }
 
-/* Button wrappers (like add-asset-button, dca-helper) should be transparent so button shows through */
-div.tour-highlight[data-tour="add-asset-button"],
-div.tour-highlight[data-tour="dca-helper"] {
+/* Div wrappers around buttons should be transparent */
+div.tour-highlight {
   background-color: transparent !important;
 }
 
-/* For buttons with data-tour directly on them, preserve their original background */
+/* Buttons preserve their original background color */
 button.tour-highlight,
 button[data-tour].tour-highlight {
   background-color: inherit !important;
