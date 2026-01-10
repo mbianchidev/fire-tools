@@ -279,13 +279,24 @@ const EXPENSE_TEMPLATES: Array<{
 ];
 
 /**
+ * Seeded random number generator for deterministic testing
+ * Uses sine-based pseudo-random for consistent values
+ */
+function seededRandom(seed: number, min: number, max: number): number {
+  const x = Math.sin(seed * 9999) * 10000;
+  return min + (x - Math.floor(x)) * (max - min);
+}
+
+/**
  * Generate random amount with variance
  */
-function randomAmount(base: number, variancePercent: number): number {
+function randomAmount(base: number, variancePercent: number, seed?: number): number {
   const variance = base * (variancePercent / 100);
   const min = base - variance;
   const max = base + variance;
-  const amount = Math.random() * (max - min) + min;
+  const amount = seed !== undefined 
+    ? seededRandom(seed, min, max)
+    : Math.random() * (max - min) + min;
   // Ensure we never return 0 or negative amounts
   return Math.max(1, Math.round(amount));
 }
@@ -293,8 +304,11 @@ function randomAmount(base: number, variancePercent: number): number {
 /**
  * Pick random item from array
  */
-function randomPick<T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)];
+function randomPick<T>(array: T[], seed?: number): T {
+  const index = seed !== undefined
+    ? Math.floor(seededRandom(seed, 0, array.length))
+    : Math.floor(Math.random() * array.length);
+  return array[index];
 }
 
 /**
@@ -321,22 +335,33 @@ function generateMonthlyIncome(year: number, month: number): IncomeEntry[] {
 
 /**
  * Generate monthly expense entries
+ * @param year - Year for the expenses
+ * @param month - Month for the expenses (1-12)
+ * @param useSeed - Whether to use seeded random for deterministic results (for testing)
  */
-function generateMonthlyExpenses(year: number, month: number): ExpenseEntry[] {
+function generateMonthlyExpenses(year: number, month: number, useSeed: boolean = false): ExpenseEntry[] {
   const expenses: ExpenseEntry[] = [];
+  const monthSeed = useSeed ? year * 100 + month : undefined;
   
   // Monthly expenses (always occur)
   const monthlyTemplates = EXPENSE_TEMPLATES.filter(t => t.frequency === 'monthly');
-  for (const template of monthlyTemplates) {
-    const day = Math.floor(Math.random() * 28) + 1; // 1-28 to avoid month-end issues
+  for (let idx = 0; idx < monthlyTemplates.length; idx++) {
+    const template = monthlyTemplates[idx];
+    const daySeed = monthSeed !== undefined ? monthSeed * 1000 + idx : undefined;
+    const day = daySeed !== undefined 
+      ? Math.floor(seededRandom(daySeed, 1, 29))
+      : Math.floor(Math.random() * 28) + 1; // 1-28 to avoid month-end issues
     const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    const amountSeed = monthSeed !== undefined ? monthSeed * 10000 + idx : undefined;
+    const descSeed = monthSeed !== undefined ? monthSeed * 100000 + idx : undefined;
     
     expenses.push({
       id: generateTransactionId(),
       type: 'expense',
       date: dateStr,
-      amount: randomAmount(template.baseAmount, template.variance),
-      description: randomPick(template.descriptions),
+      amount: randomAmount(template.baseAmount, template.variance, amountSeed),
+      description: randomPick(template.descriptions, descSeed),
       category: template.category,
       expenseType: template.type,
       currency: 'EUR',
@@ -345,19 +370,31 @@ function generateMonthlyExpenses(year: number, month: number): ExpenseEntry[] {
   
   // Occasional expenses (always occur now to reach ~€40k annual expenses target)
   const occasionalTemplates = EXPENSE_TEMPLATES.filter(t => t.frequency === 'occasional');
-  for (const template of occasionalTemplates) {
+  for (let idx = 0; idx < occasionalTemplates.length; idx++) {
+    const template = occasionalTemplates[idx];
     // Generate 1-2 of each occasional expense per month
-    const count = Math.random() < 0.6 ? 1 : 2;
+    const countSeed = monthSeed !== undefined ? monthSeed * 500 + idx : undefined;
+    const countRand = countSeed !== undefined 
+      ? seededRandom(countSeed, 0, 1)
+      : Math.random();
+    const count = countRand < 0.6 ? 1 : 2;
+    
     for (let i = 0; i < count; i++) {
-      const day = Math.floor(Math.random() * 28) + 1;
+      const daySeed = monthSeed !== undefined ? monthSeed * 2000 + idx * 10 + i : undefined;
+      const day = daySeed !== undefined
+        ? Math.floor(seededRandom(daySeed, 1, 29))
+        : Math.floor(Math.random() * 28) + 1;
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      const amountSeed = monthSeed !== undefined ? monthSeed * 20000 + idx * 10 + i : undefined;
+      const descSeed = monthSeed !== undefined ? monthSeed * 200000 + idx * 10 + i : undefined;
       
       expenses.push({
         id: generateTransactionId(),
         type: 'expense',
         date: dateStr,
-        amount: randomAmount(template.baseAmount, template.variance),
-        description: randomPick(template.descriptions),
+        amount: randomAmount(template.baseAmount, template.variance, amountSeed),
+        description: randomPick(template.descriptions, descSeed),
         category: template.category,
         expenseType: template.type,
         currency: 'EUR',
@@ -367,25 +404,46 @@ function generateMonthlyExpenses(year: number, month: number): ExpenseEntry[] {
   
   // Rare expenses (35% chance, seasonal for some)
   const rareTemplates = EXPENSE_TEMPLATES.filter(t => t.frequency === 'rare');
-  for (const template of rareTemplates) {
-    let shouldInclude = Math.random() < 0.35;
+  for (let idx = 0; idx < rareTemplates.length; idx++) {
+    const template = rareTemplates[idx];
+    const shouldIncludeSeed = monthSeed !== undefined ? monthSeed * 300 + idx : undefined;
+    const shouldIncludeRand = shouldIncludeSeed !== undefined
+      ? seededRandom(shouldIncludeSeed, 0, 1)
+      : Math.random();
+    let shouldInclude = shouldIncludeRand < 0.35;
     
     // Special handling for holiday expenses
     if (template.category === 'HOLIDAYS') {
       // Higher chance in December, November, January
-      shouldInclude = month === 12 || (month === 11 && Math.random() < 0.4) || (month === 1 && Math.random() < 0.3);
+      if (month === 12) {
+        shouldInclude = true;
+      } else if (month === 11) {
+        const novSeed = monthSeed !== undefined ? monthSeed * 400 + idx : undefined;
+        const novRand = novSeed !== undefined ? seededRandom(novSeed, 0, 1) : Math.random();
+        shouldInclude = novRand < 0.4;
+      } else if (month === 1) {
+        const janSeed = monthSeed !== undefined ? monthSeed * 400 + idx : undefined;
+        const janRand = janSeed !== undefined ? seededRandom(janSeed, 0, 1) : Math.random();
+        shouldInclude = janRand < 0.3;
+      }
     }
     
     if (shouldInclude) {
-      const day = Math.floor(Math.random() * 28) + 1;
+      const daySeed = monthSeed !== undefined ? monthSeed * 3000 + idx : undefined;
+      const day = daySeed !== undefined
+        ? Math.floor(seededRandom(daySeed, 1, 29))
+        : Math.floor(Math.random() * 28) + 1;
       const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      const amountSeed = monthSeed !== undefined ? monthSeed * 30000 + idx : undefined;
+      const descSeed = monthSeed !== undefined ? monthSeed * 300000 + idx : undefined;
       
       expenses.push({
         id: generateTransactionId(),
         type: 'expense',
         date: dateStr,
-        amount: randomAmount(template.baseAmount, template.variance),
-        description: randomPick(template.descriptions),
+        amount: randomAmount(template.baseAmount, template.variance, amountSeed),
+        description: randomPick(template.descriptions, descSeed),
         category: template.category,
         expenseType: template.type,
         currency: 'EUR',
@@ -402,8 +460,9 @@ function generateMonthlyExpenses(year: number, month: number): ExpenseEntry[] {
 /**
  * Generate demo expense tracker data for a specific year
  * @param targetYear - The year to generate data for (defaults to current year)
+ * @param useSeed - Whether to use seeded random for deterministic results (defaults to false)
  */
-export function generateDemoExpenseData(targetYear?: number): ExpenseTrackerData {
+export function generateDemoExpenseData(targetYear?: number, useSeed: boolean = false): ExpenseTrackerData {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
@@ -414,7 +473,7 @@ export function generateDemoExpenseData(targetYear?: number): ExpenseTrackerData
   for (let month = 1; month <= 12; month++) {
     const monthData = createEmptyMonthData(year, month);
     monthData.incomes = generateMonthlyIncome(year, month);
-    monthData.expenses = generateMonthlyExpenses(year, month);
+    monthData.expenses = generateMonthlyExpenses(year, month, useSeed);
     months.push(monthData);
   }
 
