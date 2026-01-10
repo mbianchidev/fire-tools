@@ -513,7 +513,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(2px);
+  /* Removed backdrop-filter: blur to prevent blurriness on highlighted elements */
   z-index: 9999;
   pointer-events: none;
   animation: fadeIn 0.3s ease-out;
@@ -665,6 +665,9 @@
   box-shadow: 0 0 0 4px rgba(85, 104, 212, 0.6), 0 0 20px rgba(85, 104, 212, 0.4) !important;
   border-radius: 8px;
   animation: tourPulse 2s ease-in-out infinite;
+  /* Ensure highlighted element is NOT blurry - add solid background */
+  background-color: inherit;
+  isolation: isolate;
 }
 
 @keyframes tourPulse {
@@ -856,4 +859,22 @@ body.tour-interactive-mode .tour-highlight .primary-btn {
   cursor: pointer !important;
   z-index: 10002 !important;
   position: relative !important;
+}
+
+/* Ensure all content inside highlighted sections is visible and not dimmed */
+body.tour-interactive-mode .tour-highlight,
+body.tour-interactive-mode .tour-highlight * {
+  opacity: 1 !important;
+}
+
+/* Specifically ensure tables inside highlighted sections are fully visible */
+body.tour-interactive-mode .tour-highlight table,
+body.tour-interactive-mode .tour-highlight table *,
+body.tour-interactive-mode .tour-highlight .breakdown-table,
+body.tour-interactive-mode .tour-highlight .breakdown-table *,
+body.tour-interactive-mode .tour-highlight tbody,
+body.tour-interactive-mode .tour-highlight tbody tr,
+body.tour-interactive-mode .tour-highlight tbody td {
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
