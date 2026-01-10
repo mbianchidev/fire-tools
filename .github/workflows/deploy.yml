@@ -30,8 +30,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
-        run: npm run test -- --reporter=json --outputFile=test-results.json
+      - name: Run tests with coverage
+        run: npm run test:coverage -- --reporter=default --reporter=json --outputFile=test-results.json
+
+      - name: Display coverage summary
+        if: always()
+        run: |
+          echo "## Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e "
+              const fs = require('fs');
+              const coverage = JSON.parse(fs.readFileSync('./coverage/coverage-summary.json', 'utf8'));
+              const total = coverage.total;
+              console.log('| Category | Coverage |');
+              console.log('|----------|----------|');
+              console.log('| Lines | ' + total.lines.pct + '% |');
+              console.log('| Statements | ' + total.statements.pct + '% |');
+              console.log('| Functions | ' + total.functions.pct + '% |');
+              console.log('| Branches | ' + total.branches.pct + '% |');
+            " >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Coverage summary not available" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -39,6 +59,14 @@ jobs:
         with:
           name: test-results
           path: test-results.json
+          retention-days: 30
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
           retention-days: 30
 
   build:
