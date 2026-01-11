@@ -8,6 +8,7 @@ import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs
 import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from '../utils/defaults';
 import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
+import { clearTourPreference } from '../utils/tourPreferences';
 import { exportAllDataAsJSON, importAllDataFromJSON, serializeAllDataExport } from '../utils/dataExportImport';
 import { Tooltip } from './Tooltip';
 import './SettingsPage.css';
@@ -647,6 +648,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 <input type="file" accept=".json" onChange={handleImportNetWorth} hidden />
               </label>
             </div>
+          </div>
+
+          <div className="data-management-group">
+            <div className="subsection-header-with-tooltip">
+              <h3>🎓 Guided Tour</h3>
+              <Tooltip content="Take a step-by-step walkthrough of all Fire Tools features. The tour will show you how to use each tool and how they work together to help you achieve financial independence." position="right" maxWidth={350}>
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
+            <p className="setting-help">Restart the guided tour to learn about Fire Tools features</p>
+            <button className="secondary-btn" onClick={() => {
+              clearTourPreference();
+              window.location.href = '/';
+            }}>
+              🔄 Restart Tour
+            </button>
           </div>
 
           <div className="data-management-group">

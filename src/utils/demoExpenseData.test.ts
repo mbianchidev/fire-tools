@@ -71,7 +71,8 @@ describe('generateDemoExpenseData', () => {
   });
 
   it('should generate monthly expenses for each month', () => {
-    const data = generateDemoExpenseData();
+    // Use seeded data for deterministic testing
+    const data = generateDemoExpenseData(2024, true);
     
     // Each month should have expense entries
     data.years[0].months.forEach(month => {
@@ -91,6 +92,7 @@ describe('generateDemoExpenseData', () => {
     });
     
     // Total annual expenses should be around €40,000 (default expenses)
+    // With seeded data, the total should be consistent
     const totalExpenses = data.years[0].months.reduce((sum, month) => {
       return sum + month.expenses.reduce((monthSum, exp) => monthSum + exp.amount, 0);
     }, 0);

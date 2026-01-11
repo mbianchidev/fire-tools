@@ -61,7 +61,7 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge, zo
   };
 
   return (
-    <section className="fire-metrics" aria-labelledby="fire-metrics-heading">
+    <section className="fire-metrics" aria-labelledby="fire-metrics-heading" data-tour="results-section">
       <div className="fire-metrics-header">
         <h3 id="fire-metrics-heading"><span aria-hidden="true">🎯</span> FIRE Metrics</h3>
         <button 

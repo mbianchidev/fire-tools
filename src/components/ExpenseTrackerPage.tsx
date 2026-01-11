@@ -614,7 +614,7 @@ export function ExpenseTrackerPage() {
             aria-expanded={isHowToUseOpen}
             aria-controls="how-to-use-content"
           >
-            <h4><span aria-hidden="true">💡</span> How to Use <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
+            <h4><span aria-hidden="true">💡</span> How this page works <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
           </button>
           {isHowToUseOpen && (
             <ul id="how-to-use-content" className="how-to-use-content">
@@ -713,7 +713,7 @@ export function ExpenseTrackerPage() {
 
         {/* 50/30/20 Budget Rule */}
         {budgetRuleBreakdown && (
-          <section className="budget-rule-section">
+          <section className="budget-rule-section" data-tour="budget-analysis">
             <button 
               className="collapsible-header" 
               onClick={() => setIsBudgetRuleInfoOpen(!isBudgetRuleInfoOpen)}
@@ -779,7 +779,7 @@ export function ExpenseTrackerPage() {
         )}
 
         {/* Tabs */}
-        <div className="tabs" role="tablist" aria-label="Expense tracker sections">
+        <div className="tabs" role="tablist" aria-label="Expense tracker sections" data-tour="expense-tabs">
           <button
             role="tab"
             aria-selected={activeTab === 'transactions'}
@@ -793,6 +793,7 @@ export function ExpenseTrackerPage() {
             aria-selected={activeTab === 'budgets'}
             onClick={() => setActiveTab('budgets')}
             className={`tab ${activeTab === 'budgets' ? 'active' : ''}`}
+            data-tour="budgets-tab"
           >
             <span aria-hidden="true">💵</span> Budgets
           </button>
@@ -801,6 +802,7 @@ export function ExpenseTrackerPage() {
             aria-selected={activeTab === 'analytics'}
             onClick={() => setActiveTab('analytics')}
             className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
+            data-tour="analytics-tab"
           >
             <span aria-hidden="true">📊</span> Analytics
           </button>
@@ -811,7 +813,7 @@ export function ExpenseTrackerPage() {
           <section className="transactions-section" role="tabpanel" aria-labelledby="transactions-tab">
             <div className="section-header">
               <h3>Transactions</h3>
-              <div className="transaction-actions">
+              <div className="transaction-actions" data-tour="transaction-actions">
                 <button className="btn-add income" onClick={() => setShowIncomeForm(true)}>
                   <span aria-hidden="true">➕</span> Add Income
                 </button>
@@ -938,7 +940,7 @@ export function ExpenseTrackerPage() {
 
         {/* Budgets Tab */}
         {activeTab === 'budgets' && (
-          <section className="budgets-section" role="tabpanel" aria-labelledby="budgets-tab">
+          <section className="budgets-section" role="tabpanel" aria-labelledby="budgets-tab" data-tour="budgets-content">
             <h3>Monthly Budgets</h3>
             <p className="section-description">
               Set monthly spending limits for each category. These budgets apply to all months and help you track your spending across your entire budget.
@@ -997,7 +999,7 @@ export function ExpenseTrackerPage() {
 
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
-          <section className="analytics-section" role="tabpanel" aria-labelledby="analytics-tab">
+          <section className="analytics-section" role="tabpanel" aria-labelledby="analytics-tab" data-tour="analytics-content">
             <h3>Spending Analytics for {selectedYear}</h3>
             
             {/* Analytics View Selector */}

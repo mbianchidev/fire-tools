@@ -604,7 +604,7 @@ export const AssetAllocationPage: React.FC = () => {
           </div>
         )}
 
-        <section className="allocation-section" aria-labelledby="asset-classes-heading">
+        <section className="allocation-section" aria-labelledby="asset-classes-heading" data-tour="target-allocations">
           <div className="section-header-with-actions">
             <h3 id="asset-classes-heading">Asset Classes</h3>
             <button 
@@ -673,25 +673,29 @@ export const AssetAllocationPage: React.FC = () => {
           )}
         </section>
 
-        <section className="allocation-section" aria-labelledby="portfolio-details-heading">
+        <section className="allocation-section" aria-labelledby="portfolio-details-heading" data-tour="asset-list">
           <div className="section-header-with-actions">
             <h3 id="portfolio-details-heading">Portfolio Details by Asset Class</h3>
             <div className="table-actions">
-              <button 
-                onClick={() => setIsDCADialogOpen(true)} 
-                className="action-btn" 
-                style={{ background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)', color: 'white' }}
-                aria-label="Open Dollar Cost Averaging helper"
-              >
-                <span aria-hidden="true">💰</span> DCA Helper
-              </button>
-              <button 
-                onClick={() => setIsDialogOpen(true)} 
-                className="action-btn primary-btn"
-                aria-label="Add new asset to portfolio"
-              >
-                <span aria-hidden="true">➕</span> Add Asset
-              </button>
+              <div data-tour="dca-helper">
+                <button 
+                  onClick={() => setIsDCADialogOpen(true)} 
+                  className="action-btn" 
+                  style={{ background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)', color: 'white' }}
+                  aria-label="Open Dollar Cost Averaging helper"
+                >
+                  <span aria-hidden="true">💰</span> DCA Helper
+                </button>
+              </div>
+              <div data-tour="add-asset-button">
+                <button 
+                  onClick={() => setIsDialogOpen(true)} 
+                  className="action-btn primary-btn"
+                  aria-label="Add new asset to portfolio"
+                >
+                  <span aria-hidden="true">➕</span> Add Asset
+                </button>
+              </div>
             </div>
           </div>
           <CollapsibleAllocationTable

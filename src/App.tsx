@@ -18,6 +18,7 @@ import { SettingsPage } from './components/SettingsPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CookiePolicyPage } from './components/CookiePolicyPage';
 import { CookieConsent } from './components/CookieConsent';
+import { GuidedTour } from './components/GuidedTour';
 import { NotFoundPage } from './components/NotFoundPage';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
@@ -27,6 +28,7 @@ import './App.css';
 import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
 import './components/NetWorthTrackerPage.css';
+import './components/GuidedTour.css';
 
 function Navigation({ accountName }: { accountName: string }) {
   const location = useLocation();
@@ -262,7 +264,7 @@ function FIRECalculatorPage() {
           <>
             <FIREMetrics result={result} currentAge={currentAge} zoomYears={zoomYears} />
             
-            <div className="charts-section">
+            <div className="charts-section" data-tour="charts-section">
               <NetWorthChart 
                 projections={result.projections} 
                 fireTarget={result.fireTarget} 
@@ -339,6 +341,7 @@ function App() {
         </footer>
 
         <CookieConsent />
+        <GuidedTour />
       </div>
     </Router>
   );

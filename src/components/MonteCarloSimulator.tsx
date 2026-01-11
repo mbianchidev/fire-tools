@@ -103,13 +103,15 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
 
   return (
     <section className="monte-carlo-section" aria-labelledby="monte-carlo-heading">
-      <h2 id="monte-carlo-heading"><span aria-hidden="true" className="page-header-emoji">🎲</span> Monte Carlo Simulations</h2>
-      <p className="section-description">
-        Run multiple simulations with random market returns to assess the probability of reaching FIRE.
-      </p>
+      <div data-tour="monte-carlo-overview">
+        <h2 id="monte-carlo-heading"><span aria-hidden="true" className="page-header-emoji">🎲</span> Monte Carlo Simulations</h2>
+        <p className="section-description">
+          Run multiple simulations with random market returns to assess the probability of reaching FIRE.
+        </p>
+      </div>
 
       {/* Base Data Section - Non-editable simulation parameters */}
-      <div className="mc-base-data-section">
+      <div className="mc-base-data-section" data-tour="monte-carlo-base-data">
         <button
           type="button"
           className="mc-base-data-toggle"
@@ -216,7 +218,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         )}
       </div>
 
-      <div className="mc-inputs">
+      <div className="mc-inputs" data-tour="monte-carlo-params">
         <div className="form-group">
           <label htmlFor="num-simulations">Number of Simulations</label>
           <NumberInput
@@ -285,17 +287,19 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
         </div>
       )}
 
-      <button 
-        className="run-simulation-btn" 
-        onClick={runSimulation}
-        disabled={isRunning || hasErrors}
-        aria-label={isRunning ? 'Running simulations, please wait' : hasErrors ? 'Fix validation errors to run simulations' : 'Run Monte Carlo simulations'}
-      >
-        <span aria-hidden="true">{isRunning ? '⏳' : '▶️'}</span> {isRunning ? 'Running Simulations...' : 'Run Simulations'}
-      </button>
+      <div data-tour="monte-carlo-run-btn">
+        <button 
+          className="run-simulation-btn" 
+          onClick={runSimulation}
+          disabled={isRunning || hasErrors}
+          aria-label={isRunning ? 'Running simulations, please wait' : hasErrors ? 'Fix validation errors to run simulations' : 'Run Monte Carlo simulations'}
+        >
+          <span aria-hidden="true">{isRunning ? '⏳' : '▶️'}</span> {isRunning ? 'Running Simulations...' : 'Run Simulations'}
+        </button>
+      </div>
 
       {result && (
-        <div className="mc-results" role="region" aria-labelledby="simulation-results-heading" aria-live="polite">
+        <div className="mc-results" role="region" aria-labelledby="simulation-results-heading" aria-live="polite" data-tour="monte-carlo-results">
           <h3 id="simulation-results-heading">Simulation Results</h3>
           <div className="results-grid" role="list">
             <div className="result-card success" role="listitem">
