@@ -1209,7 +1209,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   };
 
   // Skip just the current step (not the entire tour)
-  const skipCurrentStep = () => {
+  const skipCurrentPage = () => {
     if (!currentPageTour) return;
     
     const currentTour = pageTours[currentPageTour];
@@ -1228,35 +1228,8 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       setDialogOpen(false);
     }
 
-    // Move to next step
-    const nextStepIndex = interactiveStep + 1;
-    if (nextStepIndex < currentTour.steps.length) {
-      // If next step is a dialog step but dialog is closed, skip to the non-dialog step
-      let targetStep = nextStepIndex;
-      while (targetStep < currentTour.steps.length) {
-        const nextStep = currentTour.steps[targetStep];
-        if (nextStep.isDialogStep && !dialogOpen) {
-          targetStep++;
-        } else {
-          break;
-        }
-      }
-      
-      if (targetStep < currentTour.steps.length) {
-        const nextStep = currentTour.steps[targetStep];
-        // If target step wants user to click, set waiting state
-        if (nextStep.waitForUserClick) {
-          setWaitingForUserClick(true);
-        }
-        setInteractiveStep(targetStep);
-      } else {
-        // No more steps on this page, show continue prompt
-        setShowContinuePrompt(true);
-      }
-    } else {
-      // No more steps on this page, show continue prompt
-      setShowContinuePrompt(true);
-    }
+    // Skip to the end of the current page's tour
+    setShowContinuePrompt(true);
   };
 
   if (!isVisible) return null;
@@ -1349,11 +1322,11 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
                 <div className="tour-tooltip-skip-options">
                   <button 
                     className="tour-tooltip-skip tour-tooltip-skip-step"
-                    onClick={skipCurrentStep}
-                    aria-label="Skip this step"
-                    title="Skip this step"
+                    onClick={skipCurrentPage}
+                    aria-label="Skip this page"
+                    title="Skip this page"
                   >
-                    Skip Step
+                    Skip Page
                   </button>
                   <button 
                     className="tour-tooltip-skip"

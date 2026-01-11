@@ -665,6 +665,7 @@
   box-shadow: 0 0 0 4px rgba(85, 104, 212, 0.6), 0 0 20px rgba(85, 104, 212, 0.4) !important;
   border-radius: 8px;
   animation: tourPulse 2s ease-in-out infinite;
+  background: white !important;
 }
 
 @keyframes tourPulse {
@@ -850,6 +851,25 @@ body.tour-interactive-mode .tour-highlight tbody tr,
 body.tour-interactive-mode .tour-highlight tbody td {
   opacity: 1 !important;
   pointer-events: auto !important;
+}
+
+/* Ensure analytics section and table have proper background when highlighted */
+body.tour-interactive-mode .tour-highlight.analytics-section,
+body.tour-interactive-mode .tour-highlight .breakdown-table-container,
+body.tour-interactive-mode .tour-highlight .chart-container {
+  background: white !important;
+}
+
+body.tour-interactive-mode .tour-highlight .breakdown-table th {
+  background: #f8f9fa !important;
+  opacity: 1 !important;
+  color: #555 !important;
+}
+
+body.tour-interactive-mode .tour-highlight .breakdown-table td {
+  background: white !important;
+  opacity: 1 !important;
+  color: #333 !important;
 }
 
 /* Keep tour tooltip buttons enabled */
