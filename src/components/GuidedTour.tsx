@@ -151,34 +151,52 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     };
   }, [tourPhase, currentPageTour]);
 
-  // Detect dialog opening for waitForUserClick steps
+  // Detect dialog opening for waitForUserClick steps OR button clicks for tab steps
   useEffect(() => {
     if (!waitingForUserClick || tourPhase !== 'interactive' || !currentPageTour) return;
 
     const currentTour = pageTours[currentPageTour];
     const currentInteractiveStep = currentTour?.steps[interactiveStep];
     
-    if (!currentInteractiveStep?.dialogSelector) return;
+    // If there's a dialogSelector, poll for dialog to appear
+    if (currentInteractiveStep?.dialogSelector) {
+      const checkDialog = () => {
+        const dialog = document.querySelector(currentInteractiveStep.dialogSelector!);
+        if (dialog) {
+          setDialogOpen(true);
+          setWaitingForUserClick(false);
+          // Move to next step (first dialog step)
+          setTimeout(() => {
+            setInteractiveStep(interactiveStep + 1);
+          }, DIALOG_TRANSITION_DELAY_MS);
+        }
+      };
 
-    // Poll for dialog to appear
-    const checkDialog = () => {
-      const dialog = document.querySelector(currentInteractiveStep.dialogSelector!);
-      if (dialog) {
-        setDialogOpen(true);
+      const intervalId = setInterval(checkDialog, DIALOG_WAIT_INTERVAL_MS);
+      checkDialog(); // Check immediately
+      
+      return () => clearInterval(intervalId);
+    }
+    
+    // For button clicks without dialog (like tab buttons), listen for click events
+    if (currentInteractiveStep?.elementSelector && !currentInteractiveStep?.dialogSelector) {
+      const handleTabClick = () => {
         setWaitingForUserClick(false);
-        // Move to next step (first dialog step)
+        // Move to next step after a short delay for tab content to render
         setTimeout(() => {
           setInteractiveStep(interactiveStep + 1);
         }, DIALOG_TRANSITION_DELAY_MS);
+      };
+      
+      // Find the highlighted element (should be a button/tab)
+      const element = document.querySelector(currentInteractiveStep.elementSelector);
+      if (element) {
+        element.addEventListener('click', handleTabClick);
+        return () => element.removeEventListener('click', handleTabClick);
       }
-    };
-
-    const intervalId = setInterval(checkDialog, DIALOG_WAIT_INTERVAL_MS);
+    }
     
-    // Also check immediately
-    checkDialog();
-    
-    return () => clearInterval(intervalId);
+    return undefined;
   }, [waitingForUserClick, tourPhase, currentPageTour, interactiveStep]);
 
   // Detect action completion for requiresAction steps (e.g., Monte Carlo results appearing)

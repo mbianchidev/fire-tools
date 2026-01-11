@@ -825,6 +825,17 @@
   position: relative !important;
 }
 
+/* Ensure tables inside highlighted sections are fully visible and opaque */
+.tour-interactive-mode .tour-highlight table,
+.tour-interactive-mode .tour-highlight thead,
+.tour-interactive-mode .tour-highlight tbody,
+.tour-interactive-mode .tour-highlight tr,
+.tour-interactive-mode .tour-highlight th,
+.tour-interactive-mode .tour-highlight td {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
 /* Keep tour tooltip buttons enabled */
 .tour-interactive-mode .tour-tooltip button,
 .tour-interactive-mode .tour-tooltip-skip,
