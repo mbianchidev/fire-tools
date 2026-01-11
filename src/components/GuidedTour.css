@@ -805,6 +805,14 @@
   position: relative !important;
 }
 
+/* Tab buttons with tour-highlight should look like they're being hovered */
+.tour-interactive-mode button.tab[data-tour].tour-highlight {
+  background: #f0f0f0 !important;
+  color: #333 !important;
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
 /* Keep highlighted section inputs AND buttons enabled (this rule enables buttons too!) */
 .tour-interactive-mode .tour-highlight input,
 .tour-interactive-mode .tour-highlight select,

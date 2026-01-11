@@ -651,7 +651,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           </div>
 
           <div className="data-management-group">
-            <h3>🎓 Guided Tour</h3>
+            <div className="subsection-header-with-tooltip">
+              <h3>🎓 Guided Tour</h3>
+              <Tooltip content="Take a step-by-step walkthrough of all Fire Tools features. The tour will show you how to use each tool and how they work together to help you achieve financial independence." position="right" maxWidth={350}>
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
             <p className="setting-help">Restart the guided tour to learn about Fire Tools features</p>
             <button className="secondary-btn" onClick={() => {
               clearTourPreference();

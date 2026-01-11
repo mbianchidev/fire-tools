@@ -326,7 +326,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       ),
     },
     {
-      title: 'Asset Allocation Manager 📊',
+      title: 'Asset Allocation Manager',
       icon: '📊',
       content: (
         <div className="tour-step-content">
@@ -343,7 +343,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       ),
     },
     {
-      title: 'Cashflow Tracker 💰',
+      title: 'Cashflow Tracker',
       icon: '💰',
       content: (
         <div className="tour-step-content">
@@ -360,7 +360,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       ),
     },
     {
-      title: 'Net Worth Tracker 📈',
+      title: 'Net Worth Tracker',
       icon: '📈',
       content: (
         <div className="tour-step-content">
@@ -377,7 +377,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       ),
     },
     {
-      title: 'FIRE Calculator 🔥',
+      title: 'FIRE Calculator',
       icon: '🔥',
       content: (
         <div className="tour-step-content">
@@ -394,7 +394,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       ),
     },
     {
-      title: 'Monte Carlo Simulations 🎲',
+      title: 'Monte Carlo Simulations',
       icon: '🎲',
       content: (
         <div className="tour-step-content">
@@ -411,13 +411,12 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       ),
     },
     {
-      title: 'Tools Work Together 🔗',
-      icon: '🔗',
+      title: 'Tools Work Together',
+      icon: '🤝',
       content: (
         <div className="tour-step-content">
           <p>
-            <strong>The real power comes from using tools together!</strong> Here's how 
-            they connect:
+            <strong>The real power comes from using FIRE tools together, but each tool can also work independently!</strong>
           </p>
           <div className="tour-integration-diagram">
             <div className="tour-integration-item">
@@ -693,30 +692,10 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
   const netWorthSteps: InteractiveStep[] = [
     {
       page: '/net-worth-tracker',
-      title: '💰 Log Asset Button',
-      description: 'Click the "Log Asset" button to record your asset holdings.',
+      title: '💰 Log Assets',
+      description: 'Just like in Asset Allocation, you can add assets here to track your historical net worth. Click "Log Asset" to add stocks, bonds, crypto, real estate, and other holdings with their current values.',
       position: 'center',
       elementSelector: '[data-tour="assets-section"]',
-      waitForUserClick: true,
-      dialogSelector: '.dialog',
-    },
-    // Log Asset Dialog steps
-    {
-      page: '/net-worth-tracker',
-      title: '📊 Asset Information',
-      description: 'Enter the asset class, name, and ticker symbol. Choose from Stocks, Bonds, Cash, Crypto, or Real Estate.',
-      position: 'center',
-      elementSelector: '.dialog-content',
-      isDialogStep: true,
-    },
-    {
-      page: '/net-worth-tracker',
-      title: '💵 Shares & Price',
-      description: 'Enter the number of shares you hold and the current price per share. The total value is calculated automatically.',
-      position: 'center',
-      elementSelector: '.dialog-content',
-      isDialogStep: true,
-      closeDialogAfter: true,
     },
     {
       page: '/net-worth-tracker',
