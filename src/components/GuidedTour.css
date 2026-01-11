@@ -213,8 +213,8 @@
 }
 
 .tour-tip {
-  background: #fffbeb;
-  border: 1px solid #fcd34d;
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning);
   border-radius: 8px;
   padding: 0.875rem 1rem;
   font-size: 0.95rem;
@@ -665,7 +665,7 @@
   box-shadow: 0 0 0 4px rgba(85, 104, 212, 0.6), 0 0 20px rgba(85, 104, 212, 0.4) !important;
   border-radius: 8px;
   animation: tourPulse 2s ease-in-out infinite;
-  background: white !important;
+  background: var(--color-surface-primary) !important;
 }
 
 @keyframes tourPulse {
@@ -857,19 +857,19 @@ body.tour-interactive-mode .tour-highlight tbody td {
 body.tour-interactive-mode .tour-highlight.analytics-section,
 body.tour-interactive-mode .tour-highlight .breakdown-table-container,
 body.tour-interactive-mode .tour-highlight .chart-container {
-  background: white !important;
+  background: var(--color-surface-primary) !important;
 }
 
 body.tour-interactive-mode .tour-highlight .breakdown-table th {
-  background: #f8f9fa !important;
+  background: var(--color-surface-secondary) !important;
   opacity: 1 !important;
-  color: #555 !important;
+  color: var(--color-text-secondary) !important;
 }
 
 body.tour-interactive-mode .tour-highlight .breakdown-table td {
-  background: white !important;
+  background: var(--color-surface-primary) !important;
   opacity: 1 !important;
-  color: #333 !important;
+  color: var(--color-text-primary) !important;
 }
 
 /* Keep tour tooltip buttons enabled */

@@ -442,13 +442,13 @@
 }
 
 .type-badge.need {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .type-badge.want {
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .btn-icon {
@@ -462,11 +462,11 @@
 }
 
 .btn-icon:hover {
-  background: #f0f0f0;
+  background: var(--color-surface-hover);
 }
 
 .btn-icon.delete:hover {
-  background: #ffebee;
+  background: var(--color-error-bg);
 }
 
 /* Empty State */
@@ -525,13 +525,13 @@
 }
 
 .expense-type-badge.need {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: var(--color-info-bg);
+  color: var(--color-info);
 }
 
 .expense-type-badge.want {
-  background: #fff3e0;
-  color: #e65100;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .budget-details {

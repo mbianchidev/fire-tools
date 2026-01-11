@@ -275,11 +275,11 @@
 }
 
 .secondary-btn:hover {
-  background: #f0f2ff;
+  background: var(--color-primary-subtle);
 }
 
 .danger-btn {
-  background: #ef4444;
+  background: var(--color-error);
   color: var(--color-text-inverse);
   border: none;
   padding: 0.75rem 1.5rem;
@@ -296,15 +296,15 @@
 }
 
 .danger-zone {
-  background: #fff5f5;
-  border: 2px solid #fecaca;
+  background: var(--color-error-bg);
+  border: 2px solid var(--color-error);
   border-radius: 8px;
   margin-top: 2rem;
   padding: 1.5rem;
 }
 
 .danger-zone h3 {
-  color: #ef4444;
+  color: var(--color-error);
   margin-bottom: 0.75rem;
 }
 
@@ -319,12 +319,12 @@
 }
 
 .settings-section.disclaimer {
-  background: #fffbeb;
-  color: #92400e;
+  background: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 
 .settings-section.disclaimer h2 {
-  color: #92400e;
+  color: var(--color-warning-text);
 }
 
 .settings-section.disclaimer p {

@@ -216,8 +216,8 @@
 }
 
 .asset-class-badge.crypto {
-  background: #fff3e0;
-  color: #F57C00;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
 .asset-class-badge.other {
