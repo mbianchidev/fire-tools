@@ -12,153 +12,159 @@
   animation: none !important;
 }
 
-/* Dark Mode (DEFAULT) */
+/* Dark Mode (DEFAULT) - Premium Fintech Aesthetic */
 :root,
 [data-theme="dark"] {
-  /* Background colors */
-  --color-bg-primary: #0F0F0F;
-  --color-bg-secondary: #171717;
-  --color-bg-tertiary: #1F1F1F;
-  --color-bg-elevated: #262626;
-  --color-bg-overlay: rgba(0, 0, 0, 0.75);
-  --color-bg-gradient: linear-gradient(135deg, #4557c4 0%, #664b92 100%);
+  /* Background colors - Deep midnight navy with rich depth */
+  --color-bg-primary: #0A0E1A;
+  --color-bg-secondary: #0F1420;
+  --color-bg-tertiary: #141B2D;
+  --color-bg-elevated: #1A2235;
+  --color-bg-overlay: rgba(10, 14, 26, 0.85);
+  --color-bg-gradient: linear-gradient(135deg, #0A0E1A 0%, #141B2D 50%, #1A2235 100%);
 
-  /* Surface colors */
-  --color-surface-primary: #171717;
-  --color-surface-secondary: #1F1F1F;
-  --color-surface-hover: #262626;
-  --color-surface-active: #2E2E2E;
+  /* Surface colors - Layered depth with subtle blue undertones */
+  --color-surface-primary: rgba(20, 27, 45, 0.6);
+  --color-surface-secondary: rgba(26, 34, 53, 0.5);
+  --color-surface-hover: rgba(30, 40, 65, 0.6);
+  --color-surface-active: rgba(40, 52, 82, 0.7);
 
-  /* Text colors */
-  --color-text-primary: #FAFAFA;
-  --color-text-secondary: #A3A3A3;
-  --color-text-tertiary: #737373;
-  --color-text-muted: #525252;
-  --color-text-inverse: #0F0F0F;
+  /* Text colors - High contrast with premium feel */
+  --color-text-primary: #F0F4F8;
+  --color-text-secondary: #94A3B8;
+  --color-text-tertiary: #64748B;
+  --color-text-muted: #475569;
+  --color-text-inverse: #0A0E1A;
   --color-text-on-gradient: #FFFFFF;
 
-  /* Border colors */
-  --color-border-primary: #262626;
-  --color-border-secondary: #333333;
-  --color-border-focus: #60A5FA;
+  /* Border colors - Subtle glows and premium accents */
+  --color-border-primary: rgba(148, 163, 184, 0.1);
+  --color-border-secondary: rgba(148, 163, 184, 0.15);
+  --color-border-focus: #10B981;
 
-  /* Brand colors (adjusted for dark mode) */
-  --color-primary: #60A5FA;
-  --color-primary-hover: #3B82F6;
-  --color-primary-subtle: #172554;
-  --color-gradient: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  --color-gradient-hover: linear-gradient(135deg, #4557c4 0%, #664b92 100%);
+  /* Brand colors - Emerald growth accent + Amber achievements */
+  --color-primary: #10B981;
+  --color-primary-hover: #059669;
+  --color-primary-subtle: rgba(16, 185, 129, 0.1);
+  --color-gradient: linear-gradient(135deg, #10B981 0%, #14B8A6 50%, #06B6D4 100%);
+  --color-gradient-hover: linear-gradient(135deg, #059669 0%, #0D9488 50%, #0284C7 100%);
 
-  /* Semantic colors */
-  --color-success: #4ADE80;
-  --color-success-bg: #052E16;
-  --color-success-border: #166534;
-  --color-warning: #FBBF24;
-  --color-warning-bg: #422006;
-  --color-warning-border: #92400E;
-  --color-error: #F87171;
-  --color-error-bg: #450A0A;
-  --color-error-border: #991B1B;
-  --color-info: #60A5FA;
-  --color-info-bg: #172554;
-  --color-info-border: #1E40AF;
+  /* Semantic colors - Vibrant and purposeful */
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-success-border: rgba(16, 185, 129, 0.3);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-warning-border: rgba(245, 158, 11, 0.3);
+  --color-error: #EF4444;
+  --color-error-bg: rgba(239, 68, 68, 0.1);
+  --color-error-border: rgba(239, 68, 68, 0.3);
+  --color-info: #06B6D4;
+  --color-info-bg: rgba(6, 182, 212, 0.1);
+  --color-info-border: rgba(6, 182, 212, 0.3);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
-  --shadow-glow-sm: 0 0 10px rgba(255, 255, 255, 0.05);
+  /* Shadows - Dramatic depth with colored glows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.5);
+  --shadow-glow-sm: 0 0 20px rgba(16, 185, 129, 0.15);
+  --shadow-glow-md: 0 0 40px rgba(16, 185, 129, 0.2), 0 0 20px rgba(20, 184, 166, 0.15);
+  --shadow-glow-success: 0 0 30px rgba(16, 185, 129, 0.4);
+  --shadow-glow-warning: 0 0 30px rgba(245, 158, 11, 0.3);
 
   /* Focus ring */
   --focus-ring: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-primary);
 
-  /* Scrollbar */
-  --scrollbar-track: #1F1F1F;
-  --scrollbar-thumb: #404040;
-  --scrollbar-thumb-hover: #525252;
+  /* Scrollbar - Refined with emerald accent */
+  --scrollbar-track: #141B2D;
+  --scrollbar-thumb: rgba(16, 185, 129, 0.3);
+  --scrollbar-thumb-hover: rgba(16, 185, 129, 0.5);
 
   /* Code blocks */
-  --color-code-bg: #1F1F1F;
-  --color-code-text: #E5E7EB;
+  --color-code-bg: rgba(20, 27, 45, 0.5);
+  --color-code-text: #E2E8F0;
 
-  /* Input backgrounds */
-  --color-input-bg: #171717;
-  --color-input-border: #333333;
-  --color-input-disabled-bg: #262626;
+  /* Input backgrounds - Glassmorphic feel */
+  --color-input-bg: rgba(20, 27, 45, 0.4);
+  --color-input-border: rgba(148, 163, 184, 0.2);
+  --color-input-disabled-bg: rgba(26, 34, 53, 0.3);
 }
 
-/* Light Mode */
+/* Light Mode - Clean Professional Wealth Management */
 [data-theme="light"] {
-  /* Background colors */
-  --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #F9FAFB;
-  --color-bg-tertiary: #F3F4F6;
+  /* Background colors - Crisp whites with subtle warmth */
+  --color-bg-primary: #FAFBFC;
+  --color-bg-secondary: #F4F6F8;
+  --color-bg-tertiary: #EDF0F3;
   --color-bg-elevated: #FFFFFF;
-  --color-bg-overlay: rgba(0, 0, 0, 0.5);
-  --color-bg-gradient: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
+  --color-bg-overlay: rgba(15, 23, 42, 0.6);
+  --color-bg-gradient: linear-gradient(135deg, #F4F6F8 0%, #E8ECF1 50%, #DDE3EA 100%);
 
-  /* Surface colors */
-  --color-surface-primary: #FFFFFF;
-  --color-surface-secondary: #F9FAFB;
-  --color-surface-hover: #F3F4F6;
-  --color-surface-active: #E5E7EB;
+  /* Surface colors - Layered elegance */
+  --color-surface-primary: rgba(255, 255, 255, 0.9);
+  --color-surface-secondary: rgba(244, 246, 248, 0.8);
+  --color-surface-hover: rgba(237, 240, 243, 0.9);
+  --color-surface-active: rgba(226, 232, 240, 0.9);
 
-  /* Text colors */
-  --color-text-primary: #111827;
-  --color-text-secondary: #4B5563;
-  --color-text-tertiary: #6B7280;
-  --color-text-muted: #9CA3AF;
+  /* Text colors - Rich navy for professionalism */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #64748B;
+  --color-text-muted: #94A3B8;
   --color-text-inverse: #FFFFFF;
   --color-text-on-gradient: #FFFFFF;
 
-  /* Border colors */
-  --color-border-primary: #E5E7EB;
-  --color-border-secondary: #D1D5DB;
-  --color-border-focus: #3B82F6;
+  /* Border colors - Refined separation */
+  --color-border-primary: rgba(148, 163, 184, 0.2);
+  --color-border-secondary: rgba(148, 163, 184, 0.3);
+  --color-border-focus: #059669;
 
-  /* Brand colors */
-  --color-primary: #3B82F6;
-  --color-primary-hover: #2563EB;
-  --color-primary-subtle: #EFF6FF;
-  --color-gradient: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  --color-gradient-hover: linear-gradient(135deg, #4557c4 0%, #664b92 100%);
+  /* Brand colors - Emerald as primary (wealth/growth symbolism) */
+  --color-primary: #059669;
+  --color-primary-hover: #047857;
+  --color-primary-subtle: rgba(5, 150, 105, 0.08);
+  --color-gradient: linear-gradient(135deg, #059669 0%, #0D9488 50%, #0284C7 100%);
+  --color-gradient-hover: linear-gradient(135deg, #047857 0%, #0F766E 50%, #0369A1 100%);
 
-  /* Semantic colors */
-  --color-success: #22C55E;
-  --color-success-bg: #F0FDF4;
-  --color-success-border: #86EFAC;
+  /* Semantic colors - Clear and purposeful */
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.08);
+  --color-success-border: rgba(16, 185, 129, 0.25);
   --color-warning: #F59E0B;
-  --color-warning-bg: #FFFBEB;
-  --color-warning-border: #FCD34D;
-  --color-error: #EF4444;
-  --color-error-bg: #FEF2F2;
-  --color-error-border: #FCA5A5;
-  --color-info: #3B82F6;
-  --color-info-bg: #EFF6FF;
-  --color-info-border: #93C5FD;
+  --color-warning-bg: rgba(245, 158, 11, 0.08);
+  --color-warning-border: rgba(245, 158, 11, 0.25);
+  --color-error: #DC2626;
+  --color-error-bg: rgba(220, 38, 38, 0.08);
+  --color-error-border: rgba(220, 38, 38, 0.25);
+  --color-info: #0284C7;
+  --color-info-bg: rgba(2, 132, 199, 0.08);
+  --color-info-border: rgba(2, 132, 199, 0.25);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --shadow-glow-sm: 0 0 10px rgba(0, 0, 0, 0.05);
+  /* Shadows - Crisp with subtle depth */
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12), 0 6px 16px rgba(15, 23, 42, 0.1);
+  --shadow-glow-sm: 0 0 20px rgba(5, 150, 105, 0.1);
+  --shadow-glow-md: 0 0 40px rgba(5, 150, 105, 0.15), 0 0 20px rgba(13, 148, 136, 0.1);
+  --shadow-glow-success: 0 0 30px rgba(16, 185, 129, 0.25);
+  --shadow-glow-warning: 0 0 30px rgba(245, 158, 11, 0.2);
 
   /* Focus ring */
   --focus-ring: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-primary);
 
-  /* Scrollbar */
-  --scrollbar-track: #F3F4F6;
-  --scrollbar-thumb: #D1D5DB;
-  --scrollbar-thumb-hover: #9CA3AF;
+  /* Scrollbar - Subtle and refined */
+  --scrollbar-track: #EDF0F3;
+  --scrollbar-thumb: rgba(5, 150, 105, 0.2);
+  --scrollbar-thumb-hover: rgba(5, 150, 105, 0.35);
 
   /* Code blocks */
-  --color-code-bg: #F3F4F6;
-  --color-code-text: #1F2937;
+  --color-code-bg: rgba(15, 23, 42, 0.04);
+  --color-code-text: #334155;
 
   /* Input backgrounds */
-  --color-input-bg: #FFFFFF;
-  --color-input-border: #E5E7EB;
-  --color-input-disabled-bg: #F3F4F6;
+  --color-input-bg: rgba(255, 255, 255, 0.8);
+  --color-input-border: rgba(148, 163, 184, 0.25);
+  --color-input-disabled-bg: rgba(244, 246, 248, 0.6);
 }
 
 /* Smooth theme transitions */
@@ -181,12 +187,51 @@
   }
 }
 
-/* Base styles */
+/* Base styles with premium fintech feel */
 body {
   margin: 0;
   padding: 0;
   background: var(--color-bg-gradient);
   color: var(--color-text-primary);
+  position: relative;
+}
+
+/* Ambient background effects for depth - optimized for performance */
+/* Only show on larger screens to avoid mobile performance issues */
+@media (min-width: 768px) {
+  body::before {
+    content: '';
+    position: fixed;
+    top: -25%;
+    left: -25%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+    animation: ambient-drift 30s ease-in-out infinite;
+    will-change: transform;
+  }
+}
+
+@keyframes ambient-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2%, -2%) rotate(1deg); }
+  66% { transform: translate(-2%, 2%) rotate(-1deg); }
+}
+
+/* Disable ambient animation for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+}
+
+/* Ensure content appears above ambient effects */
+#root {
+  position: relative;
+  z-index: 1;
 }
 
 /* Scrollbar styling */
