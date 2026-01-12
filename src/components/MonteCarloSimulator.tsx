@@ -75,7 +75,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
       errors.blackSwanProbability = 'Minimum probability is 0.1% per year';
     }
     
-    // Black swan impact: must be negative or zero (max is 0) and not less than -50
+    // Black swan impact: must be between -50% and 0% (0% means no impact, -50% is maximum loss allowed)
     if (mcInputs.blackSwanImpact > 0) {
       errors.blackSwanImpact = 'Impact must be negative or zero (represents loss)';
     } else if (mcInputs.blackSwanImpact < -50) {
