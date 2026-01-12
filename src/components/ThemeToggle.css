@@ -1,0 +1,104 @@
+/**
+ * ThemeToggle component styles
+ * Animated toggle switch with sun/moon icons
+ */
+
+.theme-toggle {
+  --toggle-width: 3.5rem;
+  --toggle-height: 2rem;
+  --toggle-padding: 0.25rem;
+  --thumb-size: calc(var(--toggle-height) - var(--toggle-padding) * 2);
+  --transition-duration: 0.3s;
+  
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+}
+
+.theme-toggle:focus-visible .theme-toggle__track {
+  box-shadow: 0 0 0 2px var(--color-bg-primary, #FFFFFF), 0 0 0 4px var(--color-primary, #5568d4);
+}
+
+.theme-toggle__track {
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  padding: var(--toggle-padding);
+  background: var(--color-surface-secondary, #F3F4F6);
+  border: 1px solid var(--color-border-primary, #E5E7EB);
+  border-radius: var(--toggle-height);
+  transition: background-color var(--transition-duration) ease,
+              border-color var(--transition-duration) ease;
+}
+
+.theme-toggle:hover .theme-toggle__track {
+  background: var(--color-surface-hover, #E5E7EB);
+}
+
+.theme-toggle__thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  background: var(--color-bg-primary, #FFFFFF);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform var(--transition-duration) cubic-bezier(0.4, 0, 0.2, 1),
+              background-color var(--transition-duration) ease;
+  position: relative;
+}
+
+.theme-toggle[aria-checked="false"] .theme-toggle__thumb {
+  transform: translateX(0);
+}
+
+.theme-toggle[aria-checked="true"] .theme-toggle__thumb {
+  transform: translateX(calc(var(--toggle-width) - var(--thumb-size) - var(--toggle-padding) * 2));
+}
+
+.theme-toggle__icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-text-primary, #333);
+  transition: opacity var(--transition-duration) ease;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Sun icon visible in light mode */
+.theme-toggle[aria-checked="false"] .theme-toggle__icon--sun {
+  opacity: 1;
+}
+
+.theme-toggle[aria-checked="false"] .theme-toggle__icon--moon {
+  opacity: 0;
+}
+
+/* Moon icon visible in dark mode */
+.theme-toggle[aria-checked="true"] .theme-toggle__icon--sun {
+  opacity: 0;
+}
+
+.theme-toggle[aria-checked="true"] .theme-toggle__icon--moon {
+  opacity: 1;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle__thumb,
+  .theme-toggle__icon,
+  .theme-toggle__track {
+    transition: none;
+  }
+}

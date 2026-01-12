@@ -14,6 +14,7 @@ import { NetWorthTrackerPage } from './components/NetWorthTrackerPage';
 import { HomePage } from './components/HomePage';
 import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
+import { ThemeToggle } from './components/ThemeToggle';
 import { SettingsPage } from './components/SettingsPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CookiePolicyPage } from './components/CookiePolicyPage';
@@ -24,6 +25,7 @@ import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
 import { loadSettings, type UserSettings } from './utils/cookieSettings';
+import { useTheme } from './hooks/useTheme';
 import './App.css';
 import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
@@ -97,6 +99,7 @@ function Navigation({ accountName }: { accountName: string }) {
           <span aria-hidden="true" className="nav-emoji">🎲</span> Monte Carlo
         </Link>
       </div>
+      <ThemeToggle />
       <ProfileMenu accountName={accountName} />
     </nav>
   );
@@ -294,11 +297,25 @@ function App() {
   // Use base path only in production (for GitHub Pages), not in local development
   const basename = import.meta.env.MODE === 'production' ? '/fire-tools' : '/';
   
+  // Initialize theme hook
+  const { theme, setTheme } = useTheme();
+  
   // Load settings from localStorage
   const [settings, setSettings] = useState<UserSettings>(() => loadSettings());
   
+  // Sync theme from settings to useTheme hook
+  useEffect(() => {
+    if (settings.theme && settings.theme !== theme) {
+      setTheme(settings.theme);
+    }
+  }, [settings.theme, theme, setTheme]);
+  
   const handleSettingsChange = (newSettings: UserSettings) => {
     setSettings(newSettings);
+    // When theme changes in settings, update the theme hook
+    if (newSettings.theme !== theme) {
+      setTheme(newSettings.theme);
+    }
   };
   
   return (

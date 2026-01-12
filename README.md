@@ -191,3 +191,52 @@ Fire Tools is provided for **educational and planning purposes only**. The calcu
 ---
 
 Made with 🔥 by the Fire Tools community
+
+## 🌙 Dark Mode
+
+FIRE Tools features a comprehensive dark mode implementation with the following highlights:
+
+- **Dark mode is the default** to reduce eye strain
+- **Three theme options**: Light, Dark, and System (follows OS preference)
+- **Smooth transitions** between themes with no flash
+- **Fully accessible** with WCAG AA contrast ratios
+- **Persistent** - your theme preference is saved
+
+### Toggle Theme
+
+- Click the sun/moon toggle in the navigation bar
+- Or go to Settings → Display → Theme to choose between Light, Dark, or System
+
+### For Developers
+
+```typescript
+import { useTheme } from './hooks/useTheme';
+
+function MyComponent() {
+  const { isDark, toggleTheme, setTheme, resolvedTheme } = useTheme();
+  
+  // Toggle between light and dark
+  toggleTheme();
+  
+  // Set specific theme
+  setTheme('dark');    // Force dark mode
+  setTheme('light');   // Force light mode
+  setTheme('system');  // Follow system preference
+  
+  // Check current theme
+  console.log(isDark);         // true/false
+  console.log(resolvedTheme);  // 'light' or 'dark'
+}
+```
+
+Use CSS variables in your styles:
+```css
+.my-component {
+  background: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-primary);
+}
+```
+
+See [DARK_MODE_IMPLEMENTATION.md](DARK_MODE_IMPLEMENTATION.md) for complete documentation.
+

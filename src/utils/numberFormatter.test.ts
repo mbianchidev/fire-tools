@@ -7,7 +7,8 @@ vi.mock('./cookieSettings', () => ({
     accountName: 'My Portfolio',
     decimalSeparator: '.',
     decimalPlaces: 2,
-    currencySettings: {
+    theme: 'dark',
+      currencySettings: {
       defaultCurrency: 'EUR',
       fallbackRates: { EUR: 1, USD: 0.85 },
       useApiRates: true,
@@ -28,6 +29,7 @@ describe('formatDisplayNumber', () => {
       accountName: 'My Portfolio',
       decimalSeparator: '.',
       decimalPlaces: 2,
+      theme: 'dark',
       currencySettings: {
         defaultCurrency: 'EUR',
         fallbackRates: { EUR: 1, USD: 0.85 },
@@ -95,7 +97,8 @@ describe('formatDisplayNumber', () => {
         accountName: 'My Portfolio',
         decimalSeparator: ',',
         decimalPlaces: 2,
-        currencySettings: {
+        theme: 'dark',
+      currencySettings: {
           defaultCurrency: 'EUR',
           fallbackRates: { EUR: 1, USD: 0.85 },
           useApiRates: true,
@@ -123,7 +126,8 @@ describe('formatDisplayNumber', () => {
         accountName: 'My Portfolio',
         decimalSeparator: '.',
         decimalPlaces: 0,
-        currencySettings: {
+        theme: 'dark',
+      currencySettings: {
           defaultCurrency: 'EUR',
           fallbackRates: { EUR: 1, USD: 0.85 },
           useApiRates: true,
@@ -138,7 +142,8 @@ describe('formatDisplayNumber', () => {
         accountName: 'My Portfolio',
         decimalSeparator: '.',
         decimalPlaces: 3,
-        currencySettings: {
+        theme: 'dark',
+      currencySettings: {
           defaultCurrency: 'EUR',
           fallbackRates: { EUR: 1, USD: 0.85 },
           useApiRates: true,
@@ -153,7 +158,8 @@ describe('formatDisplayNumber', () => {
         accountName: 'My Portfolio',
         decimalSeparator: '.',
         decimalPlaces: 3,
-        currencySettings: {
+        theme: 'dark',
+      currencySettings: {
           defaultCurrency: 'EUR',
           fallbackRates: { EUR: 1, USD: 0.85 },
           useApiRates: true,
@@ -182,6 +188,7 @@ describe('formatDisplayPercent', () => {
       accountName: 'My Portfolio',
       decimalSeparator: '.',
       decimalPlaces: 2,
+      theme: 'dark',
       currencySettings: {
         defaultCurrency: 'EUR',
         fallbackRates: { EUR: 1, USD: 0.85 },
@@ -208,6 +215,7 @@ describe('formatDisplayPercent', () => {
       accountName: 'My Portfolio',
       decimalSeparator: ',',
       decimalPlaces: 2,
+      theme: 'dark',
       currencySettings: {
         defaultCurrency: 'EUR',
         fallbackRates: { EUR: 1, USD: 0.85 },
@@ -248,6 +256,7 @@ describe('formatDisplayCurrency', () => {
       accountName: 'My Portfolio',
       decimalSeparator: '.',
       decimalPlaces: 2,
+      theme: 'dark',
       currencySettings: {
         defaultCurrency: 'EUR',
         fallbackRates: { EUR: 1, USD: 0.85 },
@@ -278,6 +287,7 @@ describe('formatDisplayCurrency', () => {
       accountName: 'My Portfolio',
       decimalSeparator: ',',
       decimalPlaces: 2,
+      theme: 'dark',
       currencySettings: {
         defaultCurrency: 'EUR',
         fallbackRates: { EUR: 1, USD: 0.85 },

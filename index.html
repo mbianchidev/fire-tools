@@ -5,12 +5,46 @@
     <link rel="icon" type="image/svg+xml" href="/fire-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="FIRE Tools - Comprehensive financial planning calculator for Financial Independence Retire Early (FIRE). Calculate your path to financial freedom with Monte Carlo simulations and asset allocation management." />
+    <meta name="theme-color" content="#0F0F0F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
     <!-- Preconnect hints for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <title>FIRE Calculator - Financial Independence Retire Early</title>
+    <!-- Flash prevention script - runs before React hydration -->
+    <script>
+      (function() {
+        try {
+          // Read theme preference from localStorage
+          const stored = localStorage.getItem('fire-tools-theme');
+          // Default to 'dark' if no preference is set
+          const theme = stored || 'dark';
+          
+          // Resolve system preference if needed
+          let resolvedTheme = theme;
+          if (theme === 'system') {
+            resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          
+          // Apply theme immediately
+          document.documentElement.setAttribute('data-theme', resolvedTheme);
+          
+          // Update theme-color meta tag
+          const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+          if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#0F0F0F' : '#FFFFFF');
+          }
+          
+          // Add no-transitions class to prevent flash during initial load
+          document.documentElement.classList.add('no-transitions');
+        } catch (e) {
+          // Silently fail if localStorage is unavailable
+          console.error('Theme initialization failed:', e);
+        }
+      })();
+    </script>
     <!-- Inline critical CSS to prevent render blocking -->
     <style>
       /* Critical above-the-fold styles */
@@ -25,7 +59,7 @@
           sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
+        background: var(--color-bg-gradient, linear-gradient(135deg, #5568d4 0%, #764ba2 100%));
         min-height: 100vh;
       }
       #root {
@@ -38,18 +72,18 @@
         flex-direction: column;
       }
       .app-header {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--color-surface-primary, rgba(255, 255, 255, 0.95));
         padding: 2rem;
         text-align: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-md, 0 2px 10px rgba(0, 0, 0, 0.1));
       }
       .app-header h1 {
         font-size: 2.5rem;
-        color: #333;
+        color: var(--color-text-primary, #333);
         margin-bottom: 0.5rem;
       }
       .app-header p {
-        color: #666;
+        color: var(--color-text-secondary, #666);
         font-size: 1.1rem;
       }
       .app-nav {
@@ -58,8 +92,8 @@
         align-items: center;
         gap: 1rem;
         padding: 1rem 2rem;
-        background: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background: var(--color-surface-primary, rgba(255, 255, 255, 0.95));
+        box-shadow: var(--shadow-md, 0 2px 10px rgba(0, 0, 0, 0.1));
       }
       .nav-links {
         display: flex;
@@ -71,7 +105,7 @@
         padding: 0.75rem 1.5rem;
         border-radius: 8px;
         text-decoration: none;
-        color: #333;
+        color: var(--color-text-primary, #333);
         font-weight: 500;
         background: transparent;
         min-height: 44px;
@@ -91,16 +125,16 @@
       .hero-section {
         text-align: center;
         padding: 3rem 2rem;
-        background: white;
+        background: var(--color-surface-primary, white);
         border-radius: 16px;
         margin-bottom: 3rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-lg, 0 4px 20px rgba(0, 0, 0, 0.1));
         /* Prevent CLS by reserving minimum height based on content */
         min-height: 180px;
       }
       .hero-title {
         font-size: 3.5rem;
-        color: #333;
+        color: var(--color-text-primary, #333);
         margin-bottom: 1rem;
         font-weight: bold;
         /* Prevent CLS from font loading by reserving line height */
@@ -108,7 +142,7 @@
       }
       .hero-subtitle {
         font-size: 1.3rem;
-        color: #666;
+        color: var(--color-text-secondary, #666);
         max-width: 700px;
         margin: 0 auto;
         line-height: 1.6;
@@ -124,7 +158,7 @@
           border: none;
           font-size: 1.75rem;
           cursor: pointer;
-          color: #5568d4;
+          color: var(--color-primary, #5568d4);
         }
         .nav-links {
           display: none;

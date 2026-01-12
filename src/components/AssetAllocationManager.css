@@ -12,7 +12,7 @@
 }
 
 .manager-header h2 {
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
   font-size: 1.8rem;
 }
@@ -38,14 +38,14 @@
 }
 
 .add-btn {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-gradient);
+  color: var(--color-text-on-gradient);
 }
 
 /* Primary action button (Add Asset) - more prominent with teal color */
 .primary-btn {
   background: linear-gradient(135deg, #009688 0%, #00796B 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
   font-weight: 700;
 }
 
@@ -57,7 +57,7 @@
 /* Reset button styling - medium-dark grey */
 .reset-btn {
   background: linear-gradient(135deg, #757575 0%, #616161 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .reset-btn:hover {
@@ -68,7 +68,7 @@
 /* Back button styling - blue */
 .back-btn {
   background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .back-btn:hover {
@@ -79,7 +79,7 @@
 /* Start Over button styling - orange-ish */
 .start-over-btn {
   background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .start-over-btn:hover {
@@ -89,12 +89,12 @@
 
 .export-btn {
   background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .import-btn {
   background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .action-btn:hover {
@@ -120,7 +120,7 @@
 }
 
 .allocation-section h3 {
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
   font-size: 1.5rem;
 }
@@ -139,7 +139,7 @@
 .asset-class-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--color-surface-primary);
 }
 
 .allocation-table th,
@@ -148,13 +148,13 @@
 .asset-class-table td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border-primary);
 }
 
 .allocation-table th,
 .asset-class-table th {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-gradient);
+  color: var(--color-text-on-gradient);
   font-weight: 600;
   position: sticky;
   top: 0;
@@ -163,17 +163,17 @@
 
 .allocation-table tbody tr:hover,
 .asset-class-table tbody tr:hover {
-  background: #f5f5f5;
+  background: var(--color-surface-secondary);
 }
 
 .excluded-row {
   opacity: 0.5;
-  background: #f9f9f9 !important;
+  background: var(--color-surface-secondary) !important;
 }
 
 .asset-name {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .currency-value {
@@ -221,7 +221,7 @@
 }
 
 .asset-class-badge.other {
-  background: #f5f5f5;
+  background: var(--color-surface-secondary);
   color: #616161;
 }
 
@@ -229,7 +229,7 @@
   display: inline-block;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  color: white;
+  color: var(--color-text-on-gradient);
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -238,7 +238,7 @@
 .target-mode-select,
 .target-input {
   padding: 0.4rem 0.6rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--color-border-primary);
   border-radius: 4px;
   font-size: 0.9rem;
 }
@@ -251,7 +251,7 @@
 .target-mode-select:focus,
 .target-input:focus {
   outline: none;
-  border-color: #5568d4;
+  border-color: var(--color-border-focus);
 }
 
 .set-label,
@@ -265,18 +265,18 @@
 
 .set-label {
   background: #fff3cd;
-  color: #856404;
+  color: var(--color-text-primary);
 }
 
 .off-label {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
 }
 
 .total-row {
-  background: #f5f5f5;
+  background: var(--color-surface-secondary);
   font-weight: bold;
-  border-top: 2px solid #5568d4;
+  border-top: 2px solid var(--color-border-focus);
 }
 
 /* Charts */
@@ -302,7 +302,7 @@
 
 .charts-section .collapsible-header h3 {
   margin: 0;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 1.3rem;
 }
 
@@ -316,13 +316,13 @@
 .empty-chart {
   padding: 2rem;
   text-align: center;
-  color: #999;
+  color: var(--color-text-tertiary);
   font-style: italic;
 }
 
 .custom-tooltip {
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid #5568d4;
+  background: var(--color-surface-primary);
+  border: 2px solid var(--color-border-focus);
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -330,17 +330,17 @@
 
 .custom-tooltip .label {
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .custom-tooltip .value {
-  color: #5568d4;
+  color: var(--color-border-focus);
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
 
 .custom-tooltip .percentage {
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -353,12 +353,12 @@
 
 .class-selector label {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .class-select {
   padding: 0.6rem 1rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--color-border-primary);
   border-radius: 6px;
   font-size: 1rem;
   min-width: 200px;
@@ -366,19 +366,19 @@
 
 .class-select:focus {
   outline: none;
-  border-color: #5568d4;
+  border-color: var(--color-border-focus);
 }
 
 /* Info Section */
 .allocation-info {
-  background: #f8f9fa;
+  background: var(--color-surface-secondary);
   border-radius: 8px;
   padding: 1.5rem;
   margin-top: 2rem;
 }
 
 .allocation-info h4 {
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 1rem;
   font-size: 1.2rem;
 }
@@ -392,7 +392,7 @@
 .allocation-info li {
   padding: 0.5rem 0;
   line-height: 1.6;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .info-badge {
@@ -402,7 +402,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   margin: 0 0.25rem;
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .info-badge.buy {
@@ -464,7 +464,7 @@
 }
 
 .dialog-content {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 12px;
   padding: 2rem;
   max-width: 600px;
@@ -484,7 +484,7 @@
 .dialog-header h3 {
   margin: 0;
   font-size: 1.5rem;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .dialog-close {
@@ -492,13 +492,13 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #666;
+  color: var(--color-text-secondary);
   padding: 0.25rem 0.5rem;
   transition: color 0.3s;
 }
 
 .dialog-close:hover {
-  color: #f44336;
+  color: var(--color-error);
 }
 
 .dialog-form {
@@ -517,7 +517,7 @@
 .dialog-select {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--color-border-primary);
   border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.3s;
@@ -526,7 +526,7 @@
 .dialog-input:focus,
 .dialog-select:focus {
   outline: none;
-  border-color: #5568d4;
+  border-color: var(--color-border-focus);
 }
 
 .dialog-actions {
@@ -549,7 +549,7 @@
 
 .btn-cancel {
   background: #e0e0e0;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .btn-cancel:hover {
@@ -557,8 +557,8 @@
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-gradient);
+  color: var(--color-text-on-gradient);
 }
 
 .btn-submit:hover {
@@ -575,7 +575,7 @@
 
 .asset-class-group {
   margin-bottom: 1rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--color-border-primary);
   border-radius: 8px;
   overflow: hidden;
   max-width: 100%;
@@ -586,8 +586,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-gradient);
+  color: var(--color-text-on-gradient);
   cursor: pointer;
   transition: all 0.3s;
   flex-wrap: wrap;
@@ -636,7 +636,7 @@
 .assets-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--color-surface-primary);
 }
 
 /* Table scroll wrapper for mobile */
@@ -650,18 +650,18 @@
 .assets-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border-primary);
 }
 
 .assets-table th {
-  background: #f5f5f5;
+  background: var(--color-surface-secondary);
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 0.9rem;
 }
 
 .assets-table tbody tr:hover {
-  background: #f9f9f9;
+  background: var(--color-surface-secondary);
 }
 
 .sub-type-badge {
@@ -678,7 +678,7 @@
 .edit-input {
   width: 80px;
   padding: 0.4rem;
-  border: 2px solid #5568d4;
+  border: 2px solid var(--color-border-focus);
   border-radius: 4px;
   font-size: 0.9rem;
 }
@@ -711,7 +711,7 @@
 
 .btn-edit {
   background: #2196F3;
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .btn-edit:hover {
@@ -720,7 +720,7 @@
 
 .btn-save {
   background: #4CAF50;
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .btn-save:hover {
@@ -729,7 +729,7 @@
 
 .btn-cancel-edit {
   background: #f44336;
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .btn-cancel-edit:hover {
@@ -743,7 +743,7 @@
 
 /* Navigation Styles */
 .app-nav {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--color-surface-primary);
   padding: 1rem 2rem;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -758,7 +758,7 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #5568d4;
+  color: var(--color-border-focus);
   padding: 0.5rem;
 }
 
@@ -799,7 +799,7 @@
 
 .nav-link {
   text-decoration: none;
-  color: #5568d4;
+  color: var(--color-border-focus);
   font-weight: 600;
   font-size: 1.1rem;
   padding: 0.5rem 1rem;
@@ -812,8 +812,8 @@
 }
 
 .nav-link.active {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-gradient);
+  color: var(--color-text-on-gradient);
 }
 
 .asset-allocation-page {
@@ -824,7 +824,7 @@
 }
 
 .page-header {
-  background: white;
+  background: var(--color-surface-primary);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -833,14 +833,14 @@
 
 .page-header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: var(--color-text-primary);
   margin-bottom: 0.5rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
 .page-header p {
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 1.1rem;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -870,7 +870,7 @@
 
 /* White background for charts */
 .chart-container {
-  background: white;
+  background: var(--color-surface-primary);
   padding: 1.5rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -878,7 +878,7 @@
 
 /* Collapsible How to Use section */
 .collapsible-section {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   padding: 1rem;
   margin-bottom: 2rem;
@@ -929,7 +929,7 @@
 /* Danger button styling */
 .danger-btn {
   background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .danger-btn:hover {
@@ -946,18 +946,18 @@
   cursor: pointer;
   transition: all 0.3s;
   background: #e0e0e0;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .btn-delete:hover {
   background: #d0d0d0;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 /* Edit select for asset class table */
 .edit-select-small {
   padding: 0.4rem;
-  border: 2px solid #5568d4;
+  border: 2px solid var(--color-border-focus);
   border-radius: 4px;
   font-size: 0.9rem;
 }
@@ -969,12 +969,12 @@
 
 /* Display delta in asset class header */
 .class-delta.positive {
-  color: #4CAF50;
+  color: var(--color-success);
   font-weight: bold;
 }
 
 .class-delta.negative {
-  color: #f44336;
+  color: var(--color-error);
   font-weight: bold;
 }
 
@@ -1001,7 +1001,7 @@
 }
 
 .allocation-table tbody tr:not(.editing-row):hover {
-  background-color: #f5f5f5;
+  background-color: var(--color-surface-secondary);
 }
 
 .allocation-table tbody tr.editing-row {
@@ -1010,12 +1010,12 @@
 
 /* Dark background text colors */
 .asset-class-header {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-gradient);
+  color: var(--color-text-on-gradient);
 }
 
 .asset-class-header * {
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .class-delta.positive {
@@ -1028,15 +1028,15 @@
 
 /* White text for specific headings */
 .allocation-section > h3 {
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .class-selector label {
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 .section-header-with-actions h3 {
-  color: white;
+  color: var(--color-text-on-gradient);
 }
 
 /* Mass Edit Button - orange-ish style for consistency with palette */
@@ -1048,7 +1048,7 @@
   font-weight: 600;
   cursor: pointer;
   background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
   transition: all 0.3s;
   margin-left: 0.5rem;
   box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
@@ -1062,7 +1062,7 @@
 /* For Asset Classes header - same orange style on light background */
 .section-header-with-actions .btn-mass-edit {
   background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-  color: white;
+  color: var(--color-text-on-gradient);
   border: none;
   box-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
 }
@@ -1078,7 +1078,7 @@
 }
 
 .mass-edit-instructions {
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 1.5rem;
   font-size: 0.95rem;
 }
@@ -1095,13 +1095,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background: #f9f9f9;
+  background: var(--color-surface-secondary);
   border-radius: 6px;
 }
 
 .mass-edit-row .asset-name {
   font-weight: 500;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .mass-edit-input-group {
@@ -1113,7 +1113,7 @@
 .mass-edit-input {
   width: 80px;
   padding: 0.5rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--color-border-primary);
   border-radius: 4px;
   font-size: 1rem;
   text-align: right;
@@ -1121,11 +1121,11 @@
 
 .mass-edit-input:focus {
   outline: none;
-  border-color: #5568d4;
+  border-color: var(--color-border-focus);
 }
 
 .percent-sign {
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -1147,7 +1147,7 @@
 
 .mass-edit-total.invalid {
   background: #ffebee;
-  color: #f44336;
+  color: var(--color-error);
 }
 
 .mass-edit-total .total-value {
@@ -1155,17 +1155,17 @@
 }
 
 .valid-icon {
-  color: #4CAF50;
+  color: var(--color-success);
   font-size: 1.2rem;
 }
 
 .invalid-icon {
-  color: #f44336;
+  color: var(--color-error);
   font-size: 1.2rem;
 }
 
 .mass-edit-error {
-  color: #f44336;
+  color: var(--color-error);
   font-size: 0.9rem;
   margin-top: 0.5rem;
   text-align: center;
@@ -1173,7 +1173,7 @@
 
 .btn-submit:disabled {
   background: #e0e0e0;
-  color: #999;
+  color: var(--color-text-tertiary);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -1181,7 +1181,7 @@
 
 /* Portfolio Value Section */
 .portfolio-value-section {
-  background: white;
+  background: var(--color-surface-primary);
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -1201,18 +1201,18 @@
 }
 
 .portfolio-value-label strong {
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 1.1rem;
 }
 
 .portfolio-value {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #5568d4;
+  color: var(--color-border-focus);
 }
 
 .portfolio-value-info {
-  color: #666;
+  color: var(--color-text-secondary);
   font-size: 0.95rem;
 }
 
@@ -1254,7 +1254,7 @@
   left: 50%;
   transform: translateX(-50%);
   background: #4CAF50;
-  color: white;
+  color: var(--color-text-on-gradient);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -1269,7 +1269,7 @@
 }
 
 .dialog-description {
-  color: #666;
+  color: var(--color-text-secondary);
   margin-bottom: 1.5rem;
   line-height: 1.6;
 }
@@ -1282,7 +1282,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .input-row {
@@ -1295,7 +1295,7 @@
 .input-row input[type="text"] {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--color-border-primary);
   border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.3s;
@@ -1304,12 +1304,12 @@
 .input-row input[type="number"]:focus,
 .input-row input[type="text"]:focus {
   outline: none;
-  border-color: #5568d4;
+  border-color: var(--color-border-focus);
 }
 
 .input-row input[type="number"]:disabled,
 .input-row input[type="text"]:disabled {
-  background: #f5f5f5;
+  background: var(--color-surface-secondary);
   cursor: not-allowed;
 }
 
@@ -1332,7 +1332,7 @@
 }
 
 .dca-summary {
-  background: #f8f9fa;
+  background: var(--color-surface-secondary);
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -1340,21 +1340,21 @@
 
 .dca-summary h3 {
   margin: 0 0 0.75rem 0;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 1.3rem;
 }
 
 .dca-summary p {
   margin: 0.5rem 0;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .dca-note {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--color-text-secondary);
   margin-top: 0.75rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--color-border-primary);
 }
 
 .warning-text {
@@ -1372,30 +1372,30 @@
 .dca-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--color-surface-primary);
 }
 
 .dca-table th,
 .dca-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border-primary);
 }
 
 .dca-table th {
-  background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: white;
+  background: var(--color-gradient);
+  color: var(--color-text-on-gradient);
   font-weight: 600;
   font-size: 0.9rem;
 }
 
 .dca-table tbody tr:hover {
-  background: #f9f9f9;
+  background: var(--color-surface-secondary);
 }
 
 .dca-table .ticker-label {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-text-secondary);
   font-family: 'Courier New', monospace;
 }
 
@@ -1408,11 +1408,11 @@
 
 .dca-table .amount-cell {
   font-weight: 600;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .dca-table .price-cell {
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .dca-table .shares-cell {
@@ -1420,25 +1420,25 @@
 }
 
 .dca-table .shares-cell strong {
-  color: #5568d4;
+  color: var(--color-border-focus);
 }
 
 .error-text {
-  color: #f44336;
+  color: var(--color-error);
   font-weight: 600;
 }
 
 .loading-text {
-  color: #999;
+  color: var(--color-text-tertiary);
   font-style: italic;
 }
 
 .dca-table tfoot {
-  border-top: 2px solid #5568d4;
+  border-top: 2px solid var(--color-border-focus);
 }
 
 .dca-table .total-row {
-  background: #f5f5f5;
+  background: var(--color-surface-secondary);
   font-weight: bold;
 }
 
@@ -1449,7 +1449,7 @@
 }
 
 .dca-info {
-  background: #f8f9fa;
+  background: var(--color-surface-secondary);
   border-radius: 8px;
   padding: 1.5rem;
   margin-top: 1rem;
@@ -1457,7 +1457,7 @@
 
 .dca-info h4 {
   margin: 0 0 1rem 0;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 1.1rem;
 }
 
@@ -1470,7 +1470,7 @@
 .dca-info li {
   padding: 0.5rem 0 0.5rem 1.5rem;
   position: relative;
-  color: #555;
+  color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
@@ -1478,14 +1478,14 @@
   content: "✓";
   position: absolute;
   left: 0;
-  color: #4CAF50;
+  color: var(--color-success);
   font-weight: bold;
 }
 
 .dialog-footer {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--color-border-primary);
   display: flex;
   justify-content: flex-end;
 }
@@ -1505,7 +1505,7 @@
 .actual-amount-input {
   width: 80px;
   padding: 0.4rem;
-  border: 2px solid #5568d4;
+  border: 2px solid var(--color-border-focus);
   border-radius: 4px;
   font-size: 0.9rem;
   text-align: right;
@@ -1522,7 +1522,7 @@
   border: none;
   border-radius: 4px;
   background: #4CAF50;
-  color: white;
+  color: var(--color-text-on-gradient);
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.3s;
@@ -1558,11 +1558,11 @@
 
 .deviation-amount {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-text-secondary);
 }
 
 .deviation-exact {
-  color: #4CAF50;
+  color: var(--color-success);
   background-color: rgba(76, 175, 80, 0.1);
 }
 
@@ -1577,7 +1577,7 @@
 }
 
 .pending-text {
-  color: #999;
+  color: var(--color-text-tertiary);
   font-style: italic;
 }
 
@@ -1605,12 +1605,12 @@
 
 .confirmation-summary h4 {
   margin: 0 0 0.75rem 0;
-  color: #333;
+  color: var(--color-text-primary);
 }
 
 .confirmation-summary p {
   margin: 0.5rem 0;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .success-message {
@@ -1791,7 +1791,7 @@
   margin-left: 0.5rem;
   opacity: 0.8;
   font-size: 1em;
-  color: #5568d4;
+  color: var(--color-border-focus);
   font-weight: bold;
   position: absolute;
   right: 0.5rem;
@@ -1809,35 +1809,35 @@ select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-color: #fff;
+  background-color: var(--color-input-bg);
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235568d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 0.5rem center;
   background-size: 1.2em;
   padding: 0.6rem 2.5rem 0.6rem 0.8rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--color-border-primary);
   border-radius: 8px;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #333;
+  color: var(--color-text-primary);
   cursor: pointer;
   transition: all 0.3s ease;
   min-width: 80px;
 }
 
 select:hover {
-  border-color: #5568d4;
+  border-color: var(--color-border-focus);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 
 select:focus {
   outline: none;
-  border-color: #5568d4;
+  border-color: var(--color-border-focus);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 select:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--color-surface-secondary);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -2009,7 +2009,7 @@ select:disabled {
   /* Portfolio value section */
   .portfolio-value-section {
     padding: 1rem;
-    background: white;
+    background: var(--color-surface-primary);
     border-radius: 8px;
     margin-bottom: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -2081,13 +2081,13 @@ select:disabled {
   .asset-class-table td:first-child {
     position: sticky;
     left: 0;
-    background: white;
+    background: var(--color-surface-primary);
     z-index: 2;
   }
 
   .allocation-table th:first-child,
   .asset-class-table th:first-child {
-    background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
+    background: var(--color-gradient);
     z-index: 3;
   }
 
@@ -2109,7 +2109,7 @@ select:disabled {
   /* Class selector */
   .class-selector {
     padding: 1rem;
-    background: white;
+    background: var(--color-surface-primary);
     border-radius: 8px;
     margin-bottom: 1rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -2343,15 +2343,15 @@ select:disabled {
 }
 
 .calculated-value-container input:disabled {
-  background-color: #f5f5f5;
-  color: #666;
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
   cursor: not-allowed;
   opacity: 0.8;
 }
 
 .calculated-label {
   font-size: 0.7rem;
-  color: #666;
+  color: var(--color-text-secondary);
   font-style: italic;
 }
 

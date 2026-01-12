@@ -15,6 +15,7 @@ export interface UserSettings {
   decimalSeparator: '.' | ',';
   decimalPlaces: number;
   currencySettings: CurrencySettings;
+  theme: 'light' | 'dark' | 'system';
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -22,6 +23,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   decimalSeparator: '.',
   decimalPlaces: 2,
   currencySettings: DEFAULT_CURRENCY_SETTINGS,
+  theme: 'dark',
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
