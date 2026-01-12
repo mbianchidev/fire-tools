@@ -5,15 +5,13 @@
     <link rel="icon" type="image/svg+xml" href="/fire-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="FIRE Tools - Comprehensive financial planning calculator for Financial Independence Retire Early (FIRE). Calculate your path to financial freedom with Monte Carlo simulations and asset allocation management." />
-    <meta name="theme-color" content="#0A0E1A" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#FAFBFC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <!-- Preconnect hints for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    <!-- Google Fonts - Outfit for premium fintech feel -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>FIRE Calculator - Financial Independence Retire Early</title>
     <!-- Flash prevention script - runs before React hydration -->
     <script>
@@ -36,7 +34,7 @@
           // Update theme-color meta tag
           const metaThemeColor = document.querySelector('meta[name="theme-color"]');
           if (metaThemeColor) {
-            metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#0A0E1A' : '#FAFBFC');
+            metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#0a0a0a' : '#ffffff');
           }
           
           // Add no-transitions class to prevent flash during initial load
@@ -56,12 +54,11 @@
         padding: 0;
       }
       body {
-        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-          sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Helvetica Neue', 'Arial', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background: var(--color-bg-gradient, linear-gradient(135deg, #0A0E1A 0%, #141B2D 50%, #1A2235 100%));
+        background: var(--color-bg-primary, #0a0a0a);
         min-height: 100vh;
       }
       #root {
@@ -74,23 +71,21 @@
         flex-direction: column;
       }
       .app-header {
-        background: var(--color-surface-primary, rgba(20, 27, 45, 0.6));
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background: var(--color-surface-primary, #141414);
         padding: 2rem;
         text-align: center;
-        box-shadow: var(--shadow-md, 0 8px 16px rgba(0, 0, 0, 0.5));
-        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
       .app-header h1 {
         font-size: 2.5rem;
-        color: var(--color-text-primary, #F0F4F8);
+        color: var(--color-text-primary, #ffffff);
         margin-bottom: 0.5rem;
         font-weight: 700;
         letter-spacing: -0.02em;
       }
       .app-header p {
-        color: var(--color-text-secondary, #94A3B8);
+        color: var(--color-text-secondary, #a0a0a0);
         font-size: 1.1rem;
       }
       .app-nav {
@@ -99,11 +94,9 @@
         align-items: center;
         gap: 1rem;
         padding: 1rem 2rem;
-        background: var(--color-surface-primary, rgba(20, 27, 45, 0.6));
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        box-shadow: var(--shadow-md, 0 8px 16px rgba(0, 0, 0, 0.5));
-        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        background: var(--color-surface-primary, #141414);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
       .nav-links {
         display: flex;
@@ -113,9 +106,9 @@
       }
       .nav-link {
         padding: 0.75rem 1.5rem;
-        border-radius: 12px;
+        border-radius: 8px;
         text-decoration: none;
-        color: var(--color-text-primary, #F0F4F8);
+        color: var(--color-text-primary, #ffffff);
         font-weight: 500;
         background: transparent;
         min-height: 44px;
@@ -135,19 +128,17 @@
       .hero-section {
         text-align: center;
         padding: 3rem 2rem;
-        background: var(--color-surface-primary, rgba(20, 27, 45, 0.6));
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 16px;
+        background: var(--color-surface-primary, #141414);
+        border-radius: 8px;
         margin-bottom: 3rem;
-        box-shadow: var(--shadow-lg, 0 20px 40px rgba(0, 0, 0, 0.6));
-        border: 1px solid rgba(148, 163, 184, 0.1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         /* Prevent CLS by reserving minimum height based on content */
         min-height: 180px;
       }
       .hero-title {
         font-size: 3.5rem;
-        color: var(--color-text-primary, #F0F4F8);
+        color: var(--color-text-primary, #ffffff);
         margin-bottom: 1rem;
         font-weight: 700;
         letter-spacing: -0.02em;
@@ -156,7 +147,7 @@
       }
       .hero-subtitle {
         font-size: 1.3rem;
-        color: var(--color-text-secondary, #94A3B8);
+        color: var(--color-text-secondary, #a0a0a0);
         max-width: 700px;
         margin: 0 auto;
         line-height: 1.6;
@@ -172,7 +163,7 @@
           border: none;
           font-size: 1.75rem;
           cursor: pointer;
-          color: var(--color-primary, #10B981);
+          color: var(--color-primary, #00D632);
         }
         .nav-links {
           display: none;

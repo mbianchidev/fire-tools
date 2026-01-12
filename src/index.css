@@ -1,5 +1,5 @@
 /**
- * CSS Variable System for Dark Mode
+ * CSS Variable System - Minimalist Fintech Design
  * Dark mode is the DEFAULT theme
  */
 
@@ -12,169 +12,169 @@
   animation: none !important;
 }
 
-/* Dark Mode (DEFAULT) - Premium Fintech Aesthetic */
+/* Dark Mode (DEFAULT) - Minimalist Trading Platform Aesthetic */
 :root,
 [data-theme="dark"] {
-  /* Background colors - Deep midnight navy with rich depth */
-  --color-bg-primary: #0A0E1A;
-  --color-bg-secondary: #0F1420;
-  --color-bg-tertiary: #141B2D;
-  --color-bg-elevated: #1A2235;
-  --color-bg-overlay: rgba(10, 14, 26, 0.85);
-  --color-bg-gradient: linear-gradient(135deg, #0A0E1A 0%, #141B2D 50%, #1A2235 100%);
+  /* Background colors - Pure near-black */
+  --color-bg-primary: #0a0a0a;
+  --color-bg-secondary: #0f0f0f;
+  --color-bg-tertiary: #141414;
+  --color-bg-elevated: #1a1a1a;
+  --color-bg-overlay: rgba(10, 10, 10, 0.95);
+  --color-bg-gradient: #0a0a0a;
 
-  /* Surface colors - Layered depth with subtle blue undertones */
-  --color-surface-primary: rgba(20, 27, 45, 0.6);
-  --color-surface-secondary: rgba(26, 34, 53, 0.5);
-  --color-surface-hover: rgba(30, 40, 65, 0.6);
-  --color-surface-active: rgba(40, 52, 82, 0.7);
+  /* Surface colors - Clean elevated surfaces */
+  --color-surface-primary: #141414;
+  --color-surface-secondary: #1a1a1a;
+  --color-surface-hover: #1f1f1f;
+  --color-surface-active: #242424;
 
-  /* Text colors - High contrast with premium feel */
-  --color-text-primary: #F0F4F8;
-  --color-text-secondary: #94A3B8;
-  --color-text-tertiary: #64748B;
-  --color-text-muted: #475569;
-  --color-text-inverse: #0A0E1A;
-  --color-text-on-gradient: #FFFFFF;
+  /* Text colors - Clean grayscale hierarchy */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a0a0a0;
+  --color-text-tertiary: #666666;
+  --color-text-muted: #4d4d4d;
+  --color-text-inverse: #0a0a0a;
+  --color-text-on-gradient: #ffffff;
 
-  /* Border colors - Subtle glows and premium accents */
-  --color-border-primary: rgba(148, 163, 184, 0.1);
-  --color-border-secondary: rgba(148, 163, 184, 0.15);
-  --color-border-focus: #10B981;
+  /* Border colors - Minimal separation */
+  --color-border-primary: rgba(255, 255, 255, 0.1);
+  --color-border-secondary: rgba(255, 255, 255, 0.15);
+  --color-border-focus: #00D632;
 
-  /* Brand colors - Emerald growth accent + Amber achievements */
-  --color-primary: #10B981;
-  --color-primary-hover: #059669;
-  --color-primary-subtle: rgba(16, 185, 129, 0.1);
-  --color-gradient: linear-gradient(135deg, #10B981 0%, #14B8A6 50%, #06B6D4 100%);
-  --color-gradient-hover: linear-gradient(135deg, #059669 0%, #0D9488 50%, #0284C7 100%);
-
-  /* Semantic colors - Vibrant and purposeful */
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.1);
-  --color-success-border: rgba(16, 185, 129, 0.3);
-  --color-warning: #F59E0B;
-  --color-warning-bg: rgba(245, 158, 11, 0.1);
-  --color-warning-border: rgba(245, 158, 11, 0.3);
-  --color-error: #EF4444;
-  --color-error-bg: rgba(239, 68, 68, 0.1);
-  --color-error-border: rgba(239, 68, 68, 0.3);
-  --color-info: #06B6D4;
-  --color-info-bg: rgba(6, 182, 212, 0.1);
-  --color-info-border: rgba(6, 182, 212, 0.3);
-
-  /* Shadows - Dramatic depth with colored glows */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.5);
-  --shadow-glow-sm: 0 0 20px rgba(16, 185, 129, 0.15);
-  --shadow-glow-md: 0 0 40px rgba(16, 185, 129, 0.2), 0 0 20px rgba(20, 184, 166, 0.15);
-  --shadow-glow-success: 0 0 30px rgba(16, 185, 129, 0.4);
-  --shadow-glow-warning: 0 0 30px rgba(245, 158, 11, 0.3);
-
-  /* Focus ring */
-  --focus-ring: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-primary);
-
-  /* Scrollbar - Refined with emerald accent */
-  --scrollbar-track: #141B2D;
-  --scrollbar-thumb: rgba(16, 185, 129, 0.3);
-  --scrollbar-thumb-hover: rgba(16, 185, 129, 0.5);
-
-  /* Code blocks */
-  --color-code-bg: rgba(20, 27, 45, 0.5);
-  --color-code-text: #E2E8F0;
-
-  /* Input backgrounds - Glassmorphic feel */
-  --color-input-bg: rgba(20, 27, 45, 0.4);
-  --color-input-border: rgba(148, 163, 184, 0.2);
-  --color-input-disabled-bg: rgba(26, 34, 53, 0.3);
-}
-
-/* Light Mode - Clean Professional Wealth Management */
-[data-theme="light"] {
-  /* Background colors - Crisp whites with subtle warmth */
-  --color-bg-primary: #FAFBFC;
-  --color-bg-secondary: #F4F6F8;
-  --color-bg-tertiary: #EDF0F3;
-  --color-bg-elevated: #FFFFFF;
-  --color-bg-overlay: rgba(15, 23, 42, 0.6);
-  --color-bg-gradient: linear-gradient(135deg, #F4F6F8 0%, #E8ECF1 50%, #DDE3EA 100%);
-
-  /* Surface colors - Layered elegance */
-  --color-surface-primary: rgba(255, 255, 255, 0.9);
-  --color-surface-secondary: rgba(244, 246, 248, 0.8);
-  --color-surface-hover: rgba(237, 240, 243, 0.9);
-  --color-surface-active: rgba(226, 232, 240, 0.9);
-
-  /* Text colors - Rich navy for professionalism */
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-tertiary: #64748B;
-  --color-text-muted: #94A3B8;
-  --color-text-inverse: #FFFFFF;
-  --color-text-on-gradient: #FFFFFF;
-
-  /* Border colors - Refined separation */
-  --color-border-primary: rgba(148, 163, 184, 0.2);
-  --color-border-secondary: rgba(148, 163, 184, 0.3);
-  --color-border-focus: #059669;
-
-  /* Brand colors - Emerald as primary (wealth/growth symbolism) */
-  --color-primary: #059669;
-  --color-primary-hover: #047857;
-  --color-primary-subtle: rgba(5, 150, 105, 0.08);
-  --color-gradient: linear-gradient(135deg, #059669 0%, #0D9488 50%, #0284C7 100%);
-  --color-gradient-hover: linear-gradient(135deg, #047857 0%, #0F766E 50%, #0369A1 100%);
+  /* Brand colors - Clean green accent (Robinhood-inspired) */
+  --color-primary: #00D632;
+  --color-primary-hover: #00B829;
+  --color-primary-subtle: rgba(0, 214, 50, 0.1);
+  --color-gradient: #00D632;
+  --color-gradient-hover: #00B829;
 
   /* Semantic colors - Clear and purposeful */
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.08);
-  --color-success-border: rgba(16, 185, 129, 0.25);
-  --color-warning: #F59E0B;
-  --color-warning-bg: rgba(245, 158, 11, 0.08);
-  --color-warning-border: rgba(245, 158, 11, 0.25);
-  --color-error: #DC2626;
-  --color-error-bg: rgba(220, 38, 38, 0.08);
-  --color-error-border: rgba(220, 38, 38, 0.25);
-  --color-info: #0284C7;
-  --color-info-bg: rgba(2, 132, 199, 0.08);
-  --color-info-border: rgba(2, 132, 199, 0.25);
+  --color-success: #00D632;
+  --color-success-bg: rgba(0, 214, 50, 0.1);
+  --color-success-border: rgba(0, 214, 50, 0.2);
+  --color-warning: #FFA500;
+  --color-warning-bg: rgba(255, 165, 0, 0.1);
+  --color-warning-border: rgba(255, 165, 0, 0.2);
+  --color-error: #FF3B30;
+  --color-error-bg: rgba(255, 59, 48, 0.1);
+  --color-error-border: rgba(255, 59, 48, 0.2);
+  --color-info: #5AC8FA;
+  --color-info-bg: rgba(90, 200, 250, 0.1);
+  --color-info-border: rgba(90, 200, 250, 0.2);
 
-  /* Shadows - Crisp with subtle depth */
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12), 0 6px 16px rgba(15, 23, 42, 0.1);
-  --shadow-glow-sm: 0 0 20px rgba(5, 150, 105, 0.1);
-  --shadow-glow-md: 0 0 40px rgba(5, 150, 105, 0.15), 0 0 20px rgba(13, 148, 136, 0.1);
-  --shadow-glow-success: 0 0 30px rgba(16, 185, 129, 0.25);
-  --shadow-glow-warning: 0 0 30px rgba(245, 158, 11, 0.2);
+  /* Shadows - Clean and minimal */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-glow-sm: none;
+  --shadow-glow-md: none;
+  --shadow-glow-success: none;
+  --shadow-glow-warning: none;
 
   /* Focus ring */
   --focus-ring: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-primary);
 
-  /* Scrollbar - Subtle and refined */
-  --scrollbar-track: #EDF0F3;
-  --scrollbar-thumb: rgba(5, 150, 105, 0.2);
-  --scrollbar-thumb-hover: rgba(5, 150, 105, 0.35);
+  /* Scrollbar - Clean minimal */
+  --scrollbar-track: #141414;
+  --scrollbar-thumb: #333333;
+  --scrollbar-thumb-hover: #4d4d4d;
 
   /* Code blocks */
-  --color-code-bg: rgba(15, 23, 42, 0.04);
-  --color-code-text: #334155;
+  --color-code-bg: #141414;
+  --color-code-text: #a0a0a0;
 
   /* Input backgrounds */
-  --color-input-bg: rgba(255, 255, 255, 0.8);
-  --color-input-border: rgba(148, 163, 184, 0.25);
-  --color-input-disabled-bg: rgba(244, 246, 248, 0.6);
+  --color-input-bg: #141414;
+  --color-input-border: rgba(255, 255, 255, 0.1);
+  --color-input-disabled-bg: #1a1a1a;
+}
+
+/* Light Mode - Clean Professional Fintech */
+[data-theme="light"] {
+  /* Background colors - Pure white */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8f8f8;
+  --color-bg-tertiary: #f0f0f0;
+  --color-bg-elevated: #ffffff;
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-gradient: #ffffff;
+
+  /* Surface colors - Clean elevation */
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f8f8f8;
+  --color-surface-hover: #f0f0f0;
+  --color-surface-active: #e8e8e8;
+
+  /* Text colors - Clean grayscale hierarchy */
+  --color-text-primary: #000000;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --color-text-muted: #b3b3b3;
+  --color-text-inverse: #ffffff;
+  --color-text-on-gradient: #ffffff;
+
+  /* Border colors - Minimal separation */
+  --color-border-primary: rgba(0, 0, 0, 0.1);
+  --color-border-secondary: rgba(0, 0, 0, 0.15);
+  --color-border-focus: #00D632;
+
+  /* Brand colors - Clean green accent */
+  --color-primary: #00D632;
+  --color-primary-hover: #00B829;
+  --color-primary-subtle: rgba(0, 214, 50, 0.1);
+  --color-gradient: #00D632;
+  --color-gradient-hover: #00B829;
+
+  /* Semantic colors - Clear and purposeful */
+  --color-success: #00D632;
+  --color-success-bg: rgba(0, 214, 50, 0.1);
+  --color-success-border: rgba(0, 214, 50, 0.2);
+  --color-warning: #FFA500;
+  --color-warning-bg: rgba(255, 165, 0, 0.1);
+  --color-warning-border: rgba(255, 165, 0, 0.2);
+  --color-error: #FF3B30;
+  --color-error-bg: rgba(255, 59, 48, 0.1);
+  --color-error-border: rgba(255, 59, 48, 0.2);
+  --color-info: #5AC8FA;
+  --color-info-bg: rgba(90, 200, 250, 0.1);
+  --color-info-border: rgba(90, 200, 250, 0.2);
+
+  /* Shadows - Clean and minimal */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+  --shadow-glow-sm: none;
+  --shadow-glow-md: none;
+  --shadow-glow-success: none;
+  --shadow-glow-warning: none;
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-primary);
+
+  /* Scrollbar - Clean minimal */
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #cccccc;
+  --scrollbar-thumb-hover: #b3b3b3;
+
+  /* Code blocks */
+  --color-code-bg: #f8f8f8;
+  --color-code-text: #666666;
+
+  /* Input backgrounds */
+  --color-input-bg: #ffffff;
+  --color-input-border: rgba(0, 0, 0, 0.1);
+  --color-input-disabled-bg: #f8f8f8;
 }
 
 /* Smooth theme transitions */
 *,
 *::before,
 *::after {
-  transition: background-color 0.3s ease,
-              border-color 0.3s ease,
-              color 0.3s ease,
-              box-shadow 0.3s ease;
+  transition: background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease,
+              box-shadow 0.2s ease;
 }
 
 /* Respect reduced motion preferences */
@@ -187,48 +187,15 @@
   }
 }
 
-/* Base styles with premium fintech feel */
+/* Base styles with minimalist fintech feel */
 body {
   margin: 0;
   padding: 0;
-  background: var(--color-bg-gradient);
+  background: var(--color-bg-primary);
   color: var(--color-text-primary);
-  position: relative;
 }
 
-/* Ambient background effects for depth - optimized for performance */
-/* Only show on larger screens to avoid mobile performance issues */
-@media (min-width: 768px) {
-  body::before {
-    content: '';
-    position: fixed;
-    top: -25%;
-    left: -25%;
-    width: 150%;
-    height: 150%;
-    background: radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
-    pointer-events: none;
-    z-index: 0;
-    animation: ambient-drift 30s ease-in-out infinite;
-    will-change: transform;
-  }
-}
-
-@keyframes ambient-drift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(2%, -2%) rotate(1deg); }
-  66% { transform: translate(-2%, 2%) rotate(-1deg); }
-}
-
-/* Disable ambient animation for users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  body::before {
-    animation: none;
-  }
-}
-
-/* Ensure content appears above ambient effects */
+/* Ensure content appears properly */
 #root {
   position: relative;
   z-index: 1;
