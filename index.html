@@ -5,15 +5,91 @@
     <link rel="icon" type="image/svg+xml" href="/fire-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="FIRE Tools - Comprehensive financial planning calculator for Financial Independence Retire Early (FIRE). Calculate your path to financial freedom with Monte Carlo simulations and asset allocation management." />
+    <meta name="theme-color" content="#0F0F0F" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
     <!-- Preconnect hints for faster resource loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <title>FIRE Calculator - Financial Independence Retire Early</title>
+    <!-- Theme detection script - must run before React loads to prevent flash -->
+    <script>
+      (function() {
+        try {
+          // Try to get theme from encrypted cookie
+          var cookieName = 'fire-calculator-settings';
+          var cookies = document.cookie.split(';');
+          var settingsCookie = null;
+          
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.startsWith(cookieName + '=')) {
+              settingsCookie = cookie.substring(cookieName.length + 1);
+              break;
+            }
+          }
+          
+          var theme = 'dark'; // Default to dark
+          
+          if (settingsCookie) {
+            try {
+              // Try to decrypt and parse (simple approach - actual decryption happens in React)
+              // For now, we'll check if settings exist and use system preference if theme is 'system'
+              var decoded = decodeURIComponent(settingsCookie);
+              // This is a simplified check - the actual cookie is encrypted
+              // So we'll fall back to localStorage for faster access
+            } catch (e) {
+              // Ignore decryption errors
+            }
+          }
+          
+          // Check localStorage for quick access (set by React)
+          var storedTheme = localStorage.getItem('fire-theme-preference');
+          if (storedTheme) {
+            theme = storedTheme;
+          }
+          
+          // Resolve system theme if needed
+          if (theme === 'system') {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          
+          // Apply theme immediately
+          document.documentElement.setAttribute('data-theme', theme);
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (error) {
+          // Fail silently and default to dark theme
+          document.documentElement.setAttribute('data-theme', 'dark');
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <!-- Inline critical CSS to prevent render blocking -->
     <style>
-      /* Critical above-the-fold styles */
+      /* Critical above-the-fold styles with theme support */
+      :root {
+        /* Light theme colors (default in critical CSS) */
+        --color-bg-page: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+        --color-bg-surface: rgba(255, 255, 255, 0.95);
+        --color-text-primary: #333;
+        --color-text-secondary: #666;
+        --color-primary: #00bcd4;
+        --color-primary-hover: #0097a7;
+      }
+      
+      [data-theme="dark"], .dark {
+        /* Dark theme colors */
+        --color-bg-page: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+        --color-bg-surface: rgba(23, 23, 23, 0.95);
+        --color-text-primary: #fafafa;
+        --color-text-secondary: #a3a3a3;
+        --color-primary: #00bcd4;
+        --color-primary-hover: #26c6da;
+      }
+      
       * {
         box-sizing: border-box;
         margin: 0;
@@ -25,7 +101,7 @@
           sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
+        background: var(--color-bg-page);
         min-height: 100vh;
       }
       #root {
@@ -38,18 +114,18 @@
         flex-direction: column;
       }
       .app-header {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--color-bg-surface);
         padding: 2rem;
         text-align: center;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
       .app-header h1 {
         font-size: 2.5rem;
-        color: #333;
+        color: var(--color-text-primary);
         margin-bottom: 0.5rem;
       }
       .app-header p {
-        color: #666;
+        color: var(--color-text-secondary);
         font-size: 1.1rem;
       }
       .app-nav {
@@ -58,7 +134,7 @@
         align-items: center;
         gap: 1rem;
         padding: 1rem 2rem;
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--color-bg-surface);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
       .nav-links {
@@ -71,7 +147,7 @@
         padding: 0.75rem 1.5rem;
         border-radius: 8px;
         text-decoration: none;
-        color: #333;
+        color: var(--color-text-primary);
         font-weight: 500;
         background: transparent;
         min-height: 44px;
@@ -91,7 +167,7 @@
       .hero-section {
         text-align: center;
         padding: 3rem 2rem;
-        background: white;
+        background: var(--color-bg-surface);
         border-radius: 16px;
         margin-bottom: 3rem;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -100,7 +176,7 @@
       }
       .hero-title {
         font-size: 3.5rem;
-        color: #333;
+        color: var(--color-text-primary);
         margin-bottom: 1rem;
         font-weight: bold;
         /* Prevent CLS from font loading by reserving line height */
@@ -108,7 +184,7 @@
       }
       .hero-subtitle {
         font-size: 1.3rem;
-        color: #666;
+        color: var(--color-text-secondary);
         max-width: 700px;
         margin: 0 auto;
         line-height: 1.6;
@@ -124,7 +200,7 @@
           border: none;
           font-size: 1.75rem;
           cursor: pointer;
-          color: #5568d4;
+          color: var(--color-primary);
         }
         .nav-links {
           display: none;

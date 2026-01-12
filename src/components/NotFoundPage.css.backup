@@ -7,12 +7,12 @@
 }
 
 .not-found-container {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   padding: 3rem;
   max-width: 600px;
   width: 100%;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
   animation: fadeInUp 0.5s ease-out;
 }
@@ -45,14 +45,14 @@
 
 .not-found-title {
   font-size: 2.5rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
   font-weight: bold;
 }
 
 .not-found-message {
   font-size: 1.1rem;
-  color: var(--color-text-secondary);
+  color: #666;
   line-height: 1.6;
   margin-bottom: 2rem;
 }
@@ -81,7 +81,7 @@
 
 .btn-home {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
@@ -96,14 +96,14 @@
 }
 
 .btn-calculator {
-  background: var(--color-surface-primary);
+  background: white;
   color: #667eea;
   border: 2px solid #667eea;
 }
 
 .btn-calculator:hover {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   transform: translateY(-2px);
 }
 
@@ -120,7 +120,7 @@
 
 .helpful-links h2 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
@@ -144,17 +144,17 @@
   padding: 0.75rem 1.25rem;
   border-radius: 8px;
   text-decoration: none;
-  color: var(--color-text-primary);
+  color: #333;
   font-weight: 500;
   transition: all 0.3s;
-  background: var(--color-surface-secondary);
+  background: #f5f5f5;
   width: 100%;
   min-height: 44px;
 }
 
 .helpful-links nav ul li a:hover {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   transform: translateX(5px);
 }
 

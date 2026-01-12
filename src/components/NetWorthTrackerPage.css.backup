@@ -11,20 +11,20 @@
 
 .net-worth-tracker-page .page-header h1 {
   font-size: 2rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 0.5rem;
 }
 
 .net-worth-tracker-page .page-header p {
-  color: var(--color-text-secondary);
+  color: #666;
   font-size: 1rem;
 }
 
 .net-worth-tracker-main {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Net Worth Summary Cards */
@@ -34,7 +34,7 @@
 
 .net-worth-summary h3 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
@@ -50,7 +50,7 @@
   gap: 1rem;
   padding: 1.25rem;
   border-radius: 12px;
-  color: var(--color-text-inverse);
+  color: white;
 }
 
 .net-worth-card.assets {
@@ -116,7 +116,7 @@
 
 .data-entry-section h3 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin: 0;
 }
 
@@ -134,7 +134,7 @@
   font-size: 0.9rem;
   transition: transform 0.2s, box-shadow 0.2s;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
 }
 
 .btn-entry:hover {
@@ -165,14 +165,14 @@
 }
 
 .data-table-section {
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 12px;
   padding: 1rem;
 }
 
 .data-table-section h4 {
   font-size: 1.1rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -189,13 +189,13 @@
 .data-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-border-primary);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .data-table th {
-  background: var(--color-surface-primary);
+  background: white;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: #555;
 }
 
 .data-table tbody tr:hover {
@@ -219,12 +219,12 @@
 
 .chart-section h3 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
 .chart-container {
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 12px;
   padding: 1.5rem;
   min-height: 300px;
@@ -246,15 +246,15 @@
 
 .chart-view-mode label {
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #555;
   font-weight: 500;
 }
 
 .view-mode-select {
   padding: 0.4rem 0.8rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
-  background: var(--color-surface-primary);
+  background: white;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -276,7 +276,7 @@
   gap: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #555;
 }
 
 /* Forecast confidence info box */
@@ -329,14 +329,14 @@
   gap: 0.75rem;
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 8px;
   flex-wrap: wrap;
 }
 
 .currency-selector-label {
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #555;
   font-weight: 500;
 }
 
@@ -353,9 +353,9 @@
 
 .currency-btn {
   padding: 0.4rem 0.8rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
-  background: var(--color-surface-primary);
+  background: white;
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
@@ -367,7 +367,7 @@
 }
 
 .currency-btn.active {
-  color: var(--color-text-inverse);
+  color: white;
   border-color: transparent;
 }
 
@@ -377,7 +377,7 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 12px;
   padding: 1.5rem;
-  color: var(--color-text-inverse);
+  color: white;
 }
 
 .fire-progress-section h3 {
@@ -436,7 +436,7 @@
 
 .fire-progress-fill {
   height: 100%;
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 6px;
   transition: width 0.5s ease;
 }
@@ -445,7 +445,7 @@
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: var(--color-text-secondary);
+  color: #666;
 }
 
 .empty-state-icon {
@@ -455,7 +455,7 @@
 
 .empty-state h4 {
   font-size: 1.2rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 0.5rem;
 }
 
@@ -562,7 +562,7 @@
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .sync-toggle-label input[type="checkbox"] {
@@ -579,12 +579,12 @@
 }
 
 .sync-info {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 6px;
   padding: 1rem;
   margin: 0;
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #555;
   border-left: 3px solid #2196F3;
 }
 

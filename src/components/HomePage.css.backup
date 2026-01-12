@@ -6,7 +6,7 @@
 
 .security-warning-banner {
   background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-  color: var(--color-text-inverse);
+  color: white;
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -62,7 +62,7 @@
   margin-left: auto;
   background: transparent;
   border: none;
-  color: var(--color-text-inverse);
+  color: white;
   font-size: 1.25rem;
   cursor: pointer;
   padding: 0.25rem;
@@ -74,7 +74,7 @@
 }
 
 .warning-button {
-  background: var(--color-surface-primary);
+  background: white;
   color: #dc2626;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -96,17 +96,17 @@
 .hero-section {
   text-align: center;
   padding: 3rem 2rem;
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   margin-bottom: 3rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   /* Prevent CLS by reserving minimum height based on content */
   min-height: 180px;
 }
 
 .hero-title {
   font-size: 3.5rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
   font-weight: bold;
   /* Prevent CLS from font loading by reserving line height */
@@ -115,7 +115,7 @@
 
 .hero-subtitle {
   font-size: 1.3rem;
-  color: var(--color-text-secondary);
+  color: #666;
   max-width: 700px;
   margin: 0 auto;
   line-height: 1.6;
@@ -129,10 +129,10 @@
 }
 
 .feature-card {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-decoration: none;
   color: inherit;
   transition: transform 0.3s, box-shadow 0.3s;
@@ -152,20 +152,20 @@
 
 .feature-card h2 {
   font-size: 1.8rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
 /* Maintain visual style for feature card headings when using h3 */
 .feature-card .feature-card-title {
   font-size: 1.8rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
 .feature-card p {
   font-size: 1rem;
-  color: var(--color-text-secondary);
+  color: #666;
   line-height: 1.6;
   margin-bottom: 1.5rem;
   flex-grow: 1;
@@ -180,7 +180,7 @@
 
 .highlight-item {
   background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -200,30 +200,30 @@
 }
 
 .info-section {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   margin-top: 2.5rem;
   margin-bottom: 3rem;
 }
 
 .info-section h3 {
   font-size: 1.8rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
 /* Maintain visual style for info section heading when using h2 */
 .info-section .info-section-title {
   font-size: 1.8rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
 .info-section p {
   font-size: 1.1rem;
-  color: var(--color-text-secondary);
+  color: #666;
   line-height: 1.8;
   margin-bottom: 1.5rem;
 }

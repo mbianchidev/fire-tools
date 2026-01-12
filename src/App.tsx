@@ -24,6 +24,7 @@ import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
 import { loadSettings, type UserSettings } from './utils/cookieSettings';
+import { ThemeProvider } from './hooks/useTheme';
 import './App.css';
 import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
@@ -302,48 +303,50 @@ function App() {
   };
   
   return (
-    <Router basename={basename}>
-      <div className="app">
-        <a href="#main-content" className="skip-link">Skip to main content</a>
-        
-        <header className="app-header">
-          <h1><span className="header-emoji">💸</span> Fire Tools</h1>
-          <p>Rocket fuel for your financial planning</p>
-        </header>
+    <ThemeProvider>
+      <Router basename={basename}>
+        <div className="app">
+          <a href="#main-content" className="skip-link">Skip to main content</a>
+          
+          <header className="app-header">
+            <h1><span className="header-emoji">💸</span> Fire Tools</h1>
+            <p>Rocket fuel for your financial planning</p>
+          </header>
 
-        <Navigation accountName={settings.accountName} />
+          <Navigation accountName={settings.accountName} />
 
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
-          <Route path="/monte-carlo" element={<MonteCarloPage />} />
-          <Route path="/asset-allocation" element={<AssetAllocationPage />} />
-          <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
-          <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
-          <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
+            <Route path="/monte-carlo" element={<MonteCarloPage />} />
+            <Route path="/asset-allocation" element={<AssetAllocationPage />} />
+            <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
+            <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
+            <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
 
-        <footer className="app-footer">
-          <p>
-            Fire Tools - Disclaimer: This is for educational purposes only. 
-            Consult with a financial advisor for professional advice.
-          </p>
-          <div className="footer-links">
-            <a href="/privacy-policy">Privacy Policy</a>
-            <span className="footer-separator">•</span>
-            <a href="/cookie-policy">Cookie Policy</a>
-            <span className="footer-separator">•</span>
-            <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </div>
-        </footer>
+          <footer className="app-footer">
+            <p>
+              Fire Tools - Disclaimer: This is for educational purposes only. 
+              Consult with a financial advisor for professional advice.
+            </p>
+            <div className="footer-links">
+              <a href="/privacy-policy">Privacy Policy</a>
+              <span className="footer-separator">•</span>
+              <a href="/cookie-policy">Cookie Policy</a>
+              <span className="footer-separator">•</span>
+              <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
+          </footer>
 
-        <CookieConsent />
-        <GuidedTour />
-      </div>
-    </Router>
+          <CookieConsent />
+          <GuidedTour />
+        </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

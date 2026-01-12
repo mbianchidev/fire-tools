@@ -26,7 +26,7 @@
 
 /* Tour modal container */
 .tour-modal {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   max-width: 550px;
   width: 100%;
@@ -56,8 +56,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--color-border-primary);
-  background: var(--color-surface-secondary);
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
   border-radius: 16px 16px 0 0;
 }
 
@@ -86,7 +86,7 @@
 .tour-skip-btn {
   background: transparent;
   border: none;
-  color: var(--color-text-secondary);
+  color: #666;
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0.5rem 0.75rem;
@@ -96,7 +96,7 @@
 
 .tour-skip-btn:hover {
   background: #e0e0e0;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .tour-skip-btn:focus {
@@ -122,7 +122,7 @@
 
 .tour-title {
   font-size: 1.5rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin: 0 0 1.5rem 0;
   font-weight: 700;
 }
@@ -133,7 +133,7 @@
 }
 
 .tour-step-content p {
-  color: var(--color-text-secondary);
+  color: #555;
   line-height: 1.7;
   margin-bottom: 1rem;
   font-size: 1rem;
@@ -181,7 +181,7 @@
 
 /* Integration diagram styling */
 .tour-integration-diagram {
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 12px;
   padding: 1.25rem;
   margin: 1rem 0;
@@ -193,7 +193,7 @@
   gap: 0.5rem;
   padding: 0.625rem 0;
   font-size: 0.95rem;
-  color: var(--color-text-secondary);
+  color: #555;
   flex-wrap: wrap;
 }
 
@@ -227,13 +227,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  border-top: 1px solid var(--color-border-primary);
-  background: var(--color-surface-secondary);
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
   border-radius: 0 0 16px 16px;
 }
 
 .tour-step-count {
-  color: var(--color-text-tertiary);
+  color: #888;
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -262,7 +262,7 @@
 
 .tour-btn-primary {
   background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
@@ -272,9 +272,9 @@
 }
 
 .tour-btn-secondary {
-  background: var(--color-surface-primary);
+  background: white;
   color: #5568d4;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
 }
 
 .tour-btn-secondary:hover:not(:disabled) {
@@ -301,7 +301,7 @@
 .tour-end-header h2 {
   margin: 0;
   font-size: 1.75rem;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .tour-end-content {
@@ -309,13 +309,13 @@
 }
 
 .tour-end-content p {
-  color: var(--color-text-secondary);
+  color: #555;
   line-height: 1.7;
   margin-bottom: 1rem;
 }
 
 .tour-end-question {
-  color: var(--color-text-primary) !important;
+  color: #333 !important;
   margin-top: 1.5rem;
 }
 
@@ -353,10 +353,10 @@
   gap: 0.5rem;
   padding: 1.25rem 1.5rem;
   margin-top: 1rem;
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 0 0 16px 16px;
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  color: #666;
 }
 
 /* Mobile responsive */
@@ -481,7 +481,7 @@
 .tour-continue-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .tour-continue-content {
@@ -489,7 +489,7 @@
 }
 
 .tour-continue-content p {
-  color: var(--color-text-secondary);
+  color: #555;
   line-height: 1.6;
   margin-bottom: 1rem;
 }
@@ -532,7 +532,7 @@
 }
 
 .tour-tooltip {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.3s ease-out;
@@ -543,15 +543,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--color-border-primary);
-  background: var(--color-surface-secondary);
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
   border-radius: 12px 12px 0 0;
 }
 
 .tour-tooltip-header h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: var(--color-text-primary);
+  color: #333;
   font-weight: 600;
 }
 
@@ -563,7 +563,7 @@
 .tour-tooltip-skip {
   background: transparent;
   border: none;
-  color: var(--color-text-tertiary);
+  color: #888;
   font-size: 0.85rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -582,13 +582,13 @@
 
 .tour-tooltip-skip:hover {
   background: #e0e0e0;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .tour-tooltip p {
   margin: 0;
   padding: 1rem 1.25rem;
-  color: var(--color-text-secondary);
+  color: #555;
   line-height: 1.6;
   font-size: 0.95rem;
 }
@@ -598,13 +598,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.25rem;
-  border-top: 1px solid var(--color-border-primary);
-  background: var(--color-surface-secondary);
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
   border-radius: 0 0 12px 12px;
 }
 
 .tour-tooltip-count {
-  color: var(--color-text-tertiary);
+  color: #888;
   font-size: 0.85rem;
   font-weight: 500;
 }
@@ -665,7 +665,7 @@
   box-shadow: 0 0 0 4px rgba(85, 104, 212, 0.6), 0 0 20px rgba(85, 104, 212, 0.4) !important;
   border-radius: 8px;
   animation: tourPulse 2s ease-in-out infinite;
-  background: var(--color-surface-primary) !important;
+  background: white !important;
 }
 
 @keyframes tourPulse {
@@ -808,8 +808,8 @@
 
 /* Tab buttons with tour-highlight should look like they're being hovered */
 .tour-interactive-mode button.tab[data-tour].tour-highlight {
-  background: var(--color-surface-hover) !important;
-  color: var(--color-text-primary) !important;
+  background: #f0f0f0 !important;
+  color: #333 !important;
   transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
@@ -857,19 +857,19 @@ body.tour-interactive-mode .tour-highlight tbody td {
 body.tour-interactive-mode .tour-highlight.analytics-section,
 body.tour-interactive-mode .tour-highlight .breakdown-table-container,
 body.tour-interactive-mode .tour-highlight .chart-container {
-  background: var(--color-surface-primary) !important;
+  background: white !important;
 }
 
 body.tour-interactive-mode .tour-highlight .breakdown-table th {
-  background: var(--color-surface-secondary) !important;
+  background: #f8f9fa !important;
   opacity: 1 !important;
-  color: var(--color-text-secondary) !important;
+  color: #555 !important;
 }
 
 body.tour-interactive-mode .tour-highlight .breakdown-table td {
-  background: var(--color-surface-primary) !important;
+  background: white !important;
   opacity: 1 !important;
-  color: var(--color-text-primary) !important;
+  color: #333 !important;
 }
 
 /* Keep tour tooltip buttons enabled */

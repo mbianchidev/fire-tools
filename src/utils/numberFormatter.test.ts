@@ -13,6 +13,7 @@ vi.mock('./cookieSettings', () => ({
       useApiRates: true,
       lastApiUpdate: null,
     },
+    theme: 'dark' as const,
   })),
 }));
 
@@ -34,6 +35,7 @@ describe('formatDisplayNumber', () => {
         useApiRates: true,
         lastApiUpdate: null,
       },
+      theme: 'dark' as const,
     });
   });
 
@@ -101,6 +103,7 @@ describe('formatDisplayNumber', () => {
           useApiRates: true,
           lastApiUpdate: null,
         },
+      theme: 'dark' as const,
       });
     });
 
@@ -129,6 +132,7 @@ describe('formatDisplayNumber', () => {
           useApiRates: true,
           lastApiUpdate: null,
         },
+      theme: 'dark' as const,
       });
       expect(formatDisplayNumber(123.456)).toBe('123');
     });
@@ -144,6 +148,7 @@ describe('formatDisplayNumber', () => {
           useApiRates: true,
           lastApiUpdate: null,
         },
+      theme: 'dark' as const,
       });
       expect(formatDisplayNumber(123.4567)).toBe('123.457');
     });
@@ -159,6 +164,7 @@ describe('formatDisplayNumber', () => {
           useApiRates: true,
           lastApiUpdate: null,
         },
+      theme: 'dark' as const,
       });
       expect(formatDisplayNumber(1234.5678)).toBe('1,235');
     });
@@ -188,6 +194,7 @@ describe('formatDisplayPercent', () => {
         useApiRates: true,
         lastApiUpdate: null,
       },
+      theme: 'dark' as const,
     });
   });
 
@@ -214,6 +221,7 @@ describe('formatDisplayPercent', () => {
         useApiRates: true,
         lastApiUpdate: null,
       },
+      theme: 'dark' as const,
     });
     expect(formatDisplayPercent(45.678)).toBe('45,68%');
   });
@@ -254,6 +262,7 @@ describe('formatDisplayCurrency', () => {
         useApiRates: true,
         lastApiUpdate: null,
       },
+      theme: 'dark' as const,
     });
   });
 
@@ -284,6 +293,7 @@ describe('formatDisplayCurrency', () => {
         useApiRates: true,
         lastApiUpdate: null,
       },
+      theme: 'dark' as const,
     });
     expect(formatDisplayCurrency(123.45)).toBe('€123,45');
   });

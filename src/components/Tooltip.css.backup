@@ -102,7 +102,7 @@
   height: 18px;
   border-radius: 50%;
   background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   font-size: 12px;
   font-weight: bold;
   font-family: 'Georgia', serif;

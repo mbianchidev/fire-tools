@@ -9,12 +9,14 @@ import {
   DEFAULT_CURRENCY_SETTINGS,
 } from '../types/currency';
 import { encryptData, decryptData } from './cookieEncryption';
+import { DEFAULT_THEME, type Theme } from './themeConstants';
 
 export interface UserSettings {
   accountName: string;
   decimalSeparator: '.' | ',';
   decimalPlaces: number;
   currencySettings: CurrencySettings;
+  theme: Theme;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -22,6 +24,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   decimalSeparator: '.',
   decimalPlaces: 2,
   currencySettings: DEFAULT_CURRENCY_SETTINGS,
+  theme: DEFAULT_THEME,
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
@@ -152,6 +155,12 @@ export function validateSettings(settings: Partial<UserSettings>): { isValid: bo
       if (typeof rate !== 'number' || rate <= 0) {
         errors.push(`Invalid rate for ${currency}: must be a positive number`);
       }
+    }
+  }
+
+  if (settings.theme !== undefined) {
+    if (settings.theme !== 'dark' && settings.theme !== 'light' && settings.theme !== 'system') {
+      errors.push('Theme must be "dark", "light", or "system"');
     }
   }
 

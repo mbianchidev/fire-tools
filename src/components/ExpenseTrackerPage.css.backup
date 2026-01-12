@@ -11,27 +11,27 @@
 
 .expense-tracker-page .page-header h1 {
   font-size: 2rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 0.5rem;
 }
 
 .expense-tracker-page .page-header p {
-  color: var(--color-text-secondary);
+  color: #666;
   font-size: 1rem;
 }
 
 .expense-tracker-main {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   padding: 2rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Period Selector */
 .period-selector {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 8px;
 }
 
@@ -50,16 +50,16 @@
 
 .selector-group label {
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #666;
   font-weight: 500;
 }
 
 .selector-group select {
   padding: 0.5rem 1rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 1rem;
-  background: var(--color-surface-primary);
+  background: white;
   cursor: pointer;
   min-width: 120px;
 }
@@ -72,7 +72,7 @@
 
 .btn-add-month {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -93,7 +93,7 @@
 
 .summary-section h3 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1rem;
 }
 
@@ -109,7 +109,7 @@
   gap: 1rem;
   padding: 1.25rem;
   border-radius: 12px;
-  color: var(--color-text-inverse);
+  color: white;
 }
 
 .summary-card.income {
@@ -154,7 +154,7 @@
 /* Budget Rule Section */
 .budget-rule-section {
   margin-bottom: 2rem;
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -166,7 +166,7 @@
 .budget-rule-section h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .budget-rule-content {
@@ -176,14 +176,14 @@
 .budget-rule-info {
   margin-bottom: 1rem;
   padding: 0.75rem;
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 8px;
   border-left: 4px solid #667eea;
 }
 
 .budget-rule-info p {
   margin: 0;
-  color: var(--color-text-secondary);
+  color: #555;
   font-size: 0.95rem;
 }
 
@@ -203,7 +203,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #555;
 }
 
 .rule-bar-track {
@@ -254,7 +254,7 @@
 
 .rule-bar-amount {
   font-size: 0.85rem;
-  color: var(--color-text-secondary);
+  color: #666;
   text-align: right;
 }
 
@@ -273,19 +273,19 @@
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   cursor: pointer;
-  color: var(--color-text-secondary);
+  color: #666;
   border-radius: 8px 8px 0 0;
   transition: all 0.2s;
 }
 
 .tab:hover {
-  background: var(--color-surface-hover);
-  color: var(--color-text-primary);
+  background: #f0f0f0;
+  color: #333;
 }
 
 .tab.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
 }
 
 /* Transactions Section */
@@ -300,7 +300,7 @@
 
 .transactions-section h3 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin: 0;
 }
 
@@ -320,12 +320,12 @@
 
 .btn-add.income {
   background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-  color: var(--color-text-inverse);
+  color: white;
 }
 
 .btn-add.expense {
   background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
-  color: var(--color-text-inverse);
+  color: white;
 }
 
 .btn-add:hover {
@@ -340,7 +340,7 @@
   margin-bottom: 1rem;
   flex-wrap: wrap;
   padding: 1rem;
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 8px;
 }
 
@@ -352,13 +352,13 @@
 
 .filter-group label {
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #666;
 }
 
 .filter-group select,
 .filter-group input {
   padding: 0.4rem 0.75rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 0.9rem;
 }
@@ -372,7 +372,7 @@
 
 .sort-direction-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   border: none;
   width: 32px;
   height: 32px;
@@ -399,13 +399,13 @@
 .transactions-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-border-primary);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .transactions-table th {
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: #555;
 }
 
 .transactions-table .amount-col {
@@ -462,7 +462,7 @@
 }
 
 .btn-icon:hover {
-  background: var(--color-surface-hover);
+  background: #f0f0f0;
 }
 
 .btn-icon.delete:hover {
@@ -473,18 +473,18 @@
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: var(--color-text-secondary);
+  color: #666;
 }
 
 /* Budgets Section */
 .budgets-section h3 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 0.5rem;
 }
 
 .budgets-section .section-description {
-  color: var(--color-text-secondary);
+  color: #666;
   margin-bottom: 1.5rem;
 }
 
@@ -495,10 +495,10 @@
 }
 
 .budget-card {
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 12px;
   padding: 1rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
 }
 
 .budget-header {
@@ -515,7 +515,7 @@
 .category-name {
   flex: 1;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .expense-type-badge {
@@ -548,14 +548,14 @@
 
 .budget-input-row label {
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #666;
   min-width: 60px;
 }
 
 .budget-input-row input {
   flex: 1;
   padding: 0.4rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 0.9rem;
 }
@@ -571,7 +571,7 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.85rem;
-  color: var(--color-text-secondary);
+  color: #666;
 }
 
 .budget-stats .positive {
@@ -606,20 +606,20 @@
 /* Analytics Section */
 .analytics-section h3 {
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
   margin-bottom: 1.5rem;
 }
 
 .chart-container {
   margin-bottom: 2rem;
   padding: 1rem;
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 12px;
 }
 
 .chart-container h4 {
   font-size: 1.1rem;
-  color: var(--color-text-secondary);
+  color: #555;
   margin-bottom: 1rem;
 }
 
@@ -630,7 +630,7 @@
 
 .breakdown-table-container h4 {
   font-size: 1.1rem;
-  color: var(--color-text-secondary);
+  color: #555;
   margin-bottom: 1rem;
 }
 
@@ -644,13 +644,13 @@
 .breakdown-table td {
   padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid var(--color-border-primary);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .breakdown-table th {
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: #555;
 }
 
 /* Dialog Styles */
@@ -669,7 +669,7 @@
 }
 
 .dialog {
-  background: var(--color-surface-primary);
+  background: white;
   border-radius: 16px;
   width: 100%;
   max-width: 500px;
@@ -683,13 +683,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid var(--color-border-primary);
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .dialog-header h2 {
   margin: 0;
   font-size: 1.3rem;
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .dialog-close {
@@ -697,13 +697,13 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--color-text-secondary);
+  color: #666;
   padding: 0.25rem;
   line-height: 1;
 }
 
 .dialog-close:hover {
-  color: var(--color-text-primary);
+  color: #333;
 }
 
 .dialog-form {
@@ -718,7 +718,7 @@
   display: block;
   margin-bottom: 0.25rem;
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #666;
   font-weight: 500;
 }
 
@@ -726,7 +726,7 @@
 .dialog-form .form-group select {
   width: 100%;
   padding: 0.6rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 1rem;
 }
@@ -747,7 +747,7 @@
 
 .btn-cancel {
   background: #e0e0e0;
-  color: var(--color-text-primary);
+  color: #333;
   border: none;
   padding: 0.6rem 1.25rem;
   border-radius: 6px;
@@ -761,7 +761,7 @@
 
 .btn-submit {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   border: none;
   padding: 0.6rem 1.25rem;
   border-radius: 6px;
@@ -882,7 +882,7 @@
 /* Back to Current Period Button */
 .btn-current-period {
   background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-  color: var(--color-text-inverse);
+  color: white;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
@@ -903,7 +903,7 @@
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: var(--color-surface-secondary);
+  background: #f8f9fa;
   border-radius: 8px;
 }
 
@@ -915,10 +915,10 @@
 
 .analytics-view-selector select {
   padding: 0.5rem 1rem;
-  border: 2px solid var(--color-border-input);
+  border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 1rem;
-  background: var(--color-surface-primary);
+  background: white;
   cursor: pointer;
   min-width: 150px;
 }

@@ -41,26 +41,26 @@
 .cookie-banner-title {
   margin: 0 0 0.5rem 0;
   font-size: 1.2rem;
-  color: var(--color-text-primary);
+  color: #333;
   font-weight: 600;
 }
 
 .cookie-banner-description {
   margin: 0 0 0.5rem 0;
-  color: var(--color-text-secondary);
+  color: #555;
   line-height: 1.6;
   font-size: 0.95rem;
 }
 
 .cookie-banner-description strong {
-  color: var(--color-text-primary);
+  color: #333;
   font-weight: 600;
 }
 
 .cookie-banner-links {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--color-text-secondary);
+  color: #666;
 }
 
 .cookie-banner-links a {
@@ -86,7 +86,7 @@
 
 .cookie-btn-acknowledge {
   background: linear-gradient(135deg, #5568d4 0%, #764ba2 100%);
-  color: var(--color-text-inverse);
+  color: white;
   border: none;
   padding: 0.875rem 2rem;
   border-radius: 8px;

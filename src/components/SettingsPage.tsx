@@ -10,6 +10,7 @@ import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
 import { clearTourPreference } from '../utils/tourPreferences';
 import { exportAllDataAsJSON, importAllDataFromJSON, serializeAllDataExport } from '../utils/dataExportImport';
+import { useTheme } from '../hooks/useTheme';
 import { Tooltip } from './Tooltip';
 import './SettingsPage.css';
 
@@ -19,6 +20,7 @@ interface SettingsPageProps {
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -414,6 +416,50 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
         {/* Display Settings */}
         <section className="settings-section">
           <h2>🎨 Display</h2>
+          
+          {/* Theme Setting */}
+          <div className="setting-item">
+            <div className="label-with-tooltip">
+              <label>Theme</label>
+              <Tooltip content="Choose your preferred theme. Dark mode (default) is easier on the eyes and saves battery on OLED screens. Light mode provides a brighter, traditional interface. System automatically matches your operating system's theme preference.">
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
+            <div className="toggle-group theme-toggle-group">
+              <button
+                className={`toggle-btn ${theme === 'dark' ? 'active' : ''}`}
+                onClick={() => {
+                  setTheme('dark');
+                  handleSettingChange('theme', 'dark');
+                }}
+                aria-pressed={theme === 'dark'}
+              >
+                🌙 Dark
+              </button>
+              <button
+                className={`toggle-btn ${theme === 'light' ? 'active' : ''}`}
+                onClick={() => {
+                  setTheme('light');
+                  handleSettingChange('theme', 'light');
+                }}
+                aria-pressed={theme === 'light'}
+              >
+                ☀️ Light
+              </button>
+              <button
+                className={`toggle-btn ${theme === 'system' ? 'active' : ''}`}
+                onClick={() => {
+                  setTheme('system');
+                  handleSettingChange('theme', 'system');
+                }}
+                aria-pressed={theme === 'system'}
+              >
+                💻 System
+              </button>
+            </div>
+            <span className="setting-help">Dark mode is set as default for optimal viewing</span>
+          </div>
+          
           <div className="setting-item">
             <div className="label-with-tooltip">
               <label htmlFor="defaultCurrency">Default Currency</label>
