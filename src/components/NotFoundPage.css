@@ -1,88 +1,228 @@
-/* ============================================================================
-   NOT FOUND PAGE (404) - Premium Fintech Dark Theme
-   ============================================================================ */
-
 .not-found-page {
-  min-height: 80vh;
+  min-height: calc(100vh - 400px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
 }
 
-.not-found-content {
-  text-align: center;
+.not-found-container {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 3rem;
   max-width: 600px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-accent);
+  text-align: center;
+  animation: fadeInUp 0.5s ease-out;
 }
 
-.not-found-code {
-  font-family: var(--font-heading);
-  font-size: 8rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 1rem;
-  letter-spacing: -0.05em;
-  text-shadow: 0 0 60px var(--accent-glow);
-  animation: glow 2s ease-in-out infinite;
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes glow {
+.not-found-icon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
   0%, 100% {
-    filter: drop-shadow(0 0 20px var(--accent-glow));
+    transform: translateY(0);
   }
   50% {
-    filter: drop-shadow(0 0 40px var(--accent-glow-strong));
+    transform: translateY(-10px);
   }
 }
 
 .not-found-title {
-  font-family: var(--font-heading);
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: var(--text-primary);
   margin-bottom: 1rem;
-  font-weight: 700;
+  font-weight: bold;
+  font-family: var(--font-heading);
 }
 
 .not-found-message {
   font-size: 1.1rem;
   color: var(--text-secondary);
-  margin-bottom: 2rem;
   line-height: 1.6;
+  margin-bottom: 2rem;
 }
 
-.not-found-link {
+.not-found-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.btn-home,
+.btn-calculator {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
-  color: var(--text-inverse);
-  padding: 1rem 2rem;
-  border-radius: var(--radius-lg);
+  padding: 0.875rem 1.75rem;
+  border-radius: var(--radius-md);
   text-decoration: none;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: all var(--transition-base);
+  min-height: 48px;
+}
+
+.btn-home {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
+  color: var(--text-inverse);
   box-shadow: var(--glow-primary);
 }
 
-.not-found-link:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px var(--accent-glow-strong);
+.btn-home:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px var(--accent-glow-strong);
 }
 
+.btn-home:focus {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.btn-calculator {
+  background: var(--bg-tertiary);
+  color: var(--accent-primary);
+  border: 2px solid var(--accent-primary);
+}
+
+.btn-calculator:hover {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
+  color: var(--text-inverse);
+  transform: translateY(-2px);
+}
+
+.btn-calculator:focus {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.helpful-links {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--border-subtle);
+}
+
+.helpful-links h2 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-family: var(--font-heading);
+}
+
+.helpful-links nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.helpful-links nav ul li {
+  margin: 0;
+}
+
+.helpful-links nav ul li a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: all var(--transition-base);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  width: 100%;
+  min-height: 44px;
+}
+
+.helpful-links nav ul li a:hover {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
+  color: var(--text-inverse);
+  transform: translateX(5px);
+  border-color: transparent;
+}
+
+.helpful-links nav ul li a:focus {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-  .not-found-code {
-    font-size: 5rem;
+  .not-found-page {
+    padding: 1rem;
+  }
+
+  .not-found-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .not-found-icon {
+    font-size: 4rem;
   }
 
   .not-found-title {
-    font-size: 1.5rem;
+    font-size: 2rem;
   }
 
   .not-found-message {
     font-size: 1rem;
+  }
+
+  .not-found-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-home,
+  .btn-calculator {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .helpful-links nav ul {
+    align-items: stretch;
+  }
+
+  .helpful-links nav ul li a {
+    justify-content: flex-start;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .not-found-container {
+    animation: none;
+  }
+
+  .not-found-icon {
+    animation: none;
+  }
+
+  .btn-home,
+  .btn-calculator,
+  .helpful-links nav ul li a {
+    transition: none;
   }
 }
