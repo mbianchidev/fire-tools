@@ -133,7 +133,7 @@ body {
 }
 
 .app-header {
-  background: var(--bg-overlay);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
   backdrop-filter: blur(20px);
   padding: 2rem;
   text-align: center;
@@ -256,7 +256,7 @@ body {
 
 .nav-link:hover {
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
-  color: var(--text-inverse);
+  color: var(--text-primary);
   box-shadow: var(--glow-primary);
   transform: translateY(-2px);
 }
@@ -268,7 +268,7 @@ body {
 
 .nav-link.active {
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
-  color: var(--text-inverse);
+  color: var(--text-primary);
   box-shadow: var(--glow-primary);
 }
 
@@ -357,7 +357,7 @@ body {
 
 .form-section h3 {
   font-family: var(--font-heading);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: 1.1rem;
   margin-bottom: 1rem;
   font-weight: 600;

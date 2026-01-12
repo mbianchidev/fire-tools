@@ -303,11 +303,11 @@
 .danger-btn {
   background: var(--error);
   color: white;
-  border: none;
+  border: 2px solid var(--error);
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-md);
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-base);
   box-shadow: var(--error-glow);

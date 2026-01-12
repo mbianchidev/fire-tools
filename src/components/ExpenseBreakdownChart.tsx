@@ -39,19 +39,19 @@ function CustomTooltip({ active, payload, currency }: CustomTooltipProps) {
 
   return (
     <div style={{
-      background: 'white',
+      background: '#1A1D26',
       padding: '0.75rem 1rem',
       borderRadius: '8px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-      border: '1px solid #e0e0e0',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
+      border: '1px solid rgba(20, 120, 150, 0.4)',
     }}>
-      <p style={{ margin: 0, fontWeight: 600, color: '#333' }}>
+      <p style={{ margin: 0, fontWeight: 600, color: '#F8FAFC' }}>
         {categoryInfo.icon} {categoryInfo.name}
       </p>
-      <p style={{ margin: '0.25rem 0 0', color: '#666' }}>
+      <p style={{ margin: '0.25rem 0 0', color: '#94A3B8' }}>
         {formatCurrency(data.totalAmount, currency)} ({data.percentage.toFixed(1)}%)
       </p>
-      <p style={{ margin: '0.25rem 0 0', color: '#888', fontSize: '0.85rem' }}>
+      <p style={{ margin: '0.25rem 0 0', color: '#64748B', fontSize: '0.85rem' }}>
         {data.transactionCount} transaction{data.transactionCount !== 1 ? 's' : ''}
       </p>
     </div>
@@ -71,10 +71,10 @@ function renderCustomLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent
     <text
       x={x}
       y={y}
-      fill="white"
+      fill="#0A0B0E"
       textAnchor="middle"
       dominantBaseline="central"
-      style={{ fontSize: '0.8rem', fontWeight: 600 }}
+      style={{ fontSize: '0.8rem', fontWeight: 700 }}
     >
       {`${(percent * 100).toFixed(0)}%`}
     </text>
@@ -113,7 +113,7 @@ function renderLegend(props: any) {
               background: entry.color,
               flexShrink: 0,
             }} />
-            <span style={{ color: '#555' }}>
+            <span style={{ color: '#F8FAFC' }}>
               {categoryInfo.icon} {categoryInfo.name}
             </span>
           </li>
@@ -129,8 +129,8 @@ export function ExpenseBreakdownChart({ data, currency }: ExpenseBreakdownChartP
       <div style={{ 
         textAlign: 'center', 
         padding: '3rem', 
-        color: '#666',
-        background: '#f8f9fa',
+        color: '#94A3B8',
+        background: '#1A1D26',
         borderRadius: '8px',
       }}>
         <p>No expense data to display. Add some expenses to see the breakdown.</p>

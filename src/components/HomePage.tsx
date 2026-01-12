@@ -68,10 +68,6 @@ export function HomePage() {
           </button>
         </div>
       )}
-      <section className="hero-section" aria-labelledby="hero-title">
-        <h1 id="hero-title" className="hero-title"><span aria-hidden="true">💸</span> Fire Tools</h1>
-        <p className="hero-subtitle">Rocket fuel for your financial planning</p>
-      </section>
 
       <section className="info-section" aria-labelledby="about-title">
         <h2 id="about-title" className="info-section-title">About FIRE Tools</h2>

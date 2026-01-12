@@ -44,9 +44,10 @@
 
 /* Primary action button (Add Asset) - more prominent with teal color */
 .primary-btn {
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
   color: white;
   font-weight: 700;
+  border: none;
 }
 
 .primary-btn:hover {
@@ -182,8 +183,9 @@
 }
 
 .currency-value.positive {
-  color: var(--color-action-buy);
-  font-weight: 600;
+  color: #4ADE80;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
 }
 
 .currency-value.negative {
@@ -1209,7 +1211,7 @@
 .portfolio-value {
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--accent-primary);
+  color: var(--text-primary);
 }
 
 .portfolio-value-info {
@@ -1300,6 +1302,8 @@
   border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.3s;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .input-row input[type="number"]:focus,
@@ -1311,6 +1315,7 @@
 .input-row input[type="number"]:disabled,
 .input-row input[type="text"]:disabled {
   background: var(--bg-elevated); 
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -2328,7 +2333,7 @@ select:disabled {
   margin-bottom: 1.5rem;
   border: 1px solid var(--accent-primary);
   font-weight: 500;
-  color: var(--accent-primary);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.5rem;
