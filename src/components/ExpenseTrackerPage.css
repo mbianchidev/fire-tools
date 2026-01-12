@@ -361,6 +361,8 @@
   border: 2px solid var(--border-subtle);
   border-radius: 6px;
   font-size: 0.9rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .filter-group select:focus,
@@ -558,6 +560,8 @@
   border: 2px solid var(--border-subtle);
   border-radius: 6px;
   font-size: 0.9rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .budget-input-row input:focus {

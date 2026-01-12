@@ -1,6 +1,6 @@
 /* ============================================================================
    FIRE TOOLS - PREMIUM FINTECH DARK THEME
-   Design System: Teal/Cyan + Gold accents with deep charcoal backgrounds
+   Design System: Purple gradient accents with deep charcoal backgrounds
    Typography: Sora (headings) + DM Sans (body)
    ============================================================================ */
 
@@ -17,9 +17,9 @@
   
   /* Border Colors */
   --border-subtle: #2A2D36;
-  --border-accent: rgba(0, 212, 170, 0.3);
-  --border-accent-strong: rgba(0, 212, 170, 0.5);
-  --border-gold: rgba(255, 184, 0, 0.3);
+  --border-accent: rgba(121, 9, 121, 0.4);
+  --border-accent-strong: rgba(121, 9, 121, 0.6);
+  --border-gold: rgba(180, 83, 180, 0.3);
   
   /* Text Colors */
   --text-primary: #F8FAFC;
@@ -27,17 +27,17 @@
   --text-muted: #64748B;
   --text-inverse: #0A0B0E;
   
-  /* Accent Colors - Teal/Cyan Primary */
-  --accent-primary: #00D4AA;
-  --accent-primary-dark: #00B894;
-  --accent-primary-light: #1DE9B6;
-  --accent-glow: rgba(0, 212, 170, 0.4);
-  --accent-glow-strong: rgba(0, 212, 170, 0.6);
+  /* Accent Colors - Purple Primary */
+  --accent-primary: #790979;
+  --accent-primary-dark: #5C075C;
+  --accent-primary-light: #A020A0;
+  --accent-glow: rgba(121, 9, 121, 0.4);
+  --accent-glow-strong: rgba(121, 9, 121, 0.6);
   
-  /* Accent Colors - Gold Secondary */
-  --accent-gold: #FFB800;
-  --accent-gold-dark: #F59E0B;
-  --accent-gold-glow: rgba(255, 184, 0, 0.4);
+  /* Accent Colors - Light Purple/Magenta Secondary */
+  --accent-gold: #B453B4;
+  --accent-gold-dark: #9A3D9A;
+  --accent-gold-glow: rgba(180, 83, 180, 0.4);
   
   /* Semantic Colors */
   --success: #22C55E;
@@ -338,6 +338,12 @@ body {
   cursor: pointer;
   transition: opacity var(--transition-fast);
   display: block;
+}
+
+.collapsible-header h4 {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  margin: 0;
 }
 
 .collapsible-header:hover {

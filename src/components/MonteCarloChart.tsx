@@ -134,23 +134,29 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result }) => {
         <h4 id="years-distribution-heading">Years to FIRE Distribution</h4>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={distributionData.bins} aria-label="Distribution of years to FIRE">
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#2A2D36" />
             <XAxis 
               dataKey="range" 
-              label={{ value: 'Years to FIRE', position: 'insideBottom', offset: -5 }}
-              tick={{ fontSize: 11 }}
+              label={{ value: 'Years to FIRE', position: 'insideBottom', offset: -5, fill: '#94A3B8' }}
+              tick={{ fontSize: 11, fill: '#94A3B8' }}
+              stroke="#3A3D46"
             />
             <YAxis 
-              label={{ value: 'Simulations', angle: -90, position: 'insideLeft' }}
+              label={{ value: 'Simulations', angle: -90, position: 'insideLeft', fill: '#94A3B8' }}
+              tick={{ fill: '#94A3B8' }}
+              stroke="#3A3D46"
             />
             <Tooltip 
               formatter={(value) => [`${value} simulations`, 'Count']}
               labelFormatter={(label) => `Years: ${label}`}
+              contentStyle={{ background: '#1A1D26', border: '1px solid #790979', borderRadius: '8px', color: '#F8FAFC' }}
+              labelStyle={{ color: '#F8FAFC' }}
+              itemStyle={{ color: '#F8FAFC' }}
             />
-            <Legend wrapperStyle={{ paddingTop: '12px' }} />
+            <Legend wrapperStyle={{ paddingTop: '12px', color: '#F8FAFC' }} />
             <Bar 
               dataKey="count" 
-              fill="#4CAF50" 
+              fill="#790979" 
               name="Simulations"
             />
             {distributionData.stats && (() => {
@@ -158,10 +164,10 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result }) => {
               return medianBinIndex >= 0 ? (
                 <ReferenceLine 
                   x={distributionData.bins[medianBinIndex].range}
-                  stroke="#ff9800" 
+                  stroke="#B453B4" 
                   strokeWidth={2}
                   strokeDasharray="5 5"
-                  label={{ value: 'Median', position: 'top', fill: '#ff9800' }}
+                  label={{ value: 'Median', position: 'top', fill: '#B453B4' }}
                 />
               ) : null;
             })()}

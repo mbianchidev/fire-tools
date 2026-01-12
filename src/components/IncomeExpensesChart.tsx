@@ -67,10 +67,10 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
 
   const buttonStyle = (isActive: boolean) => ({
     padding: '5px 10px',
-    border: '1px solid #ccc',
+    border: '1px solid #3A3D46',
     borderRadius: '4px',
-    background: isActive ? '#4CAF50' : 'white',
-    color: isActive ? 'white' : 'black',
+    background: isActive ? '#790979' : '#1A1D26',
+    color: isActive ? 'white' : '#94A3B8',
     cursor: 'pointer',
     fontSize: '12px',
   });
@@ -127,9 +127,11 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
             style={{
               width: '70px',
               padding: '5px',
-              border: '1px solid #ccc',
+              border: '1px solid #3A3D46',
               borderRadius: '4px',
               fontSize: '12px',
+              background: '#1A1D26',
+              color: '#F8FAFC',
             }}
             min="1"
             step="1"
@@ -139,28 +141,35 @@ export const IncomeExpensesChart: React.FC<IncomeExpensesChartProps> = ({
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} aria-label="Income and expenses comparison chart over time" barSize={calculateBarSize(data.length)}>
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2A2D36" />
           <XAxis 
             dataKey="age" 
-            label={{ value: 'Age', position: 'insideBottom', offset: -5 }}
+            label={{ value: 'Age', position: 'insideBottom', offset: -5, fill: '#94A3B8' }}
             interval={calculateXAxisInterval(data.length)}
+            tick={{ fill: '#94A3B8' }}
+            stroke="#3A3D46"
           />
           <YAxis 
             tickFormatter={formatYAxis}
             domain={[0, 'auto']}
             allowDataOverflow={false}
+            tick={{ fill: '#94A3B8' }}
+            stroke="#3A3D46"
           />
           <Tooltip 
             formatter={(value) => formatCurrency(Number(value))} 
             labelFormatter={(label) => `Age ${label}`}
+            contentStyle={{ background: '#1A1D26', border: '1px solid #790979', borderRadius: '8px', color: '#F8FAFC' }}
+            labelStyle={{ color: '#F8FAFC' }}
+            itemStyle={{ color: '#F8FAFC' }}
           />
-          <Legend wrapperStyle={{ paddingTop: '12px' }} />
-          <Bar dataKey="Labor Income" fill="#4CAF50" />
-          <Bar dataKey="Investment Yield" fill="#2196F3" />
-          <Bar dataKey="State Pension" fill="#9C27B0" />
-          <Bar dataKey="Private Pension" fill="#FF9800" />
-          <Bar dataKey="Other Income" fill="#00BCD4" />
-          <Bar dataKey="Expenses" fill="#f44336" />
+          <Legend wrapperStyle={{ paddingTop: '12px', color: '#F8FAFC' }} />
+          <Bar dataKey="Labor Income" fill="#22C55E" />
+          <Bar dataKey="Investment Yield" fill="#3B82F6" />
+          <Bar dataKey="State Pension" fill="#A855F7" />
+          <Bar dataKey="Private Pension" fill="#F59E0B" />
+          <Bar dataKey="Other Income" fill="#06B6D4" />
+          <Bar dataKey="Expenses" fill="#EF4444" />
         </BarChart>
       </ResponsiveContainer>
     </section>

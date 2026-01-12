@@ -196,33 +196,34 @@
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .asset-class-badge.stocks {
-  background: rgba(59, 130, 246, 0.2);
-  color: var(--info);
+  background: #3B82F6;
+  color: #FFFFFF;
 }
 
 .asset-class-badge.bonds {
-  background: rgba(168, 85, 247, 0.2);
-  color: var(--accent-primary);
+  background: #A855F7;
+  color: #FFFFFF;
 }
 
 .asset-class-badge.cash {
-  background: rgba(34, 197, 94, 0.2);
-  color: var(--success);
+  background: #22C55E;
+  color: #FFFFFF;
 }
 
 .asset-class-badge.crypto {
-  background: rgba(251, 146, 60, 0.2);
-  color: var(--warning);
+  background: #F59E0B;
+  color: #0A0B0E;
 }
 
 .asset-class-badge.other {
-  background: var(--bg-tertiary);
-  color: var(--text-muted);
+  background: #64748B;
+  color: #FFFFFF;
 }
 
 .action-badge {
@@ -737,8 +738,8 @@
 }
 
 .asset-class-badge.real_estate {
-  background: rgba(168, 85, 247, 0.2);
-  color: var(--accent-primary);
+  background: #EC4899;
+  color: #FFFFFF;
 }
 
 /* Navigation Styles */

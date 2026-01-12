@@ -65,10 +65,10 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
   const buttonStyle = (isActive: boolean) => ({
     padding: '5px 10px',
-    border: '1px solid #ccc',
+    border: '1px solid #3A3D46',
     borderRadius: '4px',
-    background: isActive ? '#4CAF50' : 'white',
-    color: isActive ? 'white' : 'black',
+    background: isActive ? '#790979' : '#1A1D26',
+    color: isActive ? 'white' : '#94A3B8',
     cursor: 'pointer',
     fontSize: '12px',
   });
@@ -125,9 +125,11 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
             style={{
               width: '70px',
               padding: '5px',
-              border: '1px solid #ccc',
+              border: '1px solid #3A3D46',
               borderRadius: '4px',
               fontSize: '12px',
+              background: '#1A1D26',
+              color: '#F8FAFC',
             }}
             min="1"
             step="1"
@@ -137,24 +139,31 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} aria-label="Net worth growth chart over time">
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2A2D36" />
           <XAxis 
             dataKey="age" 
-            label={{ value: 'Age', position: 'insideBottom', offset: -5 }}
+            label={{ value: 'Age', position: 'insideBottom', offset: -5, fill: '#94A3B8' }}
             interval={calculateXAxisInterval(data.length)}
+            tick={{ fill: '#94A3B8' }}
+            stroke="#3A3D46"
           />
           <YAxis 
             tickFormatter={formatYAxis}
             domain={[0, 'auto']}
             allowDataOverflow={false}
+            tick={{ fill: '#94A3B8' }}
+            stroke="#3A3D46"
           />
           <Tooltip 
             formatter={(value) => formatCurrency(Number(value))} 
             labelFormatter={(label) => `Age ${label}`}
+            contentStyle={{ background: '#1A1D26', border: '1px solid #790979', borderRadius: '8px', color: '#F8FAFC' }}
+            labelStyle={{ color: '#F8FAFC' }}
+            itemStyle={{ color: '#F8FAFC' }}
           />
-          <Legend wrapperStyle={{ paddingTop: '12px' }} />
-          <Line type="monotone" dataKey="Net Worth" stroke="#4CAF50" strokeWidth={2} />
-          <Line type="monotone" dataKey="FIRE Target" stroke="#ff9800" strokeWidth={2} strokeDasharray="5 5" />
+          <Legend wrapperStyle={{ paddingTop: '12px', color: '#F8FAFC' }} />
+          <Line type="monotone" dataKey="Net Worth" stroke="#22C55E" strokeWidth={2} />
+          <Line type="monotone" dataKey="FIRE Target" stroke="#790979" strokeWidth={2} strokeDasharray="5 5" />
         </LineChart>
       </ResponsiveContainer>
     </section>

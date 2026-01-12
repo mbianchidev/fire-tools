@@ -327,10 +327,10 @@ export function HistoricalNetWorthChart({
     
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={12} textAnchor="middle" fill="#666" fontSize={11}>
+        <text x={0} y={0} dy={12} textAnchor="middle" fill="#94A3B8" fontSize={11}>
           {month}
         </text>
-        <text x={0} y={0} dy={26} textAnchor="middle" fill="#666" fontSize={10}>
+        <text x={0} y={0} dy={26} textAnchor="middle" fill="#94A3B8" fontSize={10}>
           {year}
         </text>
       </g>
@@ -349,7 +349,7 @@ export function HistoricalNetWorthChart({
     
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={0} dy={16} textAnchor="middle" fill="#666" fontSize={11}>
+        <text x={0} y={0} dy={16} textAnchor="middle" fill="#94A3B8" fontSize={11}>
           {year}
         </text>
       </g>
@@ -411,20 +411,22 @@ export function HistoricalNetWorthChart({
 
       <ResponsiveContainer width="100%" height={350}>
         <LineChart data={combinedData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2A2D36" />
           <XAxis
             dataKey="month"
             tick={tickFormatter}
-            tickLine={{ stroke: '#e0e0e0' }}
+            tickLine={{ stroke: '#3A3D46' }}
             height={50}
             interval={0}
+            stroke="#3A3D46"
           />
           <YAxis
-            tick={{ fontSize: 12, fill: '#666' }}
-            tickLine={{ stroke: '#e0e0e0' }}
+            tick={{ fontSize: 12, fill: '#94A3B8' }}
+            tickLine={{ stroke: '#3A3D46' }}
             tickFormatter={(value) => `${symbol}${formatChartCurrency(value)}`}
             width={80}
             domain={yAxisDomain}
+            stroke="#3A3D46"
           />
           <Tooltip
             formatter={(value, name) => {
@@ -454,29 +456,31 @@ export function HistoricalNetWorthChart({
                 displayName,
               ];
             }}
-            labelStyle={{ color: '#333', fontWeight: 'bold' }}
+            labelStyle={{ color: '#F8FAFC', fontWeight: 'bold' }}
             contentStyle={{
-              background: 'white',
-              border: '1px solid #e0e0e0',
+              background: '#1A1D26',
+              border: '1px solid #790979',
               borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              color: '#F8FAFC',
             }}
+            itemStyle={{ color: '#F8FAFC' }}
           />
           <Legend
             wrapperStyle={{ paddingTop: '20px' }}
             formatter={(value) => {
               const valueStr = String(value);
-              if (valueStr === 'netWorth') return <span style={{ color: '#666', fontSize: '12px' }}>{`Net Worth (${currency})`}</span>;
-              if (valueStr === 'forecast') return <span style={{ color: '#666', fontSize: '12px' }}>{`Forecast (${currency})`}</span>;
+              if (valueStr === 'netWorth') return <span style={{ color: '#F8FAFC', fontSize: '12px' }}>{`Net Worth (${currency})`}</span>;
+              if (valueStr === 'forecast') return <span style={{ color: '#F8FAFC', fontSize: '12px' }}>{`Forecast (${currency})`}</span>;
               if (valueStr.startsWith('netWorth_')) {
                 const curr = valueStr.replace('netWorth_', '');
-                return <span style={{ color: '#666', fontSize: '12px' }}>{`Net Worth (${curr})`}</span>;
+                return <span style={{ color: '#F8FAFC', fontSize: '12px' }}>{`Net Worth (${curr})`}</span>;
               }
               if (valueStr.startsWith('forecast_')) {
                 const curr = valueStr.replace('forecast_', '');
-                return <span style={{ color: '#666', fontSize: '12px' }}>{`Forecast (${curr})`}</span>;
+                return <span style={{ color: '#F8FAFC', fontSize: '12px' }}>{`Forecast (${curr})`}</span>;
               }
-              return <span style={{ color: '#666', fontSize: '12px' }}>{value}</span>;
+              return <span style={{ color: '#F8FAFC', fontSize: '12px' }}>{value}</span>;
             }}
           />
           
@@ -484,12 +488,12 @@ export function HistoricalNetWorthChart({
           {previousYearEnd !== null && (
             <ReferenceLine
               y={previousYearEnd}
-              stroke="#9c27b0"
+              stroke="#A855F7"
               strokeDasharray="5 5"
               label={{
                 value: `Prev Year: ${symbol}${formatChartCurrency(previousYearEnd)}`,
                 position: 'right',
-                fill: '#9c27b0',
+                fill: '#A855F7',
                 fontSize: 11,
               }}
             />
@@ -499,10 +503,10 @@ export function HistoricalNetWorthChart({
           <Line
             type="monotone"
             dataKey="netWorth"
-            stroke="#667eea"
+            stroke="#790979"
             strokeWidth={3}
-            dot={{ fill: '#667eea', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, fill: '#667eea' }}
+            dot={{ fill: '#790979', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, fill: '#790979' }}
             name="netWorth"
             connectNulls={false}
           />
@@ -512,11 +516,11 @@ export function HistoricalNetWorthChart({
             <Line
               type="monotone"
               dataKey="forecast"
-              stroke="#ff9800"
+              stroke="#B453B4"
               strokeWidth={2}
               strokeDasharray="5 5"
-              dot={{ fill: '#ff9800', strokeWidth: 2, r: 3 }}
-              activeDot={{ r: 5, fill: '#ff9800' }}
+              dot={{ fill: '#B453B4', strokeWidth: 2, r: 3 }}
+              activeDot={{ r: 5, fill: '#B453B4' }}
               name="forecast"
               connectNulls={true}
             />
