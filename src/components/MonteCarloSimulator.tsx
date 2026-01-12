@@ -79,7 +79,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
     if (mcInputs.blackSwanImpact > 0) {
       errors.blackSwanImpact = 'Impact must be negative or zero (represents loss)';
     } else if (mcInputs.blackSwanImpact < -50) {
-      errors.blackSwanImpact = 'Impact cannot be more than 50% (minimum is -50%)';
+      errors.blackSwanImpact = 'Impact cannot be less than -50% (represents maximum 50% loss)';
     }
     
     return errors;
