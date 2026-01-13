@@ -6,6 +6,8 @@ import { saveSettings, loadSettings, DEFAULT_SETTINGS } from '../utils/cookieSet
 import { DEFAULT_INPUTS, getDemoNetWorthData, getDemoAssetAllocationData } from '../utils/defaults';
 import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
+import { addNotification, clearNotifications } from '../utils/notificationStorage';
+import { generateDemoTourNotifications } from '../utils/notificationGenerator';
 import { MaterialIcon } from './MaterialIcon';
 import './GuidedTour.css';
 
@@ -132,6 +134,13 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     // Load demo Net Worth Tracker data
     const netWorthData = getDemoNetWorthData();
     saveNetWorthTrackerData(netWorthData);
+
+    // Load demo notifications for the tour
+    clearNotifications(); // Clear any existing notifications first
+    const demoNotifications = generateDemoTourNotifications();
+    demoNotifications.forEach(notification => {
+      addNotification(notification);
+    });
 
     setDemoDataLoaded(true);
   }, [demoDataLoaded]);

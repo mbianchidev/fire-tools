@@ -498,6 +498,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
               checked={inputs.stopWorkingAtFIRE}
               onChange={(e) => handleChange('stopWorkingAtFIRE', e.target.checked)}
             />
+            <span className="toggle-switch"></span>
             Stop working when reaching FIRE number
           </label>
         </div>
@@ -508,6 +509,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
               checked={inputs.useAssetAllocationValue}
               onChange={(e) => handleChange('useAssetAllocationValue', e.target.checked)}
             />
+            <span className="toggle-switch"></span>
             Use Asset Allocation portfolio value and allocation
           </label>
         </div>
@@ -518,6 +520,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
               checked={inputs.useExpenseTrackerExpenses}
               onChange={(e) => handleChange('useExpenseTrackerExpenses', e.target.checked)}
             />
+            <span className="toggle-switch"></span>
             Calculate current expenses from last 12 months of Expense Tracker
           </label>
         </div>
@@ -528,6 +531,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
               checked={inputs.useExpenseTrackerIncome}
               onChange={(e) => handleChange('useExpenseTrackerIncome', e.target.checked)}
             />
+            <span className="toggle-switch"></span>
             Calculate labor income from last 12 months of Expense Tracker
           </label>
         </div>

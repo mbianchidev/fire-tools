@@ -183,6 +183,7 @@ body {
   box-shadow: 0 4px 30px var(--accent-glow);
   border-bottom: 1px solid var(--border-accent);
   position: relative;
+  z-index: 1000;
 }
 
 .nav-toggle {
@@ -220,9 +221,17 @@ body {
   justify-content: center;
 }
 
-.profile-menu-container {
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   position: absolute;
   right: 2rem;
+}
+
+.profile-menu-container {
+  position: relative;
+  right: auto;
 }
 
 .nav-link {
@@ -477,6 +486,7 @@ body {
   font-style: italic;
 }
 
+/* Toggle switch styles for checkbox-group */
 .checkbox-group label {
   display: flex;
   align-items: center;
@@ -485,12 +495,41 @@ body {
 }
 
 .checkbox-group input[type="checkbox"] {
-  margin-right: 0.75rem;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
+  display: none;
+}
+
+.checkbox-group .toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 1.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 1rem;
   flex-shrink: 0;
-  accent-color: var(--accent-primary);
+  transition: background 0.2s ease;
+  margin-right: 1rem;
+}
+
+.checkbox-group .toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.checkbox-group input[type="checkbox"]:checked + .toggle-switch {
+  background: var(--accent-primary);
+}
+
+.checkbox-group input[type="checkbox"]:checked + .toggle-switch::after {
+  transform: translateX(1.25rem);
+  background: var(--bg-primary);
 }
 
 .allocation-sum {
@@ -1356,8 +1395,8 @@ body {
   }
 
   .profile-menu-container {
-    position: absolute;
-    right: 2rem;
+    position: relative;
+    right: auto;
   }
 }
 

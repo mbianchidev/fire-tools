@@ -10,6 +10,9 @@ import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { formatWithSeparator, validateNumberInput } from '../utils/inputValidation';
 import { clearTourPreference } from '../utils/tourPreferences';
 import { exportAllDataAsJSON, importAllDataFromJSON, serializeAllDataExport } from '../utils/dataExportImport';
+import { loadNotificationState, updateNotificationPreferences, clearNotifications, addNotification } from '../utils/notificationStorage';
+import { type NotificationPreferences, DEFAULT_NOTIFICATION_PREFERENCES } from '../types/notification';
+import { generateDemoTourNotifications } from '../utils/notificationGenerator';
 import { Tooltip } from './Tooltip';
 import { MaterialIcon } from './MaterialIcon';
 import './SettingsPage.css';
@@ -24,6 +27,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [rateTextValues, setRateTextValues] = useState<Record<string, string>>({});
+  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
 
   // Initialize rate text values when settings load, default currency, or decimal separator changes
   useEffect(() => {
@@ -39,6 +43,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   useEffect(() => {
     const loaded = loadSettings();
     setSettings(loaded);
+    
+    // Load notification preferences
+    const notifState = loadNotificationState();
+    setNotificationPrefs(notifState.preferences);
+    
     setIsLoading(false);
   }, []);
 
@@ -370,6 +379,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     }
   };
 
+  // Handle notification preference change
+  const handleNotificationPrefChange = <K extends keyof NotificationPreferences>(
+    key: K,
+    value: NotificationPreferences[K]
+  ) => {
+    const newPrefs = { ...notificationPrefs, [key]: value };
+    setNotificationPrefs(newPrefs);
+    updateNotificationPreferences({ [key]: value });
+    showMessage('success', 'Notification preferences saved!');
+  };
+
+  // Clear all notifications
+  const handleClearNotifications = () => {
+    if (confirm('Are you sure you want to clear all notifications? This cannot be undone.')) {
+      clearNotifications();
+      showMessage('success', 'All notifications cleared!');
+    }
+  };
+
+  // Trigger test notifications
+  const handleTriggerTestNotifications = () => {
+    const testNotifications = generateDemoTourNotifications();
+    testNotifications.forEach(notification => {
+      addNotification(notification);
+    });
+    showMessage('success', `${testNotifications.length} test notifications created! Check the notification bell.`);
+  };
+
   if (isLoading) {
     return <div className="settings-page loading">Loading settings...</div>;
   }
@@ -535,6 +572,182 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             </select>
             <span className="setting-help">Number of decimal places shown for values below 1,000. Values at or above 1,000 show no decimals.</span>
           </div>
+        </section>
+
+        {/* Notification Settings */}
+        <section className="settings-section">
+          <h2><MaterialIcon name="notifications" /> Notifications</h2>
+          
+          <div className="setting-item">
+            <div className="label-with-tooltip">
+              <label>Enable In-App Notifications</label>
+              <Tooltip content="Control whether you receive in-app notifications for reminders like new months, tax deadlines, and financial milestones.">
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
+            <div className="toggle-group">
+              <button
+                className={`toggle-btn ${notificationPrefs.enableInAppNotifications ? 'active' : ''}`}
+                onClick={() => handleNotificationPrefChange('enableInAppNotifications', true)}
+              >
+                Enabled
+              </button>
+              <button
+                className={`toggle-btn ${!notificationPrefs.enableInAppNotifications ? 'active' : ''}`}
+                onClick={() => handleNotificationPrefChange('enableInAppNotifications', false)}
+              >
+                Disabled
+              </button>
+            </div>
+          </div>
+
+          {notificationPrefs.enableInAppNotifications && (
+            <>
+              <div className="setting-item">
+                <label className="toggle-switch-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPrefs.newMonthReminders}
+                    onChange={(e) => handleNotificationPrefChange('newMonthReminders', e.target.checked)}
+                  />
+                  <span className="toggle-switch"></span>
+                  <span>New Month Reminders</span>
+                </label>
+                <span className="setting-help">Remind to update financial data at the start of each month</span>
+              </div>
+
+              <div className="setting-item">
+                <label className="toggle-switch-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPrefs.newQuarterReminders}
+                    onChange={(e) => handleNotificationPrefChange('newQuarterReminders', e.target.checked)}
+                  />
+                  <span className="toggle-switch"></span>
+                  <span>New Quarter Reminders</span>
+                </label>
+                <span className="setting-help">Remind to review quarterly performance</span>
+              </div>
+
+              <div className="setting-item">
+                <label className="toggle-switch-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPrefs.taxReminders}
+                    onChange={(e) => handleNotificationPrefChange('taxReminders', e.target.checked)}
+                  />
+                  <span className="toggle-switch"></span>
+                  <span>Tax Payment Reminders</span>
+                </label>
+                <span className="setting-help">Remind about upcoming tax deadlines</span>
+              </div>
+
+              <div className="setting-item">
+                <label className="toggle-switch-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPrefs.dcaReminders}
+                    onChange={(e) => handleNotificationPrefChange('dcaReminders', e.target.checked)}
+                  />
+                  <span className="toggle-switch"></span>
+                  <span>DCA Investment Reminders</span>
+                </label>
+                <span className="setting-help">Remind about regular investment contributions</span>
+              </div>
+
+              <div className="setting-item">
+                <label className="toggle-switch-label">
+                  <input
+                    type="checkbox"
+                    checked={notificationPrefs.fireMilestones}
+                    onChange={(e) => handleNotificationPrefChange('fireMilestones', e.target.checked)}
+                  />
+                  <span className="toggle-switch"></span>
+                  <span>FIRE Milestone Alerts</span>
+                </label>
+                <span className="setting-help">Get notified when you reach FIRE milestones (25%, 50%, 75%, 100%)</span>
+              </div>
+            </>
+          )}
+
+          <div className="setting-item">
+            <div className="subsection-header-with-tooltip">
+              <h3><MaterialIcon name="science" /> Test Mode</h3>
+              <Tooltip content="Trigger sample notifications to test the notification system. This will add demo notifications to your notification bell so you can see how they look and work.">
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
+            <p className="setting-help">Create sample notifications to test the notification UI</p>
+            <button className="secondary-btn" onClick={handleTriggerTestNotifications}>
+              <MaterialIcon name="notifications_active" /> Trigger Test Notifications
+            </button>
+          </div>
+
+          <div className="setting-item">
+            <button className="secondary-btn" onClick={handleClearNotifications}>
+              <MaterialIcon name="delete" /> Clear All Notifications
+            </button>
+          </div>
+        </section>
+
+        {/* Email Preferences */}
+        <section className="settings-section">
+          <h2><MaterialIcon name="email" /> Email Preferences</h2>
+          <div className="setting-item">
+            <div className="label-with-tooltip">
+              <label>Email Notifications</label>
+              <Tooltip content="Email notifications require a server to send emails. Since Fire Tools is a client-side only application, email functionality is currently a placeholder for future development.">
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
+            <div className="toggle-group">
+              <button
+                className={`toggle-btn ${notificationPrefs.enableEmailNotifications ? 'active' : ''}`}
+                onClick={() => handleNotificationPrefChange('enableEmailNotifications', true)}
+                disabled
+              >
+                Enabled
+              </button>
+              <button
+                className={`toggle-btn ${!notificationPrefs.enableEmailNotifications ? 'active' : ''}`}
+                onClick={() => handleNotificationPrefChange('enableEmailNotifications', false)}
+              >
+                Disabled
+              </button>
+            </div>
+            <span className="setting-help">🚧 Email notifications are not yet available (requires server integration)</span>
+          </div>
+
+          {notificationPrefs.enableEmailNotifications && (
+            <>
+              <div className="setting-item">
+                <label htmlFor="emailAddress">Email Address</label>
+                <input
+                  id="emailAddress"
+                  type="email"
+                  value={notificationPrefs.emailAddress}
+                  onChange={(e) => handleNotificationPrefChange('emailAddress', e.target.value)}
+                  placeholder="your@email.com"
+                  disabled
+                />
+              </div>
+
+              <div className="setting-item">
+                <label htmlFor="emailFrequency">Email Frequency</label>
+                <select
+                  id="emailFrequency"
+                  value={notificationPrefs.emailFrequency}
+                  onChange={(e) => handleNotificationPrefChange('emailFrequency', e.target.value as NotificationPreferences['emailFrequency'])}
+                  disabled
+                >
+                  <option value="NEVER">Never</option>
+                  <option value="DAILY">Daily</option>
+                  <option value="WEEKLY">Weekly</option>
+                  <option value="MONTHLY">Monthly</option>
+                </select>
+              </div>
+            </>
+          )}
         </section>
 
         {/* Currency Disclaimer - Moved before currency settings */}

@@ -14,6 +14,7 @@ import { NetWorthTrackerPage } from './components/NetWorthTrackerPage';
 import { HomePage } from './components/HomePage';
 import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
+import { NotificationBell } from './components/NotificationBell';
 import { SettingsPage } from './components/SettingsPage';
 import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
 import { CookiePolicyPage } from './components/CookiePolicyPage';
@@ -29,6 +30,7 @@ import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
 import './components/NetWorthTrackerPage.css';
 import './components/GuidedTour.css';
+import './components/NotificationBell.css';
 import { MaterialIcon } from './components/MaterialIcon';
 import { FireIcon } from './components/FireIcon';
 
@@ -99,7 +101,10 @@ function Navigation({ accountName }: { accountName: string }) {
           <MaterialIcon name="casino" className="nav-icon" /> Monte Carlo
         </Link>
       </div>
-      <ProfileMenu accountName={accountName} />
+      <div className="nav-actions">
+        <NotificationBell />
+        <ProfileMenu accountName={accountName} />
+      </div>
     </nav>
   );
 }

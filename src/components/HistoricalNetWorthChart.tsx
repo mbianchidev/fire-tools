@@ -381,6 +381,7 @@ export function HistoricalNetWorthChart({
             checked={showForecast}
             onChange={(e) => setShowForecast(e.target.checked)}
           />
+          <span className="toggle-switch"></span>
           Show Forecast
         </label>
       </div>

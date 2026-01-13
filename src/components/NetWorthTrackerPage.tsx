@@ -813,6 +813,7 @@ export function NetWorthTrackerPage() {
                   onChange={(e) => handleToggleSync(e.target.checked)}
                   aria-label="Sync with Asset Allocation Manager"
                 />
+                <span className="toggle-switch"></span>
                 <span className="sync-label-text">
                   <MaterialIcon name="sync" /> Sync current month with Asset Allocation Manager
                 </span>
