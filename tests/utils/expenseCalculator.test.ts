@@ -362,6 +362,45 @@ describe('Expense Calculator', () => {
       const filtered = filterTransactions(mixedExpenses, filter);
       expect(filtered.length).toBe(2); // non-recurring and undefined should both match false
     });
+
+    it('should filter by search term in amount', () => {
+      const filter: TransactionFilter = { searchTerm: '1500' };
+      const filtered = filterTransactions(mockExpenses, filter);
+      expect(filtered.length).toBe(1);
+      expect(filtered[0].amount).toBe(1500);
+    });
+
+    it('should filter by partial amount match', () => {
+      const filter: TransactionFilter = { searchTerm: '50' };
+      const filtered = filterTransactions(mockExpenses, filter);
+      // Matches: 1500 (rent), 150 (dining out), 50 (subscription)
+      expect(filtered.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should filter by exact date', () => {
+      const filter: TransactionFilter = { filterDate: '2024-01-05' };
+      const filtered = filterTransactions(mockExpenses, filter);
+      expect(filtered.length).toBe(1);
+      expect(filtered[0].date).toBe('2024-01-05');
+    });
+
+    it('should filter by exact date with no matches', () => {
+      const filter: TransactionFilter = { filterDate: '2024-02-01' };
+      const filtered = filterTransactions(mockExpenses, filter);
+      expect(filtered.length).toBe(0);
+    });
+
+    it('should filter by search term matching either description or amount', () => {
+      const testExpenses: ExpenseEntry[] = [
+        { id: 'exp-1', type: 'expense', date: '2024-01-05', amount: 100, description: 'Coffee', category: 'DINING_OUT', expenseType: 'WANT' },
+        { id: 'exp-2', type: 'expense', date: '2024-01-06', amount: 250, description: 'Groceries', category: 'GROCERIES', expenseType: 'NEED' },
+        { id: 'exp-3', type: 'expense', date: '2024-01-07', amount: 25, description: 'Bus fare', category: 'TRANSPORTATION', expenseType: 'NEED' },
+      ];
+      // Search for "25" should match expense with amount 250 and expense with amount 25
+      const filter: TransactionFilter = { searchTerm: '25' };
+      const filtered = filterTransactions(testExpenses, filter);
+      expect(filtered.length).toBe(2);
+    });
   });
 
   describe('sortTransactions', () => {

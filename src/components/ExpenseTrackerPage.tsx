@@ -890,6 +890,28 @@ export function ExpenseTrackerPage() {
                 </button>
               </div>
               <div className="filter-group">
+                <label htmlFor="filter-category">Category:</label>
+                <select
+                  id="filter-category"
+                  value={filter.category || ''}
+                  onChange={(e) => setFilter({ ...filter, category: e.target.value as ExpenseCategory || undefined })}
+                >
+                  <option value="">All</option>
+                  {EXPENSE_CATEGORIES.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="filter-group">
+                <label htmlFor="filter-date">Date:</label>
+                <input
+                  id="filter-date"
+                  type="date"
+                  value={filter.filterDate || ''}
+                  onChange={(e) => setFilter({ ...filter, filterDate: e.target.value || undefined })}
+                />
+              </div>
+              <div className="filter-group">
                 <label htmlFor="filter-type">Type:</label>
                 <select
                   id="filter-type"
@@ -918,7 +940,7 @@ export function ExpenseTrackerPage() {
                 <input
                   id="filter-search"
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Search description or amount..."
                   value={filter.searchTerm || ''}
                   onChange={(e) => setFilter({ ...filter, searchTerm: e.target.value || undefined })}
                 />

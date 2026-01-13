@@ -223,6 +223,11 @@ export function filterTransactions<T extends Transaction>(
   filter: TransactionFilter
 ): T[] {
   return transactions.filter(transaction => {
+    // Exact date filter
+    if (filter.filterDate && transaction.date !== filter.filterDate) {
+      return false;
+    }
+
     // Date range filter
     if (filter.startDate && transaction.date < filter.startDate) {
       return false;
@@ -239,10 +244,12 @@ export function filterTransactions<T extends Transaction>(
       return false;
     }
 
-    // Search term filter
+    // Search term filter - searches in description and amount
     if (filter.searchTerm) {
       const searchLower = filter.searchTerm.toLowerCase();
-      if (!transaction.description.toLowerCase().includes(searchLower)) {
+      const descriptionMatches = transaction.description.toLowerCase().includes(searchLower);
+      const amountMatches = transaction.amount.toString().includes(filter.searchTerm);
+      if (!descriptionMatches && !amountMatches) {
         return false;
       }
     }

@@ -172,6 +172,7 @@ export type SortDirection = 'asc' | 'desc';
 export interface TransactionFilter {
   startDate?: string;
   endDate?: string;
+  filterDate?: string; // Exact date filter (e.g., "2026-01-15")
   category?: ExpenseCategory;
   incomeSource?: IncomeSource;
   expenseType?: ExpenseType;
