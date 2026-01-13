@@ -309,7 +309,8 @@ function App() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         
         <header className="app-header">
-          <h1><FireIcon size={32} className="header-icon" /> Fire Tools</h1>
+          <FireIcon size={96} className="header-fire-icon" />
+          <h1>Fire Tools</h1>
           <p>Rocket fuel for your financial planning</p>
         </header>
 

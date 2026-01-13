@@ -1672,6 +1672,12 @@ body {
   margin-right: 0.25rem;
 }
 
+/* Large fire icon in header - positioned above text */
+.header-fire-icon {
+  display: block;
+  margin: 0 auto 0.5rem auto;
+}
+
 /* Icon in page header context */
 .page-header-icon {
   margin-right: 0.5rem;
