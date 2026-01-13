@@ -5,7 +5,7 @@ import {
   clearSettings,
   DEFAULT_SETTINGS,
   type UserSettings,
-} from './cookieSettings';
+} from '../../src/utils/cookieSettings';
 
 // Mock document.cookie
 const cookieMock = (() => {

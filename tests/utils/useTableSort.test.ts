@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { useTableSort } from './useTableSort';
+import { useTableSort } from '../../src/utils/useTableSort';
 import { renderHook, act } from '@testing-library/react';
 
 describe('useTableSort', () => {

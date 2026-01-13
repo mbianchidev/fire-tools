@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/react';
-import { SliderInput } from './SliderInput';
+import { SliderInput } from '../../src/components/SliderInput';
 
 describe('SliderInput', () => {
   describe('max/min bounds validation', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateXAxisInterval, calculateBarSize } from './chartHelper';
+import { calculateXAxisInterval, calculateBarSize } from '../../src/utils/chartHelper';
 
 describe('Chart Helper - calculateXAxisInterval', () => {
   describe('Small datasets (20 years or less)', () => {

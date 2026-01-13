@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { runMonteCarloSimulation } from './monteCarlo';
-import { CalculatorInputs, MonteCarloInputs } from '../types/calculator';
+import { runMonteCarloSimulation } from '../../src/utils/monteCarlo';
+import { CalculatorInputs, MonteCarloInputs } from '../../src/types/calculator';
 
 describe('Monte Carlo Simulation', () => {
   const baseInputs: CalculatorInputs = {

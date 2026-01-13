@@ -7,8 +7,8 @@ import {
   calculateInvestmentDeviation,
   formatDeviation,
   confirmInvestment
-} from './dcaCalculator';
-import { Asset, AssetClass } from '../types/assetAllocation';
+} from '../../src/utils/dcaCalculator';
+import { Asset, AssetClass } from '../../src/types/assetAllocation';
 
 describe('DCA Calculator', () => {
   describe('calculateDCAAllocation', () => {

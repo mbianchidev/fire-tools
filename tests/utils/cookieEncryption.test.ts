@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { encryptData, decryptData } from './cookieEncryption';
+import { encryptData, decryptData } from '../../src/utils/cookieEncryption';
 
 describe('Cookie Encryption Utilities', () => {
   describe('encryptData', () => {

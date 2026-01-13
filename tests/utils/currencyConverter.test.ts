@@ -13,11 +13,11 @@ import {
   convertFireCalculatorInputsToNewCurrency,
   convertMonthlyVariationsToDisplayCurrency,
   convertNetWorthForecastToDisplayCurrency,
-} from './currencyConverter';
-import { DEFAULT_FALLBACK_RATES } from '../types/currency';
-import { Asset } from '../types/assetAllocation';
-import { NetWorthTrackerData, MonthlyVariation, NetWorthForecast } from '../types/netWorthTracker';
-import { ExpenseTrackerData } from '../types/expenseTracker';
+} from '../../src/utils/currencyConverter';
+import { DEFAULT_FALLBACK_RATES } from '../../src/types/currency';
+import { Asset } from '../../src/types/assetAllocation';
+import { NetWorthTrackerData, MonthlyVariation, NetWorthForecast } from '../../src/types/netWorthTracker';
+import { ExpenseTrackerData } from '../../src/types/expenseTracker';
 
 describe('Currency Converter', () => {
   describe('convertToEUR', () => {

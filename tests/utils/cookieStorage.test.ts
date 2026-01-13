@@ -11,11 +11,11 @@ import {
   clearExpenseTrackerData,
   clearAllData,
   isCookieStorageAvailable,
-} from './cookieStorage';
-import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
-import { CalculatorInputs } from '../types/calculator';
-import { ExpenseTrackerData, ExpenseCategory, IncomeSource } from '../types/expenseTracker';
-import { DEFAULT_INPUTS } from './defaults';
+} from '../../src/utils/cookieStorage';
+import { Asset, AssetClass, AllocationMode } from '../../src/types/assetAllocation';
+import { CalculatorInputs } from '../../src/types/calculator';
+import { ExpenseTrackerData, ExpenseCategory, IncomeSource } from '../../src/types/expenseTracker';
+import { DEFAULT_INPUTS } from '../../src/utils/defaults';
 
 // Mock document.cookie
 const cookieMock = (() => {

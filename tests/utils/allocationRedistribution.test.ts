@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { AllocationMode, AssetClass, Asset as TypedAsset } from '../types/assetAllocation';
-import { calculateAllocationDeltas, calculateAssetClassSummaries, calculatePortfolioAllocation } from './allocationCalculator';
+import { AllocationMode, AssetClass, Asset as TypedAsset } from '../../src/types/assetAllocation';
+import { calculateAllocationDeltas, calculateAssetClassSummaries, calculatePortfolioAllocation } from '../../src/utils/allocationCalculator';
 
 /**
  * Tests for target allocation redistribution logic.

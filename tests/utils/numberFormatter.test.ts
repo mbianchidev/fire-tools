@@ -1,8 +1,8 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest';
-import { formatDisplayNumber, formatDisplayPercent, formatDisplayCurrency } from './numberFormatter';
+import { formatDisplayNumber, formatDisplayPercent, formatDisplayCurrency } from '../../src/utils/numberFormatter';
 
 // Mock loadSettings to return controlled settings
-vi.mock('./cookieSettings', () => ({
+vi.mock('../../src/utils/cookieSettings', () => ({
   loadSettings: vi.fn(() => ({
     accountName: 'My Portfolio',
     decimalSeparator: '.',
@@ -17,7 +17,7 @@ vi.mock('./cookieSettings', () => ({
 }));
 
 // Import after mocking
-import { loadSettings } from './cookieSettings';
+import { loadSettings } from '../../src/utils/cookieSettings';
 const mockedLoadSettings = vi.mocked(loadSettings);
 
 describe('formatDisplayNumber', () => {
