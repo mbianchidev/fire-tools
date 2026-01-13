@@ -600,7 +600,7 @@ export function ExpenseTrackerPage() {
   return (
     <div className="expense-tracker-page">
       <header className="page-header">
-        <h1><span aria-hidden="true">💰</span> Cashflow Tracker</h1>
+        <h1><MaterialIcon name="account_balance_wallet" className="page-header-icon" /> Cashflow Tracker</h1>
         <p>
           Track your income and expenses, set budgets, and gain insights into your spending patterns.
         </p>
@@ -615,7 +615,7 @@ export function ExpenseTrackerPage() {
             aria-expanded={isHowToUseOpen}
             aria-controls="how-to-use-content"
           >
-            <h4><span aria-hidden="true">💡</span> How this page works <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
+            <h4><MaterialIcon name="lightbulb" /> How this page works <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
           </button>
           {isHowToUseOpen && (
             <ul id="how-to-use-content" className="how-to-use-content">
@@ -682,28 +682,28 @@ export function ExpenseTrackerPage() {
           <h3 id="summary-heading">Summary for {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h3>
           <div className="summary-cards">
             <div className="summary-card income">
-              <span className="card-icon" aria-hidden="true">📈</span>
+              <span className="card-icon" aria-hidden="true"><MaterialIcon name="trending_up" /></span>
               <div className="card-content">
                 <span className="card-label">Total Income</span>
                 <span className="card-value">{formatCurrency(summary.totalIncome, data.currency)}</span>
               </div>
             </div>
             <div className="summary-card expenses">
-              <span className="card-icon" aria-hidden="true">📉</span>
+              <span className="card-icon" aria-hidden="true"><MaterialIcon name="trending_down" /></span>
               <div className="card-content">
                 <span className="card-label">Total Expenses</span>
                 <span className="card-value">{formatCurrency(summary.totalExpenses, data.currency)}</span>
               </div>
             </div>
             <div className={`summary-card balance ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
-              <span className="card-icon" aria-hidden="true">{summary.netBalance >= 0 ? '💰' : '⚠️'}</span>
+              <span className="card-icon" aria-hidden="true">{summary.netBalance >= 0 ? <MaterialIcon name="account_balance_wallet" /> : <MaterialIcon name="warning" />}</span>
               <div className="card-content">
                 <span className="card-label">Net Balance</span>
                 <span className="card-value">{formatCurrency(summary.netBalance, data.currency)}</span>
               </div>
             </div>
             <div className="summary-card savings">
-              <span className="card-icon" aria-hidden="true">🏦</span>
+              <span className="card-icon" aria-hidden="true"><MaterialIcon name="savings" /></span>
               <div className="card-content">
                 <span className="card-label">Savings Rate</span>
                 <span className="card-value">{formatDisplayPercent(summary.savingsRate)}</span>
@@ -721,7 +721,7 @@ export function ExpenseTrackerPage() {
               aria-expanded={isBudgetRuleInfoOpen}
               aria-controls="budget-rule-content"
             >
-              <h3><span aria-hidden="true">📊</span> 50/30/20 Budget Rule <span className="collapse-icon-small" aria-hidden="true">{isBudgetRuleInfoOpen ? '▼' : '▶'}</span></h3>
+              <h3><MaterialIcon name="bar_chart" /> 50/30/20 Budget Rule <span className="collapse-icon-small" aria-hidden="true">{isBudgetRuleInfoOpen ? '▼' : '▶'}</span></h3>
             </button>
             {isBudgetRuleInfoOpen && (
               <div id="budget-rule-content" className="budget-rule-content">
@@ -787,7 +787,7 @@ export function ExpenseTrackerPage() {
             onClick={() => setActiveTab('transactions')}
             className={`tab ${activeTab === 'transactions' ? 'active' : ''}`}
           >
-            <span aria-hidden="true">📝</span> Transactions
+            <MaterialIcon name="receipt_long" /> Transactions
           </button>
           <button
             role="tab"
@@ -796,7 +796,7 @@ export function ExpenseTrackerPage() {
             className={`tab ${activeTab === 'budgets' ? 'active' : ''}`}
             data-tour="budgets-tab"
           >
-            <span aria-hidden="true">💵</span> Budgets
+            <MaterialIcon name="savings" /> Budgets
           </button>
           <button
             role="tab"
@@ -805,7 +805,7 @@ export function ExpenseTrackerPage() {
             className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
             data-tour="analytics-tab"
           >
-            <span aria-hidden="true">📊</span> Analytics
+            <MaterialIcon name="analytics" /> Analytics
           </button>
         </div>
 
@@ -816,10 +816,10 @@ export function ExpenseTrackerPage() {
               <h3>Transactions</h3>
               <div className="transaction-actions" data-tour="transaction-actions">
                 <button className="btn-add income" onClick={() => setShowIncomeForm(true)}>
-                  <span aria-hidden="true">➕</span> Add Income
+                  <MaterialIcon name="add" /> Add Income
                 </button>
                 <button className="btn-add expense" onClick={() => setShowExpenseForm(true)}>
-                  <span aria-hidden="true">➕</span> Add Expense
+                  <MaterialIcon name="add" /> Add Expense
                 </button>
               </div>
             </div>
@@ -920,14 +920,14 @@ export function ExpenseTrackerPage() {
                             onClick={() => setEditingTransaction(transaction)}
                             aria-label="Edit transaction"
                           >
-                            ✏️
+                            <MaterialIcon name="edit" size="small" />
                           </button>
                           <button
                             className="btn-icon delete"
                             onClick={() => handleDeleteTransaction(transaction.id, transaction.type)}
                             aria-label="Delete transaction"
                           >
-                            🗑️
+                            <MaterialIcon name="delete" size="small" />
                           </button>
                         </td>
                       </tr>

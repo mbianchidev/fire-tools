@@ -295,7 +295,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     <div className="dialog-overlay" onClick={onClose}>
       <div className="dialog-content" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h3>{isEditing ? '✏️ Edit' : '➕ Add'} Asset</h3>
+          <h3>{isEditing ? 'Edit' : 'Add'} Asset</h3>
           <button className="dialog-close" onClick={onClose}>✕</button>
         </div>
 

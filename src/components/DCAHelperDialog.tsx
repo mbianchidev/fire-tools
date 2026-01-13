@@ -13,6 +13,7 @@ import {
   ConfirmedDCAAssetAllocation
 } from '../utils/dcaCalculator';
 import { formatAssetName } from '../utils/allocationCalculator';
+import { MaterialIcon } from './MaterialIcon';
 import { formatDisplayPercent } from '../utils/numberFormatter';
 
 // Constants for deviation feedback thresholds
@@ -347,7 +348,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
     <div className="dialog-overlay" onClick={handleClose}>
       <div className="dialog-content dca-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
-          <h2>💰 DCA Investment Calculator</h2>
+          <h2><MaterialIcon name="savings" /> DCA Investment Calculator</h2>
           <button className="dialog-close" onClick={handleClose}>×</button>
         </div>
 
@@ -382,7 +383,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
 
           {error && (
             <div className="error-message">
-              <strong>⚠️ Error:</strong> {error}
+              <strong><MaterialIcon name="error" /> Error:</strong> {error}
             </div>
           )}
 
@@ -399,7 +400,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                   </p>
                 ) : !isConfirmMode && (
                   <p className="dca-note">
-                    💡 Prices fetched from Yahoo Finance API. 
+                    <MaterialIcon name="lightbulb" size="small" /> Prices fetched from Yahoo Finance API. 
                     {calculation.allocations.some(a => a.priceError) && (
                       <span className="warning-text"> Some prices could not be fetched.</span>
                     )}
@@ -576,7 +577,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
               {/* Confirmation Summary */}
               {allConfirmed && totalDeviation && (
                 <div className={`confirmation-summary ${totalDeviation.deviationPercent === 0 ? 'exact' : Math.abs(totalDeviation.deviationPercent) <= DEVIATION_FAR_THRESHOLD / 2 ? 'close' : 'far'}`}>
-                  <h4>📊 Investment Summary</h4>
+                  <h4><MaterialIcon name="bar_chart" /> Investment Summary</h4>
                   <p>
                     <strong>Suggested Total:</strong> {formatDCACurrency(totalDeviation.totalSuggested, currency)}
                   </p>
@@ -596,7 +597,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                     <p className="info-message">ℹ️ Your investments are reasonably close to the suggested allocation.</p>
                   )}
                   {Math.abs(totalDeviation.deviationPercent) > DEVIATION_FAR_THRESHOLD && (
-                    <p className="warning-message">⚠️ Your investments deviate significantly from the suggestion. Consider adjusting future investments.</p>
+                    <p className="warning-message"><MaterialIcon name="warning" /> Your investments deviate significantly from the suggestion. Consider adjusting future investments.</p>
                   )}
                 </div>
               )}
@@ -605,7 +606,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                 {!isConfirmMode ? (
                   <>
                     <button className="action-btn reset-btn" onClick={handleReset}>
-                      🔄 Restart
+                      <MaterialIcon name="refresh" /> Restart
                     </button>
                     <button 
                       className="action-btn primary-btn"
@@ -617,7 +618,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                 ) : allConfirmed ? (
                   <>
                     <button className="action-btn primary-btn" onClick={handleReset}>
-                      💰 Invest Again
+                      <MaterialIcon name="savings" /> Invest Again
                     </button>
                   </>
                 ) : (
@@ -636,7 +637,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
                       ✓ Confirm All
                     </button>
                     <button className="action-btn reset-btn" onClick={handleReset}>
-                      🔄 Restart
+                      <MaterialIcon name="refresh" /> Restart
                     </button>
                   </>
                 )}
@@ -646,7 +647,7 @@ export const DCAHelperDialog: React.FC<DCAHelperDialogProps> = ({
 
           {!calculation && !error && (
             <div className="dca-info">
-              <h4>📊 How it works:</h4>
+              <h4><MaterialIcon name="bar_chart" /> How it works:</h4>
               <ul>
                 <li>Enter the amount you want to invest</li>
                 <li>The calculator will distribute it according to your asset allocation targets</li>

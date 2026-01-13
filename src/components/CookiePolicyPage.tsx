@@ -94,7 +94,7 @@ export function CookiePolicyPage() {
           </div>
 
           <div className="info-box">
-            <h4>🔒 Privacy & Security</h4>
+            <h4>Privacy & Security</h4>
             <p>
               All financial data stored in cookies is encrypted using AES-256 encryption before being saved. This ensures that even if someone gains access to your cookies, they cannot read your sensitive financial information without the encryption key.
             </p>

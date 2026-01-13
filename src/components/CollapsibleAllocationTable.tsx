@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Asset, AllocationDelta, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { formatCurrency, formatPercent, formatAssetName } from '../utils/allocationCalculator';
 import { NumberInput } from './NumberInput';
+import { MaterialIcon } from './MaterialIcon';
 
 interface CollapsibleAllocationTableProps {
   assets: Asset[];
@@ -446,7 +447,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                     }}
                     title="Edit All Percentages"
                   >
-                    ✏️ Edit All
+                    <MaterialIcon name="edit" size="small" /> Edit All
                   </button>
                 )}
               </div>
@@ -652,7 +653,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                                   onDeleteAsset(asset.id);
                                   setEditingAsset(null);
                                 }
-                              }} className="btn-delete" title="Delete">🗑️</button>
+                              }} className="btn-delete" title="Delete"><MaterialIcon name="delete" size="small" /></button>
                             </div>
                           ) : (
                             <button onClick={() => startEditing(asset)} className="btn-edit" title="Edit">✎</button>

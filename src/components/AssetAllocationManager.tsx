@@ -5,6 +5,7 @@ import { DEFAULT_ASSETS } from '../utils/defaultAssets';
 import { AllocationTable } from './AllocationTable';
 import { AssetClassTable } from './AssetClassTable';
 import { AllocationChart } from './AllocationChart';
+import { MaterialIcon } from './MaterialIcon';
 
 export const AssetAllocationManager: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>(DEFAULT_ASSETS);
@@ -82,7 +83,7 @@ export const AssetAllocationManager: React.FC = () => {
   return (
     <div className="asset-allocation-manager">
       <div className="manager-header">
-        <h2>📊 Asset Allocation Manager</h2>
+        <h2><MaterialIcon name="pie_chart" /> Asset Allocation Manager</h2>
         <p className="section-description">
           Manage and visualize your portfolio asset allocation. Set target allocations,
           track current positions, and see recommended actions to rebalance your portfolio.
@@ -91,7 +92,7 @@ export const AssetAllocationManager: React.FC = () => {
 
       {!allocation.isValid && (
         <div className="validation-errors">
-          <strong>⚠️ Validation Errors:</strong>
+          <strong><MaterialIcon name="warning" /> Validation Errors:</strong>
           <ul>
             {allocation.validationErrors.map((error, index) => (
               <li key={index}>{error}</li>
@@ -102,13 +103,13 @@ export const AssetAllocationManager: React.FC = () => {
 
       <div className="manager-actions">
         <button onClick={handleAddAsset} className="action-btn add-btn">
-          ➕ Add Asset
+          <MaterialIcon name="add" /> Add Asset
         </button>
         <button onClick={handleExport} className="action-btn export-btn">
-          📥 Export CSV
+          <MaterialIcon name="download" /> Export CSV
         </button>
         <label className="action-btn import-btn">
-          📤 Import CSV
+          <MaterialIcon name="upload" /> Import CSV
           <input
             type="file"
             accept=".csv"
@@ -170,7 +171,7 @@ export const AssetAllocationManager: React.FC = () => {
       </div>
 
       <div className="allocation-info">
-        <h4>💡 How to Use</h4>
+        <h4><MaterialIcon name="lightbulb" /> How to Use</h4>
         <ul>
           <li><strong>Target Mode:</strong> Choose "%" for percentage-based allocation, "SET" for fixed amounts (e.g., emergency cash), or "OFF" to exclude from calculations</li>
           <li><strong>Percentage targets</strong> for active assets should sum to 100%</li>

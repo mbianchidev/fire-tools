@@ -11,6 +11,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { MonthlyVariation, NetWorthForecast } from '../types/netWorthTracker';
+import { MaterialIcon } from './MaterialIcon';
 import { SupportedCurrency, SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES } from '../types/currency';
 import { 
   convertMonthlyVariationsToDisplayCurrency, 
@@ -309,7 +310,7 @@ export function HistoricalNetWorthChart({
     return (
       <div className="chart-container">
         <div className="empty-state">
-          <div className="empty-state-icon">📈</div>
+          <div className="empty-state-icon"><MaterialIcon name="trending_up" size="large" /></div>
           <h4>No Historical Data</h4>
           <p>Start tracking your net worth to see the historical chart.</p>
         </div>
