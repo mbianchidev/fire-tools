@@ -510,6 +510,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                   {getSortedAssets(classAssets, assetClass).map(({ asset, delta }) => {
 
                     const isEditing = editingAsset === asset.id;
+                    const isCashAsset = asset.assetClass === 'CASH';
 
                     return (
                       <tr 
@@ -583,7 +584,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         <td>{formatPercent(delta.currentPercent)}</td>
                         <td>{formatPercent(delta.currentPercentInClass)}</td>
                         <td>
-                          {asset.assetClass === 'CASH' ? (
+                          {isCashAsset ? (
                             '-'
                           ) : isEditing ? (
                             <NumberInput
@@ -598,7 +599,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                           )}
                         </td>
                         <td className="currency-value">
-                          {asset.assetClass === 'CASH' ? (
+                          {isCashAsset ? (
                             '-'
                           ) : isEditing ? (
                             <NumberInput
@@ -614,7 +615,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         </td>
                         <td className="currency-value">
                           {isEditing ? (
-                            asset.assetClass === 'CASH' ? (
+                            isCashAsset ? (
                               <NumberInput
                                 value={editValues.currentValue}
                                 onChange={handleEditCurrentValueChange}

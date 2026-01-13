@@ -941,7 +941,7 @@ export function ExpenseTrackerPage() {
                           {transaction.type === 'income' ? (
                             <PrivacyBlur isPrivacyMode={isPrivacyMode}>+{formatCurrency(transaction.amount, data.currency)}</PrivacyBlur>
                           ) : (
-                            <>-{formatCurrency(transaction.amount, data.currency)}</>
+                            <span>-{formatCurrency(transaction.amount, data.currency)}</span>
                           )}
                         </td>
                         <td>
