@@ -806,7 +806,7 @@
 
 .nav-link {
   text-decoration: none;
-  color: var(--accent-primary);
+  color: white;
   font-weight: 600;
   font-size: 1.1rem;
   padding: 0.5rem 1rem;
