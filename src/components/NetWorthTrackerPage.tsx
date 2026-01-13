@@ -36,6 +36,7 @@ import { formatDisplayCurrency, formatDisplayPercent, formatDisplayNumber } from
 import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import { SharedAssetDialog } from './SharedAssetDialog';
+import { MaterialIcon } from './MaterialIcon';
 import './NetWorthTrackerPage.css';
 
 // Month names for display
@@ -769,7 +770,7 @@ export function NetWorthTrackerPage() {
   return (
     <div className="net-worth-tracker-page">
       <header className="page-header">
-        <h1><span aria-hidden="true">📈</span> Net Worth Tracker</h1>
+        <h1><MaterialIcon name="trending_up" className="page-header-icon" /> Net Worth Tracker</h1>
         <p>
           Track your financial operations and net worth on a monthly basis. Monitor assets, cash, pensions, and progress toward FIRE.
         </p>
@@ -784,7 +785,7 @@ export function NetWorthTrackerPage() {
             aria-expanded={isHowToUseOpen}
             aria-controls="how-to-use-content"
           >
-            <h4><span aria-hidden="true">💡</span> How this page works <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
+            <h4><MaterialIcon name="lightbulb" /> How this page works <span className="collapse-icon-small" aria-hidden="true">{isHowToUseOpen ? '▼' : '▶'}</span></h4>
           </button>
           {isHowToUseOpen && (
             <ul id="how-to-use-content" className="how-to-use-content">
@@ -813,7 +814,7 @@ export function NetWorthTrackerPage() {
                   aria-label="Sync with Asset Allocation Manager"
                 />
                 <span className="sync-label-text">
-                  <span aria-hidden="true">🔄</span> Sync current month with Asset Allocation Manager
+                  <MaterialIcon name="sync" /> Sync current month with Asset Allocation Manager
                 </span>
               </label>
               {data.settings.syncWithAssetAllocation && (
@@ -870,14 +871,14 @@ export function NetWorthTrackerPage() {
               className="btn-add-month"
               onClick={handleAddMonth}
             >
-              <span aria-hidden="true">➕</span> Start Month Log
+              <MaterialIcon name="add" /> Start Month Log
             </button>
             {isViewingPastPeriod && (
               <button
                 className="btn-current-period"
                 onClick={goToCurrentPeriod}
               >
-                <span aria-hidden="true">📅</span> Back to Current Period
+                <MaterialIcon name="event" /> Back to Current Period
               </button>
             )}
           </div>
@@ -888,7 +889,7 @@ export function NetWorthTrackerPage() {
           <h3 id="summary-heading">Net Worth Summary for {MONTH_NAMES[selectedMonth - 1]} {selectedYear}</h3>
           <div className="net-worth-cards">
             <div className="net-worth-card assets">
-              <span className="card-icon" aria-hidden="true">📊</span>
+              <span className="card-icon" aria-hidden="true"><MaterialIcon name="bar_chart" /></span>
               <div className="card-content">
                 <span className="card-label">Total Assets</span>
                 <span className="card-value">{formatCurrency(netWorthResult.totalAssetValue, data.defaultCurrency)}</span>
@@ -900,7 +901,7 @@ export function NetWorthTrackerPage() {
               </div>
             </div>
             <div className="net-worth-card cash">
-              <span className="card-icon" aria-hidden="true">💵</span>
+              <span className="card-icon" aria-hidden="true"><MaterialIcon name="payments" /></span>
               <div className="card-content">
                 <span className="card-label">Total Cash</span>
                 <span className="card-value">{formatCurrency(netWorthResult.totalCash, data.defaultCurrency)}</span>
@@ -912,7 +913,7 @@ export function NetWorthTrackerPage() {
               </div>
             </div>
             <div className="net-worth-card pension">
-              <span className="card-icon" aria-hidden="true">🧓</span>
+              <span className="card-icon" aria-hidden="true"><MaterialIcon name="elderly" /></span>
               <div className="card-content">
                 <span className="card-label">Total Pension</span>
                 <span className="card-value">{formatCurrency(netWorthResult.totalPension, data.defaultCurrency)}</span>
@@ -924,7 +925,7 @@ export function NetWorthTrackerPage() {
               </div>
             </div>
             <div className="net-worth-card total">
-              <span className="card-icon" aria-hidden="true">💰</span>
+              <span className="card-icon" aria-hidden="true"><MaterialIcon name="account_balance_wallet" /></span>
               <div className="card-content">
                 <span className="card-label">Net Worth</span>
                 <span className="card-value">{formatCurrency(netWorthResult.netWorth, data.defaultCurrency)}</span>
@@ -944,16 +945,16 @@ export function NetWorthTrackerPage() {
             <h3>Monthly Data Entry</h3>
             <div className="entry-actions">
               <button className="btn-entry asset" onClick={() => setShowAssetDialog(true)}>
-                <span aria-hidden="true">📊</span> Log Asset
+                <MaterialIcon name="bar_chart" /> Log Asset
               </button>
               <button className="btn-entry cash" onClick={() => setShowCashDialog(true)}>
-                <span aria-hidden="true">💵</span> Log Cash
+                <MaterialIcon name="payments" /> Log Cash
               </button>
               <button className="btn-entry pension" onClick={() => setShowPensionDialog(true)}>
-                <span aria-hidden="true">🧓</span> Log Pension
+                <MaterialIcon name="elderly" /> Log Pension
               </button>
               <button className="btn-entry operation" onClick={() => setShowOperationDialog(true)}>
-                <span aria-hidden="true">📝</span> Log Operation
+                <MaterialIcon name="edit_note" /> Log Operation
               </button>
             </div>
           </div>
@@ -962,7 +963,7 @@ export function NetWorthTrackerPage() {
           <div className="data-tables">
             {/* Assets Table */}
             <div className="data-table-section">
-              <h4><span aria-hidden="true">📊</span> Assets</h4>
+              <h4><MaterialIcon name="bar_chart" /> Assets</h4>
               {currentMonthData && currentMonthData.assets.length > 0 ? (
                 <table className="data-table">
                   <thead>
@@ -991,14 +992,14 @@ export function NetWorthTrackerPage() {
                             onClick={() => { setEditingItem(asset); setEditingItemType('asset'); setShowAssetDialog(true); }}
                             aria-label="Edit asset"
                           >
-                            ✏️
+                            <MaterialIcon name="edit" size="small" />
                           </button>
                           <button
                             className="btn-icon delete"
                             onClick={() => handleDeleteAsset(asset.id)}
                             aria-label="Delete asset"
                           >
-                            🗑️
+                            <MaterialIcon name="delete" size="small" />
                           </button>
                         </td>
                       </tr>
@@ -1014,7 +1015,7 @@ export function NetWorthTrackerPage() {
 
             {/* Cash Table */}
             <div className="data-table-section">
-              <h4><span aria-hidden="true">💵</span> Cash & Liquidity</h4>
+              <h4><MaterialIcon name="payments" /> Cash & Liquidity</h4>
               {currentMonthData && currentMonthData.cashEntries.length > 0 ? (
                 <table className="data-table">
                   <thead>
@@ -1037,14 +1038,14 @@ export function NetWorthTrackerPage() {
                             onClick={() => { setEditingItem(cash); setEditingItemType('cash'); setShowCashDialog(true); }}
                             aria-label="Edit cash entry"
                           >
-                            ✏️
+                            <MaterialIcon name="edit" size="small" />
                           </button>
                           <button
                             className="btn-icon delete"
                             onClick={() => handleDeleteCash(cash.id)}
                             aria-label="Delete cash entry"
                           >
-                            🗑️
+                            <MaterialIcon name="delete" size="small" />
                           </button>
                         </td>
                       </tr>
@@ -1060,7 +1061,7 @@ export function NetWorthTrackerPage() {
 
             {/* Pensions Table */}
             <div className="data-table-section">
-              <h4><span aria-hidden="true">🧓</span> Pensions</h4>
+              <h4><MaterialIcon name="elderly" /> Pensions</h4>
               {currentMonthData && currentMonthData.pensions.length > 0 ? (
                 <table className="data-table">
                   <thead>
@@ -1083,14 +1084,14 @@ export function NetWorthTrackerPage() {
                             onClick={() => { setEditingItem(pension); setEditingItemType('pension'); setShowPensionDialog(true); }}
                             aria-label="Edit pension"
                           >
-                            ✏️
+                            <MaterialIcon name="edit" size="small" />
                           </button>
                           <button
                             className="btn-icon delete"
                             onClick={() => handleDeletePension(pension.id)}
                             aria-label="Delete pension"
                           >
-                            🗑️
+                            <MaterialIcon name="delete" size="small" />
                           </button>
                         </td>
                       </tr>
@@ -1106,7 +1107,7 @@ export function NetWorthTrackerPage() {
 
             {/* Operations Table */}
             <div className="data-table-section">
-              <h4><span aria-hidden="true">📝</span> Financial Operations</h4>
+              <h4><MaterialIcon name="edit_note" /> Financial Operations</h4>
               {currentMonthData && currentMonthData.operations.length > 0 ? (
                 <table className="data-table">
                   <thead>
@@ -1124,7 +1125,7 @@ export function NetWorthTrackerPage() {
                       return (
                         <tr key={op.id}>
                           <td>{op.date}</td>
-                          <td>{opType?.icon} {opType?.name || op.type}</td>
+                          <td><MaterialIcon name={opType?.icon || 'edit_note'} size="small" /> {opType?.name || op.type}</td>
                           <td>{op.description}</td>
                           <td className={`amount-col ${opType?.isIncome ? 'positive' : 'negative'}`}>
                             {opType?.isIncome ? '+' : '-'}{formatCurrency(op.amount, op.currency)}
@@ -1135,7 +1136,7 @@ export function NetWorthTrackerPage() {
                               onClick={() => handleDeleteOperation(op.id)}
                               aria-label="Delete operation"
                             >
-                              🗑️
+                              <MaterialIcon name="delete" size="small" />
                             </button>
                           </td>
                         </tr>
@@ -1154,7 +1155,7 @@ export function NetWorthTrackerPage() {
 
         {/* Historical Net Worth Chart */}
         <section className="chart-section" data-tour="historical-chart">
-          <h3><span aria-hidden="true">📈</span> Historical Net Worth</h3>
+          <h3><MaterialIcon name="trending_up" /> Historical Net Worth</h3>
           <HistoricalNetWorthChart
             variations={monthlyVariations}
             forecast={forecast}
@@ -1168,7 +1169,7 @@ export function NetWorthTrackerPage() {
         {/* YTD Summary - only show in YTD mode */}
         {chartViewMode === 'ytd' && ytdSummary.averageMonthlyNetWorth > 0 && (
           <section className="fire-progress-section">
-            <h3><span aria-hidden="true">🎯</span> Year-to-Date Progress</h3>
+            <h3><MaterialIcon name="gps_fixed" /> Year-to-Date Progress</h3>
             <div className="fire-progress-content">
               <div className="fire-percentage">
                 <div className="percentage">{formatPercent(ytdSummary.netWorthChangePercent)}</div>
@@ -1339,7 +1340,7 @@ function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDup
                 onChange={(e) => setAccountType(e.target.value as CashEntry['accountType'])}
               >
                 {ACCOUNT_TYPES.map(t => (
-                  <option key={t.id} value={t.id}>{t.icon} {t.name}</option>
+                  <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
             </div>
@@ -1473,7 +1474,7 @@ function PensionDialog({ initialData, onSubmit, onClose, defaultCurrency, isName
                 onChange={(e) => setPensionType(e.target.value as PensionEntry['pensionType'])}
               >
                 {PENSION_TYPES.map(t => (
-                  <option key={t.id} value={t.id}>{t.icon} {t.name}</option>
+                  <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
             </div>
@@ -1592,7 +1593,7 @@ function OperationDialog({ onSubmit, onClose, defaultCurrency, defaultDate }: Op
                 onChange={(e) => setType(e.target.value as OperationType)}
               >
                 {OPERATION_TYPES.map(t => (
-                  <option key={t.id} value={t.id}>{t.icon} {t.name}</option>
+                  <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
             </div>

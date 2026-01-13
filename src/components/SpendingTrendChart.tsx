@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { CategoryTrendData, getCategoryInfo, ExpenseCategory } from '../types/expenseTracker';
+import { MaterialIcon } from './MaterialIcon';
 
 // Color palette for categories
 const CATEGORY_COLORS: Record<string, string> = {
@@ -107,7 +108,7 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
                 borderRadius: '50%',
                 background: entry.color,
               }} />
-              {categoryInfo.icon} {categoryInfo.name}
+              <MaterialIcon name={categoryInfo.icon} size="small" /> {categoryInfo.name}
             </span>
             <span style={{ fontWeight: 500, color: entry.color }}>
               {formatCurrency(entry.value, currency)}
@@ -172,7 +173,7 @@ export function SpendingTrendChart({ data, currency }: SpendingTrendChartProps) 
           <Legend 
             formatter={(value) => {
               const categoryInfo = getCategoryInfo(value as ExpenseCategory);
-              return `${categoryInfo.icon} ${categoryInfo.name}`;
+              return categoryInfo.name;
             }}
             wrapperStyle={{ fontSize: '0.85rem' }}
           />
