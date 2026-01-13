@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import { CalculatorInputs, MonteCarloInputs, MonteCarloResult } from '../types/calculator';
 import { runMonteCarloSimulation } from '../utils/monteCarlo';
-import { loadSettings } from '../utils/cookieSettings';
+import { loadSettings, saveSettings } from '../utils/cookieSettings';
 import { NumberInput } from './NumberInput';
 import { MonteCarloChart } from './MonteCarloChart';
 import { MaterialIcon } from './MaterialIcon';
+import { PrivacyBlur } from './PrivacyBlur';
 import { formatDisplayCurrency, formatDisplayPercent } from '../utils/numberFormatter';
 
 interface MonteCarloSimulatorProps {
@@ -30,6 +31,20 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
     const settings = loadSettings();
     return settings.currencySettings.defaultCurrency;
   }, []);
+  
+  // Privacy mode state (loaded from settings, toggleable on page)
+  const [isPrivacyMode, setIsPrivacyMode] = useState<boolean>(() => {
+    const settings = loadSettings();
+    return settings.privacyMode;
+  });
+  
+  // Toggle privacy mode and save to settings
+  const togglePrivacyMode = () => {
+    const newMode = !isPrivacyMode;
+    setIsPrivacyMode(newMode);
+    const settings = loadSettings();
+    saveSettings({ ...settings, privacyMode: newMode });
+  };
   
   const [mcInputs, setMcInputs] = useState<MonteCarloInputs>({
     numSimulations: 1000,
@@ -107,7 +122,18 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
   return (
     <section className="monte-carlo-section" aria-labelledby="monte-carlo-heading">
       <div data-tour="monte-carlo-overview">
-        <h2 id="monte-carlo-heading"><MaterialIcon name="casino" className="page-header-icon" /> Monte Carlo Simulations</h2>
+        <h2 id="monte-carlo-heading">
+          <MaterialIcon name="casino" className="page-header-icon" /> Monte Carlo Simulations
+          <button 
+            className="privacy-eye-btn"
+            onClick={togglePrivacyMode}
+            title={isPrivacyMode ? 'Show values' : 'Hide values'}
+            aria-pressed={isPrivacyMode}
+            style={{ marginLeft: '0.5rem' }}
+          >
+            <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+          </button>
+        </h2>
         <p className="section-description">
           Run multiple simulations with random market returns to assess the probability of reaching FIRE.
         </p>
@@ -139,19 +165,19 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
                 <h4 className="mc-data-group-title">Financial Position</h4>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Initial Portfolio</span>
-                  <span className="mc-data-value">{formatCurrency(inputs.initialSavings, defaultCurrency)}</span>
+                  <span className="mc-data-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(inputs.initialSavings, defaultCurrency)}</PrivacyBlur></span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">FIRE Target</span>
-                  <span className="mc-data-value highlight">{formatCurrency(fireTarget, defaultCurrency)}</span>
+                  <span className="mc-data-value highlight"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(fireTarget, defaultCurrency)}</PrivacyBlur></span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Annual Income</span>
-                  <span className="mc-data-value">{formatCurrency(inputs.annualLaborIncome, defaultCurrency)}</span>
+                  <span className="mc-data-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(inputs.annualLaborIncome, defaultCurrency)}</PrivacyBlur></span>
                 </div>
                 <div className="mc-data-item">
                   <span className="mc-data-label">Savings Rate</span>
-                  <span className="mc-data-value">{formatDisplayPercent(inputs.savingsRate)}</span>
+                  <span className="mc-data-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayPercent(inputs.savingsRate)}</PrivacyBlur></span>
                 </div>
               </div>
 
@@ -337,7 +363,7 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
             </div>
           </div>
 
-          <MonteCarloChart result={result} />
+          <MonteCarloChart result={result} isPrivacyMode={isPrivacyMode} />
         </div>
       )}
     </section>

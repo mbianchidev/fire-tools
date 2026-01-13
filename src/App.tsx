@@ -24,7 +24,7 @@ import { NotFoundPage } from './components/NotFoundPage';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
-import { loadSettings, type UserSettings } from './utils/cookieSettings';
+import { loadSettings, saveSettings, type UserSettings } from './utils/cookieSettings';
 import './App.css';
 import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
@@ -132,6 +132,20 @@ function FIRECalculatorPage() {
   // Shared zoom state for both charts (default to 30 years)
   const [zoomYears, setZoomYears] = useState<number | 'all'>(30);
   const [customZoomInput, setCustomZoomInput] = useState<string>('');
+  
+  // Privacy mode state (loaded from settings, toggleable on page)
+  const [isPrivacyMode, setIsPrivacyMode] = useState<boolean>(() => {
+    const settings = loadSettings();
+    return settings.privacyMode;
+  });
+  
+  // Toggle privacy mode and save to settings
+  const togglePrivacyMode = () => {
+    const newMode = !isPrivacyMode;
+    setIsPrivacyMode(newMode);
+    const settings = loadSettings();
+    saveSettings({ ...settings, privacyMode: newMode });
+  };
 
   // Load asset allocation data for use in calculator
   const assetAllocationData = useMemo(() => {
@@ -269,7 +283,13 @@ function FIRECalculatorPage() {
         
         {result && !hasValidationErrors && (
           <>
-            <FIREMetrics result={result} currentAge={currentAge} zoomYears={zoomYears} />
+            <FIREMetrics 
+              result={result} 
+              currentAge={currentAge} 
+              zoomYears={zoomYears} 
+              isPrivacyMode={isPrivacyMode}
+              onTogglePrivacyMode={togglePrivacyMode}
+            />
             
             <div className="charts-section" data-tour="charts-section">
               <NetWorthChart 
@@ -280,6 +300,7 @@ function FIRECalculatorPage() {
                 onZoomChange={setZoomYears}
                 customZoomInput={customZoomInput}
                 onCustomZoomInputChange={setCustomZoomInput}
+                isPrivacyMode={isPrivacyMode}
               />
               <IncomeExpensesChart 
                 projections={result.projections} 
@@ -288,6 +309,7 @@ function FIRECalculatorPage() {
                 onZoomChange={setZoomYears}
                 customZoomInput={customZoomInput}
                 onCustomZoomInputChange={setCustomZoomInput}
+                isPrivacyMode={isPrivacyMode}
               />
             </div>
           </>

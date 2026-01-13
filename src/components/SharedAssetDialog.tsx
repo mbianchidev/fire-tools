@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { Asset, AssetClass, SubAssetType, AllocationMode } from '../types/assetAllocation';
 import { AssetHolding } from '../types/netWorthTracker';
 import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
+import { getUCITSWarning } from '../types/country';
 import { formatAssetName } from '../utils/allocationCalculator';
 import { convertToEUR } from '../utils/currencyConverter';
 import { loadSettings } from '../utils/cookieSettings';
@@ -24,7 +25,7 @@ interface SharedAssetDialogProps {
 }
 
 const SUB_ASSET_TYPES: Record<AssetClass, SubAssetType[]> = {
-  STOCKS: ['ETF', 'SINGLE_STOCK'],
+  STOCKS: ['ETF', 'SINGLE_STOCK', 'PRIVATE_EQUITY'],
   BONDS: ['ETF', 'SINGLE_BOND'],
   CASH: ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF'],
   CRYPTO: ['COIN'],
@@ -37,8 +38,11 @@ const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT',
 // Sub-types that require ISIN code (including MONEY_ETF now)
 const ISIN_REQUIRED: SubAssetType[] = ['ETF', 'SINGLE_STOCK', 'SINGLE_BOND', 'REIT', 'MONEY_ETF'];
 
-// Sub-types that don't need ticker
-const NO_TICKER_REQUIRED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'PROPERTY'];
+// Sub-types that don't need ticker (PRIVATE_EQUITY added - no ticker)
+const NO_TICKER_REQUIRED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'PROPERTY', 'PRIVATE_EQUITY'];
+
+// Sub-types that should show UCITS warning (only ETFs)
+const UCITS_WARNING_TYPES: SubAssetType[] = ['ETF', 'MONEY_ETF'];
 
 // Get ticker label based on sub-asset type
 const getTickerLabel = (subAssetType: SubAssetType): string => {
@@ -53,7 +57,10 @@ const getTickerLabel = (subAssetType: SubAssetType): string => {
 
 // Map Asset Allocation AssetClass to Net Worth Tracker assetClass
 const mapToNetWorthAssetClass = (assetClass: AssetClass, subAssetType: SubAssetType): AssetHolding['assetClass'] => {
-  if (assetClass === 'STOCKS') return 'STOCKS';
+  if (assetClass === 'STOCKS') {
+    if (subAssetType === 'PRIVATE_EQUITY') return 'PRIVATE_EQUITY';
+    return 'STOCKS';
+  }
   if (assetClass === 'BONDS') return 'BONDS';
   if (assetClass === 'REAL_ESTATE') {
     return subAssetType === 'REIT' ? 'ETF' : 'REAL_ESTATE';
@@ -70,6 +77,7 @@ const mapFromNetWorthAssetClass = (assetClass: AssetHolding['assetClass']): { as
   if (assetClass === 'ETF') return { assetClass: 'STOCKS', subAssetType: 'ETF' };
   if (assetClass === 'CRYPTO') return { assetClass: 'CRYPTO', subAssetType: 'COIN' };
   if (assetClass === 'REAL_ESTATE') return { assetClass: 'REAL_ESTATE', subAssetType: 'PROPERTY' };
+  if (assetClass === 'PRIVATE_EQUITY') return { assetClass: 'STOCKS', subAssetType: 'PRIVATE_EQUITY' };
   return { assetClass: 'STOCKS', subAssetType: 'ETF' };
 };
 
@@ -291,6 +299,10 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const needsTicker = !NO_TICKER_REQUIRED.includes(subAssetType);
   const needsIsin = ISIN_REQUIRED.includes(subAssetType);
   const showTargetSettings = mode === 'assetAllocation';
+  
+  // UCITS warning for EU users (only for ETFs)
+  const showUcitsWarning = UCITS_WARNING_TYPES.includes(subAssetType);
+  const ucitsWarning = showUcitsWarning && needsIsin ? getUCITSWarning(isin, settings.country) : null;
 
   return (
     <div className="dialog-overlay" onClick={onClose}>
@@ -345,17 +357,20 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
             />
           </div>
 
+          {/* Ticker/ISIN row - hide ticker for PRIVATE_EQUITY */}
           <div className="form-row">
-            <div className="form-group">
-              <label>{getTickerLabel(subAssetType)}</label>
-              <input
-                type="text"
-                value={ticker}
-                onChange={(e) => setTicker(e.target.value)}
-                placeholder={needsTicker ? "e.g., SPY" : "Optional"}
-                className="dialog-input"
-              />
-            </div>
+            {subAssetType !== 'PRIVATE_EQUITY' && (
+              <div className="form-group">
+                <label>{getTickerLabel(subAssetType)}</label>
+                <input
+                  type="text"
+                  value={ticker}
+                  onChange={(e) => setTicker(e.target.value)}
+                  placeholder={needsTicker ? "e.g., SPY" : "Optional"}
+                  className="dialog-input"
+                />
+              </div>
+            )}
 
             {needsIsin && (
               <div className="form-group">
@@ -368,6 +383,11 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                   className="dialog-input"
                   required
                 />
+                {ucitsWarning && (
+                  <div className="ucits-warning" role="alert">
+                    <MaterialIcon name="warning" size="small" /> {ucitsWarning}
+                  </div>
+                )}
               </div>
             )}
           </div>

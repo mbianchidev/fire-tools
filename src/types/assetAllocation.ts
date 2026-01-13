@@ -19,6 +19,7 @@ export type SubAssetType =
   | 'COIN'
   | 'PROPERTY'
   | 'REIT'
+  | 'PRIVATE_EQUITY'
   | 'NONE';
 
 export interface Asset {

@@ -29,7 +29,7 @@ import {
   loadAssetAllocation,
   saveAssetAllocation,
 } from '../utils/cookieStorage';
-import { loadSettings } from '../utils/cookieSettings';
+import { loadSettings, saveSettings } from '../utils/cookieSettings';
 import { generateDemoNetWorthDataForYear } from '../utils/defaults';
 import { syncAssetAllocationToNetWorth, syncNetWorthToAssetAllocation, DEFAULT_ASSET_CLASS_TARGETS } from '../utils/dataSync';
 import { formatDisplayCurrency, formatDisplayPercent, formatDisplayNumber } from '../utils/numberFormatter';
@@ -37,6 +37,8 @@ import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import { SharedAssetDialog } from './SharedAssetDialog';
 import { MaterialIcon } from './MaterialIcon';
+import { ScrollToTopButton } from './ScrollToTopButton';
+import { PrivacyBlur } from './PrivacyBlur';
 import './NetWorthTrackerPage.css';
 
 // Month names for display
@@ -150,6 +152,20 @@ export function NetWorthTrackerPage() {
   
   // Chart view mode (YTD or All historical data)
   const [chartViewMode, setChartViewMode] = useState<ChartViewMode>('ytd');
+  
+  // Privacy mode state (loaded from settings, toggleable on page)
+  const [isPrivacyMode, setIsPrivacyMode] = useState<boolean>(() => {
+    const settings = loadSettings();
+    return settings.privacyMode;
+  });
+  
+  // Toggle privacy mode and save to settings
+  const togglePrivacyMode = () => {
+    const newMode = !isPrivacyMode;
+    setIsPrivacyMode(newMode);
+    const settings = loadSettings();
+    saveSettings({ ...settings, privacyMode: newMode });
+  };
   
   // Track if we're currently syncing to prevent infinite loops
   const isSyncingRef = useRef(false);
@@ -770,7 +786,9 @@ export function NetWorthTrackerPage() {
   return (
     <div className="net-worth-tracker-page">
       <header className="page-header">
-        <h1><MaterialIcon name="trending_up" className="page-header-icon" /> Net Worth Tracker</h1>
+        <div className="page-header-top">
+          <h1><MaterialIcon name="trending_up" className="page-header-icon" /> Net Worth Tracker</h1>
+        </div>
         <p>
           Track your financial operations and net worth on a monthly basis. Monitor assets, cash, pensions, and progress toward FIRE.
         </p>
@@ -893,10 +911,20 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="bar_chart" /></span>
               <div className="card-content">
                 <span className="card-label">Total Assets</span>
-                <span className="card-value">{formatCurrency(netWorthResult.totalAssetValue, data.defaultCurrency)}</span>
+                <span className="card-value">
+                  <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(netWorthResult.totalAssetValue, data.defaultCurrency)}</PrivacyBlur>
+                  <button 
+                    className="privacy-eye-btn"
+                    onClick={togglePrivacyMode}
+                    title={isPrivacyMode ? 'Show values' : 'Hide values'}
+                    aria-pressed={isPrivacyMode}
+                  >
+                    <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+                  </button>
+                </span>
                 {currentMonthVariation && currentMonthVariation.assetValueChange !== 0 && (
                   <span className={`card-change ${currentMonthVariation.assetValueChange >= 0 ? 'positive' : 'negative'}`}>
-                    {currentMonthVariation.assetValueChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.assetValueChange, data.defaultCurrency)}
+                    <PrivacyBlur isPrivacyMode={isPrivacyMode}>{currentMonthVariation.assetValueChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.assetValueChange, data.defaultCurrency)}</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -905,10 +933,10 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="payments" /></span>
               <div className="card-content">
                 <span className="card-label">Total Cash</span>
-                <span className="card-value">{formatCurrency(netWorthResult.totalCash, data.defaultCurrency)}</span>
+                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(netWorthResult.totalCash, data.defaultCurrency)}</PrivacyBlur></span>
                 {currentMonthVariation && currentMonthVariation.cashChange !== 0 && (
                   <span className={`card-change ${currentMonthVariation.cashChange >= 0 ? 'positive' : 'negative'}`}>
-                    {currentMonthVariation.cashChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.cashChange, data.defaultCurrency)}
+                    <PrivacyBlur isPrivacyMode={isPrivacyMode}>{currentMonthVariation.cashChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.cashChange, data.defaultCurrency)}</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -917,10 +945,10 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="elderly" /></span>
               <div className="card-content">
                 <span className="card-label">Total Pension</span>
-                <span className="card-value">{formatCurrency(netWorthResult.totalPension, data.defaultCurrency)}</span>
+                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(netWorthResult.totalPension, data.defaultCurrency)}</PrivacyBlur></span>
                 {currentMonthVariation && currentMonthVariation.pensionChange !== 0 && (
                   <span className={`card-change ${currentMonthVariation.pensionChange >= 0 ? 'positive' : 'negative'}`}>
-                    {currentMonthVariation.pensionChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.pensionChange, data.defaultCurrency)}
+                    <PrivacyBlur isPrivacyMode={isPrivacyMode}>{currentMonthVariation.pensionChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.pensionChange, data.defaultCurrency)}</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -929,10 +957,10 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="account_balance_wallet" /></span>
               <div className="card-content">
                 <span className="card-label">Net Worth</span>
-                <span className="card-value">{formatCurrency(netWorthResult.netWorth, data.defaultCurrency)}</span>
+                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(netWorthResult.netWorth, data.defaultCurrency)}</PrivacyBlur></span>
                 {currentMonthVariation && currentMonthVariation.changeFromPrevMonth !== 0 && (
                   <span className={`card-change ${currentMonthVariation.changeFromPrevMonth >= 0 ? 'positive' : 'negative'}`}>
-                    {formatPercent(currentMonthVariation.changePercent)} ({currentMonthVariation.changeFromPrevMonth >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.changeFromPrevMonth, data.defaultCurrency)})
+                    <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatPercent(currentMonthVariation.changePercent)} ({currentMonthVariation.changeFromPrevMonth >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.changeFromPrevMonth, data.defaultCurrency)})</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -984,9 +1012,9 @@ export function NetWorthTrackerPage() {
                         <td>{asset.name}</td>
                         <td>{asset.ticker}</td>
                         <td>{ASSET_CLASSES.find(c => c.id === asset.assetClass)?.name || asset.assetClass}</td>
-                        <td>{formatDisplayNumber(asset.shares)}</td>
-                        <td className="amount-col">{formatCurrency(asset.pricePerShare, asset.currency)}</td>
-                        <td className="amount-col">{formatCurrency(asset.shares * asset.pricePerShare, asset.currency)}</td>
+                        <td><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayNumber(asset.shares)}</PrivacyBlur></td>
+                        <td className="amount-col"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, asset.currency)}</PrivacyBlur></td>
+                        <td className="amount-col"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.shares * asset.pricePerShare, asset.currency)}</PrivacyBlur></td>
                         <td className="actions-col">
                           <button
                             className="btn-icon"
@@ -1032,7 +1060,7 @@ export function NetWorthTrackerPage() {
                       <tr key={cash.id}>
                         <td>{cash.accountName}</td>
                         <td>{ACCOUNT_TYPES.find(t => t.id === cash.accountType)?.name || cash.accountType}</td>
-                        <td className="amount-col">{formatCurrency(cash.balance, cash.currency)}</td>
+                        <td className="amount-col"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(cash.balance, cash.currency)}</PrivacyBlur></td>
                         <td className="actions-col">
                           <button
                             className="btn-icon"
@@ -1164,6 +1192,7 @@ export function NetWorthTrackerPage() {
             previousYearEnd={previousYearEndValue}
             viewMode={chartViewMode}
             onViewModeChange={setChartViewMode}
+            isPrivacyMode={isPrivacyMode}
           />
         </section>
 
@@ -1178,15 +1207,15 @@ export function NetWorthTrackerPage() {
               </div>
               <div className="fire-details">
                 <div className="fire-detail-item">
-                  <div className="value">{formatCurrency(ytdSummary.netWorthChange, data.defaultCurrency)}</div>
+                  <div className="value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(ytdSummary.netWorthChange, data.defaultCurrency)}</PrivacyBlur></div>
                   <div className="label">Net Worth Change</div>
                 </div>
                 <div className="fire-detail-item">
-                  <div className="value">{formatCurrency(ytdSummary.averageMonthlyNetWorth, data.defaultCurrency)}</div>
+                  <div className="value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(ytdSummary.averageMonthlyNetWorth, data.defaultCurrency)}</PrivacyBlur></div>
                   <div className="label">Avg Monthly Net Worth</div>
                 </div>
                 <div className="fire-detail-item">
-                  <div className="value">{previousYearEndValue ? formatCurrency(previousYearEndValue, data.defaultCurrency) : 'N/A'}</div>
+                  <div className="value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{previousYearEndValue ? formatCurrency(previousYearEndValue, data.defaultCurrency) : 'N/A'}</PrivacyBlur></div>
                   <div className="label">Dec {selectedYear - 1}</div>
                 </div>
               </div>
@@ -1255,6 +1284,8 @@ export function NetWorthTrackerPage() {
             defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
           />
         )}
+
+        <ScrollToTopButton />
       </main>
     </div>
   );

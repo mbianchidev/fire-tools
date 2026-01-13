@@ -246,6 +246,8 @@
   border: 2px solid var(--border-subtle);
   border-radius: 4px;
   font-size: 0.9rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .target-input {
@@ -578,6 +580,26 @@
 .btn-submit:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* UCITS Warning */
+.ucits-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 6px;
+  color: #b8860b;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.ucits-warning .material-icon {
+  flex-shrink: 0;
+  color: #ffc107;
 }
 
 /* Collapsible Table Styles */
@@ -2402,5 +2424,83 @@ select:disabled {
   font-size: 0.7rem;
   color: var(--text-secondary);
   font-style: italic;
+}
+
+/* Page Header with Privacy Toggle */
+.page-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.privacy-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-toggle-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.privacy-toggle-btn.active {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-gold) 100%);
+  border-color: transparent;
+  color: white;
+}
+
+.privacy-toggle-btn:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Privacy eye button - minimal eye icon next to values */
+.privacy-eye-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.privacy-eye-btn:hover {
+  color: var(--accent-primary);
+  background: var(--bg-tertiary);
+}
+
+.privacy-eye-btn:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Edit input dark background styling */
+.edit-input {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-subtle) !important;
+}
+
+.edit-input:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none;
 }
 

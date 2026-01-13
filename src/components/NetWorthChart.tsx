@@ -3,6 +3,9 @@ import { YearProjection } from '../types/calculator';
 import { formatCurrency } from '../utils/allocationCalculator';
 import { calculateXAxisInterval } from '../utils/chartHelper';
 
+// Privacy placeholder for blurred values
+const PRIVACY_PLACEHOLDER = '***';
+
 interface NetWorthChartProps {
   projections: YearProjection[];
   fireTarget: number;
@@ -11,6 +14,7 @@ interface NetWorthChartProps {
   onZoomChange: (years: number | 'all') => void;
   customZoomInput: string;
   onCustomZoomInputChange: (value: string) => void;
+  isPrivacyMode?: boolean;
 }
 
 export const NetWorthChart: React.FC<NetWorthChartProps> = ({ 
@@ -20,7 +24,8 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
   zoomYears,
   onZoomChange,
   customZoomInput,
-  onCustomZoomInputChange
+  onCustomZoomInputChange,
+  isPrivacyMode = false
 }) => {
   // Filter data based on zoom level
   const getFilteredData = () => {
@@ -42,6 +47,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
   // Format large numbers for Y axis (e.g., 1M, 5M, 10M)
   const formatYAxis = (value: number) => {
+    if (isPrivacyMode) return PRIVACY_PLACEHOLDER;
     if (value >= 1000000) {
       return `${(value / 1000000).toFixed(1)}M`;
     } else if (value >= 1000) {
@@ -155,7 +161,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
             stroke="#3A3D46"
           />
           <Tooltip 
-            formatter={(value) => formatCurrency(Number(value))} 
+            formatter={(value) => isPrivacyMode ? PRIVACY_PLACEHOLDER : formatCurrency(Number(value))} 
             labelFormatter={(label) => `Age ${label}`}
             contentStyle={{ background: '#1A1D26', border: '1px solid #2DD4BF', borderRadius: '8px', color: '#F8FAFC' }}
             labelStyle={{ color: '#F8FAFC' }}
