@@ -172,7 +172,8 @@ export function exportAssetAllocationToCSV(
   rows.push(['Assets']);
   rows.push([
     'ID', 'Name', 'Ticker', 'ISIN', 'Asset Class', 'Sub Asset Type',
-    'Current Value', 'Target Mode', 'Target Percent', 'Target Value'
+    'Current Value', 'Target Mode', 'Target Percent', 'Target Value',
+    'Institution Code', 'Institution Name'
   ]);
 
   // Add assets
@@ -188,6 +189,8 @@ export function exportAssetAllocationToCSV(
       escapeCSV(asset.targetMode),
       escapeCSV(asset.targetPercent?.toString() || ''),
       escapeCSV(asset.targetValue?.toString() || ''),
+      escapeCSV(asset.institutionCode || ''),
+      escapeCSV(asset.institutionName || ''),
     ]);
   });
 
@@ -272,6 +275,8 @@ export function importAssetAllocationFromCSV(csv: string): {
           targetMode: parts[7] as AllocationMode,
           targetPercent: parts[8] ? parseFloat(parts[8]) : undefined,
           targetValue: parts[9] ? parseFloat(parts[9]) : undefined,
+          institutionCode: parts[10] || undefined,
+          institutionName: parts[11] || undefined,
         };
 
         assets.push(asset);

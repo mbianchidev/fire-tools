@@ -9,10 +9,14 @@ import { Asset, AssetClass, SubAssetType, AllocationMode } from '../types/assetA
 import { AssetHolding } from '../types/netWorthTracker';
 import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
 import { getUCITSWarning } from '../types/country';
+import { BankInfo, getBanksByCountry, getBankByCode } from '../types/bank';
 import { formatAssetName } from '../utils/allocationCalculator';
 import { convertToEUR } from '../utils/currencyConverter';
 import { loadSettings } from '../utils/cookieSettings';
 import { MaterialIcon } from './MaterialIcon';
+
+// Sub-types that should show bank/institution selector
+const INSTITUTION_TYPES: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT'];
 
 interface SharedAssetDialogProps {
   mode: 'assetAllocation' | 'netWorthTracker';
@@ -105,9 +109,14 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const [targetMode, setTargetMode] = useState<AllocationMode>('PERCENTAGE');
   const [targetPercent, setTargetPercent] = useState<string>('0');
   const [note, setNote] = useState('');
+  const [institutionCode, setInstitutionCode] = useState<string>('');
+  const [institutionName, setInstitutionName] = useState<string>('');
 
   // Get fallback rates from settings
   const settings = loadSettings();
+
+  // Get banks for the user's country
+  const countryBanks: BankInfo[] = settings.country ? getBanksByCountry(settings.country) : [];
 
   // Initialize form with initial data
   useEffect(() => {
@@ -124,6 +133,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setCurrency(asset.originalCurrency || 'EUR');
         setTargetMode(asset.targetMode);
         setTargetPercent(asset.targetPercent?.toString() || '0');
+        setInstitutionCode(asset.institutionCode || '');
+        setInstitutionName(asset.institutionName || '');
       } else {
         // Net Worth Tracker mode
         const holding = initialData as AssetHolding;
@@ -136,6 +147,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setPricePerShare(holding.pricePerShare.toString());
         setCurrency(holding.currency);
         setNote(holding.note || '');
+        setInstitutionCode('');
+        setInstitutionName('');
       }
     } else {
       // Reset for new entry
@@ -150,6 +163,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       setTargetMode('PERCENTAGE');
       setTargetPercent('0');
       setNote('');
+      setInstitutionCode('');
+      setInstitutionName('');
     }
   }, [initialData, mode, defaultCurrency]);
 
@@ -170,6 +185,11 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       setSubAssetType(availableSubTypes[0]);
     }
     setIsin('');
+    // Reset institution when changing asset class
+    if (!INSTITUTION_TYPES.includes(SUB_ASSET_TYPES[newClass][0])) {
+      setInstitutionCode('');
+      setInstitutionName('');
+    }
   };
 
   const handleSubAssetTypeChange = (newType: SubAssetType) => {
@@ -177,6 +197,23 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setIsin('');
     if (NO_TICKER_REQUIRED.includes(newType)) {
       setTicker('');
+    }
+    // Reset institution when changing to a type that doesn't need it
+    if (!INSTITUTION_TYPES.includes(newType)) {
+      setInstitutionCode('');
+      setInstitutionName('');
+    }
+  };
+
+  const handleInstitutionChange = (code: string) => {
+    setInstitutionCode(code);
+    if (code && code !== 'OTHER') {
+      const bank = getBankByCode(code);
+      if (bank) {
+        setInstitutionName(bank.name);
+      }
+    } else if (code === 'OTHER') {
+      setInstitutionName('');
     }
   };
 
@@ -263,6 +300,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         targetMode,
         targetPercent: targetMode === 'PERCENTAGE' ? (parseFloat(targetPercent) || 0) : undefined,
         targetValue: targetMode === 'SET' ? valueInEUR : undefined,
+        institutionCode: INSTITUTION_TYPES.includes(subAssetType) && institutionCode ? institutionCode : undefined,
+        institutionName: INSTITUTION_TYPES.includes(subAssetType) && institutionName ? institutionName.trim() : undefined,
       };
       
       onSubmit(asset);
@@ -291,6 +330,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setCurrency(defaultCurrency);
     setTargetPercent('0');
     setNote('');
+    setInstitutionCode('');
+    setInstitutionName('');
     onClose();
   };
 
@@ -299,6 +340,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const needsTicker = !NO_TICKER_REQUIRED.includes(subAssetType);
   const needsIsin = ISIN_REQUIRED.includes(subAssetType);
   const showTargetSettings = mode === 'assetAllocation';
+  const showInstitution = mode === 'assetAllocation' && INSTITUTION_TYPES.includes(subAssetType);
   
   // UCITS warning for EU users (only for ETFs)
   const showUcitsWarning = UCITS_WARNING_TYPES.includes(subAssetType);
@@ -356,6 +398,54 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
               required
             />
           </div>
+
+          {/* Bank/Institution selector for cash and brokerage accounts */}
+          {showInstitution && (
+            <div className="form-row">
+              <div className="form-group">
+                <label>
+                  Bank/Institution {settings.country ? '' : '(Set country in Settings)'}
+                </label>
+                <select
+                  value={institutionCode}
+                  onChange={(e) => handleInstitutionChange(e.target.value)}
+                  className="dialog-select"
+                >
+                  <option value="">Select Bank/Broker...</option>
+                  {countryBanks.length > 0 ? (
+                    <>
+                      {countryBanks.map(bank => (
+                        <option key={bank.code} value={bank.code}>
+                          {bank.name}
+                          {bank.supportsOpenBanking ? ' 🔗' : ''}
+                        </option>
+                      ))}
+                    </>
+                  ) : (
+                    <option value="" disabled>No banks available for your country</option>
+                  )}
+                  <option value="OTHER">Other (Custom Name)</option>
+                </select>
+                {institutionCode && getBankByCode(institutionCode)?.supportsOpenBanking && (
+                  <div className="openbanking-info">
+                    <MaterialIcon name="link" size="small" /> Supports OpenBanking PSD2
+                  </div>
+                )}
+              </div>
+              {institutionCode === 'OTHER' && (
+                <div className="form-group">
+                  <label>Institution Name *</label>
+                  <input
+                    type="text"
+                    value={institutionName}
+                    onChange={(e) => setInstitutionName(e.target.value)}
+                    placeholder="e.g., Local Credit Union"
+                    className="dialog-input"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Ticker/ISIN row - hide ticker for PRIVATE_EQUITY */}
           <div className="form-row">

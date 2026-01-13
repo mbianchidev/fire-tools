@@ -602,6 +602,26 @@
   color: #ffc107;
 }
 
+/* OpenBanking Info */
+.openbanking-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  background: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+  border-radius: 6px;
+  color: #28a745;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.openbanking-info .material-icon {
+  flex-shrink: 0;
+  color: #28a745;
+}
+
 /* Collapsible Table Styles */
 .collapsible-allocation-table {
   margin-top: 1rem;
@@ -775,6 +795,13 @@
 .asset-class-badge.real_estate {
   background: #EC4899;
   color: #FFFFFF;
+}
+
+/* Institution Badge */
+.institution-badge {
+  margin-left: 0.35rem;
+  cursor: help;
+  font-size: 0.9em;
 }
 
 /* Navigation Styles */
