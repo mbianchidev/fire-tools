@@ -11,6 +11,7 @@ import { formatWithSeparator, validateNumberInput } from '../utils/inputValidati
 import { clearTourPreference } from '../utils/tourPreferences';
 import { exportAllDataAsJSON, importAllDataFromJSON, serializeAllDataExport } from '../utils/dataExportImport';
 import { Tooltip } from './Tooltip';
+import { MaterialIcon } from './MaterialIcon';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -380,7 +381,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           <button className="back-button" onClick={() => navigate(-1)}>
             ← Back
           </button>
-          <h1>⚙️ Settings</h1>
+          <h1><MaterialIcon name="settings" /> Settings</h1>
         </div>
 
         {message && (
@@ -391,7 +392,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
 
         {/* Account Settings */}
         <section className="settings-section">
-          <h2>👤 Account</h2>
+          <h2><MaterialIcon name="person" /> Account</h2>
           <div className="setting-item">
             <div className="label-with-tooltip">
               <label htmlFor="accountName">Account Name</label>
@@ -413,7 +414,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
 
         {/* Display Settings */}
         <section className="settings-section">
-          <h2>🎨 Display</h2>
+          <h2><MaterialIcon name="palette" /> Display</h2>
           <div className="setting-item">
             <div className="label-with-tooltip">
               <label htmlFor="defaultCurrency">Default Currency</label>
@@ -538,7 +539,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
 
         {/* Currency Disclaimer - Moved before currency settings */}
         <section className="settings-section disclaimer">
-          <h2>⚠️ Disclaimer</h2>
+          <h2><MaterialIcon name="warning" /> Disclaimer</h2>
           <p>
             Exchange rates are fetched from publicly available APIs and may not reflect real-time rates.
             Fallback rates are used when the API is unavailable. For accurate financial decisions,
@@ -549,7 +550,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
         {/* Currency Settings */}
         <section className="settings-section">
           <div className="section-header-with-tooltip">
-            <h2>💱 Currency Conversion Fallback Rates</h2>
+            <h2><MaterialIcon name="currency_exchange" /> Currency Conversion Fallback Rates</h2>
             <Tooltip content="These are backup exchange rates used when the live API is unavailable or slow. The app attempts to fetch real-time rates first. You can customize these rates based on your preferences or recent market rates." position="right" maxWidth={350}>
               <span className="info-icon section-info-icon" aria-label="More information">i</span>
             </Tooltip>
@@ -588,7 +589,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
 
         {/* Data Management */}
         <section className="settings-section">
-          <h2>💾 Data Management</h2>
+          <h2><MaterialIcon name="save" /> Data Management</h2>
           
           <div className="data-management-group">
             <div className="subsection-header-with-tooltip">
@@ -600,10 +601,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             <p className="setting-help">Export all your data in a single file or as separate files</p>
             <div className="export-buttons">
               <button className="primary-btn" onClick={handleExportAllJSON}>
-                📥 Export as JSON (Single File)
+                <MaterialIcon name="download" /> Export as JSON (Single File)
               </button>
               <button className="secondary-btn" onClick={handleExportAll}>
-                📥 Export as Separate Files
+                <MaterialIcon name="download" /> Export as Separate Files
               </button>
             </div>
           </div>
@@ -617,7 +618,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             </div>
             <p className="setting-help">Import all data from a single JSON file. Data will be converted to your current currency.</p>
             <label className="primary-btn import-label">
-              📤 Import All Data (JSON)
+              <MaterialIcon name="upload" /> Import All Data (JSON)
               <input type="file" accept=".json" onChange={handleImportAllJSON} hidden />
             </label>
           </div>
@@ -632,19 +633,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             <p className="setting-help">Import data from individual CSV/JSON files for each tool.</p>
             <div className="import-buttons">
               <label className="secondary-btn import-label">
-                📤 Import FIRE Calculator
+                <MaterialIcon name="upload" /> Import FIRE Calculator
                 <input type="file" accept=".csv" onChange={handleImportFire} hidden />
               </label>
               <label className="secondary-btn import-label">
-                📤 Import Asset Allocation
+                <MaterialIcon name="upload" /> Import Asset Allocation
                 <input type="file" accept=".csv" onChange={handleImportAssets} hidden />
               </label>
               <label className="secondary-btn import-label">
-                📤 Import Cashflow Tracker
+                <MaterialIcon name="upload" /> Import Cashflow Tracker
                 <input type="file" accept=".csv" onChange={handleImportCashflow} hidden />
               </label>
               <label className="secondary-btn import-label">
-                📤 Import Net Worth Tracker
+                <MaterialIcon name="upload" /> Import Net Worth Tracker
                 <input type="file" accept=".json" onChange={handleImportNetWorth} hidden />
               </label>
             </div>
@@ -652,7 +653,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
 
           <div className="data-management-group">
             <div className="subsection-header-with-tooltip">
-              <h3>🎓 Guided Tour</h3>
+              <h3><MaterialIcon name="school" /> Guided Tour</h3>
               <Tooltip content="Take a step-by-step walkthrough of all Fire Tools features. The tour will show you how to use each tool and how they work together to help you achieve financial independence." position="right" maxWidth={350}>
                 <span className="info-icon" aria-label="More information">i</span>
               </Tooltip>
@@ -662,28 +663,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               clearTourPreference();
               window.location.href = '/';
             }}>
-              🔄 Restart Tour
+              <MaterialIcon name="refresh" /> Restart Tour
             </button>
           </div>
 
           <div className="data-management-group">
             <div className="subsection-header-with-tooltip">
-              <h3>📦 Demo Data</h3>
+              <h3><MaterialIcon name="inventory_2" /> Demo Data</h3>
               <Tooltip content="Load realistic sample data to explore all features of Fire Tools. Great for testing the app or learning how to use it. This will overwrite your current data, so export first if needed!" position="right" maxWidth={350}>
                 <span className="info-icon" aria-label="More information">i</span>
               </Tooltip>
             </div>
             <p className="setting-help">Load sample data to explore the application</p>
             <button className="secondary-btn" onClick={handleLoadDemoData}>
-              🎮 Load Demo Data
+              <MaterialIcon name="sports_esports" /> Load Demo Data
             </button>
           </div>
 
           <div className="data-management-group danger-zone">
-            <h3>⚠️ Danger Zone</h3>
+            <h3><MaterialIcon name="warning" /> Danger Zone</h3>
             <p className="setting-help">This action cannot be undone</p>
             <button className="danger-btn" onClick={handleResetAll}>
-              🗑️ Reset All Data
+              <MaterialIcon name="delete" /> Reset All Data
             </button>
           </div>
         </section>

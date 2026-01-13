@@ -29,6 +29,7 @@ import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
 import './components/NetWorthTrackerPage.css';
 import './components/GuidedTour.css';
+import { MaterialIcon } from './components/MaterialIcon';
 
 function Navigation({ accountName }: { accountName: string }) {
   const location = useLocation();
@@ -45,7 +46,7 @@ function Navigation({ accountName }: { accountName: string }) {
         aria-label="Toggle navigation menu"
         aria-expanded={isOpen}
       >
-        {isOpen ? '✕' : '☰'}
+        {isOpen ? <MaterialIcon name="close" /> : <MaterialIcon name="menu" />}
       </button>
       <div className={`nav-links ${isOpen ? 'open' : ''}`}>
         <Link 
@@ -54,7 +55,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/' ? 'page' : undefined}
         >
-          <span aria-hidden="true" className="nav-emoji">🏠</span> Home
+          <MaterialIcon name="home" className="nav-icon" /> Home
         </Link>
         <Link 
           to="/asset-allocation" 
@@ -62,7 +63,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/asset-allocation' ? 'page' : undefined}
         >
-          <span aria-hidden="true" className="nav-emoji">📊</span> Asset Allocation
+          <MaterialIcon name="pie_chart" className="nav-icon" /> Asset Allocation
         </Link>
         <Link 
           to="/expense-tracker" 
@@ -70,7 +71,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/expense-tracker' ? 'page' : undefined}
         >
-          <span aria-hidden="true" className="nav-emoji">💰</span> Cashflow
+          <MaterialIcon name="account_balance_wallet" className="nav-icon" /> Cashflow
         </Link>
         <Link 
           to="/net-worth-tracker" 
@@ -78,7 +79,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/net-worth-tracker' ? 'page' : undefined}
         >
-          <span aria-hidden="true" className="nav-emoji">📈</span> Net Worth
+          <MaterialIcon name="trending_up" className="nav-icon" /> Net Worth
         </Link>
         <Link 
           to="/fire-calculator" 
@@ -86,7 +87,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/fire-calculator' ? 'page' : undefined}
         >
-          <span aria-hidden="true" className="nav-emoji">🔥</span> FIRE Calculator
+          <MaterialIcon name="local_fire_department" className="nav-icon" /> FIRE Calculator
         </Link>
         <Link 
           to="/monte-carlo" 
@@ -94,7 +95,7 @@ function Navigation({ accountName }: { accountName: string }) {
           onClick={closeMenu}
           aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
         >
-          <span aria-hidden="true" className="nav-emoji">🎲</span> Monte Carlo
+          <MaterialIcon name="casino" className="nav-icon" /> Monte Carlo
         </Link>
       </div>
       <ProfileMenu accountName={accountName} />
@@ -253,7 +254,7 @@ function FIRECalculatorPage() {
       <main className="main-content">
         {hasValidationErrors && (
           <div className="validation-error-banner" role="alert" aria-live="polite">
-            <strong>⚠️ Validation Error</strong>
+            <strong><MaterialIcon name="warning" /> Validation Error</strong>
             {result.validationErrors?.map((error, index) => (
               <div key={index} className="validation-error-message">{error}</div>
             ))}
@@ -307,7 +308,7 @@ function App() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         
         <header className="app-header">
-          <h1><span className="header-emoji">💸</span> Fire Tools</h1>
+          <h1><MaterialIcon name="payments" className="header-icon" /> Fire Tools</h1>
           <p>Rocket fuel for your financial planning</p>
         </header>
 

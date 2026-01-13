@@ -1625,3 +1625,53 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================================
+   MATERIAL ICONS
+   ============================================================================ */
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.material-icon-sm {
+  font-size: 18px;
+}
+
+.material-icon-md {
+  font-size: 24px;
+}
+
+.material-icon-lg {
+  font-size: 32px;
+}
+
+.material-icon-filled {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Icon in navigation context */
+.nav-icon {
+  margin-right: 0.35rem;
+}
+
+/* Icon in header context */
+.header-icon {
+  margin-right: 0.25rem;
+}
+
+/* Icon in page header context */
+.page-header-icon {
+  margin-right: 0.5rem;
+}

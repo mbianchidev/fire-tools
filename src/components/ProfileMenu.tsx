@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { MaterialIcon } from './MaterialIcon';
 import './ProfileMenu.css';
 
 interface ProfileMenuProps {
@@ -79,7 +80,7 @@ export const ProfileMenu: React.FC<ProfileMenuProps> = ({ accountName }) => {
             onClick={() => setIsOpen(false)}
             role="menuitem"
           >
-            <span className="dropdown-icon">⚙️</span>
+            <span className="dropdown-icon"><MaterialIcon name="settings" size="small" /></span>
             Settings
           </Link>
         </div>

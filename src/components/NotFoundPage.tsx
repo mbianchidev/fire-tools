@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
+import { MaterialIcon } from './MaterialIcon';
 import './NotFoundPage.css';
 
 export function NotFoundPage() {
   return (
     <main className="not-found-page" id="main-content">
       <div className="not-found-container">
-        <div className="not-found-icon" aria-hidden="true">🔍</div>
+        <div className="not-found-icon" aria-hidden="true"><MaterialIcon name="search" size="large" /></div>
         <h1 className="not-found-title">404 - Page Not Found</h1>
         <p className="not-found-message">
           Oops! The page you're looking for doesn't exist. 
@@ -13,10 +14,10 @@ export function NotFoundPage() {
         </p>
         <div className="not-found-actions">
           <Link to="/" className="btn-home">
-            <span aria-hidden="true">🏠</span> Back to Home
+            <MaterialIcon name="home" /> Back to Home
           </Link>
           <Link to="/fire-calculator" className="btn-calculator">
-            <span aria-hidden="true">🔥</span> FIRE Calculator
+            <MaterialIcon name="local_fire_department" /> FIRE Calculator
           </Link>
         </div>
         <div className="helpful-links">
@@ -25,22 +26,22 @@ export function NotFoundPage() {
             <ul>
               <li>
                 <Link to="/asset-allocation">
-                  <span aria-hidden="true">📊</span> Asset Allocation Manager
+                  <MaterialIcon name="pie_chart" /> Asset Allocation Manager
                 </Link>
               </li>
               <li>
                 <Link to="/expense-tracker">
-                  <span aria-hidden="true">💰</span> Cashflow Tracker
+                  <MaterialIcon name="account_balance_wallet" /> Cashflow Tracker
                 </Link>
               </li>
               <li>
                 <Link to="/monte-carlo">
-                  <span aria-hidden="true">🎲</span> Monte Carlo Simulations
+                  <MaterialIcon name="casino" /> Monte Carlo Simulations
                 </Link>
               </li>
               <li>
                 <Link to="/settings">
-                  <span aria-hidden="true">⚙️</span> Settings
+                  <MaterialIcon name="settings" /> Settings
                 </Link>
               </li>
             </ul>
