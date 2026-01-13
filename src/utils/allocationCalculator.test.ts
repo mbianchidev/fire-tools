@@ -162,12 +162,13 @@ describe('allocationCalculator', () => {
       expect(result).toBe('INVEST');
     });
 
-    it('should use 100 as threshold', () => {
-      // Exactly at threshold should be HOLD
+    it('should use ACTION_THRESHOLD (100) as threshold for triggering actions', () => {
+      // ACTION_THRESHOLD is defined as 100 in allocationCalculator.ts
+      // Values below the threshold (Math.abs(delta) < 100) should result in HOLD
       expect(determineAction('STOCKS', 99, 'PERCENTAGE')).toBe('HOLD');
       expect(determineAction('STOCKS', -99, 'PERCENTAGE')).toBe('HOLD');
       
-      // Above threshold should trigger action
+      // Values at or above the threshold should trigger BUY/SELL actions
       expect(determineAction('STOCKS', 101, 'PERCENTAGE')).toBe('BUY');
       expect(determineAction('STOCKS', -101, 'PERCENTAGE')).toBe('SELL');
     });
@@ -403,7 +404,10 @@ describe('allocationCalculator', () => {
       expect(result.errors.some(e => e.includes('negative target value'))).toBe(true);
     });
 
-    it('should allow small floating point tolerance', () => {
+    it('should allow small floating point tolerance (0.1% deviation from 100%)', () => {
+      // validateAllocation allows tolerance of 0.1% for floating point errors
+      // Math.abs(totalPercent - 100) > 0.1 triggers an error
+      // 99.95 is within the 0.1% tolerance (100 - 99.95 = 0.05, which is < 0.1)
       const assets: Asset[] = [
         createAsset({ id: '1', assetClass: 'STOCKS', targetPercent: 99.95, currentValue: 10000 }),
       ];
