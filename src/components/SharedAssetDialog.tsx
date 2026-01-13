@@ -414,9 +414,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                   setShares(e.target.value);
                   setPricePerShare('1');
                 } : undefined}
-                className="dialog-input"
+                className="dialog-input dialog-input-calculated"
                 disabled={(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') || mode === 'netWorthTracker'}
-                style={(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') || mode === 'netWorthTracker' ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed' } : {}}
                 placeholder={(assetClass === 'CASH' && subAssetType !== 'MONEY_ETF' && mode === 'assetAllocation') ? 'Enter cash amount' : ''}
                 min={(assetClass === 'CASH' && subAssetType !== 'MONEY_ETF' && mode === 'assetAllocation') ? '0' : undefined}
                 step={(assetClass === 'CASH' && subAssetType !== 'MONEY_ETF' && mode === 'assetAllocation') ? 'any' : undefined}

@@ -536,6 +536,13 @@
   border-color: var(--accent-primary);
 }
 
+/* Calculated/disabled input field - dark background */
+.dialog-input-calculated:disabled {
+  background: var(--bg-secondary) !important;
+  color: var(--text-muted) !important;
+  cursor: not-allowed !important;
+}
+
 .dialog-actions {
   display: flex;
   gap: 1rem;
