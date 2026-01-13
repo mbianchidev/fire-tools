@@ -14,13 +14,13 @@ import {
   exportToCSV,
   importFromCSV,
   formatAssetName,
-} from './allocationCalculator';
+} from '../../src/utils/allocationCalculator';
 import {
   Asset,
   AssetClass,
   AllocationMode,
   AssetClassSummary,
-} from '../types/assetAllocation';
+} from '../../src/types/assetAllocation';
 
 // Helper to create test assets
 function createAsset(overrides: Partial<Asset> = {}): Asset {

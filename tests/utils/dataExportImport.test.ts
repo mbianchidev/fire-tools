@@ -3,13 +3,13 @@ import {
   exportAllDataAsJSON,
   importAllDataFromJSON,
   AllDataExport,
-} from './dataExportImport';
-import { CalculatorInputs } from '../types/calculator';
-import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
-import { ExpenseTrackerData } from '../types/expenseTracker';
-import { NetWorthTrackerData } from '../types/netWorthTracker';
-import { DEFAULT_INPUTS } from './defaults';
-import { DEFAULT_FALLBACK_RATES } from '../types/currency';
+} from '../../src/utils/dataExportImport';
+import { CalculatorInputs } from '../../src/types/calculator';
+import { Asset, AssetClass, AllocationMode } from '../../src/types/assetAllocation';
+import { ExpenseTrackerData } from '../../src/types/expenseTracker';
+import { NetWorthTrackerData } from '../../src/types/netWorthTracker';
+import { DEFAULT_INPUTS } from '../../src/utils/defaults';
+import { DEFAULT_FALLBACK_RATES } from '../../src/types/currency';
 
 describe('Data Export/Import All', () => {
   // Test data

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './urlParams';
-import { DEFAULT_INPUTS } from './defaults';
-import { CalculatorInputs } from '../types/calculator';
+import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from '../../src/utils/urlParams';
+import { DEFAULT_INPUTS } from '../../src/utils/defaults';
+import { CalculatorInputs } from '../../src/types/calculator';
 
 describe('urlParams', () => {
   describe('serializeInputsToURL', () => {

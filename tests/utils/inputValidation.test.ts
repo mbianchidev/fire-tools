@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { validateNumberInput, safeParseNumber, formatWithSeparator, parseWithSeparator } from './inputValidation';
+import { validateNumberInput, safeParseNumber, formatWithSeparator, parseWithSeparator } from '../../src/utils/inputValidation';
 
 describe('validateNumberInput', () => {
   describe('valid inputs', () => {

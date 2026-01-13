@@ -3,12 +3,12 @@ import {
   getLast12MonthsData,
   calculateAnnualExpensesFromTracker,
   calculateAnnualIncomeFromTracker,
-} from './expenseTrackerIntegration';
-import { ExpenseTrackerData, YearData, MonthData } from '../types/expenseTracker';
-import * as cookieStorage from './cookieStorage';
+} from '../../src/utils/expenseTrackerIntegration';
+import { ExpenseTrackerData, YearData, MonthData } from '../../src/types/expenseTracker';
+import * as cookieStorage from '../../src/utils/cookieStorage';
 
 // Mock the cookieStorage module
-vi.mock('./cookieStorage', () => ({
+vi.mock('../../src/utils/cookieStorage', () => ({
   loadExpenseTrackerData: vi.fn(),
 }));
 

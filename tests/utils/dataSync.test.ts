@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   syncAssetAllocationToNetWorth,
   syncNetWorthToAssetAllocation,
-} from './dataSync';
-import { Asset, AssetClass, AllocationMode, SubAssetType } from '../types/assetAllocation';
-import { NetWorthTrackerData } from '../types/netWorthTracker';
-import { SupportedCurrency } from '../types/currency';
-import { getDemoAssetAllocationData } from './defaults';
+} from '../../src/utils/dataSync';
+import { Asset, AssetClass, AllocationMode, SubAssetType } from '../../src/types/assetAllocation';
+import { NetWorthTrackerData } from '../../src/types/netWorthTracker';
+import { SupportedCurrency } from '../../src/types/currency';
+import { getDemoAssetAllocationData } from '../../src/utils/defaults';
 
 describe('Data Sync Utilities', () => {
   describe('syncAssetAllocationToNetWorth', () => {

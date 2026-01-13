@@ -1,9 +1,9 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import {
-  loadTourCompleted,
-  saveTourCompleted,
-  clearTourPreference,
-} from './tourPreferences';
+  clearSecurityBannerPreference,
+  loadSecurityBannerDismissed,
+  saveSecurityBannerDismissed,
+} from '../../src/utils/bannerPreferences';
 
 // Mock document.cookie
 const cookieMock = (() => {
@@ -39,28 +39,28 @@ Object.defineProperty(document, 'cookie', {
   configurable: true,
 });
 
-describe('Tour preferences', () => {
+describe('Security banner preferences', () => {
   beforeEach(() => {
     cookieMock.clear();
   });
 
-  it('should default to not completed', () => {
-    expect(loadTourCompleted()).toBe(false);
+  it('should default to not dismissed', () => {
+    expect(loadSecurityBannerDismissed()).toBe(false);
   });
 
-  it('should persist completion state', () => {
-    saveTourCompleted(true);
-    expect(loadTourCompleted()).toBe(true);
+  it('should persist dismissal state', () => {
+    saveSecurityBannerDismissed(true);
+    expect(loadSecurityBannerDismissed()).toBe(true);
   });
 
   it('should handle corrupted data gracefully', () => {
-    document.cookie = 'fire-tools-tour-completed=invalid';
-    expect(loadTourCompleted()).toBe(false);
+    document.cookie = 'fire-tools-security-banner-dismissed=invalid';
+    expect(loadSecurityBannerDismissed()).toBe(false);
   });
 
   it('should clear preference', () => {
-    saveTourCompleted(true);
-    clearTourPreference();
-    expect(loadTourCompleted()).toBe(false);
+    saveSecurityBannerDismissed(true);
+    clearSecurityBannerPreference();
+    expect(loadSecurityBannerDismissed()).toBe(false);
   });
 });

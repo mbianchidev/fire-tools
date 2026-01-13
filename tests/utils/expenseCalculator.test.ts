@@ -11,14 +11,14 @@ import {
   calculateYearToDateAverage,
   calculateQuarterlyBreakdown,
   calculateYearToDateBreakdown,
-} from './expenseCalculator';
+} from '../../src/utils/expenseCalculator';
 import {
   IncomeEntry,
   ExpenseEntry,
   MonthData,
   TransactionFilter,
   TransactionSort,
-} from '../types/expenseTracker';
+} from '../../src/types/expenseTracker';
 
 describe('Expense Calculator', () => {
   // Test data

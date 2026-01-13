@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { DEFAULT_PORTFOLIO_VALUE, DEFAULT_ASSETS } from './defaultAssets';
-import { Asset, AssetClass } from '../types/assetAllocation';
+import { DEFAULT_PORTFOLIO_VALUE, DEFAULT_ASSETS } from '../../src/utils/defaultAssets';
+import { Asset, AssetClass } from '../../src/types/assetAllocation';
 
 describe('defaultAssets', () => {
   describe('DEFAULT_PORTFOLIO_VALUE', () => {

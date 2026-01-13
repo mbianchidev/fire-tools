@@ -6,10 +6,10 @@ import {
   importAssetAllocationFromCSV,
   exportNetWorthTrackerToJSON,
   importNetWorthTrackerFromJSON,
-} from './csvExport';
-import { CalculatorInputs } from '../types/calculator';
-import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
-import { DEFAULT_INPUTS } from './defaults';
+} from '../../src/utils/csvExport';
+import { CalculatorInputs } from '../../src/types/calculator';
+import { Asset, AssetClass, AllocationMode } from '../../src/types/assetAllocation';
+import { DEFAULT_INPUTS } from '../../src/utils/defaults';
 
 describe('CSV Export/Import', () => {
   describe('FIRE Calculator CSV', () => {

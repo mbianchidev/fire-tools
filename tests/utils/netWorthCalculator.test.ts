@@ -5,13 +5,13 @@ import {
   calculateMonthlyVariations,
   calculateNetWorthForecast,
   calculateFIREProgress,
-} from './netWorthCalculator';
+} from '../../src/utils/netWorthCalculator';
 import {
   MonthlySnapshot,
   AssetHolding,
   CashEntry,
   PensionEntry,
-} from '../types/netWorthTracker';
+} from '../../src/types/netWorthTracker';
 
 describe('Net Worth Calculator', () => {
   // Test data

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { formatCurrency } from './allocationCalculator';
+import { formatCurrency } from '../../src/utils/allocationCalculator';
 
 // Mock loadSettings to return controlled settings
-vi.mock('./cookieSettings', () => ({
+vi.mock('../../src/utils/cookieSettings', () => ({
   loadSettings: vi.fn(() => ({
     accountName: 'My Portfolio',
     decimalSeparator: '.',

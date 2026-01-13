@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { calculateFIRE, calculateYearsOfExpenses } from './fireCalculator';
-import { CalculatorInputs } from '../types/calculator';
+import { calculateFIRE, calculateYearsOfExpenses } from '../../src/utils/fireCalculator';
+import { CalculatorInputs } from '../../src/types/calculator';
 
 describe('calculateYearsOfExpenses', () => {
   it('should calculate 33.33 years for 3% withdrawal rate', () => {

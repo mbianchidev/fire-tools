@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_INPUTS, getDemoNetWorthData, generateDemoNetWorthDataForYear, getDemoAssetAllocationData, getDemoCashflowData } from './defaults';
+import { DEFAULT_INPUTS, getDemoNetWorthData, generateDemoNetWorthDataForYear, getDemoAssetAllocationData, getDemoCashflowData } from '../../src/utils/defaults';
 
 describe('DEFAULT_INPUTS', () => {
   it('should have initialSavings consistent with Asset Allocation demo (~€70k)', () => {
