@@ -21,6 +21,8 @@ import { CollapsibleAllocationTable } from './CollapsibleAllocationTable';
 import { MassEditDialog } from './MassEditDialog';
 import { DCAHelperDialog } from './DCAHelperDialog';
 import { DataManagement } from './DataManagement';
+import { ScrollToTopButton } from './ScrollToTopButton';
+import { PrivacyBlur } from './PrivacyBlur';
 
 /**
  * Calculate cash delta from assets and targets.
@@ -550,10 +552,10 @@ export const AssetAllocationPage: React.FC = () => {
         <section className="portfolio-value-section" aria-labelledby="portfolio-value-heading">
           <div className="portfolio-value-label">
             <strong id="portfolio-value-heading">Portfolio Value (excl. Cash):</strong>
-            <span className="portfolio-value">{formatCurrency(portfolioValue, currency)}</span>
+            <span className="portfolio-value"><PrivacyBlur>{formatCurrency(portfolioValue, currency)}</PrivacyBlur></span>
           </div>
           <div className="portfolio-value-info">
-            Total holdings (incl. cash): {formatCurrency(allocation.totalHoldings, currency)}
+            Total holdings (incl. cash): <PrivacyBlur>{formatCurrency(allocation.totalHoldings, currency)}</PrivacyBlur>
           </div>
         </section>
 
@@ -754,6 +756,8 @@ export const AssetAllocationPage: React.FC = () => {
           updateAllocation(newAssets);
         }}
       />
+
+      <ScrollToTopButton />
     </div>
   );
 };

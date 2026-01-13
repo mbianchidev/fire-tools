@@ -244,4 +244,42 @@ describe('Cookie Settings utilities', () => {
       expect(loaded.decimalPlaces).toBe(2);
     });
   });
+
+  describe('privacyMode setting', () => {
+    it('should save and load privacy mode setting', () => {
+      const settings: UserSettings = {
+        ...DEFAULT_SETTINGS,
+        privacyMode: true,
+      };
+      
+      saveSettings(settings);
+      const loaded = loadSettings();
+      
+      expect(loaded.privacyMode).toBe(true);
+    });
+
+    it('should default to false for privacy mode', () => {
+      const loaded = loadSettings();
+      expect(loaded.privacyMode).toBe(false);
+    });
+  });
+
+  describe('country setting', () => {
+    it('should save and load country setting', () => {
+      const settings: UserSettings = {
+        ...DEFAULT_SETTINGS,
+        country: 'DE',
+      };
+      
+      saveSettings(settings);
+      const loaded = loadSettings();
+      
+      expect(loaded.country).toBe('DE');
+    });
+
+    it('should default to undefined for country', () => {
+      const loaded = loadSettings();
+      expect(loaded.country).toBeUndefined();
+    });
+  });
 });

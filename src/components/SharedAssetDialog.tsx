@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { Asset, AssetClass, SubAssetType, AllocationMode } from '../types/assetAllocation';
 import { AssetHolding } from '../types/netWorthTracker';
 import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
+import { getUCITSWarning } from '../types/country';
 import { formatAssetName } from '../utils/allocationCalculator';
 import { convertToEUR } from '../utils/currencyConverter';
 import { loadSettings } from '../utils/cookieSettings';
@@ -24,7 +25,7 @@ interface SharedAssetDialogProps {
 }
 
 const SUB_ASSET_TYPES: Record<AssetClass, SubAssetType[]> = {
-  STOCKS: ['ETF', 'SINGLE_STOCK'],
+  STOCKS: ['ETF', 'SINGLE_STOCK', 'PRIVATE_EQUITY'],
   BONDS: ['ETF', 'SINGLE_BOND'],
   CASH: ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF'],
   CRYPTO: ['COIN'],
@@ -53,7 +54,10 @@ const getTickerLabel = (subAssetType: SubAssetType): string => {
 
 // Map Asset Allocation AssetClass to Net Worth Tracker assetClass
 const mapToNetWorthAssetClass = (assetClass: AssetClass, subAssetType: SubAssetType): AssetHolding['assetClass'] => {
-  if (assetClass === 'STOCKS') return 'STOCKS';
+  if (assetClass === 'STOCKS') {
+    if (subAssetType === 'PRIVATE_EQUITY') return 'PRIVATE_EQUITY';
+    return 'STOCKS';
+  }
   if (assetClass === 'BONDS') return 'BONDS';
   if (assetClass === 'REAL_ESTATE') {
     return subAssetType === 'REIT' ? 'ETF' : 'REAL_ESTATE';
@@ -70,6 +74,7 @@ const mapFromNetWorthAssetClass = (assetClass: AssetHolding['assetClass']): { as
   if (assetClass === 'ETF') return { assetClass: 'STOCKS', subAssetType: 'ETF' };
   if (assetClass === 'CRYPTO') return { assetClass: 'CRYPTO', subAssetType: 'COIN' };
   if (assetClass === 'REAL_ESTATE') return { assetClass: 'REAL_ESTATE', subAssetType: 'PROPERTY' };
+  if (assetClass === 'PRIVATE_EQUITY') return { assetClass: 'STOCKS', subAssetType: 'PRIVATE_EQUITY' };
   return { assetClass: 'STOCKS', subAssetType: 'ETF' };
 };
 
@@ -291,6 +296,9 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const needsTicker = !NO_TICKER_REQUIRED.includes(subAssetType);
   const needsIsin = ISIN_REQUIRED.includes(subAssetType);
   const showTargetSettings = mode === 'assetAllocation';
+  
+  // UCITS warning for EU users
+  const ucitsWarning = needsIsin ? getUCITSWarning(isin, settings.country) : null;
 
   return (
     <div className="dialog-overlay" onClick={onClose}>
@@ -368,6 +376,11 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                   className="dialog-input"
                   required
                 />
+                {ucitsWarning && (
+                  <div className="ucits-warning" role="alert">
+                    <MaterialIcon name="warning" size="small" /> {ucitsWarning}
+                  </div>
+                )}
               </div>
             )}
           </div>

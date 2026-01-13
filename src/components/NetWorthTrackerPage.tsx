@@ -37,6 +37,8 @@ import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import { SharedAssetDialog } from './SharedAssetDialog';
 import { MaterialIcon } from './MaterialIcon';
+import { ScrollToTopButton } from './ScrollToTopButton';
+import { PrivacyBlur } from './PrivacyBlur';
 import './NetWorthTrackerPage.css';
 
 // Month names for display
@@ -892,10 +894,10 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="bar_chart" /></span>
               <div className="card-content">
                 <span className="card-label">Total Assets</span>
-                <span className="card-value">{formatCurrency(netWorthResult.totalAssetValue, data.defaultCurrency)}</span>
+                <span className="card-value"><PrivacyBlur>{formatCurrency(netWorthResult.totalAssetValue, data.defaultCurrency)}</PrivacyBlur></span>
                 {currentMonthVariation && currentMonthVariation.assetValueChange !== 0 && (
                   <span className={`card-change ${currentMonthVariation.assetValueChange >= 0 ? 'positive' : 'negative'}`}>
-                    {currentMonthVariation.assetValueChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.assetValueChange, data.defaultCurrency)}
+                    <PrivacyBlur>{currentMonthVariation.assetValueChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.assetValueChange, data.defaultCurrency)}</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -904,10 +906,10 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="payments" /></span>
               <div className="card-content">
                 <span className="card-label">Total Cash</span>
-                <span className="card-value">{formatCurrency(netWorthResult.totalCash, data.defaultCurrency)}</span>
+                <span className="card-value"><PrivacyBlur>{formatCurrency(netWorthResult.totalCash, data.defaultCurrency)}</PrivacyBlur></span>
                 {currentMonthVariation && currentMonthVariation.cashChange !== 0 && (
                   <span className={`card-change ${currentMonthVariation.cashChange >= 0 ? 'positive' : 'negative'}`}>
-                    {currentMonthVariation.cashChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.cashChange, data.defaultCurrency)}
+                    <PrivacyBlur>{currentMonthVariation.cashChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.cashChange, data.defaultCurrency)}</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -916,10 +918,10 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="elderly" /></span>
               <div className="card-content">
                 <span className="card-label">Total Pension</span>
-                <span className="card-value">{formatCurrency(netWorthResult.totalPension, data.defaultCurrency)}</span>
+                <span className="card-value"><PrivacyBlur>{formatCurrency(netWorthResult.totalPension, data.defaultCurrency)}</PrivacyBlur></span>
                 {currentMonthVariation && currentMonthVariation.pensionChange !== 0 && (
                   <span className={`card-change ${currentMonthVariation.pensionChange >= 0 ? 'positive' : 'negative'}`}>
-                    {currentMonthVariation.pensionChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.pensionChange, data.defaultCurrency)}
+                    <PrivacyBlur>{currentMonthVariation.pensionChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.pensionChange, data.defaultCurrency)}</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -928,10 +930,10 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="account_balance_wallet" /></span>
               <div className="card-content">
                 <span className="card-label">Net Worth</span>
-                <span className="card-value">{formatCurrency(netWorthResult.netWorth, data.defaultCurrency)}</span>
+                <span className="card-value"><PrivacyBlur>{formatCurrency(netWorthResult.netWorth, data.defaultCurrency)}</PrivacyBlur></span>
                 {currentMonthVariation && currentMonthVariation.changeFromPrevMonth !== 0 && (
                   <span className={`card-change ${currentMonthVariation.changeFromPrevMonth >= 0 ? 'positive' : 'negative'}`}>
-                    {formatPercent(currentMonthVariation.changePercent)} ({currentMonthVariation.changeFromPrevMonth >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.changeFromPrevMonth, data.defaultCurrency)})
+                    <PrivacyBlur>{formatPercent(currentMonthVariation.changePercent)} ({currentMonthVariation.changeFromPrevMonth >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.changeFromPrevMonth, data.defaultCurrency)})</PrivacyBlur>
                   </span>
                 )}
               </div>
@@ -1254,6 +1256,8 @@ export function NetWorthTrackerPage() {
             defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
           />
         )}
+
+        <ScrollToTopButton />
       </main>
     </div>
   );

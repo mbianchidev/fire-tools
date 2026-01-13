@@ -1,0 +1,15 @@
+/**
+ * PrivacyBlur CSS
+ */
+
+.privacy-blur {
+  filter: blur(6px);
+  user-select: none;
+  transition: filter 0.2s ease;
+  display: inline-block;
+}
+
+.privacy-blur:hover {
+  filter: blur(4px);
+  cursor: help;
+}

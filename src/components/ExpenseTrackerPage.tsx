@@ -46,6 +46,8 @@ import { SpendingTrendChart } from './SpendingTrendChart';
 import { MonthlyComparisonChart } from './MonthlyComparisonChart';
 import { ValidatedNumberInput } from './ValidatedNumberInput';
 import { MaterialIcon } from './MaterialIcon';
+import { ScrollToTopButton } from './ScrollToTopButton';
+import { PrivacyBlur } from './PrivacyBlur';
 import './ExpenseTrackerPage.css';
 
 // Month names for display
@@ -685,28 +687,28 @@ export function ExpenseTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="trending_up" /></span>
               <div className="card-content">
                 <span className="card-label">Total Income</span>
-                <span className="card-value">{formatCurrency(summary.totalIncome, data.currency)}</span>
+                <span className="card-value"><PrivacyBlur>{formatCurrency(summary.totalIncome, data.currency)}</PrivacyBlur></span>
               </div>
             </div>
             <div className="summary-card expenses">
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="trending_down" /></span>
               <div className="card-content">
                 <span className="card-label">Total Expenses</span>
-                <span className="card-value">{formatCurrency(summary.totalExpenses, data.currency)}</span>
+                <span className="card-value"><PrivacyBlur shouldBlur={false}>{formatCurrency(summary.totalExpenses, data.currency)}</PrivacyBlur></span>
               </div>
             </div>
             <div className={`summary-card balance ${summary.netBalance >= 0 ? 'positive' : 'negative'}`}>
               <span className="card-icon" aria-hidden="true">{summary.netBalance >= 0 ? <MaterialIcon name="account_balance_wallet" /> : <MaterialIcon name="warning" />}</span>
               <div className="card-content">
                 <span className="card-label">Net Balance</span>
-                <span className="card-value">{formatCurrency(summary.netBalance, data.currency)}</span>
+                <span className="card-value"><PrivacyBlur>{formatCurrency(summary.netBalance, data.currency)}</PrivacyBlur></span>
               </div>
             </div>
             <div className="summary-card savings">
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="savings" /></span>
               <div className="card-content">
                 <span className="card-label">Savings Rate</span>
-                <span className="card-value">{formatDisplayPercent(summary.savingsRate)}</span>
+                <span className="card-value"><PrivacyBlur>{formatDisplayPercent(summary.savingsRate)}</PrivacyBlur></span>
               </div>
             </div>
           </div>
@@ -1192,6 +1194,8 @@ export function ExpenseTrackerPage() {
             currency={data.currency}
           />
         )}
+
+        <ScrollToTopButton />
       </main>
     </div>
   );

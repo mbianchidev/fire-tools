@@ -431,3 +431,15 @@
     flex-direction: column;
   }
 }
+
+/* EU Notice for Country Settings */
+.eu-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #3b82f6;
+}
+
+.eu-notice .material-icon {
+  color: #3b82f6;
+}

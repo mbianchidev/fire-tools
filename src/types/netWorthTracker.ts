@@ -13,7 +13,7 @@ export interface AssetHolding {
   shares: number; // Number of shares owned
   pricePerShare: number; // Price per share at the time of entry
   currency: SupportedCurrency;
-  assetClass: 'STOCKS' | 'BONDS' | 'ETF' | 'CRYPTO' | 'REAL_ESTATE' | 'OTHER';
+  assetClass: 'STOCKS' | 'BONDS' | 'ETF' | 'CRYPTO' | 'REAL_ESTATE' | 'PRIVATE_EQUITY' | 'OTHER';
   note?: string;
   // Sync metadata (hidden from UI, preserved during sync)
   targetMode?: 'PERCENTAGE' | 'OFF' | 'SET';
@@ -257,6 +257,7 @@ export const ASSET_CLASSES: AssetClassInfo[] = [
   { id: 'ETF', name: 'ETF', icon: 'trending_up' },
   { id: 'CRYPTO', name: 'Crypto', icon: 'currency_bitcoin' },
   { id: 'REAL_ESTATE', name: 'Real Estate', icon: 'home' },
+  { id: 'PRIVATE_EQUITY', name: 'Private Equity', icon: 'business_center' },
   { id: 'OTHER', name: 'Other', icon: 'inventory_2' },
 ];
 

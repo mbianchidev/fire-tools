@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
+import { ALL_COUNTRIES, isEUCountry } from '../types/country';
 import { recalculateFallbackRates, convertAssetsToNewCurrency, convertNetWorthDataToNewCurrency, convertExpenseDataToNewCurrency, convertFireCalculatorInputsToNewCurrency } from '../utils/currencyConverter';
 import { exportFireCalculatorToCSV, exportAssetAllocationToCSV, importFireCalculatorFromCSV, importAssetAllocationFromCSV, exportExpenseTrackerToCSV, importExpenseTrackerFromCSV, exportNetWorthTrackerToJSON, importNetWorthTrackerFromJSON } from '../utils/csvExport';
 import { loadFireCalculatorInputs, loadAssetAllocation, saveFireCalculatorInputs, saveAssetAllocation, clearAllData, loadExpenseTrackerData, saveExpenseTrackerData, loadNetWorthTrackerData, saveNetWorthTrackerData } from '../utils/cookieStorage';
@@ -534,6 +535,71 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               <option value={4}>4 (e.g., 123.4567)</option>
             </select>
             <span className="setting-help">Number of decimal places shown for values below 1,000. Values at or above 1,000 show no decimals.</span>
+          </div>
+        </section>
+
+        {/* Privacy & Region Settings */}
+        <section className="settings-section">
+          <h2><MaterialIcon name="privacy_tip" /> Privacy & Region</h2>
+          <div className="setting-item">
+            <div className="label-with-tooltip">
+              <label htmlFor="privacyMode">Privacy Mode</label>
+              <Tooltip content="When enabled, sensitive financial data like net worth, income, and asset values will be blurred on screen. This is useful when sharing your screen or working in public. Expenses are not blurred.">
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
+            <div className="toggle-group">
+              <button
+                className={`toggle-btn ${!settings.privacyMode ? 'active' : ''}`}
+                onClick={() => handleSettingChange('privacyMode', false)}
+              >
+                <MaterialIcon name="visibility" size="small" /> Show Values
+              </button>
+              <button
+                className={`toggle-btn ${settings.privacyMode ? 'active' : ''}`}
+                onClick={() => handleSettingChange('privacyMode', true)}
+              >
+                <MaterialIcon name="visibility_off" size="small" /> Hide Values
+              </button>
+            </div>
+            <span className="setting-help">Blur sensitive financial data on screen for privacy</span>
+          </div>
+          <div className="setting-item">
+            <div className="label-with-tooltip">
+              <label htmlFor="country">Country</label>
+              <Tooltip content="Select your country of residence. EU countries will receive UCITS compliance warnings when adding non-EU domiciled ETFs, as these may not be available to EU investors.">
+                <span className="info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
+            <select
+              id="country"
+              value={settings.country || ''}
+              onChange={(e) => handleSettingChange('country', e.target.value || undefined)}
+            >
+              <option value="">Select country (optional)</option>
+              <optgroup label="EU Countries">
+                {ALL_COUNTRIES.filter(c => c.isEU).map((country) => (
+                  <option key={country.code} value={country.code}>
+                    {country.name}
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="Other Countries">
+                {ALL_COUNTRIES.filter(c => !c.isEU).map((country) => (
+                  <option key={country.code} value={country.code}>
+                    {country.name}
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+            {settings.country && isEUCountry(settings.country) && (
+              <span className="setting-help eu-notice">
+                <MaterialIcon name="info" size="small" /> EU resident: You'll receive UCITS compliance warnings for non-EU ETFs
+              </span>
+            )}
+            {settings.country && !isEUCountry(settings.country) && (
+              <span className="setting-help">Country set to {ALL_COUNTRIES.find(c => c.code === settings.country)?.name}</span>
+            )}
           </div>
         </section>
 
