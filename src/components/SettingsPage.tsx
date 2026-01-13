@@ -23,7 +23,8 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-type SettingsSection = 'account' | 'display' | 'privacy' | 'notifications' | 'email' | 'currency' | 'data';
+const SETTINGS_SECTIONS = ['account', 'display', 'privacy', 'notifications', 'email', 'currency', 'data'] as const;
+type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   
   // All sections collapsed by default for cleaner interface
   const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
-    new Set(['account', 'display', 'privacy', 'notifications', 'email', 'currency', 'data'])
+    () => new Set(SETTINGS_SECTIONS)
   );
 
   // Toggle section collapse state
@@ -916,12 +917,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('currency')}
             aria-controls="currency-content"
           >
-            <div className="section-header-with-tooltip">
-              <h2><MaterialIcon name="currency_exchange" /> Currency Conversion Fallback Rates <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('currency') ? '▶' : '▼'}</span></h2>
+            <h2>
+              <MaterialIcon name="currency_exchange" /> Currency Conversion Fallback Rates 
               <Tooltip content="These are backup exchange rates used when the live API is unavailable or slow. The app attempts to fetch real-time rates first. You can customize these rates based on your preferences or recent market rates." position="right" maxWidth={350}>
                 <span className="info-icon section-info-icon" aria-label="More information">i</span>
               </Tooltip>
-            </div>
+              <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('currency') ? '▶' : '▼'}</span>
+            </h2>
           </button>
           {!collapsedSections.has('currency') && (
             <div id="currency-content" className="collapsible-content">
