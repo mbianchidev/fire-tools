@@ -136,7 +136,6 @@ export const OPENBANKING_BANKS: BankInfo[] = [
   
   // Switzerland (CH) - Limited OpenBanking
   { code: 'CH_UBS', name: 'UBS', countryCode: 'CH', supportsOpenBanking: false, bic: 'UBSWCHZH', institutionType: 'BANK' },
-  { code: 'CH_CREDIT_SUISSE', name: 'Credit Suisse', countryCode: 'CH', supportsOpenBanking: false, institutionType: 'BANK' },
   { code: 'CH_SWISSQUOTE', name: 'Swissquote', countryCode: 'CH', supportsOpenBanking: false, institutionType: 'BROKER' },
   
   // United States (US) - No PSD2, limited OpenBanking
@@ -148,10 +147,9 @@ export const OPENBANKING_BANKS: BankInfo[] = [
   { code: 'US_VANGUARD', name: 'Vanguard', countryCode: 'US', supportsOpenBanking: false, institutionType: 'BROKER' },
   { code: 'US_INTERACTIVE_BROKERS', name: 'Interactive Brokers', countryCode: 'US', supportsOpenBanking: false, institutionType: 'BROKER' },
   
-  // Pan-European
-  { code: 'EU_REVOLUT', name: 'Revolut', countryCode: 'LT', supportsOpenBanking: true, institutionType: 'NEOBANK' },
-  { code: 'EU_N26', name: 'N26', countryCode: 'DE', supportsOpenBanking: true, institutionType: 'NEOBANK' },
-  { code: 'EU_WISE', name: 'Wise (TransferWise)', countryCode: 'BE', supportsOpenBanking: true, institutionType: 'NEOBANK' },
+  // Pan-European (headquartered in one country but operating across EU)
+  { code: 'LT_REVOLUT', name: 'Revolut', countryCode: 'LT', supportsOpenBanking: true, institutionType: 'NEOBANK' },
+  { code: 'BE_WISE', name: 'Wise (TransferWise)', countryCode: 'BE', supportsOpenBanking: true, institutionType: 'NEOBANK' },
 ];
 
 /**

@@ -404,7 +404,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
             <div className="form-row">
               <div className="form-group">
                 <label>
-                  Bank/Institution {settings.country ? '' : '(Set country in Settings)'}
+                  Bank/Institution{!settings.country && ' (Set country in Settings)'}
                 </label>
                 <select
                   value={institutionCode}
