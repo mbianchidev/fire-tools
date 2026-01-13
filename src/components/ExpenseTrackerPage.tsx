@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   ExpenseTrackerData,
@@ -347,6 +347,22 @@ export function ExpenseTrackerPage() {
     const filtered = filterTransactions(allTransactions, filter);
     return sortTransactions(filtered, sort);
   }, [currentMonthData, filter, sort]);
+
+  // Helper function to handle table header sorting
+  const handleTableSort = useCallback((field: TransactionSort['field']) => {
+    setSort(prevSort => ({
+      field,
+      direction: prevSort.field === field 
+        ? (prevSort.direction === 'asc' ? 'desc' : 'asc')
+        : 'asc'
+    }));
+  }, []);
+
+  // Helper function to get sort indicator for table headers
+  const getTransactionSortIndicator = useCallback((field: TransactionSort['field']) => {
+    if (sort.field !== field) return '⇅';
+    return sort.direction === 'asc' ? '↑' : '↓';
+  }, [sort]);
 
   // Get filtered months data based on analytics view
   const filteredMonthsData = useMemo(() => {
@@ -919,11 +935,17 @@ export function ExpenseTrackerPage() {
                 <table className="transactions-table">
                   <thead>
                     <tr>
-                      <th>Date</th>
+                      <th className="sortable" onClick={() => handleTableSort('date')}>
+                        Date <span className="sort-indicator">{getTransactionSortIndicator('date')}</span>
+                      </th>
                       <th>Description</th>
-                      <th>Category/Source</th>
+                      <th className="sortable" onClick={() => handleTableSort('category')}>
+                        Category/Source <span className="sort-indicator">{getTransactionSortIndicator('category')}</span>
+                      </th>
                       <th>Type</th>
-                      <th className="amount-col">Amount</th>
+                      <th className="sortable amount-col" onClick={() => handleTableSort('amount')}>
+                        Amount <span className="sort-indicator">{getTransactionSortIndicator('amount')}</span>
+                      </th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -1290,6 +1312,27 @@ function TransactionFormDialog({
   const [isRecurring, setIsRecurring] = useState<boolean>(
     initialData?.isRecurring ?? false
   );
+  
+  // Custom dropdown state for category with icons
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+    
+    if (isCategoryDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCategoryDropdownOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1392,15 +1435,40 @@ function TransactionFormDialog({
             <>
               <div className="form-group">
                 <label htmlFor="expense-category">Category</label>
-                <select
-                  id="expense-category"
-                  value={category}
-                  onChange={(e) => handleCategoryChange(e.target.value as ExpenseCategory)}
-                >
-                  {EXPENSE_CATEGORIES.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                <div className="custom-select-container" ref={categoryDropdownRef}>
+                  <button
+                    type="button"
+                    className="custom-select-trigger"
+                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+                    aria-haspopup="listbox"
+                    aria-expanded={isCategoryDropdownOpen}
+                  >
+                    <span className="custom-select-value">
+                      <MaterialIcon name={getCategoryInfo(category).icon} size="small" />
+                      <span>{getCategoryInfo(category).name}</span>
+                    </span>
+                    <MaterialIcon name={isCategoryDropdownOpen ? 'expand_less' : 'expand_more'} size="small" />
+                  </button>
+                  {isCategoryDropdownOpen && (
+                    <ul className="custom-select-dropdown" role="listbox">
+                      {EXPENSE_CATEGORIES.map(c => (
+                        <li
+                          key={c.id}
+                          role="option"
+                          aria-selected={category === c.id}
+                          className={`custom-select-option ${category === c.id ? 'selected' : ''}`}
+                          onClick={() => {
+                            handleCategoryChange(c.id);
+                            setIsCategoryDropdownOpen(false);
+                          }}
+                        >
+                          <MaterialIcon name={c.icon} size="small" />
+                          <span>{c.name}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
               
               <div className="form-group">
