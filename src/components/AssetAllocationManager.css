@@ -2424,3 +2424,55 @@ select:disabled {
   font-style: italic;
 }
 
+/* Page Header with Privacy Toggle */
+.page-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.privacy-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-toggle-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.privacy-toggle-btn.active {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-gold) 100%);
+  border-color: transparent;
+  color: white;
+}
+
+.privacy-toggle-btn:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Edit input dark background styling */
+.edit-input {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-subtle) !important;
+}
+
+.edit-input:focus {
+  border-color: var(--accent-primary) !important;
+  outline: none;
+}
+

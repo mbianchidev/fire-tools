@@ -3,7 +3,6 @@
  * Wraps content that should be blurred when privacy mode is enabled
  */
 
-import { loadSettings } from '../utils/cookieSettings';
 import './PrivacyBlur.css';
 
 interface PrivacyBlurProps {
@@ -17,15 +16,20 @@ interface PrivacyBlurProps {
    * Custom CSS class for additional styling
    */
   className?: string;
+  /**
+   * Override the privacy mode state (for page-level toggle)
+   * If not provided, the component will just check shouldBlur
+   */
+  isPrivacyMode?: boolean;
 }
 
 export const PrivacyBlur: React.FC<PrivacyBlurProps> = ({ 
   children, 
   shouldBlur = true,
-  className = '' 
+  className = '',
+  isPrivacyMode = false
 }) => {
-  const settings = loadSettings();
-  const isBlurred = shouldBlur && settings.privacyMode;
+  const isBlurred = shouldBlur && isPrivacyMode;
 
   if (!isBlurred) {
     return <>{children}</>;

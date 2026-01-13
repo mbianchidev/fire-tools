@@ -36,7 +36,7 @@ import {
   exportExpenseTrackerToCSV,
   importExpenseTrackerFromCSV,
 } from '../utils/csvExport';
-import { loadSettings } from '../utils/cookieSettings';
+import { loadSettings, saveSettings } from '../utils/cookieSettings';
 import { generateDemoExpenseData } from '../utils/demoExpenseData';
 import { useTableSort } from '../utils/useTableSort';
 import { formatDisplayCurrency, formatDisplayPercent } from '../utils/numberFormatter';
@@ -157,6 +157,20 @@ export function ExpenseTrackerPage() {
   // Analytics period selection state
   const [analyticsView, setAnalyticsView] = useState<'monthly' | 'quarterly' | 'yearly' | 'ytd'>('monthly');
   const [selectedQuarter, setSelectedQuarter] = useState(Math.ceil(currentMonth / 3));
+  
+  // Privacy mode state (loaded from settings, toggleable on page)
+  const [isPrivacyMode, setIsPrivacyMode] = useState<boolean>(() => {
+    const settings = loadSettings();
+    return settings.privacyMode;
+  });
+  
+  // Toggle privacy mode and save to settings
+  const togglePrivacyMode = () => {
+    const newMode = !isPrivacyMode;
+    setIsPrivacyMode(newMode);
+    const settings = loadSettings();
+    saveSettings({ ...settings, privacyMode: newMode });
+  };
 
   // Sync URL params when year/month changes
   useEffect(() => {
@@ -602,7 +616,18 @@ export function ExpenseTrackerPage() {
   return (
     <div className="expense-tracker-page">
       <header className="page-header">
-        <h1><MaterialIcon name="account_balance_wallet" className="page-header-icon" /> Cashflow Tracker</h1>
+        <div className="page-header-top">
+          <h1><MaterialIcon name="account_balance_wallet" className="page-header-icon" /> Cashflow Tracker</h1>
+          <button 
+            className={`privacy-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
+            onClick={togglePrivacyMode}
+            title={isPrivacyMode ? 'Show values' : 'Hide values'}
+            aria-pressed={isPrivacyMode}
+          >
+            <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+            {isPrivacyMode ? 'Show' : 'Hide'}
+          </button>
+        </div>
         <p>
           Track your income and expenses, set budgets, and gain insights into your spending patterns.
         </p>
@@ -687,7 +712,7 @@ export function ExpenseTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="trending_up" /></span>
               <div className="card-content">
                 <span className="card-label">Total Income</span>
-                <span className="card-value"><PrivacyBlur>{formatCurrency(summary.totalIncome, data.currency)}</PrivacyBlur></span>
+                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(summary.totalIncome, data.currency)}</PrivacyBlur></span>
               </div>
             </div>
             <div className="summary-card expenses">
@@ -701,14 +726,14 @@ export function ExpenseTrackerPage() {
               <span className="card-icon" aria-hidden="true">{summary.netBalance >= 0 ? <MaterialIcon name="account_balance_wallet" /> : <MaterialIcon name="warning" />}</span>
               <div className="card-content">
                 <span className="card-label">Net Balance</span>
-                <span className="card-value"><PrivacyBlur>{formatCurrency(summary.netBalance, data.currency)}</PrivacyBlur></span>
+                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(summary.netBalance, data.currency)}</PrivacyBlur></span>
               </div>
             </div>
             <div className="summary-card savings">
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="savings" /></span>
               <div className="card-content">
                 <span className="card-label">Savings Rate</span>
-                <span className="card-value"><PrivacyBlur>{formatDisplayPercent(summary.savingsRate)}</PrivacyBlur></span>
+                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayPercent(summary.savingsRate)}</PrivacyBlur></span>
               </div>
             </div>
           </div>
@@ -736,7 +761,7 @@ export function ExpenseTrackerPage() {
                   <div className="rule-bar">
                     <div className="rule-bar-label">
                       <span>Needs (50%)</span>
-                      <span>{formatDisplayPercent(budgetRuleBreakdown.needs.percentage)}</span>
+                      <span><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayPercent(budgetRuleBreakdown.needs.percentage)}</PrivacyBlur></span>
                     </div>
                     <div className="rule-bar-track">
                       <div 
@@ -745,12 +770,12 @@ export function ExpenseTrackerPage() {
                       />
                       <div className="rule-bar-target" style={{ left: '50%' }} />
                     </div>
-                    <span className="rule-bar-amount">{formatCurrency(budgetRuleBreakdown.needs.amount, data.currency)}</span>
+                    <span className="rule-bar-amount"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(budgetRuleBreakdown.needs.amount, data.currency)}</PrivacyBlur></span>
                   </div>
                   <div className="rule-bar">
                     <div className="rule-bar-label">
                       <span>Wants (30%)</span>
-                      <span>{formatDisplayPercent(budgetRuleBreakdown.wants.percentage)}</span>
+                      <span><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayPercent(budgetRuleBreakdown.wants.percentage)}</PrivacyBlur></span>
                     </div>
                     <div className="rule-bar-track">
                       <div 
@@ -759,12 +784,12 @@ export function ExpenseTrackerPage() {
                       />
                       <div className="rule-bar-target" style={{ left: '30%' }} />
                     </div>
-                    <span className="rule-bar-amount">{formatCurrency(budgetRuleBreakdown.wants.amount, data.currency)}</span>
+                    <span className="rule-bar-amount"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(budgetRuleBreakdown.wants.amount, data.currency)}</PrivacyBlur></span>
                   </div>
                   <div className="rule-bar">
                     <div className="rule-bar-label">
                       <span>Savings (20%)</span>
-                      <span>{formatDisplayPercent(budgetRuleBreakdown.savings.percentage)}</span>
+                      <span><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayPercent(budgetRuleBreakdown.savings.percentage)}</PrivacyBlur></span>
                     </div>
                     <div className="rule-bar-track">
                       <div 
@@ -773,7 +798,7 @@ export function ExpenseTrackerPage() {
                       />
                       <div className="rule-bar-target" style={{ left: '20%' }} />
                     </div>
-                    <span className="rule-bar-amount">{formatCurrency(budgetRuleBreakdown.savings.amount, data.currency)}</span>
+                    <span className="rule-bar-amount"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(budgetRuleBreakdown.savings.amount, data.currency)}</PrivacyBlur></span>
                   </div>
                 </div>
               </div>
@@ -913,8 +938,11 @@ export function ExpenseTrackerPage() {
                           )}
                         </td>
                         <td className={`amount-col ${transaction.type === 'income' ? 'positive' : 'negative'}`}>
-                          {transaction.type === 'income' ? '+' : '-'}
-                          {formatCurrency(transaction.amount, data.currency)}
+                          {transaction.type === 'income' ? (
+                            <PrivacyBlur isPrivacyMode={isPrivacyMode}>+{formatCurrency(transaction.amount, data.currency)}</PrivacyBlur>
+                          ) : (
+                            <>-{formatCurrency(transaction.amount, data.currency)}</>
+                          )}
                         </td>
                         <td>
                           <button

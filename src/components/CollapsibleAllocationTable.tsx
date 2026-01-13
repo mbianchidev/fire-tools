@@ -3,6 +3,7 @@ import { Asset, AllocationDelta, AssetClass, AllocationMode } from '../types/ass
 import { formatCurrency, formatPercent, formatAssetName } from '../utils/allocationCalculator';
 import { NumberInput } from './NumberInput';
 import { MaterialIcon } from './MaterialIcon';
+import { PrivacyBlur } from './PrivacyBlur';
 
 interface CollapsibleAllocationTableProps {
   assets: Asset[];
@@ -15,6 +16,7 @@ interface CollapsibleAllocationTableProps {
   onBatchUpdateAssets?: (updates: Record<string, Partial<Asset>>) => void; // Batch update for redistribution
   onDeleteAsset: (assetId: string) => void;
   onMassEdit?: (assetClass: AssetClass) => void; // Handler for opening mass edit dialog
+  isPrivacyMode?: boolean; // Privacy mode toggle
 }
 
 // Sub-types that require ISIN code (clicking ticker should copy ISIN)
@@ -36,6 +38,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
   onBatchUpdateAssets,
   onDeleteAsset,
   onMassEdit,
+  isPrivacyMode = false,
 }) => {
   // Initialize with all classes collapsed
   const allClasses = new Set(assets.map(a => a.assetClass));
@@ -452,9 +455,9 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                 )}
               </div>
               <div className="class-header-right">
-                <span className="class-total">{formatCurrency(classTotal, currency)}</span>
+                <span className="class-total"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(classTotal, currency)}</PrivacyBlur></span>
                 <span className={`class-delta ${classDelta > 0 ? 'positive' : classDelta < 0 ? 'negative' : ''}`}>
-                  {classDelta > 0 ? '+' : classDelta < 0 ? '-' : ''}{formatCurrency(Math.abs(classDelta), currency)}
+                  <PrivacyBlur isPrivacyMode={isPrivacyMode}>{classDelta > 0 ? '+' : classDelta < 0 ? '-' : ''}{formatCurrency(Math.abs(classDelta), currency)}</PrivacyBlur>
                 </span>
               </div>
             </div>
@@ -580,45 +583,57 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         <td>{formatPercent(delta.currentPercent)}</td>
                         <td>{formatPercent(delta.currentPercentInClass)}</td>
                         <td>
-                          {isEditing && asset.assetClass !== 'CASH' ? (
+                          {asset.assetClass === 'CASH' ? (
+                            '-'
+                          ) : isEditing ? (
                             <NumberInput
                               value={editValues.shares || 0}
                               onChange={handleEditSharesChange}
                               className="edit-input"
                             />
                           ) : asset.shares ? (
-                            asset.shares.toFixed(2)
+                            <PrivacyBlur isPrivacyMode={isPrivacyMode}>{asset.shares.toFixed(2)}</PrivacyBlur>
                           ) : (
                             '-'
                           )}
                         </td>
                         <td className="currency-value">
-                          {isEditing && asset.assetClass !== 'CASH' ? (
+                          {asset.assetClass === 'CASH' ? (
+                            '-'
+                          ) : isEditing ? (
                             <NumberInput
                               value={editValues.pricePerShare || 0}
                               onChange={handleEditPricePerShareChange}
                               className="edit-input"
                             />
                           ) : asset.pricePerShare ? (
-                            formatCurrency(asset.pricePerShare, currency)
+                            <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, currency)}</PrivacyBlur>
                           ) : (
                             '-'
                           )}
                         </td>
                         <td className="currency-value">
                           {isEditing ? (
-                            <div className="calculated-value-container">
+                            asset.assetClass === 'CASH' ? (
                               <NumberInput
                                 value={editValues.currentValue}
                                 onChange={handleEditCurrentValueChange}
                                 className="edit-input"
-                                disabled={true}
-                                title="Current value is calculated from shares × price per share"
                               />
-                              <span className="calculated-label">(Calculated)</span>
-                            </div>
+                            ) : (
+                              <div className="calculated-value-container">
+                                <NumberInput
+                                  value={editValues.currentValue}
+                                  onChange={handleEditCurrentValueChange}
+                                  className="edit-input"
+                                  disabled={true}
+                                  title="Current value is calculated from shares × price per share"
+                                />
+                                <span className="calculated-label">(Calculated)</span>
+                              </div>
+                            )
                           ) : (
-                            formatCurrency(delta.currentValue, currency)
+                            <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(delta.currentValue, currency)}</PrivacyBlur>
                           )}
                         </td>
                         <td className="currency-value">
@@ -629,11 +644,11 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                               className="target-input"
                             />
                           ) : (
-                            formatCurrency(delta.targetValue, currency)
+                            <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(delta.targetValue, currency)}</PrivacyBlur>
                           )}
                         </td>
                         <td className={`currency-value ${delta.delta > 0 ? 'positive' : delta.delta < 0 ? 'negative' : ''}`}>
-                          {delta.delta > 0 ? '+' : delta.delta < 0 ? '-' : ''}{formatCurrency(Math.abs(delta.delta), currency)}
+                          <PrivacyBlur isPrivacyMode={isPrivacyMode}>{delta.delta > 0 ? '+' : delta.delta < 0 ? '-' : ''}{formatCurrency(Math.abs(delta.delta), currency)}</PrivacyBlur>
                         </td>
                         <td>
                           <span 

@@ -10,7 +10,7 @@ import {
   saveNetWorthTrackerData 
 } from '../utils/cookieStorage';
 import { exportAssetAllocationToCSV, importAssetAllocationFromCSV } from '../utils/csvExport';
-import { loadSettings } from '../utils/cookieSettings';
+import { loadSettings, saveSettings } from '../utils/cookieSettings';
 import { getDemoAssetAllocationData } from '../utils/defaults';
 import { syncAssetAllocationToNetWorth } from '../utils/dataSync';
 import { MaterialIcon } from './MaterialIcon';
@@ -99,9 +99,22 @@ export const AssetAllocationPage: React.FC = () => {
   const [isDCADialogOpen, setIsDCADialogOpen] = useState(false);
   // Charts collapse state
   const [isChartsCollapsed, setIsChartsCollapsed] = useState(false);
+  // Privacy mode state (loaded from settings, toggleable on page)
+  const [isPrivacyMode, setIsPrivacyMode] = useState<boolean>(() => {
+    const settings = loadSettings();
+    return settings.privacyMode;
+  });
   
   // Track if we're currently syncing to prevent infinite loops
   const isSyncingRef = useRef(false);
+  
+  // Toggle privacy mode and save to settings
+  const togglePrivacyMode = () => {
+    const newMode = !isPrivacyMode;
+    setIsPrivacyMode(newMode);
+    const settings = loadSettings();
+    saveSettings({ ...settings, privacyMode: newMode });
+  };
 
   // Auto-save to localStorage when assets or targets change
   useEffect(() => {
@@ -533,7 +546,18 @@ export const AssetAllocationPage: React.FC = () => {
   return (
     <div className="asset-allocation-page">
       <header className="page-header">
-        <h1><MaterialIcon name="pie_chart" className="page-header-icon" /> Asset Allocation Manager</h1>
+        <div className="page-header-top">
+          <h1><MaterialIcon name="pie_chart" className="page-header-icon" /> Asset Allocation Manager</h1>
+          <button 
+            className={`privacy-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
+            onClick={togglePrivacyMode}
+            title={isPrivacyMode ? 'Show values' : 'Hide values'}
+            aria-pressed={isPrivacyMode}
+          >
+            <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+            {isPrivacyMode ? 'Show' : 'Hide'}
+          </button>
+        </div>
         <p>
           Manage and visualize your portfolio asset allocation. Set target allocations,
           track current positions, and see recommended actions to rebalance your portfolio.
@@ -552,10 +576,10 @@ export const AssetAllocationPage: React.FC = () => {
         <section className="portfolio-value-section" aria-labelledby="portfolio-value-heading">
           <div className="portfolio-value-label">
             <strong id="portfolio-value-heading">Portfolio Value (excl. Cash):</strong>
-            <span className="portfolio-value"><PrivacyBlur>{formatCurrency(portfolioValue, currency)}</PrivacyBlur></span>
+            <span className="portfolio-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(portfolioValue, currency)}</PrivacyBlur></span>
           </div>
           <div className="portfolio-value-info">
-            Total holdings (incl. cash): <PrivacyBlur>{formatCurrency(allocation.totalHoldings, currency)}</PrivacyBlur>
+            Total holdings (incl. cash): <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(allocation.totalHoldings, currency)}</PrivacyBlur>
           </div>
         </section>
 
@@ -712,6 +736,7 @@ export const AssetAllocationPage: React.FC = () => {
             onBatchUpdateAssets={handleBatchUpdateAssets}
             onDeleteAsset={handleDeleteAsset}
             onMassEdit={handleOpenMassEditAsset}
+            isPrivacyMode={isPrivacyMode}
           />
         </section>
       </main>
