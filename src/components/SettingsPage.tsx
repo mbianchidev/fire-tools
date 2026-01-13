@@ -22,6 +22,9 @@ interface SettingsPageProps {
   onSettingsChange?: (settings: UserSettings) => void;
 }
 
+// Section identifiers for collapsible state
+type SettingsSection = 'account' | 'display' | 'privacy' | 'notifications' | 'email' | 'currency' | 'data';
+
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
   const navigate = useNavigate();
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
@@ -29,6 +32,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const [isLoading, setIsLoading] = useState(true);
   const [rateTextValues, setRateTextValues] = useState<Record<string, string>>({});
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
+  
+  // All sections collapsed by default for cleaner interface
+  const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
+    new Set(['account', 'display', 'privacy', 'notifications', 'email', 'currency', 'data'])
+  );
+
+  // Toggle section collapse state
+  const toggleSection = (section: SettingsSection) => {
+    setCollapsedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(section)) {
+        newSet.delete(section);
+      } else {
+        newSet.add(section);
+      }
+      return newSet;
+    });
+  };
 
   // Initialize rate text values when settings load, default currency, or decimal separator changes
   useEffect(() => {
@@ -429,397 +450,451 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
         )}
 
         {/* Account Settings */}
-        <section className="settings-section">
-          <h2><MaterialIcon name="person" /> Account</h2>
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label htmlFor="accountName">Account Name</label>
-              <Tooltip content="Choose a name for your portfolio that will appear in the app header and throughout the interface. This helps you identify your account, especially if you manage multiple portfolios.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('account')}
+            aria-expanded={!collapsedSections.has('account')}
+            aria-controls="account-content"
+          >
+            <h2><MaterialIcon name="person" /> Account <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('account') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('account') && (
+            <div id="account-content" className="collapsible-content">
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="accountName">Account Name</label>
+                  <Tooltip content="Choose a name for your portfolio that will appear in the app header and throughout the interface. This helps you identify your account, especially if you manage multiple portfolios.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <input
+                  id="accountName"
+                  type="text"
+                  value={settings.accountName}
+                  onChange={(e) => handleSettingChange('accountName', e.target.value)}
+                  maxLength={100}
+                  placeholder="My Portfolio"
+                />
+                <span className="setting-help">This name will be displayed throughout the app</span>
+              </div>
             </div>
-            <input
-              id="accountName"
-              type="text"
-              value={settings.accountName}
-              onChange={(e) => handleSettingChange('accountName', e.target.value)}
-              maxLength={100}
-              placeholder="My Portfolio"
-            />
-            <span className="setting-help">This name will be displayed throughout the app</span>
-          </div>
+          )}
         </section>
 
         {/* Display Settings */}
-        <section className="settings-section">
-          <h2><MaterialIcon name="palette" /> Display</h2>
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label htmlFor="defaultCurrency">Default Currency</label>
-              <Tooltip content="Select your preferred currency for all financial data. When you change currencies, all existing values (assets, expenses, net worth, and FIRE calculator inputs) will be automatically converted using current exchange rates.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('display')}
+            aria-expanded={!collapsedSections.has('display')}
+            aria-controls="display-content"
+          >
+            <h2><MaterialIcon name="palette" /> Display <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('display') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('display') && (
+            <div id="display-content" className="collapsible-content">
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="defaultCurrency">Default Currency</label>
+                  <Tooltip content="Select your preferred currency for all financial data. When you change currencies, all existing values (assets, expenses, net worth, and FIRE calculator inputs) will be automatically converted using current exchange rates.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <select
+                  id="defaultCurrency"
+                  value={settings.currencySettings.defaultCurrency}
+                  onChange={(e) => {
+                    const newCurrency = e.target.value as SupportedCurrency;
+                    const oldCurrency = settings.currencySettings.defaultCurrency;
+                    
+                    if (newCurrency === oldCurrency) {
+                      return;
+                    }
+                    
+                    // Get current fallback rates before recalculation
+                    const currentRates = settings.currencySettings.fallbackRates;
+                    
+                    // Convert all asset values to the new currency BEFORE recalculating rates
+                    const { assets, assetClassTargets } = loadAssetAllocation();
+                    if (assets && assetClassTargets) {
+                      const convertedAssets = convertAssetsToNewCurrency(assets, oldCurrency, newCurrency, currentRates);
+                      saveAssetAllocation(convertedAssets, assetClassTargets);
+                    }
+                    
+                    // Convert Net Worth Tracker data
+                    const netWorthData = loadNetWorthTrackerData();
+                    if (netWorthData) {
+                      const convertedNetWorth = convertNetWorthDataToNewCurrency(netWorthData, oldCurrency, newCurrency, currentRates);
+                      saveNetWorthTrackerData(convertedNetWorth);
+                    }
+                    
+                    // Convert Expense Tracker data
+                    const expenseData = loadExpenseTrackerData();
+                    if (expenseData) {
+                      const convertedExpense = convertExpenseDataToNewCurrency(expenseData, oldCurrency, newCurrency, currentRates);
+                      saveExpenseTrackerData(convertedExpense);
+                    }
+                    
+                    // Convert FIRE Calculator inputs
+                    const fireInputs = loadFireCalculatorInputs();
+                    if (fireInputs) {
+                      const convertedFireInputs = convertFireCalculatorInputsToNewCurrency(fireInputs, oldCurrency, newCurrency, currentRates);
+                      saveFireCalculatorInputs(convertedFireInputs);
+                    }
+                    
+                    // Recalculate fallback rates relative to the new default currency
+                    const newFallbackRates = recalculateFallbackRates(
+                      currentRates,
+                      oldCurrency,
+                      newCurrency
+                    );
+                    
+                    const newSettings = {
+                      ...settings,
+                      currencySettings: {
+                        ...settings.currencySettings,
+                        defaultCurrency: newCurrency,
+                        fallbackRates: newFallbackRates,
+                      },
+                    };
+                    setSettings(newSettings);
+                    saveSettings(newSettings);
+                    onSettingsChange?.(newSettings);
+                    showMessage('success', `Default currency changed to ${newCurrency}! All values converted.`);
+                  }}
+                >
+                  {SUPPORTED_CURRENCIES.map((currency) => (
+                    <option key={currency.code} value={currency.code}>
+                      {currency.symbol} {currency.name} ({currency.code})
+                    </option>
+                  ))}
+                </select>
+                <span className="setting-help">This currency will be used as default across all pages</span>
+              </div>
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label>Decimal Separator</label>
+                  <Tooltip content="Choose how decimal numbers are formatted. Point format (1,000.00) is common in the US and UK. Comma format (1.000,00) is used in many European countries. This affects how you input and view numbers throughout the app.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <div className="toggle-group">
+                  <button
+                    className={`toggle-btn ${settings.decimalSeparator === '.' ? 'active' : ''}`}
+                    onClick={() => handleSettingChange('decimalSeparator', '.')}
+                  >
+                    Point (1,000.00)
+                  </button>
+                  <button
+                    className={`toggle-btn ${settings.decimalSeparator === ',' ? 'active' : ''}`}
+                    onClick={() => handleSettingChange('decimalSeparator', ',')}
+                  >
+                    Comma (1.000,00)
+                  </button>
+                </div>
+              </div>
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="decimalPlaces">Decimal Places</label>
+                  <Tooltip content="Control the precision of small numbers. This setting only affects values below 1,000 to keep small amounts precise while keeping large amounts readable. For example, with 2 decimal places: 123.45 displays as '123.45' but 1,234.56 displays as '1,235'.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <select
+                  id="decimalPlaces"
+                  value={settings.decimalPlaces ?? 2}
+                  onChange={(e) => handleSettingChange('decimalPlaces', parseInt(e.target.value, 10))}
+                >
+                  <option value={0}>0 (e.g., 123)</option>
+                  <option value={1}>1 (e.g., 123.4)</option>
+                  <option value={2}>2 (e.g., 123.45)</option>
+                  <option value={3}>3 (e.g., 123.456)</option>
+                  <option value={4}>4 (e.g., 123.4567)</option>
+                </select>
+                <span className="setting-help">Number of decimal places shown for values below 1,000. Values at or above 1,000 show no decimals.</span>
+              </div>
             </div>
-            <select
-              id="defaultCurrency"
-              value={settings.currencySettings.defaultCurrency}
-              onChange={(e) => {
-                const newCurrency = e.target.value as SupportedCurrency;
-                const oldCurrency = settings.currencySettings.defaultCurrency;
-                
-                if (newCurrency === oldCurrency) {
-                  return;
-                }
-                
-                // Get current fallback rates before recalculation
-                const currentRates = settings.currencySettings.fallbackRates;
-                
-                // Convert all asset values to the new currency BEFORE recalculating rates
-                const { assets, assetClassTargets } = loadAssetAllocation();
-                if (assets && assetClassTargets) {
-                  const convertedAssets = convertAssetsToNewCurrency(assets, oldCurrency, newCurrency, currentRates);
-                  saveAssetAllocation(convertedAssets, assetClassTargets);
-                }
-                
-                // Convert Net Worth Tracker data
-                const netWorthData = loadNetWorthTrackerData();
-                if (netWorthData) {
-                  const convertedNetWorth = convertNetWorthDataToNewCurrency(netWorthData, oldCurrency, newCurrency, currentRates);
-                  saveNetWorthTrackerData(convertedNetWorth);
-                }
-                
-                // Convert Expense Tracker data
-                const expenseData = loadExpenseTrackerData();
-                if (expenseData) {
-                  const convertedExpense = convertExpenseDataToNewCurrency(expenseData, oldCurrency, newCurrency, currentRates);
-                  saveExpenseTrackerData(convertedExpense);
-                }
-                
-                // Convert FIRE Calculator inputs
-                const fireInputs = loadFireCalculatorInputs();
-                if (fireInputs) {
-                  const convertedFireInputs = convertFireCalculatorInputsToNewCurrency(fireInputs, oldCurrency, newCurrency, currentRates);
-                  saveFireCalculatorInputs(convertedFireInputs);
-                }
-                
-                // Recalculate fallback rates relative to the new default currency
-                const newFallbackRates = recalculateFallbackRates(
-                  currentRates,
-                  oldCurrency,
-                  newCurrency
-                );
-                
-                const newSettings = {
-                  ...settings,
-                  currencySettings: {
-                    ...settings.currencySettings,
-                    defaultCurrency: newCurrency,
-                    fallbackRates: newFallbackRates,
-                  },
-                };
-                setSettings(newSettings);
-                saveSettings(newSettings);
-                onSettingsChange?.(newSettings);
-                showMessage('success', `Default currency changed to ${newCurrency}! All values converted.`);
-              }}
-            >
-              {SUPPORTED_CURRENCIES.map((currency) => (
-                <option key={currency.code} value={currency.code}>
-                  {currency.symbol} {currency.name} ({currency.code})
-                </option>
-              ))}
-            </select>
-            <span className="setting-help">This currency will be used as default across all pages</span>
-          </div>
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label>Decimal Separator</label>
-              <Tooltip content="Choose how decimal numbers are formatted. Point format (1,000.00) is common in the US and UK. Comma format (1.000,00) is used in many European countries. This affects how you input and view numbers throughout the app.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <div className="toggle-group">
-              <button
-                className={`toggle-btn ${settings.decimalSeparator === '.' ? 'active' : ''}`}
-                onClick={() => handleSettingChange('decimalSeparator', '.')}
-              >
-                Point (1,000.00)
-              </button>
-              <button
-                className={`toggle-btn ${settings.decimalSeparator === ',' ? 'active' : ''}`}
-                onClick={() => handleSettingChange('decimalSeparator', ',')}
-              >
-                Comma (1.000,00)
-              </button>
-            </div>
-          </div>
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label htmlFor="decimalPlaces">Decimal Places</label>
-              <Tooltip content="Control the precision of small numbers. This setting only affects values below 1,000 to keep small amounts precise while keeping large amounts readable. For example, with 2 decimal places: 123.45 displays as '123.45' but 1,234.56 displays as '1,235'.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <select
-              id="decimalPlaces"
-              value={settings.decimalPlaces ?? 2}
-              onChange={(e) => handleSettingChange('decimalPlaces', parseInt(e.target.value, 10))}
-            >
-              <option value={0}>0 (e.g., 123)</option>
-              <option value={1}>1 (e.g., 123.4)</option>
-              <option value={2}>2 (e.g., 123.45)</option>
-              <option value={3}>3 (e.g., 123.456)</option>
-              <option value={4}>4 (e.g., 123.4567)</option>
-            </select>
-            <span className="setting-help">Number of decimal places shown for values below 1,000. Values at or above 1,000 show no decimals.</span>
-          </div>
+          )}
         </section>
 
         {/* Privacy & Region Settings */}
-        <section className="settings-section">
-          <h2><MaterialIcon name="privacy_tip" /> Privacy & Region</h2>
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label htmlFor="privacyMode">Privacy Mode</label>
-              <Tooltip content="When enabled, sensitive financial data like net worth, income, and asset values will be blurred on screen. This is useful when sharing your screen or working in public. Expenses are not blurred.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('privacy')}
+            aria-expanded={!collapsedSections.has('privacy')}
+            aria-controls="privacy-content"
+          >
+            <h2><MaterialIcon name="privacy_tip" /> Privacy & Region <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('privacy') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('privacy') && (
+            <div id="privacy-content" className="collapsible-content">
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="privacyMode">Privacy Mode</label>
+                  <Tooltip content="When enabled, sensitive financial data like net worth, income, and asset values will be blurred on screen. This is useful when sharing your screen or working in public. Expenses are not blurred.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <div className="toggle-group">
+                  <button
+                    className={`toggle-btn ${!settings.privacyMode ? 'active' : ''}`}
+                    onClick={() => handleSettingChange('privacyMode', false)}
+                  >
+                    <MaterialIcon name="visibility" size="small" /> Show Values
+                  </button>
+                  <button
+                    className={`toggle-btn ${settings.privacyMode ? 'active' : ''}`}
+                    onClick={() => handleSettingChange('privacyMode', true)}
+                  >
+                    <MaterialIcon name="visibility_off" size="small" /> Hide Values
+                  </button>
+                </div>
+                <span className="setting-help">Blur sensitive financial data on screen for privacy</span>
+              </div>
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="country">Country</label>
+                  <Tooltip content="Select your country of residence. EU countries will receive UCITS compliance warnings when adding non-EU domiciled ETFs, as these may not be available to EU investors.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <select
+                  id="country"
+                  value={settings.country || ''}
+                  onChange={(e) => handleSettingChange('country', e.target.value || undefined)}
+                >
+                  <option value="">Select country (optional)</option>
+                  <optgroup label="EU Countries">
+                    {ALL_COUNTRIES.filter(c => c.isEU).map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.flag} {country.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Other Countries">
+                    {ALL_COUNTRIES.filter(c => !c.isEU).map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.flag} {country.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+                {(() => {
+                  const isEU = settings.country && isEUCountry(settings.country);
+                  if (isEU) {
+                    return (
+                      <span className="setting-help eu-notice">
+                        <MaterialIcon name="info" size="small" /> EU resident: You'll receive UCITS compliance warnings for non-EU ETFs
+                      </span>
+                    );
+                  } else if (settings.country) {
+                    return (
+                      <span className="setting-help">Country set to {ALL_COUNTRIES.find(c => c.code === settings.country)?.name}</span>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
             </div>
-            <div className="toggle-group">
-              <button
-                className={`toggle-btn ${!settings.privacyMode ? 'active' : ''}`}
-                onClick={() => handleSettingChange('privacyMode', false)}
-              >
-                <MaterialIcon name="visibility" size="small" /> Show Values
-              </button>
-              <button
-                className={`toggle-btn ${settings.privacyMode ? 'active' : ''}`}
-                onClick={() => handleSettingChange('privacyMode', true)}
-              >
-                <MaterialIcon name="visibility_off" size="small" /> Hide Values
-              </button>
-            </div>
-            <span className="setting-help">Blur sensitive financial data on screen for privacy</span>
-          </div>
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label htmlFor="country">Country</label>
-              <Tooltip content="Select your country of residence. EU countries will receive UCITS compliance warnings when adding non-EU domiciled ETFs, as these may not be available to EU investors.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <select
-              id="country"
-              value={settings.country || ''}
-              onChange={(e) => handleSettingChange('country', e.target.value || undefined)}
-            >
-              <option value="">Select country (optional)</option>
-              <optgroup label="EU Countries">
-                {ALL_COUNTRIES.filter(c => c.isEU).map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.flag} {country.name}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="Other Countries">
-                {ALL_COUNTRIES.filter(c => !c.isEU).map((country) => (
-                  <option key={country.code} value={country.code}>
-                    {country.flag} {country.name}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
-            {(() => {
-              const isEU = settings.country && isEUCountry(settings.country);
-              if (isEU) {
-                return (
-                  <span className="setting-help eu-notice">
-                    <MaterialIcon name="info" size="small" /> EU resident: You'll receive UCITS compliance warnings for non-EU ETFs
-                  </span>
-                );
-              } else if (settings.country) {
-                return (
-                  <span className="setting-help">Country set to {ALL_COUNTRIES.find(c => c.code === settings.country)?.name}</span>
-                );
-              }
-              return null;
-            })()}
-          </div>
+          )}
         </section>
 
         {/* Notification Settings */}
-        <section className="settings-section">
-          <h2><MaterialIcon name="notifications" /> Notifications</h2>
-          
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label>Enable In-App Notifications</label>
-              <Tooltip content="Control whether you receive in-app notifications for reminders like new months, tax deadlines, and financial milestones.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('notifications')}
+            aria-expanded={!collapsedSections.has('notifications')}
+            aria-controls="notifications-content"
+          >
+            <h2><MaterialIcon name="notifications" /> Notifications <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('notifications') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('notifications') && (
+            <div id="notifications-content" className="collapsible-content">
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label>Enable In-App Notifications</label>
+                  <Tooltip content="Control whether you receive in-app notifications for reminders like new months, tax deadlines, and financial milestones.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <div className="toggle-group">
+                  <button
+                    className={`toggle-btn ${notificationPrefs.enableInAppNotifications ? 'active' : ''}`}
+                    onClick={() => handleNotificationPrefChange('enableInAppNotifications', true)}
+                  >
+                    Enabled
+                  </button>
+                  <button
+                    className={`toggle-btn ${!notificationPrefs.enableInAppNotifications ? 'active' : ''}`}
+                    onClick={() => handleNotificationPrefChange('enableInAppNotifications', false)}
+                  >
+                    Disabled
+                  </button>
+                </div>
+              </div>
+
+              {notificationPrefs.enableInAppNotifications && (
+                <>
+                  <div className="setting-item">
+                    <label className="toggle-switch-label">
+                      <input
+                        type="checkbox"
+                        checked={notificationPrefs.newMonthReminders}
+                        onChange={(e) => handleNotificationPrefChange('newMonthReminders', e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span>New Month Reminders</span>
+                    </label>
+                    <span className="setting-help">Remind to update financial data at the start of each month</span>
+                  </div>
+
+                  <div className="setting-item">
+                    <label className="toggle-switch-label">
+                      <input
+                        type="checkbox"
+                        checked={notificationPrefs.newQuarterReminders}
+                        onChange={(e) => handleNotificationPrefChange('newQuarterReminders', e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span>New Quarter Reminders</span>
+                    </label>
+                    <span className="setting-help">Remind to review quarterly performance</span>
+                  </div>
+
+                  <div className="setting-item">
+                    <label className="toggle-switch-label">
+                      <input
+                        type="checkbox"
+                        checked={notificationPrefs.taxReminders}
+                        onChange={(e) => handleNotificationPrefChange('taxReminders', e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span>Tax Payment Reminders</span>
+                    </label>
+                    <span className="setting-help">Remind about upcoming tax deadlines</span>
+                  </div>
+
+                  <div className="setting-item">
+                    <label className="toggle-switch-label">
+                      <input
+                        type="checkbox"
+                        checked={notificationPrefs.dcaReminders}
+                        onChange={(e) => handleNotificationPrefChange('dcaReminders', e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span>DCA Investment Reminders</span>
+                    </label>
+                    <span className="setting-help">Remind about regular investment contributions</span>
+                  </div>
+
+                  <div className="setting-item">
+                    <label className="toggle-switch-label">
+                      <input
+                        type="checkbox"
+                        checked={notificationPrefs.fireMilestones}
+                        onChange={(e) => handleNotificationPrefChange('fireMilestones', e.target.checked)}
+                      />
+                      <span className="toggle-switch"></span>
+                      <span>FIRE Milestone Alerts</span>
+                    </label>
+                    <span className="setting-help">Get notified when you reach FIRE milestones (25%, 50%, 75%, 100%)</span>
+                  </div>
+                </>
+              )}
+
+              <div className="setting-item">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="science" /> Test Mode</h3>
+                  <Tooltip content="Trigger sample notifications to test the notification system. This will add demo notifications to your notification bell so you can see how they look and work.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Create sample notifications to test the notification UI</p>
+                <button className="secondary-btn" onClick={handleTriggerTestNotifications}>
+                  <MaterialIcon name="notifications_active" /> Trigger Test Notifications
+                </button>
+              </div>
+
+              <div className="setting-item">
+                <button className="secondary-btn" onClick={handleClearNotifications}>
+                  <MaterialIcon name="delete" /> Clear All Notifications
+                </button>
+              </div>
             </div>
-            <div className="toggle-group">
-              <button
-                className={`toggle-btn ${notificationPrefs.enableInAppNotifications ? 'active' : ''}`}
-                onClick={() => handleNotificationPrefChange('enableInAppNotifications', true)}
-              >
-                Enabled
-              </button>
-              <button
-                className={`toggle-btn ${!notificationPrefs.enableInAppNotifications ? 'active' : ''}`}
-                onClick={() => handleNotificationPrefChange('enableInAppNotifications', false)}
-              >
-                Disabled
-              </button>
-            </div>
-          </div>
-
-          {notificationPrefs.enableInAppNotifications && (
-            <>
-              <div className="setting-item">
-                <label className="toggle-switch-label">
-                  <input
-                    type="checkbox"
-                    checked={notificationPrefs.newMonthReminders}
-                    onChange={(e) => handleNotificationPrefChange('newMonthReminders', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span>New Month Reminders</span>
-                </label>
-                <span className="setting-help">Remind to update financial data at the start of each month</span>
-              </div>
-
-              <div className="setting-item">
-                <label className="toggle-switch-label">
-                  <input
-                    type="checkbox"
-                    checked={notificationPrefs.newQuarterReminders}
-                    onChange={(e) => handleNotificationPrefChange('newQuarterReminders', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span>New Quarter Reminders</span>
-                </label>
-                <span className="setting-help">Remind to review quarterly performance</span>
-              </div>
-
-              <div className="setting-item">
-                <label className="toggle-switch-label">
-                  <input
-                    type="checkbox"
-                    checked={notificationPrefs.taxReminders}
-                    onChange={(e) => handleNotificationPrefChange('taxReminders', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span>Tax Payment Reminders</span>
-                </label>
-                <span className="setting-help">Remind about upcoming tax deadlines</span>
-              </div>
-
-              <div className="setting-item">
-                <label className="toggle-switch-label">
-                  <input
-                    type="checkbox"
-                    checked={notificationPrefs.dcaReminders}
-                    onChange={(e) => handleNotificationPrefChange('dcaReminders', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span>DCA Investment Reminders</span>
-                </label>
-                <span className="setting-help">Remind about regular investment contributions</span>
-              </div>
-
-              <div className="setting-item">
-                <label className="toggle-switch-label">
-                  <input
-                    type="checkbox"
-                    checked={notificationPrefs.fireMilestones}
-                    onChange={(e) => handleNotificationPrefChange('fireMilestones', e.target.checked)}
-                  />
-                  <span className="toggle-switch"></span>
-                  <span>FIRE Milestone Alerts</span>
-                </label>
-                <span className="setting-help">Get notified when you reach FIRE milestones (25%, 50%, 75%, 100%)</span>
-              </div>
-            </>
           )}
-
-          <div className="setting-item">
-            <div className="subsection-header-with-tooltip">
-              <h3><MaterialIcon name="science" /> Test Mode</h3>
-              <Tooltip content="Trigger sample notifications to test the notification system. This will add demo notifications to your notification bell so you can see how they look and work.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <p className="setting-help">Create sample notifications to test the notification UI</p>
-            <button className="secondary-btn" onClick={handleTriggerTestNotifications}>
-              <MaterialIcon name="notifications_active" /> Trigger Test Notifications
-            </button>
-          </div>
-
-          <div className="setting-item">
-            <button className="secondary-btn" onClick={handleClearNotifications}>
-              <MaterialIcon name="delete" /> Clear All Notifications
-            </button>
-          </div>
         </section>
 
         {/* Email Preferences */}
-        <section className="settings-section">
-          <h2><MaterialIcon name="email" /> Email Preferences</h2>
-          <div className="setting-item">
-            <div className="label-with-tooltip">
-              <label>Email Notifications</label>
-              <Tooltip content="Email notifications require a server to send emails. Since Fire Tools is a client-side only application, email functionality is currently a placeholder for future development.">
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <div className="toggle-group">
-              <button
-                className={`toggle-btn ${notificationPrefs.enableEmailNotifications ? 'active' : ''}`}
-                onClick={() => handleNotificationPrefChange('enableEmailNotifications', true)}
-                disabled
-              >
-                Enabled
-              </button>
-              <button
-                className={`toggle-btn ${!notificationPrefs.enableEmailNotifications ? 'active' : ''}`}
-                onClick={() => handleNotificationPrefChange('enableEmailNotifications', false)}
-              >
-                Disabled
-              </button>
-            </div>
-            <span className="setting-help">🚧 Email notifications are not yet available (requires server integration)</span>
-          </div>
-
-          {notificationPrefs.enableEmailNotifications && (
-            <>
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('email')}
+            aria-expanded={!collapsedSections.has('email')}
+            aria-controls="email-content"
+          >
+            <h2><MaterialIcon name="email" /> Email Preferences <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('email') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('email') && (
+            <div id="email-content" className="collapsible-content">
               <div className="setting-item">
-                <label htmlFor="emailAddress">Email Address</label>
-                <input
-                  id="emailAddress"
-                  type="email"
-                  value={notificationPrefs.emailAddress}
-                  onChange={(e) => handleNotificationPrefChange('emailAddress', e.target.value)}
-                  placeholder="your@email.com"
-                  disabled
-                />
+                <div className="label-with-tooltip">
+                  <label>Email Notifications</label>
+                  <Tooltip content="Email notifications require a server to send emails. Since Fire Tools is a client-side only application, email functionality is currently a placeholder for future development.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <div className="toggle-group">
+                  <button
+                    className={`toggle-btn ${notificationPrefs.enableEmailNotifications ? 'active' : ''}`}
+                    onClick={() => handleNotificationPrefChange('enableEmailNotifications', true)}
+                    disabled
+                  >
+                    Enabled
+                  </button>
+                  <button
+                    className={`toggle-btn ${!notificationPrefs.enableEmailNotifications ? 'active' : ''}`}
+                    onClick={() => handleNotificationPrefChange('enableEmailNotifications', false)}
+                  >
+                    Disabled
+                  </button>
+                </div>
+                <span className="setting-help">🚧 Email notifications are not yet available (requires server integration)</span>
               </div>
 
-              <div className="setting-item">
-                <label htmlFor="emailFrequency">Email Frequency</label>
-                <select
-                  id="emailFrequency"
-                  value={notificationPrefs.emailFrequency}
-                  onChange={(e) => handleNotificationPrefChange('emailFrequency', e.target.value as NotificationPreferences['emailFrequency'])}
-                  disabled
-                >
-                  <option value="NEVER">Never</option>
-                  <option value="DAILY">Daily</option>
-                  <option value="WEEKLY">Weekly</option>
-                  <option value="MONTHLY">Monthly</option>
-                </select>
-              </div>
-            </>
+              {notificationPrefs.enableEmailNotifications && (
+                <>
+                  <div className="setting-item">
+                    <label htmlFor="emailAddress">Email Address</label>
+                    <input
+                      id="emailAddress"
+                      type="email"
+                      value={notificationPrefs.emailAddress}
+                      onChange={(e) => handleNotificationPrefChange('emailAddress', e.target.value)}
+                      placeholder="your@email.com"
+                      disabled
+                    />
+                  </div>
+
+                  <div className="setting-item">
+                    <label htmlFor="emailFrequency">Email Frequency</label>
+                    <select
+                      id="emailFrequency"
+                      value={notificationPrefs.emailFrequency}
+                      onChange={(e) => handleNotificationPrefChange('emailFrequency', e.target.value as NotificationPreferences['emailFrequency'])}
+                      disabled
+                    >
+                      <option value="NEVER">Never</option>
+                      <option value="DAILY">Daily</option>
+                      <option value="WEEKLY">Weekly</option>
+                      <option value="MONTHLY">Monthly</option>
+                    </select>
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </section>
 
@@ -834,145 +909,166 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
         </section>
 
         {/* Currency Settings */}
-        <section className="settings-section">
-          <div className="section-header-with-tooltip">
-            <h2><MaterialIcon name="currency_exchange" /> Currency Conversion Fallback Rates</h2>
-            <Tooltip content="These are backup exchange rates used when the live API is unavailable or slow. The app attempts to fetch real-time rates first. You can customize these rates based on your preferences or recent market rates." position="right" maxWidth={350}>
-              <span className="info-icon section-info-icon" aria-label="More information">i</span>
-            </Tooltip>
-          </div>
-          <p className="section-description">
-            These rates are used when the live exchange rate API is unavailable.
-            All values convert to {settings.currencySettings.defaultCurrency} (the default currency).
-          </p>
-          <div className="fallback-rates-grid">
-            {SUPPORTED_CURRENCIES.filter(c => c.code !== settings.currencySettings.defaultCurrency).map((currency) => (
-              <div key={currency.code} className="rate-item">
-                <label htmlFor={`rate-${currency.code}`}>
-                  {currency.code} ({currency.name})
-                </label>
-                <div className="rate-input-wrapper">
-                  <span className="rate-prefix">1 {currency.code} =</span>
-                  <input
-                    id={`rate-${currency.code}`}
-                    type="text"
-                    value={rateTextValues[currency.code] ?? formatWithSeparator(
-                      settings.currencySettings.fallbackRates[currency.code] ?? DEFAULT_FALLBACK_RATES[currency.code],
-                      settings.decimalSeparator
-                    )}
-                    onChange={(e) => handleRateTextChange(currency.code, e.target.value)}
-                    onBlur={() => handleRateTextBlur(currency.code)}
-                  />
-                  <span className="rate-suffix">{settings.currencySettings.defaultCurrency}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button className="secondary-btn" onClick={handleResetFallbackRates}>
-            Reset to Default Rates
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('currency')}
+            aria-expanded={!collapsedSections.has('currency')}
+            aria-controls="currency-content"
+          >
+            <div className="section-header-with-tooltip">
+              <h2><MaterialIcon name="currency_exchange" /> Currency Conversion Fallback Rates <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('currency') ? '▶' : '▼'}</span></h2>
+              <Tooltip content="These are backup exchange rates used when the live API is unavailable or slow. The app attempts to fetch real-time rates first. You can customize these rates based on your preferences or recent market rates." position="right" maxWidth={350}>
+                <span className="info-icon section-info-icon" aria-label="More information">i</span>
+              </Tooltip>
+            </div>
           </button>
+          {!collapsedSections.has('currency') && (
+            <div id="currency-content" className="collapsible-content">
+              <p className="section-description">
+                These rates are used when the live exchange rate API is unavailable.
+                All values convert to {settings.currencySettings.defaultCurrency} (the default currency).
+              </p>
+              <div className="fallback-rates-grid">
+                {SUPPORTED_CURRENCIES.filter(c => c.code !== settings.currencySettings.defaultCurrency).map((currency) => (
+                  <div key={currency.code} className="rate-item">
+                    <label htmlFor={`rate-${currency.code}`}>
+                      {currency.code} ({currency.name})
+                    </label>
+                    <div className="rate-input-wrapper">
+                      <span className="rate-prefix">1 {currency.code} =</span>
+                      <input
+                        id={`rate-${currency.code}`}
+                        type="text"
+                        value={rateTextValues[currency.code] ?? formatWithSeparator(
+                          settings.currencySettings.fallbackRates[currency.code] ?? DEFAULT_FALLBACK_RATES[currency.code],
+                          settings.decimalSeparator
+                        )}
+                        onChange={(e) => handleRateTextChange(currency.code, e.target.value)}
+                        onBlur={() => handleRateTextBlur(currency.code)}
+                      />
+                      <span className="rate-suffix">{settings.currencySettings.defaultCurrency}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button className="secondary-btn" onClick={handleResetFallbackRates}>
+                Reset to Default Rates
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Data Management */}
-        <section className="settings-section">
-          <h2><MaterialIcon name="save" /> Data Management</h2>
-          
-          <div className="data-management-group">
-            <div className="subsection-header-with-tooltip">
-              <h3>Export All Data</h3>
-              <Tooltip content="Back up all your financial data. JSON format exports everything in one file that's easy to re-import. Separate files give you CSV/JSON files for each tool, useful for spreadsheet analysis." position="right" maxWidth={350}>
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <p className="setting-help">Export all your data in a single file or as separate files</p>
-            <div className="export-buttons">
-              <button className="primary-btn" onClick={handleExportAllJSON}>
-                <MaterialIcon name="download" /> Export as JSON (Single File)
-              </button>
-              <button className="secondary-btn" onClick={handleExportAll}>
-                <MaterialIcon name="download" /> Export as Separate Files
-              </button>
-            </div>
-          </div>
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('data')}
+            aria-expanded={!collapsedSections.has('data')}
+            aria-controls="data-content"
+          >
+            <h2><MaterialIcon name="save" /> Data Management <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('data') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('data') && (
+            <div id="data-content" className="collapsible-content">
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3>Export All Data</h3>
+                  <Tooltip content="Back up all your financial data. JSON format exports everything in one file that's easy to re-import. Separate files give you CSV/JSON files for each tool, useful for spreadsheet analysis." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Export all your data in a single file or as separate files</p>
+                <div className="export-buttons">
+                  <button className="primary-btn" onClick={handleExportAllJSON}>
+                    <MaterialIcon name="download" /> Export as JSON (Single File)
+                  </button>
+                  <button className="secondary-btn" onClick={handleExportAll}>
+                    <MaterialIcon name="download" /> Export as Separate Files
+                  </button>
+                </div>
+              </div>
 
-          <div className="data-management-group">
-            <div className="subsection-header-with-tooltip">
-              <h3>Import All Data</h3>
-              <Tooltip content="Restore your data from a previously exported JSON file. All imported values will be automatically converted to your current default currency. This overwrites existing data." position="right" maxWidth={350}>
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <p className="setting-help">Import all data from a single JSON file. Data will be converted to your current currency.</p>
-            <label className="primary-btn import-label">
-              <MaterialIcon name="upload" /> Import All Data (JSON)
-              <input type="file" accept=".json" onChange={handleImportAllJSON} hidden />
-            </label>
-          </div>
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3>Import All Data</h3>
+                  <Tooltip content="Restore your data from a previously exported JSON file. All imported values will be automatically converted to your current default currency. This overwrites existing data." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Import all data from a single JSON file. Data will be converted to your current currency.</p>
+                <label className="primary-btn import-label">
+                  <MaterialIcon name="upload" /> Import All Data (JSON)
+                  <input type="file" accept=".json" onChange={handleImportAllJSON} hidden />
+                </label>
+              </div>
 
-          <div className="data-management-group">
-            <div className="subsection-header-with-tooltip">
-              <h3>Import Individual Files</h3>
-              <Tooltip content="Import data for specific tools from CSV or JSON files. Useful if you want to update only one tool's data or migrate from other applications." position="right" maxWidth={350}>
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <p className="setting-help">Import data from individual CSV/JSON files for each tool.</p>
-            <div className="import-buttons">
-              <label className="secondary-btn import-label">
-                <MaterialIcon name="upload" /> Import FIRE Calculator
-                <input type="file" accept=".csv" onChange={handleImportFire} hidden />
-              </label>
-              <label className="secondary-btn import-label">
-                <MaterialIcon name="upload" /> Import Asset Allocation
-                <input type="file" accept=".csv" onChange={handleImportAssets} hidden />
-              </label>
-              <label className="secondary-btn import-label">
-                <MaterialIcon name="upload" /> Import Cashflow Tracker
-                <input type="file" accept=".csv" onChange={handleImportCashflow} hidden />
-              </label>
-              <label className="secondary-btn import-label">
-                <MaterialIcon name="upload" /> Import Net Worth Tracker
-                <input type="file" accept=".json" onChange={handleImportNetWorth} hidden />
-              </label>
-            </div>
-          </div>
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3>Import Individual Files</h3>
+                  <Tooltip content="Import data for specific tools from CSV or JSON files. Useful if you want to update only one tool's data or migrate from other applications." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Import data from individual CSV/JSON files for each tool.</p>
+                <div className="import-buttons">
+                  <label className="secondary-btn import-label">
+                    <MaterialIcon name="upload" /> Import FIRE Calculator
+                    <input type="file" accept=".csv" onChange={handleImportFire} hidden />
+                  </label>
+                  <label className="secondary-btn import-label">
+                    <MaterialIcon name="upload" /> Import Asset Allocation
+                    <input type="file" accept=".csv" onChange={handleImportAssets} hidden />
+                  </label>
+                  <label className="secondary-btn import-label">
+                    <MaterialIcon name="upload" /> Import Cashflow Tracker
+                    <input type="file" accept=".csv" onChange={handleImportCashflow} hidden />
+                  </label>
+                  <label className="secondary-btn import-label">
+                    <MaterialIcon name="upload" /> Import Net Worth Tracker
+                    <input type="file" accept=".json" onChange={handleImportNetWorth} hidden />
+                  </label>
+                </div>
+              </div>
 
-          <div className="data-management-group">
-            <div className="subsection-header-with-tooltip">
-              <h3><MaterialIcon name="school" /> Guided Tour</h3>
-              <Tooltip content="Take a step-by-step walkthrough of all Fire Tools features. The tour will show you how to use each tool and how they work together to help you achieve financial independence." position="right" maxWidth={350}>
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <p className="setting-help">Restart the guided tour to learn about Fire Tools features</p>
-            <button className="secondary-btn" onClick={() => {
-              clearTourPreference();
-              window.location.href = '/';
-            }}>
-              <MaterialIcon name="refresh" /> Restart Tour
-            </button>
-          </div>
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="school" /> Guided Tour</h3>
+                  <Tooltip content="Take a step-by-step walkthrough of all Fire Tools features. The tour will show you how to use each tool and how they work together to help you achieve financial independence." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Restart the guided tour to learn about Fire Tools features</p>
+                <button className="secondary-btn" onClick={() => {
+                  clearTourPreference();
+                  window.location.href = '/';
+                }}>
+                  <MaterialIcon name="refresh" /> Restart Tour
+                </button>
+              </div>
 
-          <div className="data-management-group">
-            <div className="subsection-header-with-tooltip">
-              <h3><MaterialIcon name="inventory_2" /> Demo Data</h3>
-              <Tooltip content="Load realistic sample data to explore all features of Fire Tools. Great for testing the app or learning how to use it. This will overwrite your current data, so export first if needed!" position="right" maxWidth={350}>
-                <span className="info-icon" aria-label="More information">i</span>
-              </Tooltip>
-            </div>
-            <p className="setting-help">Load sample data to explore the application</p>
-            <button className="secondary-btn" onClick={handleLoadDemoData}>
-              <MaterialIcon name="sports_esports" /> Load Demo Data
-            </button>
-          </div>
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="inventory_2" /> Demo Data</h3>
+                  <Tooltip content="Load realistic sample data to explore all features of Fire Tools. Great for testing the app or learning how to use it. This will overwrite your current data, so export first if needed!" position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Load sample data to explore the application</p>
+                <button className="secondary-btn" onClick={handleLoadDemoData}>
+                  <MaterialIcon name="sports_esports" /> Load Demo Data
+                </button>
+              </div>
 
-          <div className="data-management-group danger-zone">
-            <h3><MaterialIcon name="warning" /> Danger Zone</h3>
-            <p className="setting-help">This action cannot be undone</p>
-            <button className="danger-btn" onClick={handleResetAll}>
-              <MaterialIcon name="delete" /> Reset All Data
-            </button>
-          </div>
+              <div className="data-management-group danger-zone">
+                <h3><MaterialIcon name="warning" /> Danger Zone</h3>
+                <p className="setting-help">This action cannot be undone</p>
+                <button className="danger-btn" onClick={handleResetAll}>
+                  <MaterialIcon name="delete" /> Reset All Data
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </div>
