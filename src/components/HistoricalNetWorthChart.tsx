@@ -27,10 +27,16 @@ interface HistoricalNetWorthChartProps {
   previousYearEnd: number | null;
   viewMode: ChartViewMode;
   onViewModeChange: (mode: ChartViewMode) => void;
+  isPrivacyMode?: boolean; // Privacy mode for blurring values
 }
 
+// Privacy placeholder for blurred values
+const PRIVACY_PLACEHOLDER = '***';
+
 // Helper to format currency for chart
-function formatChartCurrency(amount: number): string {
+function formatChartCurrency(amount: number, isPrivacyMode: boolean = false): string {
+  if (isPrivacyMode) return PRIVACY_PLACEHOLDER;
+  
   const absAmount = Math.abs(amount);
   const sign = amount < 0 ? '-' : '';
   
@@ -67,6 +73,7 @@ export function HistoricalNetWorthChart({
   previousYearEnd,
   viewMode,
   onViewModeChange,
+  isPrivacyMode = false,
 }: HistoricalNetWorthChartProps) {
   const [showForecast, setShowForecast] = useState(true);
   const [additionalCurrencies, setAdditionalCurrencies] = useState<SupportedCurrency[]>([]);
@@ -424,7 +431,7 @@ export function HistoricalNetWorthChart({
           <YAxis
             tick={{ fontSize: 12, fill: '#94A3B8' }}
             tickLine={{ stroke: '#3A3D46' }}
-            tickFormatter={(value) => `${symbol}${formatChartCurrency(value)}`}
+            tickFormatter={(value) => `${symbol}${formatChartCurrency(value, isPrivacyMode)}`}
             width={80}
             domain={yAxisDomain}
             stroke="#3A3D46"
@@ -432,6 +439,26 @@ export function HistoricalNetWorthChart({
           <Tooltip
             formatter={(value, name) => {
               if (value === undefined || value === null) return ['-', name];
+              
+              // If privacy mode is on, blur the values
+              if (isPrivacyMode) {
+                const nameStr = String(name);
+                let displayName = 'Net Worth';
+                
+                if (nameStr === 'netWorth') {
+                  displayName = `Net Worth (${currency})`;
+                } else if (nameStr === 'forecast') {
+                  displayName = `Forecast (${currency})`;
+                } else if (nameStr.startsWith('netWorth_')) {
+                  const curr = nameStr.replace('netWorth_', '');
+                  displayName = `Net Worth (${curr})`;
+                } else if (nameStr.startsWith('forecast_')) {
+                  const curr = nameStr.replace('forecast_', '');
+                  displayName = `Forecast (${curr})`;
+                }
+                
+                return [PRIVACY_PLACEHOLDER, displayName];
+              }
               
               // Determine which currency this value belongs to
               const nameStr = String(name);

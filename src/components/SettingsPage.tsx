@@ -580,14 +580,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               <optgroup label="EU Countries">
                 {ALL_COUNTRIES.filter(c => c.isEU).map((country) => (
                   <option key={country.code} value={country.code}>
-                    {country.name}
+                    {country.flag} {country.name}
                   </option>
                 ))}
               </optgroup>
               <optgroup label="Other Countries">
                 {ALL_COUNTRIES.filter(c => !c.isEU).map((country) => (
                   <option key={country.code} value={country.code}>
-                    {country.name}
+                    {country.flag} {country.name}
                   </option>
                 ))}
               </optgroup>

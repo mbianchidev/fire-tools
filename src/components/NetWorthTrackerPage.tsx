@@ -788,15 +788,6 @@ export function NetWorthTrackerPage() {
       <header className="page-header">
         <div className="page-header-top">
           <h1><MaterialIcon name="trending_up" className="page-header-icon" /> Net Worth Tracker</h1>
-          <button 
-            className={`privacy-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
-            onClick={togglePrivacyMode}
-            title={isPrivacyMode ? 'Show values' : 'Hide values'}
-            aria-pressed={isPrivacyMode}
-          >
-            <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
-            {isPrivacyMode ? 'Show' : 'Hide'}
-          </button>
         </div>
         <p>
           Track your financial operations and net worth on a monthly basis. Monitor assets, cash, pensions, and progress toward FIRE.
@@ -919,7 +910,17 @@ export function NetWorthTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="bar_chart" /></span>
               <div className="card-content">
                 <span className="card-label">Total Assets</span>
-                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(netWorthResult.totalAssetValue, data.defaultCurrency)}</PrivacyBlur></span>
+                <span className="card-value">
+                  <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(netWorthResult.totalAssetValue, data.defaultCurrency)}</PrivacyBlur>
+                  <button 
+                    className="privacy-eye-btn"
+                    onClick={togglePrivacyMode}
+                    title={isPrivacyMode ? 'Show values' : 'Hide values'}
+                    aria-pressed={isPrivacyMode}
+                  >
+                    <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+                  </button>
+                </span>
                 {currentMonthVariation && currentMonthVariation.assetValueChange !== 0 && (
                   <span className={`card-change ${currentMonthVariation.assetValueChange >= 0 ? 'positive' : 'negative'}`}>
                     <PrivacyBlur isPrivacyMode={isPrivacyMode}>{currentMonthVariation.assetValueChange >= 0 ? '+' : ''}{formatCurrency(currentMonthVariation.assetValueChange, data.defaultCurrency)}</PrivacyBlur>
@@ -1190,6 +1191,7 @@ export function NetWorthTrackerPage() {
             previousYearEnd={previousYearEndValue}
             viewMode={chartViewMode}
             onViewModeChange={setChartViewMode}
+            isPrivacyMode={isPrivacyMode}
           />
         </section>
 
@@ -1204,15 +1206,15 @@ export function NetWorthTrackerPage() {
               </div>
               <div className="fire-details">
                 <div className="fire-detail-item">
-                  <div className="value">{formatCurrency(ytdSummary.netWorthChange, data.defaultCurrency)}</div>
+                  <div className="value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(ytdSummary.netWorthChange, data.defaultCurrency)}</PrivacyBlur></div>
                   <div className="label">Net Worth Change</div>
                 </div>
                 <div className="fire-detail-item">
-                  <div className="value">{formatCurrency(ytdSummary.averageMonthlyNetWorth, data.defaultCurrency)}</div>
+                  <div className="value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(ytdSummary.averageMonthlyNetWorth, data.defaultCurrency)}</PrivacyBlur></div>
                   <div className="label">Avg Monthly Net Worth</div>
                 </div>
                 <div className="fire-detail-item">
-                  <div className="value">{previousYearEndValue ? formatCurrency(previousYearEndValue, data.defaultCurrency) : 'N/A'}</div>
+                  <div className="value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{previousYearEndValue ? formatCurrency(previousYearEndValue, data.defaultCurrency) : 'N/A'}</PrivacyBlur></div>
                   <div className="label">Dec {selectedYear - 1}</div>
                 </div>
               </div>

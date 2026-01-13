@@ -618,15 +618,6 @@ export function ExpenseTrackerPage() {
       <header className="page-header">
         <div className="page-header-top">
           <h1><MaterialIcon name="account_balance_wallet" className="page-header-icon" /> Cashflow Tracker</h1>
-          <button 
-            className={`privacy-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
-            onClick={togglePrivacyMode}
-            title={isPrivacyMode ? 'Show values' : 'Hide values'}
-            aria-pressed={isPrivacyMode}
-          >
-            <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
-            {isPrivacyMode ? 'Show' : 'Hide'}
-          </button>
         </div>
         <p>
           Track your income and expenses, set budgets, and gain insights into your spending patterns.
@@ -712,7 +703,17 @@ export function ExpenseTrackerPage() {
               <span className="card-icon" aria-hidden="true"><MaterialIcon name="trending_up" /></span>
               <div className="card-content">
                 <span className="card-label">Total Income</span>
-                <span className="card-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(summary.totalIncome, data.currency)}</PrivacyBlur></span>
+                <span className="card-value">
+                  <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(summary.totalIncome, data.currency)}</PrivacyBlur>
+                  <button 
+                    className="privacy-eye-btn"
+                    onClick={togglePrivacyMode}
+                    title={isPrivacyMode ? 'Show values' : 'Hide values'}
+                    aria-pressed={isPrivacyMode}
+                  >
+                    <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+                  </button>
+                </span>
               </div>
             </div>
             <div className="summary-card expenses">

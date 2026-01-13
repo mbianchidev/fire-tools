@@ -32,6 +32,13 @@ describe('Country Types', () => {
       expect(codes).toContain('IE');
       expect(codes).toContain('LU');
     });
+
+    it('should have flag emojis for all EU countries', () => {
+      EU_COUNTRIES.forEach(country => {
+        expect(country.flag).toBeDefined();
+        expect(country.flag.length).toBeGreaterThan(0);
+      });
+    });
   });
 
   describe('OTHER_COUNTRIES', () => {
@@ -46,6 +53,13 @@ describe('Country Types', () => {
       expect(codes).toContain('US');
       expect(codes).toContain('GB');
       expect(codes).toContain('CH');
+    });
+
+    it('should have flag emojis for all other countries', () => {
+      OTHER_COUNTRIES.forEach(country => {
+        expect(country.flag).toBeDefined();
+        expect(country.flag.length).toBeGreaterThan(0);
+      });
     });
   });
 

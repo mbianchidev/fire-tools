@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { AssetClassSummary, AllocationMode, AssetClass } from '../types/assetAllocation';
 import { formatCurrency, formatPercent, formatAssetName } from '../utils/allocationCalculator';
 import { NumberInput } from './NumberInput';
+import { PrivacyBlur } from './PrivacyBlur';
 
 interface AssetClassTarget {
   targetMode: AllocationMode;
@@ -16,6 +17,7 @@ interface EditableAssetClassTableProps {
   currency: string;
   assetClassTargets: Record<AssetClass, AssetClassTarget>;
   onUpdateAssetClass: (assetClass: AssetClass, updates: { targetMode?: AllocationMode; targetPercent?: number }) => void;
+  isPrivacyMode?: boolean; // Privacy mode for blurring monetary values
 }
 
 export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = ({
@@ -26,6 +28,7 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
   currency,
   assetClassTargets,
   onUpdateAssetClass,
+  isPrivacyMode = false,
 }) => {
   const [editingClass, setEditingClass] = useState<AssetClass | null>(null);
   const [editMode, setEditMode] = useState<AllocationMode>('PERCENTAGE');
@@ -213,12 +216,12 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
                   )}
                 </td>
                 <td>{formatPercent(ac.currentPercent)}</td>
-                <td className="currency-value">{formatCurrency(ac.currentTotal, currency)}</td>
+                <td className="currency-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(ac.currentTotal, currency)}</PrivacyBlur></td>
                 <td className="currency-value">
-                  {targetTotal !== undefined ? formatCurrency(targetTotal, currency) : '-'}
+                  <PrivacyBlur isPrivacyMode={isPrivacyMode}>{targetTotal !== undefined ? formatCurrency(targetTotal, currency) : '-'}</PrivacyBlur>
                 </td>
                 <td className={`currency-value ${delta > 0 ? 'positive' : delta < 0 ? 'negative' : ''}`}>
-                  {delta > 0 ? '+' : delta < 0 ? '-' : ''}{formatCurrency(Math.abs(delta), currency)}
+                  <PrivacyBlur isPrivacyMode={isPrivacyMode}>{delta > 0 ? '+' : delta < 0 ? '-' : ''}{formatCurrency(Math.abs(delta), currency)}</PrivacyBlur>
                 </td>
                 <td>
                   <span 
@@ -245,7 +248,7 @@ export const EditableAssetClassTable: React.FC<EditableAssetClassTableProps> = (
           <tr className="total-row">
             <td><strong>Total Portfolio</strong></td>
             <td colSpan={3}></td>
-            <td className="currency-value"><strong>{formatCurrency(totalHoldings, currency)}</strong></td>
+            <td className="currency-value"><strong><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(totalHoldings, currency)}</PrivacyBlur></strong></td>
             <td colSpan={4}></td>
           </tr>
         </tbody>

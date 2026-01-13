@@ -2,14 +2,23 @@ import { CalculationResult } from '../types/calculator';
 import { formatCurrency } from '../utils/allocationCalculator';
 import { useState } from 'react';
 import { MaterialIcon } from './MaterialIcon';
+import { PrivacyBlur } from './PrivacyBlur';
 
 interface FIREMetricsProps {
   result: CalculationResult;
   currentAge: number;
   zoomYears: number | 'all';
+  isPrivacyMode?: boolean;
+  onTogglePrivacyMode?: () => void;
 }
 
-export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge, zoomYears }) => {
+export const FIREMetrics: React.FC<FIREMetricsProps> = ({ 
+  result, 
+  currentAge, 
+  zoomYears,
+  isPrivacyMode = false,
+  onTogglePrivacyMode
+}) => {
   const { yearsToFIRE, fireTarget, validationErrors, projections } = result;
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
@@ -75,8 +84,20 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge, zo
       </div>
       <div className="metrics-grid" role="list">
         <div className="metric-card" role="listitem">
-          <div className="metric-label">FIRE Target</div>
-          <div className="metric-value">{hasErrors ? 'N/A' : formatCurrency(fireTarget)}</div>
+          <div className="metric-label">
+            FIRE Target
+            {onTogglePrivacyMode && (
+              <button 
+                className="privacy-eye-btn"
+                onClick={onTogglePrivacyMode}
+                title={isPrivacyMode ? 'Show values' : 'Hide values'}
+                aria-pressed={isPrivacyMode}
+              >
+                <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+              </button>
+            )}
+          </div>
+          <div className="metric-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{hasErrors ? 'N/A' : formatCurrency(fireTarget)}</PrivacyBlur></div>
         </div>
         
         <div className="metric-card highlight" role="listitem">
@@ -93,7 +114,7 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({ result, currentAge, zo
 
         <div className="metric-card" role="listitem">
           <div className="metric-label">Portfolio Value at Age {displayedEndAge}</div>
-          <div className="metric-value">{hasErrors ? 'N/A' : formatCurrency(displayedFinalPortfolioValue)}</div>
+          <div className="metric-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{hasErrors ? 'N/A' : formatCurrency(displayedFinalPortfolioValue)}</PrivacyBlur></div>
         </div>
 
         <div className="metric-card highlight" role="listitem">

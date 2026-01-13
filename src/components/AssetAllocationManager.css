@@ -246,6 +246,8 @@
   border: 2px solid var(--border-subtle);
   border-radius: 4px;
   font-size: 0.9rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .target-input {
@@ -2460,6 +2462,32 @@ select:disabled {
 }
 
 .privacy-toggle-btn:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Privacy eye button - minimal eye icon next to values */
+.privacy-eye-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.privacy-eye-btn:hover {
+  color: var(--accent-primary);
+  background: var(--bg-tertiary);
+}
+
+.privacy-eye-btn:focus {
   outline: 2px solid var(--accent-primary);
   outline-offset: 2px;
 }

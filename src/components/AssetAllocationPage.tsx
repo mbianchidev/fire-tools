@@ -548,15 +548,6 @@ export const AssetAllocationPage: React.FC = () => {
       <header className="page-header">
         <div className="page-header-top">
           <h1><MaterialIcon name="pie_chart" className="page-header-icon" /> Asset Allocation Manager</h1>
-          <button 
-            className={`privacy-toggle-btn ${isPrivacyMode ? 'active' : ''}`}
-            onClick={togglePrivacyMode}
-            title={isPrivacyMode ? 'Show values' : 'Hide values'}
-            aria-pressed={isPrivacyMode}
-          >
-            <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
-            {isPrivacyMode ? 'Show' : 'Hide'}
-          </button>
         </div>
         <p>
           Manage and visualize your portfolio asset allocation. Set target allocations,
@@ -577,6 +568,14 @@ export const AssetAllocationPage: React.FC = () => {
           <div className="portfolio-value-label">
             <strong id="portfolio-value-heading">Portfolio Value (excl. Cash):</strong>
             <span className="portfolio-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(portfolioValue, currency)}</PrivacyBlur></span>
+            <button 
+              className="privacy-eye-btn"
+              onClick={togglePrivacyMode}
+              title={isPrivacyMode ? 'Show values' : 'Hide values'}
+              aria-pressed={isPrivacyMode}
+            >
+              <MaterialIcon name={isPrivacyMode ? 'visibility_off' : 'visibility'} size="small" />
+            </button>
           </div>
           <div className="portfolio-value-info">
             Total holdings (incl. cash): <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(allocation.totalHoldings, currency)}</PrivacyBlur>
@@ -651,6 +650,7 @@ export const AssetAllocationPage: React.FC = () => {
             currency={currency}
             assetClassTargets={assetClassTargets}
             onUpdateAssetClass={handleUpdateAssetClass}
+            isPrivacyMode={isPrivacyMode}
           />
         </section>
 
