@@ -1,15 +1,26 @@
-# 🔥 Fire Tools
+# Fire Tools
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.19.0-brightgreen)](package.json)
 
 A comprehensive suite of financial tools for **FIRE (Financial Independence Retire Early)** planning. Track your journey to financial independence with powerful calculators, Monte Carlo simulations, and portfolio management features—all running securely in your browser with **no data ever leaving your device**.
 
-🌐 **[Try it live →](https://mbianchidev.github.io/fire-tools/)**
+## ⚠️ Disclaimer
+
+Fire Tools is provided for **educational and planning purposes only**. The calculations and projections:
+
+- Make assumptions about future market returns
+- Do not account for all real-world factors
+- Are not financial, legal, or tax advice
+- Should not be the sole basis for financial decisions
+
+**Always do your research or consult with a qualified financial advisor before making investment decisions.**
+
+**[Try it live →](https://mbianchidev.github.io/fire-tools/)**
 
 ---
 
-## ✨ Features
+## Features
 
 **🧮 FIRE Calculator**  
 Calculate your path to financial independence with detailed projections based on your savings, expenses, and expected returns. Visualize your net worth growth and see exactly when you'll reach your FIRE target.
@@ -18,13 +29,13 @@ Calculate your path to financial independence with detailed projections based on
 Run thousands of probabilistic simulations accounting for market volatility and black swan events. Understand your real probability of success and make informed decisions with confidence.
 
 **📊 Asset Allocation Manager**  
-Track your portfolio allocation across stocks, bonds, real estate, commodities, and cash. Get intelligent rebalancing recommendations to maintain your target allocation.
+Track your portfolio allocation across stocks, bonds, real estate, commodities, and cash. Get intelligent rebalancing recommendations to maintain your target allocation with customizable allocation targets and visual feedback.
 
 **💵 DCA Helper**  
 Plan your dollar-cost averaging strategy with built-in calculations that help you invest systematically and reduce market timing risk.
 
 **💰 Cashflow Tracker**  
-Track your income and expenses with detailed categorization, set monthly budgets per category, and monitor your spending patterns. Includes the 50/30/20 budgeting rule analysis and comprehensive spending analytics with trends and comparisons.
+Track your income and expenses with detailed categorization, set monthly budgets per category, and monitor your spending patterns. Interactive charts showing income vs expenses over time. Includes the 50/30/20 budgeting rule analysis and comprehensive spending analytics with trends and comparisons.
 
 **📈 Net Worth Tracker**  
 Track your complete financial picture on a monthly basis. Log assets (stocks, ETFs, bonds), cash & liquidity (bank accounts, credit cards), and pensions (state, private, employer). Record financial operations like dividends, purchases, sales, and taxes. View historical net worth charts with YTD and all-time views, plus forecasts with confidence indicators.
@@ -72,7 +83,7 @@ The built files will be in the `dist` directory.
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
 - **[AGENTS.md](AGENTS.md)** - Technical architecture and AI agent instructions
@@ -82,22 +93,7 @@ The built files will be in the `dist` directory.
 
 ---
 
-## 🖼️ Screenshots
-
-Visit the [live demo](https://mbianchidev.github.io/fire-tools/) to see Fire Tools in action!
-
-**Features you'll find:**
-- 📈 Interactive charts showing income vs expenses over time
-- 💹 Net worth growth projections toward your FIRE target
-- 🎯 Customizable allocation targets with visual feedback
-- 📊 Success probability from Monte Carlo simulations
-- 🔄 Intelligent rebalancing recommendations
-- 💰 Cashflow tracking with budget management and spending analytics
-- 📊 Monthly net worth snapshots with historical trends and forecasts
-
----
-
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **React 19** - Modern UI framework with hooks
 - **TypeScript** - Type-safe development
@@ -109,7 +105,7 @@ Visit the [live demo](https://mbianchidev.github.io/fire-tools/) to see Fire Too
 
 ---
 
-## 🔒 Security & Privacy
+## Security & Privacy
 
 Fire Tools takes your privacy seriously:
 
@@ -123,7 +119,7 @@ Learn more in our [Security Policy](SECURITY.md).
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation, your help makes Fire Tools better for everyone.
 
@@ -137,20 +133,20 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🔒 Security
+## Security
 
 Found a security vulnerability? Please report it responsibly to **security@mb-consulting.dev**.  
 See [SECURITY.md](SECURITY.md) for our security policy and disclosure process.
 
 ---
 
-## 💬 Support
+## Support
 
 Need help? Have questions?
 
@@ -164,30 +160,3 @@ Need help? Have questions?
 ## 📋 Code of Conduct
 
 This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to security@mb-consulting.dev.
-
----
-
-## 🙏 Acknowledgments
-
-Built with ❤️ for the FIRE community. Special thanks to:
-
-- The open source community for the amazing tools and libraries
-- All contributors who help improve Fire Tools
-- The FIRE community for inspiration and feedback
-
----
-
-## ⚠️ Disclaimer
-
-Fire Tools is provided for **educational and planning purposes only**. The calculations and projections:
-
-- Make assumptions about future market returns
-- Do not account for all real-world factors
-- Are not financial, legal, or tax advice
-- Should not be the sole basis for financial decisions
-
-**Always consult with a qualified financial advisor before making investment decisions.**
-
----
-
-Made with 🔥 by the Fire Tools community
