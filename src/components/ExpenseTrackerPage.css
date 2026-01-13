@@ -733,6 +733,18 @@
   border: 2px solid var(--border-subtle);
   border-radius: 6px;
   font-size: 1rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Date input dark styling */
+.dialog-form .form-group input[type="date"] {
+  color-scheme: dark;
+}
+
+.dialog-form .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
 .dialog-form .form-group input:focus,
