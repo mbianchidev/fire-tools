@@ -332,9 +332,9 @@ function App() {
             Consult with a financial advisor for professional advice.
           </p>
           <div className="footer-links">
-            <a href="/privacy-policy">Privacy Policy</a>
+            <Link to="/privacy-policy">Privacy Policy</Link>
             <span className="footer-separator">•</span>
-            <a href="/cookie-policy">Cookie Policy</a>
+            <Link to="/cookie-policy">Cookie Policy</Link>
             <span className="footer-separator">•</span>
             <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
