@@ -30,6 +30,7 @@ import './components/ExpenseTrackerPage.css';
 import './components/NetWorthTrackerPage.css';
 import './components/GuidedTour.css';
 import { MaterialIcon } from './components/MaterialIcon';
+import { FireIcon } from './components/FireIcon';
 
 function Navigation({ accountName }: { accountName: string }) {
   const location = useLocation();
@@ -308,7 +309,7 @@ function App() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         
         <header className="app-header">
-          <h1><MaterialIcon name="local_fire_department" className="header-icon" /> Fire Tools</h1>
+          <h1><FireIcon size={32} className="header-icon" /> Fire Tools</h1>
           <p>Rocket fuel for your financial planning</p>
         </header>
 
