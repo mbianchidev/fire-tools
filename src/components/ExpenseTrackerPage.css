@@ -461,6 +461,7 @@
   padding: 0.25rem;
   border-radius: 4px;
   transition: background 0.2s;
+  color: var(--text-primary);
 }
 
 .btn-icon:hover {

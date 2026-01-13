@@ -610,3 +610,23 @@
 .sync-info span[aria-hidden="true"] {
   margin-right: 0.5rem;
 }
+
+/* Action buttons for tables */
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+  color: var(--text-primary);
+}
+
+.btn-icon:hover {
+  background: var(--bg-tertiary);
+}
+
+.btn-icon.delete:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
