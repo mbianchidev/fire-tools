@@ -653,7 +653,7 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
     },
     {
       page: '/asset-allocation',
-      title: '✅ Confirm Investments',
+      title: '✅ Confirm',
       description: 'After making your investments, you can confirm the actual shares purchased to track deviations from the suggested amounts.',
       position: 'center',
       elementSelector: '.dca-dialog',
