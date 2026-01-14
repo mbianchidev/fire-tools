@@ -17,6 +17,7 @@ import {
   OperationType,
 } from '../types/netWorthTracker';
 import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
+import { BankInfo, getBanksByCountry, getBankByCode } from '../types/bank';
 import {
   calculateMonthlyNetWorth,
   calculateMonthlyVariations,
@@ -1058,7 +1059,14 @@ export function NetWorthTrackerPage() {
                   <tbody>
                     {currentMonthData.cashEntries.map(cash => (
                       <tr key={cash.id}>
-                        <td>{cash.accountName}</td>
+                        <td>
+                          {cash.accountName}
+                          {cash.institutionName && (
+                            <span className="institution-tag" title={cash.institutionName}>
+                              <MaterialIcon name="account_balance" size="small" /> {cash.institutionName}
+                            </span>
+                          )}
+                        </td>
                         <td>{ACCOUNT_TYPES.find(t => t.id === cash.accountType)?.name || cash.accountType}</td>
                         <td className="amount-col"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(cash.balance, cash.currency)}</PrivacyBlur></td>
                         <td className="actions-col">
@@ -1292,7 +1300,7 @@ export function NetWorthTrackerPage() {
 }
 
 
-// Cash Dialog Component
+// Cash Dialog Component (with bank provider selection - same as Asset Allocation)
 interface CashDialogProps {
   initialData?: CashEntry;
   onSubmit: (data: Omit<CashEntry, 'id'>) => void;
@@ -1308,6 +1316,14 @@ function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDup
   const [currency, setCurrency] = useState<SupportedCurrency>(initialData?.currency || defaultCurrency);
   const [note, setNote] = useState(initialData?.note || '');
   const [nameError, setNameError] = useState<string | null>(null);
+  const [institutionCode, setInstitutionCode] = useState<string>(initialData?.institutionCode || '');
+  const [institutionName, setInstitutionName] = useState<string>(initialData?.institutionName || '');
+
+  // Get user settings for country
+  const settings = loadSettings();
+  
+  // Get banks for the user's country
+  const countryBanks: BankInfo[] = settings.country ? getBanksByCountry(settings.country) : [];
 
   const handleNameChange = (newName: string) => {
     setAccountName(newName);
@@ -1315,6 +1331,18 @@ function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDup
       setNameError('An account with this name already exists');
     } else {
       setNameError(null);
+    }
+  };
+
+  const handleInstitutionChange = (code: string) => {
+    setInstitutionCode(code);
+    if (code && code !== 'OTHER') {
+      const bank = getBankByCode(code);
+      if (bank) {
+        setInstitutionName(bank.name);
+      }
+    } else if (code === 'OTHER') {
+      setInstitutionName('');
     }
   };
 
@@ -1338,8 +1366,13 @@ function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDup
       balance: parsedBalance,
       currency,
       note: note || undefined,
+      institutionCode: institutionCode || undefined,
+      institutionName: institutionName || undefined,
     });
   };
+
+  // Account types that should show bank selector
+  const showBankSelector = ['SAVINGS', 'CHECKING', 'BROKERAGE'].includes(accountType);
 
   return (
     <div className="dialog-overlay" onClick={onClose}>
@@ -1377,6 +1410,53 @@ function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDup
               </select>
             </div>
           </div>
+
+          {/* Bank/Institution selector - same as Asset Allocation */}
+          {showBankSelector && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="cash-institution">
+                  Bank/Institution{!settings.country && ' (Set country in Settings)'}
+                </label>
+                <select
+                  id="cash-institution"
+                  value={institutionCode}
+                  onChange={(e) => handleInstitutionChange(e.target.value)}
+                  className="dialog-select"
+                >
+                  <option value="">Select Bank/Broker...</option>
+                  {countryBanks.length > 0 ? (
+                    <>
+                      {countryBanks.map(bank => (
+                        <option key={bank.code} value={bank.code}>
+                          {bank.name}
+                          {bank.supportsOpenBanking ? ' 🔗' : ''}
+                        </option>
+                      ))}
+                      <option value="OTHER">Other (specify below)</option>
+                    </>
+                  ) : (
+                    <option value="OTHER">Other (specify below)</option>
+                  )}
+                </select>
+              </div>
+              
+              {/* Custom institution name for "Other" */}
+              {institutionCode === 'OTHER' && (
+                <div className="form-group">
+                  <label htmlFor="cash-institution-name">Institution Name</label>
+                  <input
+                    id="cash-institution-name"
+                    type="text"
+                    value={institutionName}
+                    onChange={(e) => setInstitutionName(e.target.value)}
+                    placeholder="e.g., Local Credit Union"
+                    className="dialog-input"
+                  />
+                </div>
+              )}
+            </div>
+          )}
           
           <div className="form-row">
             <div className="form-group">

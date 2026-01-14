@@ -149,6 +149,9 @@ export function syncAssetAllocationToNetWorth(
         accountType: mapSubAssetTypeToCashAccountType(asset.subAssetType),
         balance: asset.currentValue,
         currency: (asset.originalCurrency || 'EUR') as SupportedCurrency,
+        // Preserve institution info (same as Asset Allocation)
+        institutionCode: asset.institutionCode,
+        institutionName: asset.institutionName,
         // Preserve sync metadata (hidden from UI)
         shares: asset.shares,
         pricePerShare: asset.pricePerShare,
@@ -264,6 +267,9 @@ export function syncNetWorthToAssetAllocation(
       pricePerShare: cashEntry.pricePerShare,
       originalCurrency: cashEntry.currency as SupportedCurrency,
       originalValue: cashEntry.balance,
+      // Restore institution info from cash entry
+      institutionCode: cashEntry.institutionCode,
+      institutionName: cashEntry.institutionName,
       // Restore target metadata from sync metadata
       targetMode: cashEntry.targetMode || 'OFF',
       targetPercent: cashEntry.targetPercent,

@@ -212,6 +212,24 @@
   width: 80px;
 }
 
+/* Institution tag for cash entries */
+.institution-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  background: rgba(0, 212, 170, 0.1);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.institution-tag .material-icon {
+  font-size: 0.875rem;
+}
+
 /* Historical Net Worth Chart */
 .chart-section {
   margin-top: 2rem;
