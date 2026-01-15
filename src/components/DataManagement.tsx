@@ -25,7 +25,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({
   const acceptType = fileFormat === 'json' ? '.json' : '.csv';
 
   return (
-    <div className="data-management-section collapsible-section">
+    <div id="section-data-management" className="data-management-section collapsible-section">
       <button 
         className="collapsible-header" 
         onClick={() => setIsOpen(!isOpen)}

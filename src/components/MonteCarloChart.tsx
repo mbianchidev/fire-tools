@@ -13,9 +13,8 @@ import {
 import { MonteCarloResult } from '../types/calculator';
 import { loadSettings } from '../utils/cookieSettings';
 import { getCurrencySymbol } from '../utils/currencyConverter';
-
-// Privacy placeholder for blurred values
-const PRIVACY_PLACEHOLDER = '***';
+import { AbbreviatedValue } from './AbbreviatedValue';
+import { PrivacyBlur } from './PrivacyBlur';
 
 interface MonteCarloChartProps {
   result: MonteCarloResult;
@@ -115,18 +114,6 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result, isPriv
   const settings = loadSettings();
   const currencySymbol = getCurrencySymbol(settings.currencySettings.defaultCurrency);
 
-  const formatCurrency = (value: number, forChart: boolean = false) => {
-    if (isPrivacyMode && forChart) {
-      return PRIVACY_PLACEHOLDER;
-    }
-    if (value >= 1000000) {
-      return `${currencySymbol}${(value / 1000000).toFixed(1)}M`;
-    } else if (value >= 1000) {
-      return `${currencySymbol}${(value / 1000).toFixed(0)}K`;
-    }
-    return `${currencySymbol}${value.toFixed(0)}`;
-  };
-
   if (!distributionData.stats || distributionData.bins.length === 0) {
     return (
       <div className="monte-carlo-chart-placeholder">
@@ -215,15 +202,15 @@ export const MonteCarloChart: React.FC<MonteCarloChartProps> = ({ result, isPriv
           <div className="distribution-stats" role="table" aria-label="Final portfolio value statistics">
             <div className="stat-row" role="row">
               <span className="stat-label" role="cell">Worst Case (10th percentile):</span>
-              <span className="stat-value worst-case" role="cell">{isPrivacyMode ? PRIVACY_PLACEHOLDER : formatCurrency(portfolioDistribution.percentile10)}</span>
+              <span className="stat-value worst-case" role="cell"><PrivacyBlur isPrivacyMode={isPrivacyMode}><AbbreviatedValue value={portfolioDistribution.percentile10} currency={currencySymbol} /></PrivacyBlur></span>
             </div>
             <div className="stat-row median" role="row">
               <span className="stat-label" role="cell">Median Portfolio:</span>
-              <span className="stat-value" role="cell">{isPrivacyMode ? PRIVACY_PLACEHOLDER : formatCurrency(portfolioDistribution.median)}</span>
+              <span className="stat-value" role="cell"><PrivacyBlur isPrivacyMode={isPrivacyMode}><AbbreviatedValue value={portfolioDistribution.median} currency={currencySymbol} /></PrivacyBlur></span>
             </div>
             <div className="stat-row" role="row">
               <span className="stat-label" role="cell">Best Case (90th percentile):</span>
-              <span className="stat-value best-case" role="cell">{isPrivacyMode ? PRIVACY_PLACEHOLDER : formatCurrency(portfolioDistribution.percentile90)}</span>
+              <span className="stat-value best-case" role="cell"><PrivacyBlur isPrivacyMode={isPrivacyMode}><AbbreviatedValue value={portfolioDistribution.percentile90} currency={currencySymbol} /></PrivacyBlur></span>
             </div>
           </div>
         </section>

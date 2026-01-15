@@ -35,9 +35,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const [rateTextValues, setRateTextValues] = useState<Record<string, string>>({});
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
   
-  // All sections collapsed by default for cleaner interface
+  // Account section expanded by default, others collapsed
   const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
-    () => new Set(SETTINGS_SECTIONS)
+    () => {
+      const collapsed = new Set(SETTINGS_SECTIONS);
+      collapsed.delete('account');
+      return collapsed;
+    }
   );
 
   // Toggle section collapse state
@@ -463,7 +467,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           </button>
           {!collapsedSections.has('account') && (
             <div id="account-content" className="collapsible-content">
-              <div className="setting-item">
+              <div className="setting-item account-name-setting">
                 <div className="label-with-tooltip">
                   <label htmlFor="accountName">Account Name</label>
                   <Tooltip content="Choose a name for your portfolio that will appear in the app header and throughout the interface. This helps you identify your account, especially if you manage multiple portfolios.">
@@ -477,6 +481,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   onChange={(e) => handleSettingChange('accountName', e.target.value)}
                   maxLength={100}
                   placeholder="My Portfolio"
+                  className="account-name-input"
                 />
                 <span className="setting-help">This name will be displayed throughout the app</span>
               </div>
@@ -909,10 +914,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-controls="currency-content"
           >
             <h2>
-              <MaterialIcon name="currency_exchange" /> Currency Conversion Fallback Rates 
-              <Tooltip content="These are backup exchange rates used when the live API is unavailable or slow. The app attempts to fetch real-time rates first. You can customize these rates based on your preferences or recent market rates." position="right" maxWidth={350}>
-                <span className="info-icon section-info-icon" aria-label="More information">i</span>
-              </Tooltip>
+              <MaterialIcon name="currency_exchange" /> Conversion Rates
               <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('currency') ? '▶' : '▼'}</span>
             </h2>
           </button>
@@ -925,6 +927,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   Fallback rates are used when the API is unavailable. For accurate financial decisions,
                   please verify rates with your financial institution.
                 </p>
+              </div>
+              
+              <div className="subsection-header-with-tooltip">
+                <h3>Fallback Rates</h3>
+                <Tooltip content="These are backup exchange rates used when the live API is unavailable or slow. The app attempts to fetch real-time rates first. You can customize these rates based on your preferences or recent market rates." position="right" maxWidth={350}>
+                  <span className="info-icon" aria-label="More information">i</span>
+                </Tooltip>
               </div>
               <p className="section-description">
                 These rates are used when the live exchange rate API is unavailable.

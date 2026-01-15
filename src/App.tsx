@@ -102,14 +102,6 @@ function Navigation({ accountName }: { accountName: string }) {
         >
           <MaterialIcon name="casino" className="nav-icon" /> Monte Carlo
         </Link>
-        <Link 
-          to="/questionnaire" 
-          className={`nav-link ${location.pathname === '/questionnaire' ? 'active' : ''}`}
-          onClick={closeMenu}
-          aria-current={location.pathname === '/questionnaire' ? 'page' : undefined}
-        >
-          <MaterialIcon name="quiz" className="nav-icon" /> FIRE Quiz
-        </Link>
       </div>
       <div className="nav-actions">
         <NotificationBell />
@@ -121,6 +113,7 @@ function Navigation({ accountName }: { accountName: string }) {
 
 function FIRECalculatorPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Initialize state from URL if parameters exist, otherwise from localStorage, then defaults
   const [inputs, setInputs] = useState<CalculatorInputs>(() => {
@@ -264,22 +257,124 @@ function FIRECalculatorPage() {
     }
   };
 
+  // Expand sidebar and scroll to a specific section
+  const expandAndScrollTo = (sectionId: string) => {
+    setSidebarCollapsed(false);
+    // Wait for the sidebar to expand and content to render
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   return (
     <div className="app-container">
-      <aside className="sidebar" aria-label="Calculator inputs">
-        <DataManagement
-          onExport={handleExportCSV}
-          onImport={handleImportCSV}
-          onReset={handleResetData}
-          defaultOpen={false}
-        />
+      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`} aria-label="Calculator inputs">
+        <button 
+          className="sidebar-toggle-btn" 
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!sidebarCollapsed}
+        >
+          <MaterialIcon name={sidebarCollapsed ? 'chevron_right' : 'chevron_left'} />
+        </button>
         
-        <CalculatorInputsForm 
-          inputs={inputs} 
-          onChange={setInputs} 
-          assetAllocationData={assetAllocationData}
-          isPrivacyMode={isPrivacyMode}
-        />
+        {/* Collapsed state icons */}
+        <div className="sidebar-collapsed-icons">
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-data-management')}
+            title="Data Management"
+            aria-label="Expand to manage data"
+          >
+            <MaterialIcon name="save" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-initial-values')}
+            title="Initial Values"
+            aria-label="Expand to edit Initial Values"
+          >
+            <MaterialIcon name="savings" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-asset-allocation')}
+            title="Asset Allocation"
+            aria-label="Expand to edit Asset Allocation"
+          >
+            <MaterialIcon name="pie_chart" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-income')}
+            title="Income"
+            aria-label="Expand to edit Income"
+          >
+            <MaterialIcon name="payments" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-pension')}
+            title="Pension"
+            aria-label="Expand to edit Pension"
+          >
+            <MaterialIcon name="account_balance" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-expenses')}
+            title="Expenses & Savings"
+            aria-label="Expand to edit Expenses & Savings"
+          >
+            <MaterialIcon name="shopping_cart" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-fire-params')}
+            title="FIRE Parameters"
+            aria-label="Expand to edit FIRE Parameters"
+          >
+            <MaterialIcon name="gps_fixed" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-expected-returns')}
+            title="Expected Returns"
+            aria-label="Expand to edit Expected Returns"
+          >
+            <MaterialIcon name="trending_up" />
+          </button>
+          <button 
+            className="sidebar-icon-btn" 
+            onClick={() => expandAndScrollTo('section-options')}
+            title="Options"
+            aria-label="Expand to edit Options"
+          >
+            <MaterialIcon name="settings" />
+          </button>
+        </div>
+        
+        {!sidebarCollapsed && (
+          <>
+            <DataManagement
+              onExport={handleExportCSV}
+              onImport={handleImportCSV}
+              onReset={handleResetData}
+              defaultOpen={false}
+            />
+            
+            <CalculatorInputsForm 
+              inputs={inputs} 
+              onChange={setInputs} 
+              assetAllocationData={assetAllocationData}
+              isPrivacyMode={isPrivacyMode}
+            />
+          </>
+        )}
       </aside>
 
       <main className="main-content">

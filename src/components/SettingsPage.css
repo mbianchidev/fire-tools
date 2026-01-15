@@ -4,7 +4,8 @@
 
 .settings-page {
   padding: 2rem;
-  max-width: 800px;
+  width: min(90vw, 1600px);
+  max-width: none;
   margin: 0 auto;
 }
 
@@ -587,4 +588,10 @@ select:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background: var(--bg-tertiary);
+}
+
+/* Account name setting - slightly larger */
+.account-name-input {
+  font-size: 1.1rem !important;
+  padding: 0.875rem 1rem !important;
 }

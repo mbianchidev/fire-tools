@@ -417,6 +417,21 @@ export function formatCurrency(value: number, currency?: string): string {
 }
 
 /**
+ * Format currency with abbreviations for large numbers (e.g., 2.1M, 850K)
+ */
+export function formatAbbreviatedCurrency(value: number, currency: string = '\u20AC'): string {
+  const absValue = Math.abs(value);
+  
+  if (absValue >= 1000000) {
+    return `${currency}${(value / 1000000).toFixed(1)}M`;
+  } else if (absValue >= 1000) {
+    return `${currency}${(value / 1000).toFixed(0)}K`;
+  } else {
+    return `${currency}${value.toFixed(0)}`;
+  }
+}
+
+/**
  * Format percentage value
  */
 export function formatPercent(value: number): string {

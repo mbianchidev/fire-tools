@@ -127,7 +127,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
     <div className="inputs-form">
       <h2>FIRE Calculator Inputs</h2>
       
-      <div className="form-section collapsible-section" data-tour="initial-savings">
+      <div id="section-initial-values" className="form-section collapsible-section" data-tour="initial-savings">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('initialValues')}
@@ -171,7 +171,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section">
+      <div id="section-asset-allocation" className="form-section collapsible-section">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('assetAllocation')}
@@ -254,7 +254,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section" data-tour="income-section">
+      <div id="section-income" className="form-section collapsible-section" data-tour="income-section">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('income')}
@@ -309,7 +309,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section">
+      <div id="section-pension" className="form-section collapsible-section">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('pension')}
@@ -351,7 +351,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section" data-tour="expenses-section">
+      <div id="section-expenses" className="form-section collapsible-section" data-tour="expenses-section">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('expenses')}
@@ -412,7 +412,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section" data-tour="fire-params">
+      <div id="section-fire-params" className="form-section collapsible-section" data-tour="fire-params">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('fireParams')}
@@ -454,7 +454,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section">
+      <div id="section-expected-returns" className="form-section collapsible-section">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('expectedReturns')}
@@ -505,7 +505,7 @@ export const CalculatorInputsForm: React.FC<CalculatorInputsProps> = ({ inputs, 
         </div>)}
       </div>
 
-      <div className="form-section collapsible-section" data-tour="options-section">
+      <div id="section-options" className="form-section collapsible-section" data-tour="options-section">
         <button 
           className="collapsible-header" 
           onClick={() => toggleSection('options')}

@@ -158,6 +158,21 @@ export function HomePage() {
           </div>
           <span className="cta-link" aria-hidden="true">Run Simulations →</span>
         </Link>
+
+        <Link to="/questionnaire" className="feature-card" aria-labelledby="fire-quiz-title">
+          <div className="feature-icon" aria-hidden="true"><MaterialIcon name="quiz" size="large" /></div>
+          <h3 id="fire-quiz-title" className="feature-card-title">FIRE Persona Quiz</h3>
+          <p>
+            Discover your FIRE persona and get personalized recommendations based on your 
+            financial situation, goals, and risk tolerance.
+          </p>
+          <div className="feature-highlights">
+            <span className="highlight-item"><MaterialIcon name="psychology" size="small" /> Personalized Analysis</span>
+            <span className="highlight-item"><MaterialIcon name="lightbulb" size="small" /> Smart Recommendations</span>
+            <span className="highlight-item"><MaterialIcon name="trending_up" size="small" /> FIRE Path Guidance</span>
+          </div>
+          <span className="cta-link" aria-hidden="true">Take the Quiz →</span>
+        </Link>
       </section>
     </main>
   );

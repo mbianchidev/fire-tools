@@ -1,8 +1,8 @@
 import { CalculationResult } from '../types/calculator';
-import { formatCurrency } from '../utils/allocationCalculator';
 import { useState } from 'react';
 import { MaterialIcon } from './MaterialIcon';
 import { PrivacyBlur } from './PrivacyBlur';
+import { AbbreviatedValue } from './AbbreviatedValue';
 
 interface FIREMetricsProps {
   result: CalculationResult;
@@ -84,11 +84,11 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({
       </div>
       <div className="metrics-grid" role="list">
         <div className="metric-card" role="listitem">
-          <div className="metric-label">
-            FIRE Target
+          <div className="metric-header">
+            <span className="metric-label">FIRE Target</span>
             {onTogglePrivacyMode && (
               <button 
-                className="privacy-eye-btn"
+                className="privacy-eye-btn metric-privacy-btn"
                 onClick={onTogglePrivacyMode}
                 title={isPrivacyMode ? 'Show values' : 'Hide values'}
                 aria-pressed={isPrivacyMode}
@@ -97,29 +97,36 @@ export const FIREMetrics: React.FC<FIREMetricsProps> = ({
               </button>
             )}
           </div>
-          <div className="metric-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{hasErrors ? 'N/A' : formatCurrency(fireTarget)}</PrivacyBlur></div>
+          <div className="metric-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{hasErrors ? 'N/A' : <AbbreviatedValue value={fireTarget} />}</PrivacyBlur></div>
+          <div className="metric-subtitle">for standard FIRE</div>
         </div>
         
         <div className="metric-card highlight" role="listitem">
-          <div className="metric-label">Years to FIRE</div>
+          <div className="metric-header">
+            <span className="metric-label">Years to FIRE</span>
+          </div>
           <div className="metric-value">
-            {hasErrors ? 'N/A' : yearsToFIRE >= 0 ? `${yearsToFIRE} years` : 'Not achieved'}
+            {hasErrors ? 'N/A' : yearsToFIRE >= 0 ? yearsToFIRE : 'N/A'}
           </div>
           {!hasErrors && yearsToFIRE >= 0 && (
-            <div className="metric-subtitle">
-              At age {currentAge + yearsToFIRE}
-            </div>
+            <div className="metric-subtitle">At age {currentAge + yearsToFIRE}</div>
           )}
         </div>
 
         <div className="metric-card" role="listitem">
-          <div className="metric-label">Portfolio Value at Age {displayedEndAge}</div>
-          <div className="metric-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{hasErrors ? 'N/A' : formatCurrency(displayedFinalPortfolioValue)}</PrivacyBlur></div>
+          <div className="metric-header">
+            <span className="metric-label">Portfolio Value</span>
+          </div>
+          <div className="metric-value"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{hasErrors ? 'N/A' : <AbbreviatedValue value={displayedFinalPortfolioValue} />}</PrivacyBlur></div>
+          <div className="metric-subtitle">At age {displayedEndAge}</div>
         </div>
 
         <div className="metric-card highlight" role="listitem">
-          <div className="metric-label">Current Age</div>
-          <div className="metric-value">{currentAge} years</div>
+          <div className="metric-header">
+            <span className="metric-label">Current Age</span>
+          </div>
+          <div className="metric-value">{currentAge}</div>
+          <div className="metric-subtitle">years</div>
         </div>
       </div>
     </section>
