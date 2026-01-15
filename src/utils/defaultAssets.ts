@@ -110,5 +110,7 @@ export const DEFAULT_ASSETS: Asset[] = [
     currentValue: 5000,
     targetMode: 'SET',
     targetValue: 5000,
+    institutionCode: 'DE_ING',
+    institutionName: 'ING Germany',
   },
 ];

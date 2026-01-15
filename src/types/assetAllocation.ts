@@ -37,6 +37,8 @@ export interface Asset {
   targetMode: AllocationMode;
   targetValue?: number; // For SET mode (fixed amount in EUR)
   targetPercent?: number; // For PERCENTAGE mode
+  institutionCode?: string; // Bank/broker code (for SAVINGS_ACCOUNT, CHECKING_ACCOUNT, BROKERAGE_ACCOUNT)
+  institutionName?: string; // Custom bank/broker name (when code is 'OTHER' or not using predefined list)
 }
 
 export interface AssetClassSummary {

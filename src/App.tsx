@@ -21,6 +21,8 @@ import { CookiePolicyPage } from './components/CookiePolicyPage';
 import { CookieConsent } from './components/CookieConsent';
 import { GuidedTour } from './components/GuidedTour';
 import { NotFoundPage } from './components/NotFoundPage';
+import { QuestionnairePage } from './components/QuestionnairePage';
+import { QuestionnairePrompt } from './components/QuestionnairePrompt';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
@@ -99,6 +101,14 @@ function Navigation({ accountName }: { accountName: string }) {
           aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
         >
           <MaterialIcon name="casino" className="nav-icon" /> Monte Carlo
+        </Link>
+        <Link 
+          to="/questionnaire" 
+          className={`nav-link ${location.pathname === '/questionnaire' ? 'active' : ''}`}
+          onClick={closeMenu}
+          aria-current={location.pathname === '/questionnaire' ? 'page' : undefined}
+        >
+          <MaterialIcon name="quiz" className="nav-icon" /> FIRE Quiz
         </Link>
       </div>
       <div className="nav-actions">
@@ -351,6 +361,7 @@ function App() {
           <Route path="/asset-allocation" element={<AssetAllocationPage />} />
           <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
           <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
+          <Route path="/questionnaire" element={<QuestionnairePage />} />
           <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/cookie-policy" element={<CookiePolicyPage />} />
@@ -373,6 +384,7 @@ function App() {
 
         <CookieConsent />
         <GuidedTour />
+        <QuestionnairePrompt />
       </div>
     </Router>
   );

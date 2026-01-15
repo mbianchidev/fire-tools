@@ -32,6 +32,9 @@ export interface CashEntry {
   balance: number;
   currency: SupportedCurrency;
   note?: string;
+  // Bank/Institution info (same as Asset Allocation)
+  institutionCode?: string;
+  institutionName?: string;
   // Sync metadata (hidden from UI, preserved during sync)
   shares?: number; // For cash treated as "1 share @ balance per share"
   pricePerShare?: number;

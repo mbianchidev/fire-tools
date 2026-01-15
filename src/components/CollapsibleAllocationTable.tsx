@@ -528,7 +528,14 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                               className="edit-input edit-name-input"
                             />
                           ) : (
-                            asset.name
+                            <span title={asset.institutionName ? `Bank/Broker: ${asset.institutionName}` : undefined}>
+                              {asset.name}
+                              {asset.institutionName && (
+                                <span className="institution-badge" title={`Bank/Broker: ${asset.institutionName}`}>
+                                  🏦
+                                </span>
+                              )}
+                            </span>
                           )}
                         </td>
                         <td>
