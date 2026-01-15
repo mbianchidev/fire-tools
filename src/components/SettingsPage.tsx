@@ -900,27 +900,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           )}
         </section>
 
-        {/* Currency Disclaimer */}
-        <section className="settings-section collapsible-section disclaimer-collapsible">
-          <button 
-            className="collapsible-header" 
-            onClick={() => toggleSection('disclaimer')}
-            aria-expanded={!collapsedSections.has('disclaimer')}
-            aria-controls="disclaimer-content"
-          >
-            <h2><MaterialIcon name="warning" /> Exchange Rate Disclaimer <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('disclaimer') ? '▶' : '▼'}</span></h2>
-          </button>
-          {!collapsedSections.has('disclaimer') && (
-            <div id="disclaimer-content" className="collapsible-content disclaimer-content">
-              <p>
-                Exchange rates are fetched from publicly available APIs and may not reflect real-time rates.
-                Fallback rates are used when the API is unavailable. For accurate financial decisions,
-                please verify rates with your financial institution.
-              </p>
-            </div>
-          )}
-        </section>
-
         {/* Currency Settings */}
         <section className="settings-section collapsible-section">
           <button 
@@ -939,6 +918,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           </button>
           {!collapsedSections.has('currency') && (
             <div id="currency-content" className="collapsible-content">
+              <div className="exchange-rate-warning">
+                <MaterialIcon name="warning" />
+                <p>
+                  Exchange rates are fetched from publicly available APIs and may not reflect real-time rates.
+                  Fallback rates are used when the API is unavailable. For accurate financial decisions,
+                  please verify rates with your financial institution.
+                </p>
+              </div>
               <p className="section-description">
                 These rates are used when the live exchange rate API is unavailable.
                 All values convert to {settings.currencySettings.defaultCurrency} (the default currency).
