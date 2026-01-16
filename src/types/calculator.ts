@@ -95,3 +95,65 @@ export interface SimulationRun {
   yearsToFIRE: number | null;
   finalPortfolio: number;
 }
+
+/**
+ * Yearly data for a single Monte Carlo simulation
+ */
+export interface SimulationYearData {
+  year: number;
+  age: number;
+  stockReturn: number;
+  bondReturn: number;
+  cashReturn: number;
+  portfolioReturn: number;
+  isBlackSwan: boolean;
+  expenses: number;
+  laborIncome: number;
+  totalIncome: number;
+  portfolioValue: number;
+  isFIREAchieved: boolean;
+}
+
+/**
+ * Detailed log entry for a single Monte Carlo simulation run
+ */
+export interface SimulationLogEntry {
+  simulationId: number;
+  timestamp: string;
+  success: boolean;
+  yearsToFIRE: number | null;
+  finalPortfolio: number;
+  yearlyData: SimulationYearData[];
+}
+
+/**
+ * Result with optional detailed logs
+ */
+export interface MonteCarloResultWithLogs extends MonteCarloResult {
+  logs: SimulationLogEntry[];
+  fixedParameters: MonteCarloFixedParameters;
+}
+
+/**
+ * Fixed parameters that are logged once (in the first log entry)
+ */
+export interface MonteCarloFixedParameters {
+  initialSavings: number;
+  stocksPercent: number;
+  bondsPercent: number;
+  cashPercent: number;
+  currentAnnualExpenses: number;
+  fireAnnualExpenses: number;
+  annualLaborIncome: number;
+  savingsRate: number;
+  desiredWithdrawalRate: number;
+  expectedStockReturn: number;
+  expectedBondReturn: number;
+  expectedCashReturn: number;
+  numSimulations: number;
+  stockVolatility: number;
+  bondVolatility: number;
+  blackSwanProbability: number;
+  blackSwanImpact: number;
+  stopWorkingAtFIRE: boolean;
+}
