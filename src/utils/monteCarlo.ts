@@ -13,6 +13,38 @@ import {
 let cachedNormal: number | null = null;
 
 /**
+ * Calculate statistics from simulation results
+ */
+function calculateSimulationStats(simulations: SimulationRun[]): {
+  successCount: number;
+  failureCount: number;
+  successRate: number;
+  medianYearsToFIRE: number;
+} {
+  const successCount = simulations.filter(s => s.success).length;
+  const failureCount = simulations.length - successCount;
+  const successRate = (successCount / simulations.length) * 100;
+  
+  // Calculate median years to FIRE for successful simulations
+  const successfulYears = simulations
+    .filter(s => s.yearsToFIRE !== null)
+    .map(s => s.yearsToFIRE as number)
+    .sort((a, b) => a - b);
+  
+  let medianYearsToFIRE = 0;
+  if (successfulYears.length > 0) {
+    const midIndex = Math.floor(successfulYears.length / 2);
+    if (successfulYears.length % 2 === 0) {
+      medianYearsToFIRE = (successfulYears[midIndex - 1] + successfulYears[midIndex]) / 2;
+    } else {
+      medianYearsToFIRE = successfulYears[midIndex];
+    }
+  }
+  
+  return { successCount, failureCount, successRate, medianYearsToFIRE };
+}
+
+/**
  * Generate a random return based on expected return and volatility
  */
 function generateRandomReturn(expectedReturn: number, volatility: number): number {
@@ -222,31 +254,10 @@ export function runMonteCarloSimulation(
     simulations.push(result);
   }
   
-  const successCount = simulations.filter(s => s.success).length;
-  const failureCount = simulations.length - successCount;
-  const successRate = (successCount / simulations.length) * 100;
-  
-  // Calculate median years to FIRE for successful simulations
-  const successfulYears = simulations
-    .filter(s => s.yearsToFIRE !== null)
-    .map(s => s.yearsToFIRE as number)
-    .sort((a, b) => a - b);
-  
-  let medianYearsToFIRE = 0;
-  if (successfulYears.length > 0) {
-    const midIndex = Math.floor(successfulYears.length / 2);
-    if (successfulYears.length % 2 === 0) {
-      medianYearsToFIRE = (successfulYears[midIndex - 1] + successfulYears[midIndex]) / 2;
-    } else {
-      medianYearsToFIRE = successfulYears[midIndex];
-    }
-  }
+  const stats = calculateSimulationStats(simulations);
   
   return {
-    successCount,
-    failureCount,
-    successRate,
-    medianYearsToFIRE,
+    ...stats,
     simulations,
   };
 }
@@ -275,25 +286,7 @@ export function runMonteCarloSimulationWithLogs(
     }
   }
   
-  const successCount = simulations.filter(s => s.success).length;
-  const failureCount = simulations.length - successCount;
-  const successRate = (successCount / simulations.length) * 100;
-  
-  // Calculate median years to FIRE for successful simulations
-  const successfulYears = simulations
-    .filter(s => s.yearsToFIRE !== null)
-    .map(s => s.yearsToFIRE as number)
-    .sort((a, b) => a - b);
-  
-  let medianYearsToFIRE = 0;
-  if (successfulYears.length > 0) {
-    const midIndex = Math.floor(successfulYears.length / 2);
-    if (successfulYears.length % 2 === 0) {
-      medianYearsToFIRE = (successfulYears[midIndex - 1] + successfulYears[midIndex]) / 2;
-    } else {
-      medianYearsToFIRE = successfulYears[midIndex];
-    }
-  }
+  const stats = calculateSimulationStats(simulations);
   
   // Fixed parameters to include in exports
   const fixedParameters: MonteCarloFixedParameters = {
@@ -318,10 +311,7 @@ export function runMonteCarloSimulationWithLogs(
   };
   
   return {
-    successCount,
-    failureCount,
-    successRate,
-    medianYearsToFIRE,
+    ...stats,
     simulations,
     logs,
     fixedParameters,

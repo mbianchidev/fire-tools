@@ -28,11 +28,16 @@ export const MonteCarloLogs: React.FC<MonteCarloLogsProps> = ({
   }, []);
 
   // Filter logs based on success/failure filter
+  // Memoized to avoid recomputation on every render - O(n) is unavoidable for filtering
+  // The slice(0, 100) in render limits DOM nodes for performance
   const filteredLogs = useMemo(() => {
     if (filterSuccess === 'all') return logs;
     if (filterSuccess === 'success') return logs.filter(l => l.success);
     return logs.filter(l => !l.success);
   }, [logs, filterSuccess]);
+
+  // Memoize the displayed logs (first 100 of filtered) to avoid re-slicing on each render
+  const displayedLogs = useMemo(() => filteredLogs.slice(0, 100), [filteredLogs]);
 
   // Get selected simulation log
   const selectedLog = useMemo(() => {
@@ -141,7 +146,7 @@ export const MonteCarloLogs: React.FC<MonteCarloLogsProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {filteredLogs.slice(0, 100).map((log) => (
+                {displayedLogs.map((log) => (
                   <tr 
                     key={log.simulationId}
                     className={selectedSimulation === log.simulationId ? 'selected' : ''}
