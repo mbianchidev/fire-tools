@@ -1009,14 +1009,15 @@ export function NetWorthTrackerPage() {
                   </thead>
                   <tbody>
                     {currentMonthData.assets.map(asset => {
-                      const isRealEstateProperty = asset.assetClass === 'REAL_ESTATE';
+                      // Only hide shares/price for PROPERTY sub-assets, not REITs
+                      const isPropertyAsset = asset.syncSubAssetType === 'PROPERTY';
                       return (
                         <tr key={asset.id}>
                           <td>{asset.name}</td>
                           <td>{asset.ticker}</td>
                           <td>{ASSET_CLASSES.find(c => c.id === asset.assetClass)?.name || asset.assetClass}</td>
-                          <td>{isRealEstateProperty ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayNumber(asset.shares)}</PrivacyBlur>}</td>
-                          <td className="amount-col">{isRealEstateProperty ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, asset.currency)}</PrivacyBlur>}</td>
+                          <td>{isPropertyAsset ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayNumber(asset.shares)}</PrivacyBlur>}</td>
+                          <td className="amount-col">{isPropertyAsset ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, asset.currency)}</PrivacyBlur>}</td>
                           <td className="amount-col"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.shares * asset.pricePerShare, asset.currency)}</PrivacyBlur></td>
                           <td className="actions-col">
                             <button

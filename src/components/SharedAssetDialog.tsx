@@ -524,38 +524,47 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
             </div>
           )}
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Current Value {(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && subAssetType !== 'PROPERTY' && mode === 'assetAllocation' ? '(Calculated)' : (mode === 'netWorthTracker' && (assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && subAssetType !== 'PROPERTY') ? '(Calculated)' : ''} *</label>
-              <input
-                type={((assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY') ? 'number' : 'text'}
-                value={currentValue}
-                onChange={((assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY') ? (e) => {
-                  setShares(e.target.value);
-                  setPricePerShare('1');
-                } : undefined}
-                className="dialog-input dialog-input-calculated"
-                disabled={((assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && subAssetType !== 'PROPERTY') || (mode === 'netWorthTracker' && subAssetType !== 'PROPERTY')}
-                placeholder={((assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY') ? (subAssetType === 'PROPERTY' ? 'Enter property value' : 'Enter cash amount') : ''}
-                min={((assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY') ? '0' : undefined}
-                step={((assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY') ? 'any' : undefined}
-                required
-              />
-            </div>
+          {/* Value is directly editable for cash accounts (not MONEY_ETF) and PROPERTY assets */}
+          {(() => {
+            const isValueDirectlyEditable = (assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY';
+            const showCalculatedLabel = !isValueDirectlyEditable && mode === 'assetAllocation';
+            const showCalculatedLabelNetWorth = !isValueDirectlyEditable && mode === 'netWorthTracker';
+            
+            return (
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Current Value {showCalculatedLabel || showCalculatedLabelNetWorth ? '(Calculated)' : ''} *</label>
+                  <input
+                    type={isValueDirectlyEditable ? 'number' : 'text'}
+                    value={currentValue}
+                    onChange={isValueDirectlyEditable ? (e) => {
+                      setShares(e.target.value);
+                      setPricePerShare('1');
+                    } : undefined}
+                    className="dialog-input dialog-input-calculated"
+                    disabled={!isValueDirectlyEditable || (mode === 'netWorthTracker' && subAssetType !== 'PROPERTY')}
+                    placeholder={isValueDirectlyEditable ? (subAssetType === 'PROPERTY' ? 'Enter property value' : 'Enter cash amount') : ''}
+                    min={isValueDirectlyEditable ? '0' : undefined}
+                    step={isValueDirectlyEditable ? 'any' : undefined}
+                    required
+                  />
+                </div>
 
-            <div className="form-group">
-              <label>Currency *</label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-                className="dialog-select"
-              >
-                {SUPPORTED_CURRENCIES.map(curr => (
-                  <option key={curr.code} value={curr.code}>{curr.code}</option>
-                ))}
-              </select>
-            </div>
-          </div>
+                <div className="form-group">
+                  <label>Currency *</label>
+                  <select
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
+                    className="dialog-select"
+                  >
+                    {SUPPORTED_CURRENCIES.map(curr => (
+                      <option key={curr.code} value={curr.code}>{curr.code}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            );
+          })()}
 
           {showTargetSettings && (
             <>
