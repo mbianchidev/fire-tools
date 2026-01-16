@@ -1,0 +1,458 @@
+/* ============================================================================
+   POLICY MODAL - Premium Fintech Dark Theme
+   ============================================================================ */
+
+.policy-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.policy-modal-content {
+  background: var(--bg-secondary);
+  border-radius: 16px;
+  max-width: 1000px;
+  width: 100%;
+  max-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.policy-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  border-radius: 16px 16px 0 0;
+  z-index: 10;
+}
+
+.policy-modal-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.policy-modal-close {
+  background: transparent;
+  border: 2px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 1.75rem;
+  cursor: pointer;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.policy-modal-close:hover {
+  background: var(--error);
+  border-color: var(--error);
+  color: white;
+}
+
+.policy-modal-close:focus {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.policy-modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Reuse policy page styles within modal */
+.policy-modal-body .last-updated {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.policy-modal-body .policy-section {
+  margin-bottom: 2rem;
+}
+
+.policy-modal-body .policy-section h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+}
+
+.policy-modal-body .policy-section h3 {
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.policy-modal-body .policy-section h4 {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+}
+
+.policy-modal-body .policy-section p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.policy-modal-body .policy-section ul {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.policy-modal-body .policy-section li {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.policy-modal-body .policy-section a,
+.policy-inline-link {
+  color: var(--accent-primary);
+  text-decoration: underline;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.policy-modal-body .policy-section a:hover,
+.policy-inline-link:hover {
+  color: var(--accent-gold);
+}
+
+.policy-modal-body .policy-section a:focus,
+.policy-inline-link:focus {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.policy-modal-body .policy-section code {
+  background: var(--bg-tertiary);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  color: var(--accent-gold);
+}
+
+.policy-modal-body .policy-section strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Tables in modal */
+.policy-modal-body .policy-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.policy-modal-body .policy-table thead {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-gold) 100%);
+  color: var(--text-inverse);
+}
+
+.policy-modal-body .policy-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.policy-modal-body .policy-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.policy-modal-body .policy-table tbody tr:hover {
+  background: var(--bg-tertiary);
+}
+
+.policy-modal-body .policy-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Cookie table */
+.policy-modal-body .cookie-table-wrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.policy-modal-body .cookie-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 600px;
+}
+
+.policy-modal-body .cookie-table thead {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-gold) 100%);
+  color: var(--text-inverse);
+}
+
+.policy-modal-body .cookie-table th {
+  padding: 0.875rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.policy-modal-body .cookie-table td {
+  padding: 0.875rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+
+.policy-modal-body .cookie-table td:first-child {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: var(--accent-gold);
+}
+
+.policy-modal-body .cookie-table tbody tr:hover {
+  background: var(--bg-tertiary);
+}
+
+.policy-modal-body .cookie-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Info box */
+.policy-modal-body .info-box {
+  background: rgba(45, 212, 191, 0.1);
+  border-left: 4px solid var(--accent-primary);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+}
+
+.policy-modal-body .info-box h4 {
+  color: var(--accent-primary);
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.policy-modal-body .info-box p {
+  color: var(--text-secondary);
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .policy-modal-overlay {
+    padding: 1rem;
+  }
+
+  .policy-modal-content {
+    max-height: calc(100vh - 2rem);
+    border-radius: 12px;
+  }
+
+  .policy-modal-header {
+    padding: 1rem 1.25rem;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .policy-modal-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .policy-modal-close {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .policy-modal-body {
+    padding: 1.25rem;
+  }
+
+  .policy-modal-body .policy-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .policy-modal-body .policy-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .policy-modal-body .policy-section p,
+  .policy-modal-body .policy-section li {
+    font-size: 0.95rem;
+  }
+
+  .policy-modal-body .policy-section ul {
+    margin-left: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .policy-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .policy-modal-header {
+    padding: 0.875rem 1rem;
+  }
+
+  .policy-modal-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .policy-modal-close {
+    width: 36px;
+    height: 36px;
+    font-size: 1.25rem;
+  }
+
+  .policy-modal-body {
+    padding: 1rem;
+  }
+
+  .policy-modal-body .policy-section h2 {
+    font-size: 1.2rem;
+  }
+
+  .policy-modal-body .policy-section h3 {
+    font-size: 1rem;
+  }
+
+  .policy-modal-body .last-updated {
+    font-size: 0.85rem;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1440px) {
+  .policy-modal-content {
+    max-width: 1200px;
+  }
+
+  .policy-modal-header h1 {
+    font-size: 2rem;
+  }
+
+  .policy-modal-body .policy-section h2 {
+    font-size: 1.75rem;
+  }
+
+  .policy-modal-body .policy-section p,
+  .policy-modal-body .policy-section li {
+    font-size: 1.05rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .policy-modal-overlay {
+    position: static;
+    background: white;
+    padding: 0;
+  }
+
+  .policy-modal-content {
+    box-shadow: none;
+    max-height: none;
+  }
+
+  .policy-modal-header h1 {
+    -webkit-text-fill-color: #333;
+    color: #333;
+  }
+
+  .policy-modal-close {
+    display: none;
+  }
+
+  .policy-modal-body .policy-section p,
+  .policy-modal-body .policy-section li,
+  .policy-modal-body .policy-section h2,
+  .policy-modal-body .policy-section h3,
+  .policy-modal-body .policy-section h4 {
+    color: #333;
+  }
+
+  .policy-modal-body .policy-section a {
+    color: #333;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .policy-modal-overlay {
+    animation: none;
+  }
+
+  .policy-modal-content {
+    animation: none;
+  }
+}

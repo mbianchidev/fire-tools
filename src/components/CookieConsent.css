@@ -67,18 +67,27 @@
   color: var(--text-secondary);
 }
 
-.cookie-banner-links a {
+.cookie-banner-links a,
+.cookie-policy-link {
   color: var(--accent-primary);
   text-decoration: underline;
   font-weight: 500;
   transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0;
 }
 
-.cookie-banner-links a:hover {
+.cookie-banner-links a:hover,
+.cookie-policy-link:hover {
   color: var(--accent-gold);
 }
 
-.cookie-banner-links a:focus {
+.cookie-banner-links a:focus,
+.cookie-policy-link:focus {
   outline: 3px solid var(--accent-primary);
   outline-offset: 2px;
   border-radius: var(--radius-sm);

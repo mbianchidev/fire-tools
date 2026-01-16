@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, useSearchParams } from 'react-router-dom';
-import { useState, useEffect, useMemo } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useMemo, createContext, useContext } from 'react';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';
 import { calculateFIRE } from './utils/fireCalculator';
@@ -16,13 +16,12 @@ import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
 import { NotificationBell } from './components/NotificationBell';
 import { SettingsPage } from './components/SettingsPage';
-import { PrivacyPolicyPage } from './components/PrivacyPolicyPage';
-import { CookiePolicyPage } from './components/CookiePolicyPage';
 import { CookieConsent } from './components/CookieConsent';
 import { GuidedTour } from './components/GuidedTour';
 import { NotFoundPage } from './components/NotFoundPage';
 import { QuestionnairePage } from './components/QuestionnairePage';
 import { QuestionnairePrompt } from './components/QuestionnairePrompt';
+import { PolicyModal, PolicyType } from './components/PolicyModal';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
@@ -35,6 +34,19 @@ import './components/GuidedTour.css';
 import './components/NotificationBell.css';
 import { MaterialIcon } from './components/MaterialIcon';
 import { FireIcon } from './components/FireIcon';
+
+// Context for policy modal
+interface PolicyModalContextType {
+  openPolicy: (type: PolicyType) => void;
+  closePolicy: () => void;
+}
+
+export const PolicyModalContext = createContext<PolicyModalContextType>({
+  openPolicy: () => {},
+  closePolicy: () => {},
+});
+
+export const usePolicyModal = () => useContext(PolicyModalContext);
 
 function Navigation({ accountName }: { accountName: string }) {
   const location = useLocation();
@@ -109,6 +121,21 @@ function Navigation({ accountName }: { accountName: string }) {
       </div>
     </nav>
   );
+}
+
+// Component to handle policy route and redirect to home while opening modal
+function PolicyRouteRedirect({ policyType }: { policyType: PolicyType }) {
+  const navigate = useNavigate();
+  const { openPolicy } = usePolicyModal();
+  
+  useEffect(() => {
+    // Open the policy modal
+    openPolicy(policyType);
+    // Navigate to home page
+    navigate('/', { replace: true });
+  }, [navigate, openPolicy, policyType]);
+  
+  return null;
 }
 
 function FIRECalculatorPage() {
@@ -432,55 +459,86 @@ function App() {
   // Load settings from localStorage
   const [settings, setSettings] = useState<UserSettings>(() => loadSettings());
   
+  // Policy modal state
+  const [policyModalType, setPolicyModalType] = useState<PolicyType | null>(null);
+  
   const handleSettingsChange = (newSettings: UserSettings) => {
     setSettings(newSettings);
   };
   
+  const openPolicy = (type: PolicyType) => {
+    setPolicyModalType(type);
+  };
+  
+  const closePolicy = () => {
+    setPolicyModalType(null);
+  };
+  
   return (
     <Router basename={basename}>
-      <div className="app">
-        <a href="#main-content" className="skip-link">Skip to main content</a>
-        
-        <header className="app-header">
-          <FireIcon size={96} className="header-fire-icon" />
-          <h1>Fire Tools</h1>
-          <p>Rocket fuel for your financial planning</p>
-        </header>
+      <PolicyModalContext.Provider value={{ openPolicy, closePolicy }}>
+        <div className="app">
+          <a href="#main-content" className="skip-link">Skip to main content</a>
+          
+          <header className="app-header">
+            <FireIcon size={96} className="header-fire-icon" />
+            <h1>Fire Tools</h1>
+            <p>Rocket fuel for your financial planning</p>
+          </header>
 
-        <Navigation accountName={settings.accountName} />
+          <Navigation accountName={settings.accountName} />
 
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
-          <Route path="/monte-carlo" element={<MonteCarloPage />} />
-          <Route path="/asset-allocation" element={<AssetAllocationPage />} />
-          <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
-          <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
-          <Route path="/questionnaire" element={<QuestionnairePage />} />
-          <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-          <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
+            <Route path="/monte-carlo" element={<MonteCarloPage />} />
+            <Route path="/asset-allocation" element={<AssetAllocationPage />} />
+            <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
+            <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
+            <Route path="/questionnaire" element={<QuestionnairePage />} />
+            <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
+            <Route path="/privacy-policy" element={<PolicyRouteRedirect policyType="privacy" />} />
+            <Route path="/cookie-policy" element={<PolicyRouteRedirect policyType="cookie" />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
 
-        <footer className="app-footer">
-          <p>
-            Fire Tools - Disclaimer: This is for educational purposes only. 
-            Consult with a financial advisor for professional advice.
-          </p>
-          <div className="footer-links">
-            <Link to="/privacy-policy">Privacy Policy</Link>
-            <span className="footer-separator">•</span>
-            <Link to="/cookie-policy">Cookie Policy</Link>
-            <span className="footer-separator">•</span>
-            <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
-          </div>
-        </footer>
+          <footer className="app-footer">
+            <p>
+              Fire Tools - Disclaimer: This is for educational purposes only. 
+              Consult with a financial advisor for professional advice.
+            </p>
+            <div className="footer-links">
+              <button 
+                type="button" 
+                className="footer-link-btn" 
+                onClick={() => openPolicy('privacy')}
+              >
+                Privacy Policy
+              </button>
+              <span className="footer-separator">•</span>
+              <button 
+                type="button" 
+                className="footer-link-btn" 
+                onClick={() => openPolicy('cookie')}
+              >
+                Cookie Policy
+              </button>
+              <span className="footer-separator">•</span>
+              <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </div>
+          </footer>
 
-        <CookieConsent />
-        <GuidedTour />
-        <QuestionnairePrompt />
-      </div>
+          <PolicyModal 
+            isOpen={policyModalType !== null} 
+            onClose={closePolicy} 
+            policyType={policyModalType || 'privacy'}
+            onSwitchPolicy={openPolicy}
+          />
+          <CookieConsent />
+          <GuidedTour />
+          <QuestionnairePrompt />
+        </div>
+      </PolicyModalContext.Provider>
     </Router>
   );
 }

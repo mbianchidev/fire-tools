@@ -1222,6 +1222,29 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   outline-offset: 2px;
 }
 
+.footer-link-btn {
+  background: none;
+  border: none;
+  color: var(--accent-primary);
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.footer-link-btn:hover {
+  color: var(--accent-gold);
+  text-decoration: underline;
+}
+
+.footer-link-btn:focus {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
 .footer-separator {
   color: var(--text-muted);
   font-size: 0.8rem;

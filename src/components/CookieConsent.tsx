@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { usePolicyModal } from '../App';
 import './CookieConsent.css';
 
 const CONSENT_COOKIE = 'fire-tools-cookie-consent';
@@ -13,6 +14,7 @@ interface ConsentData {
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const { openPolicy } = usePolicyModal();
 
   useEffect(() => {
     // Check if user has already acknowledged the cookie notice
@@ -70,7 +72,14 @@ export function CookieConsent() {
             We <strong>do not use analytics, tracking, or marketing cookies</strong>. Your data never leaves your device.
           </p>
           <p className="cookie-banner-links">
-            Learn more: <a href="/privacy-policy">Privacy Policy</a> · <a href="/cookie-policy">Cookie Policy</a>
+            Learn more:{' '}
+            <button type="button" className="cookie-policy-link" onClick={() => openPolicy('privacy')}>
+              Privacy Policy
+            </button>
+            {' · '}
+            <button type="button" className="cookie-policy-link" onClick={() => openPolicy('cookie')}>
+              Cookie Policy
+            </button>
           </p>
         </div>
         <div className="cookie-banner-actions">
