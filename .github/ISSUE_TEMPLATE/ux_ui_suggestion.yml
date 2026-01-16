@@ -1,0 +1,67 @@
+name: UX/UI Suggestion
+description: Suggest an improvement to the user experience or interface
+title: "[UX/UI]: "
+labels: ["enhancement", "ux/ui", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the Fire Tools experience! Please describe your suggestion below.
+
+  - type: dropdown
+    id: suggestion-type
+    attributes:
+      label: Suggestion Type
+      description: What type of UX/UI improvement are you suggesting?
+      options:
+        - Visual Design (colors, typography, spacing)
+        - Layout (arrangement of elements)
+        - Navigation (menus, links, flow between pages)
+        - Usability (making features easier to use)
+        - Accessibility (making the app usable for everyone)
+        - Mobile Experience (responsiveness, touch interactions)
+        - Information Display (charts, data presentation)
+        - Forms and Inputs (better input methods)
+        - Feedback and Messaging (notifications, confirmations)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-experience
+    attributes:
+      label: Current Experience
+      description: Describe the current experience or behavior.
+      placeholder: What is the current state? What's not working well?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested Improvement
+      description: Describe how you think the experience could be improved.
+      placeholder: How would you like it to work instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected Impact
+      description: How would this improvement benefit users?
+      placeholder: What problems would this solve? How would users benefit?
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples or References
+      description: Add mockups, screenshots, or links to examples from other apps.
+      placeholder: Drag and drop images or paste links here...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the suggestion here.
+      placeholder: Any additional information...

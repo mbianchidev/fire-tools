@@ -4,11 +4,29 @@ Thank you for using Fire Tools! This document explains how to get help with the 
 
 ## Getting Help
 
+### Quick Links
+
+Use our issue templates to get help quickly:
+
+- 🐛 **[Report a Bug](https://github.com/mbianchidev/fire-tools/issues/new?template=bug_report.yml)** - Something isn't working correctly
+- ✨ **[Request a Feature](https://github.com/mbianchidev/fire-tools/issues/new?template=feature_request.yml)** - Suggest a new feature or improvement
+- 🎨 **[UX/UI Suggestion](https://github.com/mbianchidev/fire-tools/issues/new?template=ux_ui_suggestion.yml)** - Improve the user experience or interface
+- 🔒 **[Security Issue](https://github.com/mbianchidev/fire-tools/security/advisories/new)** - Report security vulnerabilities privately
+
+### Report from Within the App
+
+You can also report bugs and request features directly from Fire Tools:
+
+1. Open the app
+2. Go to **Settings** (gear icon)
+3. Scroll to **Support & Feedback** section
+4. Click the appropriate button to report a bug, request a feature, or suggest improvements
+
 ### GitHub Issues (Primary Support Channel)
 
-The primary way to get support is by **opening an issue** on GitHub:
+The primary way to get support is by **opening an issue** on GitHub using our templates:
 
-👉 [Open an issue](https://github.com/mbianchidev/fire-tools/issues/new)
+👉 [View all issue options](https://github.com/mbianchidev/fire-tools/issues/new/choose)
 
 This allows the community to:
 - See and benefit from questions and answers
@@ -17,14 +35,15 @@ This allows the community to:
 
 ### What to Include in Your Issue
 
-To help us help you quickly, please include:
+Our issue templates guide you through providing the right information. In general, include:
 
 1. **A clear title** - Summarize your question or problem
-2. **Detailed description** - Explain what you're trying to do
-3. **Steps to reproduce** (for bugs) - Exact steps to recreate the issue
-4. **Expected vs actual behavior** - What should happen vs what happens
-5. **Screenshots** - Visual aids help immensely for UI issues
-6. **Environment details**:
+2. **Category** - What type of issue is it?
+3. **Detailed description** - Explain what you're trying to do
+4. **Steps to reproduce** (for bugs) - Exact steps to recreate the issue
+5. **Expected vs actual behavior** - What should happen vs what happens
+6. **Screenshots** - Visual aids help immensely for UI issues
+7. **Environment details**:
    - Browser and version (e.g., Chrome 120, Firefox 121)
    - Operating system (e.g., Windows 11, macOS 14, Ubuntu 22.04)
    - Node.js version (if relevant for development)
@@ -33,8 +52,9 @@ To help us help you quickly, please include:
 
 ### Bug Reports
 
-Found a bug? Please report it! Include:
+Found a bug? [Report it here!](https://github.com/mbianchidev/fire-tools/issues/new?template=bug_report.yml) Include:
 - Description of the bug
+- Bug category (UI, UX, calculation, data, performance)
 - Steps to reproduce
 - Expected behavior
 - Actual behavior
@@ -43,7 +63,7 @@ Found a bug? Please report it! Include:
 
 ### Feature Requests
 
-Have an idea for a new feature? We'd love to hear it! Include:
+Have an idea for a new feature? [Request it here!](https://github.com/mbianchidev/fire-tools/issues/new?template=feature_request.yml) Include:
 - Description of the feature
 - Why it would be useful
 - How you envision it working

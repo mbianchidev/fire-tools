@@ -151,9 +151,12 @@ See [SECURITY.md](SECURITY.md) for our security policy and disclosure process.
 Need help? Have questions?
 
 - 📖 Check the [documentation](#-documentation) above
-- 🐛 [Open an issue](https://github.com/mbianchidev/fire-tools/issues/new) for bug reports
-- 💡 [Request a feature](https://github.com/mbianchidev/fire-tools/issues/new) with your ideas
+- 🐛 [Report a bug](https://github.com/mbianchidev/fire-tools/issues/new?template=bug_report.yml) - Something not working?
+- ✨ [Request a feature](https://github.com/mbianchidev/fire-tools/issues/new?template=feature_request.yml) - Have an idea?
+- 🎨 [UX/UI suggestion](https://github.com/mbianchidev/fire-tools/issues/new?template=ux_ui_suggestion.yml) - Improve the experience
 - 💬 See [SUPPORT.md](SUPPORT.md) for more support options
+
+**Tip:** You can also report bugs directly from the app via **Settings → Support & Feedback**.
 
 ---
 

@@ -205,27 +205,40 @@ npm test
 
 ## Issue Guidelines
 
+We use GitHub Issue Templates to help you report bugs and request features. This ensures we have all the information needed to help you.
+
+### Quick Links
+
+- 🐛 **[Report a Bug](https://github.com/mbianchidev/fire-tools/issues/new?template=bug_report.yml)** - Something isn't working correctly
+- ✨ **[Request a Feature](https://github.com/mbianchidev/fire-tools/issues/new?template=feature_request.yml)** - Suggest a new feature or improvement
+- 🎨 **[UX/UI Suggestion](https://github.com/mbianchidev/fire-tools/issues/new?template=ux_ui_suggestion.yml)** - Improve the user experience or interface
+- 🔒 **[Security Issue](https://github.com/mbianchidev/fire-tools/security/advisories/new)** - Report security vulnerabilities privately
+
+You can also report bugs directly from the app via **Settings → Support & Feedback → Report a Bug**.
+
 ### Reporting Bugs
 
 When reporting a bug, include:
 
 1. **Clear title** - Summarize the issue
-2. **Description** - Detailed explanation of the bug
-3. **Steps to reproduce** - Exact steps to recreate the issue
-4. **Expected behavior** - What should happen
-5. **Actual behavior** - What actually happens
-6. **Environment** - Browser, OS, Node.js version
-7. **Screenshots** - If applicable
+2. **Bug category** - UI bug, UX bug, calculation bug, etc.
+3. **Description** - Detailed explanation of the bug
+4. **Steps to reproduce** - Exact steps to recreate the issue
+5. **Expected behavior** - What should happen
+6. **Actual behavior** - What actually happens
+7. **Environment** - Browser, OS, Node.js version
+8. **Screenshots** - If applicable
 
 ### Requesting Features
 
 When requesting a feature, include:
 
 1. **Clear title** - Summarize the feature
-2. **Use case** - Why is this feature needed?
-3. **Proposed solution** - How should it work?
-4. **Alternatives** - Other solutions you've considered
-5. **Additional context** - Any other relevant information
+2. **Feature category** - Which area of the app does it relate to?
+3. **Use case** - Why is this feature needed?
+4. **Proposed solution** - How should it work?
+5. **Alternatives** - Other solutions you've considered
+6. **Additional context** - Any other relevant information
 
 ### Issue Labels
 
@@ -233,6 +246,7 @@ Issues are organized with labels:
 
 - `bug` - Something isn't working
 - `enhancement` - New feature or request
+- `ux/ui` - User experience or interface improvements
 - `documentation` - Documentation improvements
 - `good first issue` - Good for newcomers
 - `help wanted` - Extra attention needed

@@ -24,7 +24,7 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['account', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'data'] as const;
+const SETTINGS_SECTIONS = ['account', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'data', 'support'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
@@ -1090,6 +1090,136 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 <button className="danger-btn" onClick={handleResetAll}>
                   <MaterialIcon name="delete" /> Reset All Data
                 </button>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Support & Feedback */}
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('support')}
+            aria-expanded={!collapsedSections.has('support')}
+            aria-controls="support-content"
+          >
+            <h2><MaterialIcon name="help" /> Support & Feedback <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('support') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('support') && (
+            <div id="support-content" className="collapsible-content">
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="bug_report" /> Report a Bug</h3>
+                  <Tooltip content="Found something not working correctly? Report a bug to help us improve Fire Tools. You'll be taken to GitHub to submit the report." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Report bugs, UI issues, or calculation errors</p>
+                <a 
+                  href="https://github.com/mbianchidev/fire-tools/issues/new?template=bug_report.yml" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="secondary-btn"
+                  style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
+                >
+                  <MaterialIcon name="open_in_new" /> Report a Bug
+                </a>
+              </div>
+
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="lightbulb" /> Request a Feature</h3>
+                  <Tooltip content="Have an idea for a new feature or improvement? We'd love to hear it! You'll be taken to GitHub to submit your suggestion." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Suggest new features or improvements</p>
+                <a 
+                  href="https://github.com/mbianchidev/fire-tools/issues/new?template=feature_request.yml" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="secondary-btn"
+                  style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
+                >
+                  <MaterialIcon name="open_in_new" /> Request a Feature
+                </a>
+              </div>
+
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="palette" /> UX/UI Suggestion</h3>
+                  <Tooltip content="Have ideas to improve the look and feel of Fire Tools? Share your UX/UI suggestions with us on GitHub." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Suggest improvements to the user interface or experience</p>
+                <a 
+                  href="https://github.com/mbianchidev/fire-tools/issues/new?template=ux_ui_suggestion.yml" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="secondary-btn"
+                  style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
+                >
+                  <MaterialIcon name="open_in_new" /> Suggest UX/UI Improvement
+                </a>
+              </div>
+
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="security" /> Report Security Issue</h3>
+                  <Tooltip content="Found a security vulnerability? Please report it privately through GitHub's security advisory feature. Do not create a public issue for security concerns." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">Report security vulnerabilities privately</p>
+                <a 
+                  href="https://github.com/mbianchidev/fire-tools/security/advisories/new" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="secondary-btn"
+                  style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
+                >
+                  <MaterialIcon name="open_in_new" /> Report Security Issue
+                </a>
+              </div>
+
+              <div className="data-management-group">
+                <div className="subsection-header-with-tooltip">
+                  <h3><MaterialIcon name="menu_book" /> Documentation</h3>
+                  <Tooltip content="View the project documentation, including how to contribute, our security policy, and support options." position="right" maxWidth={350}>
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <p className="setting-help">View documentation and support resources</p>
+                <div className="export-buttons">
+                  <a 
+                    href="https://github.com/mbianchidev/fire-tools/blob/main/README.md" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="secondary-btn"
+                    style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
+                  >
+                    <MaterialIcon name="open_in_new" /> README
+                  </a>
+                  <a 
+                    href="https://github.com/mbianchidev/fire-tools/blob/main/CONTRIBUTING.md" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="secondary-btn"
+                    style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
+                  >
+                    <MaterialIcon name="open_in_new" /> Contributing Guide
+                  </a>
+                  <a 
+                    href="https://github.com/mbianchidev/fire-tools/blob/main/SUPPORT.md" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="secondary-btn"
+                    style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}
+                  >
+                    <MaterialIcon name="open_in_new" /> Support
+                  </a>
+                </div>
               </div>
             </div>
           )}
