@@ -595,3 +595,10 @@ select:disabled {
   font-size: 1.1rem !important;
   padding: 0.875rem 1rem !important;
 }
+
+/* External link styled as button */
+.external-link-btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
