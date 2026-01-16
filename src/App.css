@@ -1523,6 +1523,115 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: var(--radius-sm);
 }
 
+.mc-logs-controls {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.mc-logs-page-size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mc-logs-page-size label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.mc-logs-page-size select {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.mc-logs-table tr.expanded {
+  background: rgba(45, 212, 191, 0.05);
+}
+
+.mc-logs-inline-detail {
+  background: var(--bg-secondary);
+  padding: 0;
+}
+
+.mc-logs-inline-detail > td {
+  padding: 0 !important;
+}
+
+.mc-logs-detail-inline {
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mc-logs-initial-params {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+.mc-logs-initial-params h5 {
+  margin-bottom: 0.75rem;
+  color: var(--accent-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.mc-logs-params-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.mc-logs-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.mc-logs-pagination button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mc-logs-pagination button:hover:not(:disabled) {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+.mc-logs-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mc-logs-page-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 0 1rem;
+}
+
 .mc-logs-detail {
   margin-top: 1.5rem;
   padding: 1.5rem;

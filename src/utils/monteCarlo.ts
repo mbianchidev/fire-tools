@@ -104,6 +104,12 @@ function runSingleSimulation(
   let isFIREAchieved = false;
   let yearsToFIRE: number | null = null;
   
+  // Track expenses with inflation (cash return is typically negative, representing inflation)
+  // Use the absolute value of cash return as inflation rate
+  const inflationRate = Math.abs(inputs.expectedCashReturn) / 100;
+  let currentExpenses = inputs.currentAnnualExpenses;
+  let fireExpenses = inputs.fireAnnualExpenses;
+  
   // Collect yearly data for logging
   const yearlyData: SimulationYearData[] = [];
   
@@ -154,8 +160,8 @@ function runSingleSimulation(
     const otherIncomeTotal = pensionIncome + inputs.otherIncome;
     const totalIncome = currentLaborIncome + investmentYield + otherIncomeTotal;
     
-    // Calculate expenses
-    const expenses = isFIREAchieved ? inputs.fireAnnualExpenses : inputs.currentAnnualExpenses;
+    // Calculate expenses with inflation adjustment
+    const expenses = isFIREAchieved ? fireExpenses : currentExpenses;
     
     // Capture yearly data for logging if enabled
     if (captureLog) {
@@ -195,6 +201,10 @@ function runSingleSimulation(
       laborIncome = laborIncome * (1 + inputs.laborIncomeGrowthRate / 100);
     }
     
+    // Apply inflation to expenses for next year
+    currentExpenses = currentExpenses * (1 + inflationRate);
+    fireExpenses = fireExpenses * (1 + inflationRate);
+    
     // Check for failure (portfolio significantly depleted)
     if (portfolioValue < -1000) {
       const failureResult: SimulationRun & { logEntry?: SimulationLogEntry } = {
@@ -219,10 +229,20 @@ function runSingleSimulation(
     }
   }
   
+  // Determine success: either FIRE was achieved during simulation, 
+  // or final portfolio can sustain expenses at the desired withdrawal rate
+  const finalFireTarget = fireExpenses / (inputs.desiredWithdrawalRate / 100);
+  const isSuccess = isFIREAchieved || portfolioValue >= finalFireTarget;
+  
+  // If we didn't hit FIRE during simulation but ended with enough, mark when we hit it
+  if (!isFIREAchieved && isSuccess) {
+    yearsToFIRE = maxYears; // Achieved at end of simulation
+  }
+  
   const result: SimulationRun & { logEntry?: SimulationLogEntry } = {
     simulationId,
-    success: isFIREAchieved,
-    yearsToFIRE,
+    success: isSuccess,
+    yearsToFIRE: isSuccess ? yearsToFIRE : null,
     finalPortfolio: portfolioValue,
   };
   
@@ -230,8 +250,8 @@ function runSingleSimulation(
     result.logEntry = {
       simulationId,
       timestamp: new Date().toISOString(),
-      success: isFIREAchieved,
-      yearsToFIRE,
+      success: isSuccess,
+      yearsToFIRE: isSuccess ? yearsToFIRE : null,
       finalPortfolio: portfolioValue,
       yearlyData,
     };
