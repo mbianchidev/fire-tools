@@ -74,7 +74,7 @@ export interface AssetHolding {
   targetMode?: 'PERCENTAGE' | 'OFF' | 'SET';
   targetPercent?: number;
   targetValue?: number;
-  syncAssetClass?: 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE';
+  syncAssetClass?: 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE' | 'COMMODITIES';
   syncSubAssetType?: string;
   isin?: string;
 }

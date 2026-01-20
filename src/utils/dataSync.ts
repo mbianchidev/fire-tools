@@ -25,6 +25,7 @@ export const DEFAULT_ASSET_CLASS_TARGETS: Record<AssetClass, { targetMode: Alloc
   CASH: { targetMode: 'PERCENTAGE', targetPercent: 10 },
   CRYPTO: { targetMode: 'OFF' },
   REAL_ESTATE: { targetMode: 'OFF' },
+  COMMODITIES: { targetMode: 'OFF' },
 };
 
 /**
@@ -40,6 +41,8 @@ function mapAssetClassToNetWorth(assetClass: AssetClass): AssetHolding['assetCla
       return 'CRYPTO';
     case 'REAL_ESTATE':
       return 'REAL_ESTATE';
+    case 'COMMODITIES':
+      return 'COMMODITIES';
     case 'CASH':
       return 'OTHER'; // Cash handled separately
     default:
@@ -56,6 +59,7 @@ function isCashAsset(subAssetType: SubAssetType): boolean {
     'CHECKING_ACCOUNT',
     'BROKERAGE_ACCOUNT',
     'MONEY_ETF',
+    'PHYSICAL_GOLD', // Physical gold stored as cash/vault
   ].includes(subAssetType);
 }
 
@@ -92,9 +96,15 @@ function mapNetWorthAssetClassToAllocation(assetClass: AssetHolding['assetClass'
       return 'CRYPTO';
     case 'REAL_ESTATE':
       return 'REAL_ESTATE';
+    case 'COMMODITIES':
+      return 'COMMODITIES';
+    case 'VEHICLE':
+    case 'COLLECTIBLE':
+    case 'ART':
+    case 'PRIVATE_EQUITY':
     case 'OTHER':
     default:
-      return 'STOCKS'; // Default OTHER to STOCKS as closest match
+      return 'STOCKS'; // Default to STOCKS as closest match for financial assets
   }
 }
 

@@ -503,6 +503,8 @@ export function convertMonthlyVariationsToDisplayCurrency(
     assetValueChange: convertAmount(variation.assetValueChange, fromCurrency, toCurrency, rates),
     cashChange: convertAmount(variation.cashChange, fromCurrency, toCurrency, rates),
     pensionChange: convertAmount(variation.pensionChange, fromCurrency, toCurrency, rates),
+    debtChange: convertAmount(variation.debtChange, fromCurrency, toCurrency, rates),
+    taxLiabilityChange: convertAmount(variation.taxLiabilityChange, fromCurrency, toCurrency, rates),
   }));
 }
 

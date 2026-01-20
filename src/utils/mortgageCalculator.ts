@@ -3,7 +3,8 @@
  * Functions for calculating mortgage payments, interest, and principal breakdown
  */
 
-import { MortgageInfo, MortgageData } from '../types/netWorthTracker';
+import { MortgageInfo } from '../types/netWorthTracker';
+import { MortgageData } from '../types/assetAllocation';
 
 /**
  * Calculate monthly mortgage payment using the standard amortization formula
