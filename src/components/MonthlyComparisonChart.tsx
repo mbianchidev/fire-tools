@@ -39,13 +39,13 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
 
   return (
     <div style={{
-      background: 'white',
+      background: '#1e293b',
       padding: '0.75rem 1rem',
       borderRadius: '8px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-      border: '1px solid #e0e0e0',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+      border: '1px solid #334155',
     }}>
-      <p style={{ margin: 0, fontWeight: 600, color: '#333' }}>{label}</p>
+      <p style={{ margin: 0, fontWeight: 600, color: '#f1f5f9' }}>{label}</p>
       {payload.map((entry: any, index: number) => (
         <p 
           key={index}
@@ -57,15 +57,15 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
             gap: '1rem',
           }}
         >
-          <span>{entry.name}:</span>
+          <span style={{ color: '#e2e8f0' }}>{entry.name}:</span>
           <span style={{ fontWeight: 500 }}>{formatCurrency(entry.value, currency)}</span>
         </p>
       ))}
       {payload[0]?.payload?.average && (
         <p style={{ 
           margin: '0.5rem 0 0', 
-          color: '#666', 
-          borderTop: '1px solid #e0e0e0',
+          color: '#94a3b8', 
+          borderTop: '1px solid #334155',
           paddingTop: '0.5rem',
           fontSize: '0.85rem',
         }}>

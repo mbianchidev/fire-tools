@@ -78,15 +78,15 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
 
   return (
     <div style={{
-      background: 'white',
+      background: '#1e293b',
       padding: '0.75rem 1rem',
       borderRadius: '8px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-      border: '1px solid #e0e0e0',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+      border: '1px solid #334155',
       maxHeight: '300px',
       overflowY: 'auto',
     }}>
-      <p style={{ margin: 0, fontWeight: 600, color: '#333', marginBottom: '0.5rem' }}>{label}</p>
+      <p style={{ margin: 0, fontWeight: 600, color: '#f1f5f9', marginBottom: '0.5rem' }}>{label}</p>
       {sortedPayload.map((entry: any, index: number) => {
         if (!entry.value) return null;
         const categoryInfo = getCategoryInfo(entry.dataKey as ExpenseCategory);
@@ -101,7 +101,7 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
               fontSize: '0.9rem',
             }}
           >
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#e2e8f0' }}>
               <span style={{
                 width: '10px',
                 height: '10px',
@@ -173,9 +173,9 @@ export function SpendingTrendChart({ data, currency }: SpendingTrendChartProps) 
           <Legend 
             formatter={(value) => {
               const categoryInfo = getCategoryInfo(value as ExpenseCategory);
-              return categoryInfo.name;
+              return <span style={{ color: '#F8FAFC' }}>{categoryInfo.name}</span>;
             }}
-            wrapperStyle={{ fontSize: '0.85rem' }}
+            wrapperStyle={{ fontSize: '0.85rem', paddingTop: '12px' }}
           />
           {activeCategories.map((category) => (
             <Line
