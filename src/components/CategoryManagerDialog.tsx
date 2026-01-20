@@ -35,6 +35,12 @@ export function CategoryManagerDialog({
   const [customColor, setCustomColor] = useState('');
   const [defaultExpenseType, setDefaultExpenseType] = useState<ExpenseType>('WANT');
   
+  // Validation error state
+  const [errors, setErrors] = useState<{ name?: string; icon?: string; color?: string }>({});
+  
+  // Delete confirmation state
+  const [categoryToDelete, setCategoryToDelete] = useState<CustomCategory | null>(null);
+  
   // Icon picker state
   const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
   const iconPickerRef = useRef<HTMLDivElement>(null);
@@ -71,6 +77,7 @@ export function CategoryManagerDialog({
     setCustomColor('');
     setDefaultExpenseType('WANT');
     setEditingCategory(null);
+    setErrors({});
   };
   
   // Handle starting add
@@ -99,28 +106,30 @@ export function CategoryManagerDialog({
   
   // Handle save
   const handleSave = () => {
+    const newErrors: { name?: string; icon?: string; color?: string } = {};
+    
     const trimmedName = name.trim();
     if (!trimmedName) {
-      alert('Please enter a category name');
-      return;
+      newErrors.name = 'Please enter a category name';
     }
     
     if (!selectedIcon) {
-      alert('Please select an icon');
-      return;
+      newErrors.icon = 'Please select an icon';
     }
     
     const finalColor = customColor || selectedColor;
     if (!finalColor) {
-      alert('Please select or enter a color');
+      newErrors.color = 'Please select or enter a color';
+    } else if (customColor && !/^#[0-9A-Fa-f]{6}$/.test(customColor)) {
+      newErrors.color = 'Please enter a valid hex color code (e.g., #FF5733)';
+    }
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
     
-    // Validate custom color is a valid hex code
-    if (customColor && !/^#[0-9A-Fa-f]{6}$/.test(customColor)) {
-      alert('Please enter a valid hex color code (e.g., #FF5733)');
-      return;
-    }
+    setErrors({});
     
     const category: CustomCategory = {
       id: editingCategory?.id || generateCategoryId(),
@@ -140,11 +149,22 @@ export function CategoryManagerDialog({
     setView('list');
   };
   
-  // Handle delete
-  const handleDelete = (category: CustomCategory) => {
-    if (confirm(`Are you sure you want to delete the category "${category.name}"? This will not delete transactions using this category.`)) {
-      onDeleteCategory(category.id);
+  // Handle delete - shows confirmation
+  const handleDeleteClick = (category: CustomCategory) => {
+    setCategoryToDelete(category);
+  };
+  
+  // Confirm delete
+  const handleConfirmDelete = () => {
+    if (categoryToDelete) {
+      onDeleteCategory(categoryToDelete.id);
+      setCategoryToDelete(null);
     }
+  };
+  
+  // Cancel delete
+  const handleCancelDelete = () => {
+    setCategoryToDelete(null);
   };
   
   // Handle color selection
@@ -233,7 +253,7 @@ export function CategoryManagerDialog({
                         </button>
                         <button 
                           className="btn-icon btn-delete" 
-                          onClick={() => handleDelete(cat)}
+                          onClick={() => handleDeleteClick(cat)}
                           aria-label={`Delete ${cat.name}`}
                         >
                           <MaterialIcon name="delete" size="small" />
@@ -250,27 +270,31 @@ export function CategoryManagerDialog({
         {(view === 'add' || view === 'edit') && (
           <form className="category-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
             {/* Category Name */}
-            <div className="form-group">
+            <div className={`form-group ${errors.name ? 'has-error' : ''}`}>
               <label htmlFor="category-name">Category Name</label>
               <input
                 id="category-name"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => { setName(e.target.value); if (errors.name) setErrors(prev => ({ ...prev, name: undefined })); }}
                 placeholder="Enter category name..."
                 maxLength={30}
-                required
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? 'name-error' : undefined}
               />
+              {errors.name && <span id="name-error" className="error-message">{errors.name}</span>}
             </div>
             
             {/* Icon Picker */}
-            <div className="form-group">
+            <div className={`form-group ${errors.icon ? 'has-error' : ''}`}>
               <label>Icon</label>
               <div className="icon-picker-container" ref={iconPickerRef}>
                 <button
                   type="button"
                   className="icon-picker-trigger"
-                  onClick={() => setIsIconPickerOpen(!isIconPickerOpen)}
+                  onClick={() => { setIsIconPickerOpen(!isIconPickerOpen); if (errors.icon) setErrors(prev => ({ ...prev, icon: undefined })); }}
+                  aria-invalid={!!errors.icon}
+                  aria-describedby={errors.icon ? 'icon-error' : undefined}
                 >
                   {selectedIcon ? (
                     <>
@@ -297,6 +321,7 @@ export function CategoryManagerDialog({
                             onClick={() => {
                               setSelectedIcon(icon);
                               setIsIconPickerOpen(false);
+                              if (errors.icon) setErrors(prev => ({ ...prev, icon: undefined }));
                             }}
                             title={icon}
                           >
@@ -308,10 +333,11 @@ export function CategoryManagerDialog({
                   </div>
                 )}
               </div>
+              {errors.icon && <span id="icon-error" className="error-message">{errors.icon}</span>}
             </div>
             
             {/* Color Picker */}
-            <div className="form-group">
+            <div className={`form-group ${errors.color ? 'has-error' : ''}`}>
               <label>Color</label>
               <div className="color-picker">
                 <div className="color-grid">
@@ -321,7 +347,7 @@ export function CategoryManagerDialog({
                       type="button"
                       className={`color-option ${selectedColor === color ? 'selected' : ''}`}
                       style={{ backgroundColor: color }}
-                      onClick={() => handleColorSelect(color)}
+                      onClick={() => { handleColorSelect(color); if (errors.color) setErrors(prev => ({ ...prev, color: undefined })); }}
                       aria-label={`Select color ${color}`}
                     />
                   ))}
@@ -333,9 +359,11 @@ export function CategoryManagerDialog({
                       id="custom-color"
                       type="text"
                       value={customColor}
-                      onChange={(e) => handleCustomColorChange(e.target.value)}
+                      onChange={(e) => { handleCustomColorChange(e.target.value); if (errors.color) setErrors(prev => ({ ...prev, color: undefined })); }}
                       placeholder="#FF5733"
                       pattern="^#[0-9A-Fa-f]{6}$"
+                      aria-invalid={!!errors.color}
+                      aria-describedby={errors.color ? 'color-error' : undefined}
                     />
                     {(customColor || selectedColor) && (
                       <span 
@@ -345,6 +373,7 @@ export function CategoryManagerDialog({
                     )}
                   </div>
                 </div>
+                {errors.color && <span id="color-error" className="error-message">{errors.color}</span>}
               </div>
             </div>
             
@@ -375,6 +404,27 @@ export function CategoryManagerDialog({
               </button>
             </div>
           </form>
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        {categoryToDelete && (
+          <div className="confirm-overlay">
+            <div className="confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+              <h3 id="confirm-title">Delete Category</h3>
+              <p>
+                Are you sure you want to delete the category &ldquo;{categoryToDelete.name}&rdquo;? 
+                This will not delete transactions using this category.
+              </p>
+              <div className="confirm-actions">
+                <button className="btn-cancel" onClick={handleCancelDelete}>
+                  Cancel
+                </button>
+                <button className="btn-delete" onClick={handleConfirmDelete}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

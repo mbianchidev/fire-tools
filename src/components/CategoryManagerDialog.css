@@ -348,3 +348,74 @@
     justify-content: flex-end;
   }
 }
+
+/* Form validation errors */
+.form-group.has-error input,
+.form-group.has-error .icon-picker-trigger {
+  border-color: #f5576c;
+}
+
+.error-message {
+  display: block;
+  color: #f5576c;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Delete confirmation dialog */
+.confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 110;
+  border-radius: inherit;
+}
+
+.confirm-dialog {
+  background: var(--bg-elevated);
+  padding: 1.5rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.confirm-dialog h3 {
+  margin: 0 0 1rem;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.confirm-dialog p {
+  color: var(--text-secondary);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.btn-delete {
+  padding: 0.6rem 1.2rem;
+  background: #f5576c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-delete:hover {
+  background: #e04055;
+}

@@ -322,7 +322,7 @@ export function getUsedIcons(customCategories?: CustomCategory[]): string[] {
 
 // Generate unique category ID
 export function generateCategoryId(): string {
-  return `cat-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `cat-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
 // Predefined colors for category selection
