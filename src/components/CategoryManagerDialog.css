@@ -419,3 +419,28 @@
 .btn-delete:hover {
   background: #e04055;
 }
+
+/* Protected category styling */
+.category-item.protected {
+  opacity: 0.8;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), transparent);
+}
+
+.category-item.protected .category-name {
+  font-style: italic;
+}
+
+/* Warning text in delete confirmation */
+.warning-text {
+  color: #ffa726;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.warning-text .material-symbols-outlined {
+  color: #ffa726;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}

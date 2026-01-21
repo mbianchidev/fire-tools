@@ -17,6 +17,7 @@ import {
   getCategoryInfo,
   getAllCategories,
   CustomCategory,
+  CategoryOverride,
 } from '../types/expenseTracker';
 import { SupportedCurrency } from '../types/currency';
 import {
@@ -621,16 +622,64 @@ export function ExpenseTrackerPage() {
     });
   }, []);
 
-  // Delete custom category
-  const handleDeleteCategory = useCallback((categoryId: string) => {
+  // Delete custom category - reassign expenses to the specified category (defaults to NO_CATEGORY)
+  const handleDeleteCategory = useCallback((categoryId: string, reassignTo?: string) => {
     setData(prev => {
       const newData = deepCloneData(prev);
       if (!newData.customCategories) return newData;
+      
+      // If reassignTo is specified, reassign all expenses with this category
+      if (reassignTo) {
+        for (const yearData of newData.years) {
+          for (const monthData of yearData.months) {
+            for (const expense of monthData.expenses) {
+              if (expense.category === categoryId) {
+                expense.category = reassignTo;
+              }
+            }
+          }
+        }
+      }
       
       newData.customCategories = newData.customCategories.filter(c => c.id !== categoryId);
       return newData;
     });
   }, []);
+
+  // Update a built-in category with an override
+  const handleUpdateBuiltInCategory = useCallback((override: CategoryOverride) => {
+    setData(prev => {
+      const newData = deepCloneData(prev);
+      if (!newData.categoryOverrides) {
+        newData.categoryOverrides = [];
+      }
+      
+      // Find existing override and update or add new one
+      const existingIndex = newData.categoryOverrides.findIndex(o => o.id === override.id);
+      if (existingIndex >= 0) {
+        // Merge with existing override
+        newData.categoryOverrides[existingIndex] = {
+          ...newData.categoryOverrides[existingIndex],
+          ...override,
+        };
+      } else {
+        newData.categoryOverrides.push(override);
+      }
+      
+      return newData;
+    });
+  }, []);
+
+  // Get count of expenses for a specific category (across all years)
+  const getExpenseCountForCategory = useCallback((categoryId: string): number => {
+    let count = 0;
+    for (const yearData of data.years) {
+      for (const monthData of yearData.months) {
+        count += monthData.expenses.filter(e => e.category === categoryId).length;
+      }
+    }
+    return count;
+  }, [data.years]);
 
   // Export data
   const handleExport = () => {
@@ -1495,10 +1544,13 @@ export function ExpenseTrackerPage() {
         {showCategoryManager && (
           <CategoryManagerDialog
             customCategories={data.customCategories || []}
+            categoryOverrides={data.categoryOverrides || []}
             onAddCategory={handleAddCategory}
             onUpdateCategory={handleUpdateCategory}
             onDeleteCategory={handleDeleteCategory}
+            onUpdateBuiltInCategory={handleUpdateBuiltInCategory}
             onClose={() => setShowCategoryManager(false)}
+            getExpenseCountForCategory={getExpenseCountForCategory}
           />
         )}
 

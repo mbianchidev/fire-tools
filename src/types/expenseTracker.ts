@@ -6,6 +6,7 @@ import { SupportedCurrency } from './currency';
 
 // Transaction categories for expenses
 export type ExpenseCategory = 
+  | 'NO_CATEGORY'
   | 'HOUSING'
   | 'UTILITIES'
   | 'TRANSPORTATION'
@@ -197,6 +198,17 @@ export interface CustomCategory {
   defaultExpenseType: ExpenseType;
 }
 
+// Override for built-in categories (allows customization of default categories)
+export interface CategoryOverride {
+  id: ExpenseCategory; // ID of the built-in category being overridden
+  name?: string; // Custom name (optional)
+  icon?: string; // Custom icon (optional)
+  color?: string; // Custom color (optional)
+}
+
+// Special constant for the "No Category" ID - this category cannot be edited or deleted
+export const NO_CATEGORY_ID = 'NO_CATEGORY' as const;
+
 // Main expense tracker state
 export interface ExpenseTrackerData {
   years: YearData[];
@@ -205,6 +217,7 @@ export interface ExpenseTrackerData {
   currency: SupportedCurrency;
   globalBudgets: CategoryBudget[]; // Global budgets that apply to all months
   customCategories?: CustomCategory[]; // User-defined custom categories
+  categoryOverrides?: CategoryOverride[]; // User customizations of built-in categories
 }
 
 // Category display info (supports both built-in and custom categories)
@@ -215,10 +228,13 @@ export interface CategoryInfo {
   defaultExpenseType: ExpenseType;
   color?: string; // Optional color for custom categories
   isCustom?: boolean; // Flag to indicate if this is a custom category
+  isProtected?: boolean; // Flag to indicate if this category cannot be edited or deleted
 }
 
 // Default categories configuration
+// Note: NO_CATEGORY is first and protected - it cannot be edited or deleted
 export const EXPENSE_CATEGORIES: CategoryInfo[] = [
+  { id: NO_CATEGORY_ID, name: 'No Category', icon: 'help_outline', defaultExpenseType: 'WANT', isProtected: true },
   { id: 'HOUSING', name: 'Housing', icon: 'home', defaultExpenseType: 'NEED' },
   { id: 'UTILITIES', name: 'Utilities', icon: 'lightbulb', defaultExpenseType: 'NEED' },
   { id: 'TRANSPORTATION', name: 'Transportation', icon: 'directions_car', defaultExpenseType: 'NEED' },
@@ -263,12 +279,35 @@ export const INCOME_SOURCES: IncomeSourceInfo[] = [
   { id: 'OTHER', name: 'Other', icon: 'attach_money' },
 ];
 
-// Helper function to get category info (supports both built-in and custom categories)
-export function getCategoryInfo(category: ExpenseCategory | string, customCategories?: CustomCategory[]): CategoryInfo {
+// Helper function to convert snake_case icon names to readable labels
+export function formatIconLabel(icon: string): string {
+  return icon
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+// Helper function to get category info (supports built-in, custom categories, and overrides)
+export function getCategoryInfo(
+  category: ExpenseCategory | string, 
+  customCategories?: CustomCategory[],
+  categoryOverrides?: CategoryOverride[]
+): CategoryInfo {
   // First check built-in categories
   const builtIn = EXPENSE_CATEGORIES.find(c => c.id === category);
   if (builtIn) {
-    return builtIn;
+    // Check if there's an override for this built-in category
+    const override = categoryOverrides?.find(o => o.id === category);
+    if (override) {
+      return {
+        ...builtIn,
+        name: override.name || builtIn.name,
+        icon: override.icon || builtIn.icon,
+        color: override.color,
+        isCustom: false,
+      };
+    }
+    return { ...builtIn, isCustom: false };
   }
   
   // Check custom categories if provided
@@ -286,16 +325,25 @@ export function getCategoryInfo(category: ExpenseCategory | string, customCatego
     }
   }
   
-  // Fall back to "Other" category for unknown categories
-  return EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+  // Fall back to "No Category" for unknown categories
+  return { ...EXPENSE_CATEGORIES[0], isCustom: false };
 }
 
-// Helper function to get all categories (built-in + custom)
-export function getAllCategories(customCategories?: CustomCategory[]): CategoryInfo[] {
-  const builtInCategories: CategoryInfo[] = EXPENSE_CATEGORIES.map(c => ({
-    ...c,
-    isCustom: false,
-  }));
+// Helper function to get all categories (built-in + custom, with overrides applied)
+export function getAllCategories(
+  customCategories?: CustomCategory[],
+  categoryOverrides?: CategoryOverride[]
+): CategoryInfo[] {
+  const builtInCategories: CategoryInfo[] = EXPENSE_CATEGORIES.map(c => {
+    const override = categoryOverrides?.find(o => o.id === c.id);
+    return {
+      ...c,
+      name: override?.name || c.name,
+      icon: override?.icon || c.icon,
+      color: override?.color,
+      isCustom: false,
+    };
+  });
   
   if (!customCategories || customCategories.length === 0) {
     return builtInCategories;
@@ -313,9 +361,13 @@ export function getAllCategories(customCategories?: CustomCategory[]): CategoryI
   return [...builtInCategories, ...customCategoryInfos];
 }
 
-// Helper function to get icons already in use by categories
-export function getUsedIcons(customCategories?: CustomCategory[]): string[] {
-  const builtInIcons = EXPENSE_CATEGORIES.map(c => c.icon);
+// Helper function to get icons already in use by categories (considers overrides)
+export function getUsedIcons(customCategories?: CustomCategory[], categoryOverrides?: CategoryOverride[]): string[] {
+  // Get built-in icons, considering overrides
+  const builtInIcons = EXPENSE_CATEGORIES.map(c => {
+    const override = categoryOverrides?.find(o => o.id === c.id);
+    return override?.icon || c.icon;
+  });
   const customIcons = customCategories?.map(c => c.icon) || [];
   return [...builtInIcons, ...customIcons];
 }
@@ -370,8 +422,8 @@ export const AVAILABLE_ICONS: string[] = [
 ];
 
 // Helper function to get available icons (excluding ones already in use)
-export function getAvailableIcons(customCategories?: CustomCategory[]): string[] {
-  const usedIcons = getUsedIcons(customCategories);
+export function getAvailableIcons(customCategories?: CustomCategory[], categoryOverrides?: CategoryOverride[]): string[] {
+  const usedIcons = getUsedIcons(customCategories, categoryOverrides);
   return AVAILABLE_ICONS.filter(icon => !usedIcons.includes(icon));
 }
 

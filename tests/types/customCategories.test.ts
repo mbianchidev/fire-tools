@@ -49,15 +49,15 @@ describe('Custom Categories', () => {
       expect(categoryInfo.isCustom).toBe(true);
     });
 
-    it('should fall back to OTHER category for unknown category', () => {
+    it('should fall back to No Category for unknown category', () => {
       const categoryInfo = getCategoryInfo('UNKNOWN_CATEGORY');
-      expect(categoryInfo.id).toBe('OTHER');
-      expect(categoryInfo.name).toBe('Other');
+      expect(categoryInfo.id).toBe('NO_CATEGORY');
+      expect(categoryInfo.name).toBe('No Category');
     });
 
-    it('should fall back to OTHER category for unknown custom category ID when custom categories provided', () => {
+    it('should fall back to No Category for unknown custom category ID when custom categories provided', () => {
       const categoryInfo = getCategoryInfo('non-existent-id', mockCustomCategories);
-      expect(categoryInfo.id).toBe('OTHER');
+      expect(categoryInfo.id).toBe('NO_CATEGORY');
     });
 
     it('should prefer built-in category over custom with same ID', () => {
@@ -72,7 +72,7 @@ describe('Custom Categories', () => {
       ];
       const categoryInfo = getCategoryInfo('HOUSING', customWithBuiltInId);
       expect(categoryInfo.name).toBe('Housing'); // Built-in wins
-      expect(categoryInfo.isCustom).toBeUndefined();
+      expect(categoryInfo.isCustom).toBe(false);
     });
   });
 
