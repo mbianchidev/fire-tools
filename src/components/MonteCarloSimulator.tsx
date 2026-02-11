@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
-import { CalculatorInputs, MonteCarloInputs, MonteCarloResult } from '../types/calculator';
-import { runMonteCarloSimulation } from '../utils/monteCarlo';
+import { CalculatorInputs, MonteCarloInputs, MonteCarloResultWithLogs, SimulationLogEntry, MonteCarloFixedParameters } from '../types/calculator';
+import { runMonteCarloSimulationWithLogs } from '../utils/monteCarlo';
 import { loadSettings, saveSettings } from '../utils/cookieSettings';
 import { NumberInput } from './NumberInput';
 import { MonteCarloChart } from './MonteCarloChart';
+import { MonteCarloLogs } from './MonteCarloLogs';
 import { MaterialIcon } from './MaterialIcon';
 import { PrivacyBlur } from './PrivacyBlur';
 import { formatDisplayCurrency, formatDisplayPercent } from '../utils/numberFormatter';
@@ -54,9 +55,13 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
     blackSwanImpact: -40,
   });
 
-  const [result, setResult] = useState<MonteCarloResult | null>(null);
+  const [result, setResult] = useState<MonteCarloResultWithLogs | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isBaseDataExpanded, setIsBaseDataExpanded] = useState(true);
+  
+  // Simulation logs - stored in state so they reset on page refresh/navigation
+  const [simulationLogs, setSimulationLogs] = useState<SimulationLogEntry[]>([]);
+  const [fixedParameters, setFixedParameters] = useState<MonteCarloFixedParameters | null>(null);
 
   // Calculate derived values for display
   const currentYear = new Date().getFullYear();
@@ -113,8 +118,11 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
     setIsRunning(true);
     // Use setTimeout to allow UI to update
     setTimeout(() => {
-      const mcResult = runMonteCarloSimulation(inputs, mcInputs);
+      const mcResult = runMonteCarloSimulationWithLogs(inputs, mcInputs);
       setResult(mcResult);
+      // Append new logs to existing logs (logs reset on page refresh/navigation)
+      setSimulationLogs(prevLogs => [...prevLogs, ...mcResult.logs]);
+      setFixedParameters(mcResult.fixedParameters);
       setIsRunning(false);
     }, 100);
   };
@@ -365,6 +373,15 @@ export const MonteCarloSimulator: React.FC<MonteCarloSimulatorProps> = ({ inputs
 
           <MonteCarloChart result={result} isPrivacyMode={isPrivacyMode} />
         </div>
+      )}
+
+      {/* Simulation Logs Section */}
+      {simulationLogs.length > 0 && fixedParameters && (
+        <MonteCarloLogs 
+          logs={simulationLogs} 
+          fixedParameters={fixedParameters}
+          isPrivacyMode={isPrivacyMode}
+        />
       )}
     </section>
   );
