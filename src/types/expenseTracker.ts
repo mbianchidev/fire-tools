@@ -6,6 +6,7 @@ import { SupportedCurrency } from './currency';
 
 // Transaction categories for expenses
 export type ExpenseCategory = 
+  | 'NO_CATEGORY'
   | 'HOUSING'
   | 'UTILITIES'
   | 'TRANSPORTATION'
@@ -64,14 +65,14 @@ export interface IncomeEntry extends Transaction {
 // Expense entry
 export interface ExpenseEntry extends Transaction {
   type: 'expense';
-  category: ExpenseCategory;
+  category: ExpenseCategory | string; // Supports both built-in and custom category IDs
   subCategory?: string;
   expenseType: ExpenseType; // Need vs Want
 }
 
 // Budget for a specific category
 export interface CategoryBudget {
-  category: ExpenseCategory;
+  category: ExpenseCategory | string; // Supports both built-in and custom category IDs
   monthlyBudget: number;
   currency?: SupportedCurrency;
 }
@@ -104,7 +105,7 @@ export interface TransactionSummary {
 
 // Category breakdown
 export interface CategoryBreakdown {
-  category: ExpenseCategory;
+  category: ExpenseCategory | string; // Supports both built-in and custom category IDs
   totalAmount: number;
   percentage: number;
   budgeted?: number;
@@ -188,6 +189,26 @@ export interface TransactionSort {
   direction: SortDirection;
 }
 
+// Custom category definition
+export interface CustomCategory {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  defaultExpenseType: ExpenseType;
+}
+
+// Override for built-in categories (allows customization of default categories)
+export interface CategoryOverride {
+  id: ExpenseCategory; // ID of the built-in category being overridden
+  name?: string; // Custom name (optional)
+  icon?: string; // Custom icon (optional)
+  color?: string; // Custom color (optional)
+}
+
+// Special constant for the "No Category" ID - this category cannot be edited or deleted
+export const NO_CATEGORY_ID = 'NO_CATEGORY' as const;
+
 // Main expense tracker state
 export interface ExpenseTrackerData {
   years: YearData[];
@@ -195,18 +216,25 @@ export interface ExpenseTrackerData {
   currentMonth: number;
   currency: SupportedCurrency;
   globalBudgets: CategoryBudget[]; // Global budgets that apply to all months
+  customCategories?: CustomCategory[]; // User-defined custom categories
+  categoryOverrides?: CategoryOverride[]; // User customizations of built-in categories
 }
 
-// Category display info
+// Category display info (supports both built-in and custom categories)
 export interface CategoryInfo {
-  id: ExpenseCategory;
+  id: ExpenseCategory | string;
   name: string;
   icon: string;
   defaultExpenseType: ExpenseType;
+  color?: string; // Optional color for custom categories
+  isCustom?: boolean; // Flag to indicate if this is a custom category
+  isProtected?: boolean; // Flag to indicate if this category cannot be edited or deleted
 }
 
 // Default categories configuration
+// Note: NO_CATEGORY is first and protected - it cannot be edited or deleted
 export const EXPENSE_CATEGORIES: CategoryInfo[] = [
+  { id: NO_CATEGORY_ID, name: 'No Category', icon: 'help_outline', defaultExpenseType: 'WANT', isProtected: true },
   { id: 'HOUSING', name: 'Housing', icon: 'home', defaultExpenseType: 'NEED' },
   { id: 'UTILITIES', name: 'Utilities', icon: 'lightbulb', defaultExpenseType: 'NEED' },
   { id: 'TRANSPORTATION', name: 'Transportation', icon: 'directions_car', defaultExpenseType: 'NEED' },
@@ -251,9 +279,152 @@ export const INCOME_SOURCES: IncomeSourceInfo[] = [
   { id: 'OTHER', name: 'Other', icon: 'attach_money' },
 ];
 
-// Helper function to get category info
-export function getCategoryInfo(category: ExpenseCategory): CategoryInfo {
-  return EXPENSE_CATEGORIES.find(c => c.id === category) || EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1];
+// Helper function to convert snake_case icon names to readable labels
+export function formatIconLabel(icon: string): string {
+  return icon
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+// Helper function to get category info (supports built-in, custom categories, and overrides)
+export function getCategoryInfo(
+  category: ExpenseCategory | string, 
+  customCategories?: CustomCategory[],
+  categoryOverrides?: CategoryOverride[]
+): CategoryInfo {
+  // First check built-in categories
+  const builtIn = EXPENSE_CATEGORIES.find(c => c.id === category);
+  if (builtIn) {
+    // Check if there's an override for this built-in category
+    const override = categoryOverrides?.find(o => o.id === category);
+    if (override) {
+      return {
+        ...builtIn,
+        name: override.name || builtIn.name,
+        icon: override.icon || builtIn.icon,
+        color: override.color,
+        isCustom: false,
+      };
+    }
+    return { ...builtIn, isCustom: false };
+  }
+  
+  // Check custom categories if provided
+  if (customCategories) {
+    const custom = customCategories.find(c => c.id === category);
+    if (custom) {
+      return {
+        id: custom.id,
+        name: custom.name,
+        icon: custom.icon,
+        defaultExpenseType: custom.defaultExpenseType,
+        color: custom.color,
+        isCustom: true,
+      };
+    }
+  }
+  
+  // Fall back to "No Category" for unknown categories
+  return { ...EXPENSE_CATEGORIES[0], isCustom: false };
+}
+
+// Helper function to get all categories (built-in + custom, with overrides applied)
+export function getAllCategories(
+  customCategories?: CustomCategory[],
+  categoryOverrides?: CategoryOverride[]
+): CategoryInfo[] {
+  const builtInCategories: CategoryInfo[] = EXPENSE_CATEGORIES.map(c => {
+    const override = categoryOverrides?.find(o => o.id === c.id);
+    return {
+      ...c,
+      name: override?.name || c.name,
+      icon: override?.icon || c.icon,
+      color: override?.color,
+      isCustom: false,
+    };
+  });
+  
+  if (!customCategories || customCategories.length === 0) {
+    return builtInCategories;
+  }
+  
+  const customCategoryInfos: CategoryInfo[] = customCategories.map(c => ({
+    id: c.id,
+    name: c.name,
+    icon: c.icon,
+    defaultExpenseType: c.defaultExpenseType,
+    color: c.color,
+    isCustom: true,
+  }));
+  
+  return [...builtInCategories, ...customCategoryInfos];
+}
+
+// Helper function to get icons already in use by categories (considers overrides)
+export function getUsedIcons(customCategories?: CustomCategory[], categoryOverrides?: CategoryOverride[]): string[] {
+  // Get built-in icons, considering overrides
+  const builtInIcons = EXPENSE_CATEGORIES.map(c => {
+    const override = categoryOverrides?.find(o => o.id === c.id);
+    return override?.icon || c.icon;
+  });
+  const customIcons = customCategories?.map(c => c.icon) || [];
+  return [...builtInIcons, ...customIcons];
+}
+
+// Generate unique category ID
+export function generateCategoryId(): string {
+  return `cat-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
+// Predefined colors for category selection
+export const CATEGORY_COLORS: string[] = [
+  '#667eea', // Indigo
+  '#764ba2', // Purple
+  '#f093fb', // Pink light
+  '#f5576c', // Red
+  '#4facfe', // Blue
+  '#00f2fe', // Cyan
+  '#43e97b', // Green
+  '#38f9d7', // Teal
+  '#fa709a', // Rose
+  '#fee140', // Yellow
+  '#30cfd0', // Aqua
+  '#330867', // Dark purple
+  '#a8eb12', // Lime
+  '#fccb90', // Peach
+  '#d57eeb', // Violet
+  '#e0c3fc', // Lavender
+  '#8fd3f4', // Sky blue
+  '#ff6b6b', // Coral
+  '#4ecdc4', // Turquoise
+  '#ffe66d', // Sunflower
+];
+
+// Available icons for custom categories (common Material Symbols)
+export const AVAILABLE_ICONS: string[] = [
+  'pets', 'child_care', 'fitness_center', 'sports_soccer', 'sports_basketball',
+  'sports_esports', 'palette', 'brush', 'camera_alt', 'phone_iphone',
+  'laptop', 'headphones', 'watch', 'print', 'wifi',
+  'coffee', 'local_bar', 'cake', 'bakery_dining', 'fastfood',
+  'local_pizza', 'icecream', 'local_florist', 'yard', 'park',
+  'directions_bike', 'directions_boat', 'directions_bus', 'local_taxi', 'train',
+  'local_gas_station', 'local_parking', 'electric_car', 'two_wheeler', 'sailing',
+  'sports', 'pool', 'golf_course', 'casino', 'theater_comedy',
+  'library_books', 'menu_book', 'newspaper', 'article', 'bookmark',
+  'savings', 'account_balance_wallet', 'payments', 'paid', 'price_check',
+  'checkroom', 'dry_cleaning', 'iron', 'cleaning_services', 'plumbing',
+  'handyman', 'construction', 'architecture', 'engineering', 'design_services',
+  'science', 'biotech', 'psychology', 'medication', 'vaccines',
+  'local_pharmacy', 'medical_services', 'healing', 'health_and_safety', 'dentistry',
+  'volunteer_activism', 'favorite', 'loyalty', 'diamond', 'auto_awesome',
+  'star', 'thumb_up', 'emoji_emotions', 'celebration', 'party_mode',
+];
+
+// Helper function to get available icons (excluding ones already in use)
+export function getAvailableIcons(customCategories?: CustomCategory[], categoryOverrides?: CategoryOverride[]): string[] {
+  const usedIcons = getUsedIcons(customCategories, categoryOverrides);
+  return AVAILABLE_ICONS.filter(icon => !usedIcons.includes(icon));
 }
 
 // Helper function to get income source info

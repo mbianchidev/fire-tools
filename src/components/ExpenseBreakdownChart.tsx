@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { CategoryBreakdown, getCategoryInfo } from '../types/expenseTracker';
+import { CategoryBreakdown, getCategoryInfo, CustomCategory } from '../types/expenseTracker';
 import { MaterialIcon } from './MaterialIcon';
 
 // Color palette for categories
@@ -13,6 +13,7 @@ const COLORS = [
 interface ExpenseBreakdownChartProps {
   data: CategoryBreakdown[];
   currency: string;
+  customCategories?: CustomCategory[];
 }
 
 // Helper to format currency
@@ -30,13 +31,14 @@ interface CustomTooltipProps {
   active?: boolean;
   payload?: any[];
   currency: string;
+  customCategories?: CustomCategory[];
 }
 
-function CustomTooltip({ active, payload, currency }: CustomTooltipProps) {
+function CustomTooltip({ active, payload, currency, customCategories }: CustomTooltipProps) {
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0].payload;
-  const categoryInfo = getCategoryInfo(data.category);
+  const categoryInfo = getCategoryInfo(data.category, customCategories);
 
   return (
     <div style={{
@@ -82,49 +84,7 @@ function renderCustomLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent
   );
 }
 
-// Custom legend
-function renderLegend(props: any) {
-  const { payload } = props;
-  
-  return (
-    <ul style={{ 
-      listStyle: 'none', 
-      padding: 0, 
-      margin: '1.5rem 0 0',
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-      gap: '0.5rem',
-    }}>
-      {payload.map((entry: any, index: number) => {
-        const categoryInfo = getCategoryInfo(entry.payload.category);
-        return (
-          <li 
-            key={`legend-${index}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontSize: '0.85rem',
-            }}
-          >
-            <span style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '2px',
-              background: entry.color,
-              flexShrink: 0,
-            }} />
-            <span style={{ color: '#F8FAFC' }}>
-              <MaterialIcon name={categoryInfo.icon} size="small" /> {categoryInfo.name}
-            </span>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-export function ExpenseBreakdownChart({ data, currency }: ExpenseBreakdownChartProps) {
+export function ExpenseBreakdownChart({ data, currency, customCategories }: ExpenseBreakdownChartProps) {
   if (data.length === 0) {
     return (
       <div style={{ 
@@ -139,12 +99,58 @@ export function ExpenseBreakdownChart({ data, currency }: ExpenseBreakdownChartP
     );
   }
 
-  // Prepare chart data with category info
-  const chartData = data.map((item, index) => ({
-    ...item,
-    name: getCategoryInfo(item.category).name,
-    color: COLORS[index % COLORS.length],
-  }));
+  // Prepare chart data with category info - use custom category color if available
+  const chartData = data.map((item, index) => {
+    const categoryInfo = getCategoryInfo(item.category, customCategories);
+    return {
+      ...item,
+      name: categoryInfo.name,
+      // Use custom category color if available, otherwise fall back to default colors
+      color: categoryInfo.color || COLORS[index % COLORS.length],
+    };
+  });
+
+  // Create a custom legend renderer with access to customCategories
+  const renderLegendWithCategories = (props: any) => {
+    const { payload } = props;
+    
+    return (
+      <ul style={{ 
+        listStyle: 'none', 
+        padding: 0, 
+        margin: '1.5rem 0 0',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+        gap: '0.5rem',
+      }}>
+        {payload.map((entry: any, index: number) => {
+          const categoryInfo = getCategoryInfo(entry.payload.category, customCategories);
+          return (
+            <li 
+              key={`legend-${index}`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.85rem',
+              }}
+            >
+              <span style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '2px',
+                background: entry.color,
+                flexShrink: 0,
+              }} />
+              <span style={{ color: '#F8FAFC' }}>
+                <MaterialIcon name={categoryInfo.icon} size="small" /> {categoryInfo.name}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
 
   return (
     <div style={{ width: '100%', height: 450, paddingTop: '1rem' }}>
@@ -169,8 +175,8 @@ export function ExpenseBreakdownChart({ data, currency }: ExpenseBreakdownChartP
               />
             ))}
           </Pie>
-          <Tooltip content={<CustomTooltip currency={currency} />} />
-          <Legend content={(props) => renderLegend(props)} />
+          <Tooltip content={<CustomTooltip currency={currency} customCategories={customCategories} />} />
+          <Legend content={(props) => renderLegendWithCategories(props)} />
         </PieChart>
       </ResponsiveContainer>
     </div>
