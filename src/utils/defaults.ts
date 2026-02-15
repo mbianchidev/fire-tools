@@ -276,6 +276,8 @@ export function generateDemoNetWorthDataForYear(targetYear: number, previousYear
       cashEntries,
       pensions,
       operations,
+      debts: [],
+      taxes: [],
       isFrozen,
     });
   }
@@ -584,6 +586,7 @@ export function getDemoAssetAllocationData(): {
       BONDS: { targetMode: 'PERCENTAGE', targetPercent: 43 }, // 43% of portfolio
       REAL_ESTATE: { targetMode: 'OFF' },
       CRYPTO: { targetMode: 'OFF' },
+      COMMODITIES: { targetMode: 'OFF' },
       CASH: { targetMode: 'SET', targetPercent: 0 }, // SET mode (individual assets have fixed targets)
     },
   };
