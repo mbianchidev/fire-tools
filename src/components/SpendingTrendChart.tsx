@@ -8,7 +8,7 @@ import {
   Legend, 
   ResponsiveContainer,
 } from 'recharts';
-import { CategoryTrendData, getCategoryInfo, ExpenseCategory } from '../types/expenseTracker';
+import { CategoryTrendData, getCategoryInfo, ExpenseCategory, CustomCategory } from '../types/expenseTracker';
 import { MaterialIcon } from './MaterialIcon';
 
 // Color palette for categories
@@ -35,6 +35,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 interface SpendingTrendChartProps {
   data: CategoryTrendData[];
   currency: string;
+  customCategories?: CustomCategory[];
 }
 
 // Helper to format currency
@@ -62,15 +63,35 @@ function getActiveCategories(data: CategoryTrendData[]): string[] {
   return Array.from(categories);
 }
 
+// Get color for a category (supports custom categories)
+function getCategoryColor(categoryId: string, customCategories?: CustomCategory[]): string {
+  // Check built-in colors first
+  if (CATEGORY_COLORS[categoryId]) {
+    return CATEGORY_COLORS[categoryId];
+  }
+  
+  // Check custom categories
+  if (customCategories) {
+    const customCat = customCategories.find(c => c.id === categoryId);
+    if (customCat && customCat.color) {
+      return customCat.color;
+    }
+  }
+  
+  // Fallback color
+  return '#666666';
+}
+
 // Custom tooltip
 interface CustomTooltipProps {
   active?: boolean;
   payload?: any[];
   label?: string;
   currency: string;
+  customCategories?: CustomCategory[];
 }
 
-function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps) {
+function CustomTooltip({ active, payload, label, currency, customCategories }: CustomTooltipProps) {
   if (!active || !payload || !payload.length) return null;
 
   // Sort by value descending
@@ -89,7 +110,7 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
       <p style={{ margin: 0, fontWeight: 600, color: '#f1f5f9', marginBottom: '0.5rem' }}>{label}</p>
       {sortedPayload.map((entry: any, index: number) => {
         if (!entry.value) return null;
-        const categoryInfo = getCategoryInfo(entry.dataKey as ExpenseCategory);
+        const categoryInfo = getCategoryInfo(entry.dataKey as ExpenseCategory | string, customCategories);
         return (
           <p 
             key={index}
@@ -120,7 +141,7 @@ function CustomTooltip({ active, payload, label, currency }: CustomTooltipProps)
   );
 }
 
-export function SpendingTrendChart({ data, currency }: SpendingTrendChartProps) {
+export function SpendingTrendChart({ data, currency, customCategories }: SpendingTrendChartProps) {
   if (data.length === 0) {
     return (
       <div style={{ 
@@ -169,10 +190,10 @@ export function SpendingTrendChart({ data, currency }: SpendingTrendChartProps) 
             tick={{ fontSize: 12 }}
             tickLine={{ stroke: '#ccc' }}
           />
-          <Tooltip content={<CustomTooltip currency={currency} />} />
+          <Tooltip content={<CustomTooltip currency={currency} customCategories={customCategories} />} />
           <Legend 
             formatter={(value) => {
-              const categoryInfo = getCategoryInfo(value as ExpenseCategory);
+              const categoryInfo = getCategoryInfo(value as ExpenseCategory | string, customCategories);
               return <span style={{ color: '#F8FAFC' }}>{categoryInfo.name}</span>;
             }}
             wrapperStyle={{ fontSize: '0.85rem', paddingTop: '12px' }}
@@ -183,9 +204,9 @@ export function SpendingTrendChart({ data, currency }: SpendingTrendChartProps) 
               type="monotone"
               dataKey={category}
               name={category}
-              stroke={CATEGORY_COLORS[category] || '#666'}
+              stroke={getCategoryColor(category, customCategories)}
               strokeWidth={2}
-              dot={{ fill: CATEGORY_COLORS[category] || '#666', strokeWidth: 2, r: 4 }}
+              dot={{ fill: getCategoryColor(category, customCategories), strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6 }}
               connectNulls
             />
