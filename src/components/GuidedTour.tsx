@@ -849,6 +849,13 @@ export function GuidedTour({ onTourComplete }: GuidedTourProps) {
       position: 'center',
       elementSelector: '[data-tour="monte-carlo-results"]',
     },
+    {
+      page: '/monte-carlo',
+      title: 'Simulation Logs',
+      description: 'After running simulations, you can view detailed logs showing the yearly breakdown of each simulation, including returns, expenses (adjusted for inflation), and portfolio values. Export the logs as CSV or JSON for further analysis.',
+      position: 'center',
+      elementSelector: '[data-tour="monte-carlo-logs"]',
+    },
   ];
 
   const pageTours: Record<string, { steps: InteractiveStep[]; nextPage: string | null; previousPage: string | null; pageName: string }> = {
