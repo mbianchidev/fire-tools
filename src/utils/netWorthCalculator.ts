@@ -11,6 +11,8 @@ import {
   FIREProgress,
 } from '../types/netWorthTracker';
 import { SupportedCurrency } from '../types/currency';
+import { calculateDepreciatedValue } from './depreciationCalculator';
+import { calculateNetPropertyValue } from './mortgageCalculator';
 
 // Options for net worth calculation
 export interface NetWorthCalculationOptions {
@@ -24,6 +26,8 @@ export interface MonthlyNetWorthResult {
   totalCash: number;
   totalPension: number;
   totalTaxesPaid: number;
+  totalDebt: number;
+  totalTaxLiability: number;
   netWorth: number;
 }
 
@@ -41,7 +45,23 @@ export function calculateMonthlyNetWorth(
   // Calculate total asset value (shares * price)
   // Values are already in the default currency (converted when user changes currency in Settings)
   const totalAssetValue = snapshot.assets.reduce((sum, asset) => {
-    const valueInCurrency = asset.shares * asset.pricePerShare;
+    let valueInCurrency: number;
+    
+    // Handle vehicle depreciation
+    if (asset.assetClass === 'VEHICLE' && asset.vehicleDepreciation) {
+      const currentDate = new Date().toISOString().split('T')[0];
+      valueInCurrency = calculateDepreciatedValue(asset.vehicleDepreciation, currentDate);
+    }
+    // Handle real estate with mortgage (net property value = property value - mortgage balance)
+    else if (asset.assetClass === 'REAL_ESTATE' && asset.mortgageInfo) {
+      const propertyValue = asset.shares * asset.pricePerShare;
+      valueInCurrency = calculateNetPropertyValue(propertyValue, asset.mortgageInfo.currentBalance);
+    }
+    // Standard calculation for all other asset types
+    else {
+      valueInCurrency = asset.shares * asset.pricePerShare;
+    }
+    
     return sum + valueInCurrency;
   }, 0);
 
@@ -62,16 +82,28 @@ export function calculateMonthlyNetWorth(
     .filter((op) => op.type === 'TAX_PAID')
     .reduce((sum, op) => sum + op.amount, 0);
 
-  // Net worth = assets + cash + pension - taxes
+  // Calculate total debt (negative impact on net worth)
+  const totalDebt = (snapshot.debts || []).reduce((sum, debt) => {
+    return sum + debt.currentBalance;
+  }, 0);
+
+  // Calculate total tax liability (unpaid taxes, negative impact on net worth)
+  const totalTaxLiability = (snapshot.taxes || []).reduce((sum, tax) => {
+    return tax.isPaid ? sum : sum + tax.amount;
+  }, 0);
+
+  // Net worth = assets + cash + pension - debt - tax liability
   // Note: Taxes are typically already deducted from cash/income, so we don't subtract again
-  // unless tracking separately. For simplicity, net worth = assets + cash + pension
-  const netWorth = totalAssetValue + totalCash + totalPension;
+  // unless tracking separately. For simplicity, net worth = assets + cash + pension - debt - tax liability
+  const netWorth = totalAssetValue + totalCash + totalPension - totalDebt - totalTaxLiability;
 
   return {
     totalAssetValue,
     totalCash,
     totalPension,
     totalTaxesPaid,
+    totalDebt,
+    totalTaxLiability,
     netWorth,
   };
 }
@@ -198,6 +230,8 @@ export function calculateMonthlyVariations(
         assetValueChange: 0,
         cashChange: 0,
         pensionChange: 0,
+        debtChange: 0,
+        taxLiabilityChange: 0,
       });
     } else {
       const changeFromPrevMonth = result.netWorth - prevResult.netWorth;
@@ -214,6 +248,8 @@ export function calculateMonthlyVariations(
         assetValueChange: result.totalAssetValue - prevResult.totalAssetValue,
         cashChange: result.totalCash - prevResult.totalCash,
         pensionChange: result.totalPension - prevResult.totalPension,
+        debtChange: result.totalDebt - prevResult.totalDebt,
+        taxLiabilityChange: result.totalTaxLiability - prevResult.totalTaxLiability,
       });
     }
 

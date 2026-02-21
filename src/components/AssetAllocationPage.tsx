@@ -58,6 +58,7 @@ export const AssetAllocationPage: React.FC = () => {
     CASH: { targetMode: 'SET' as AllocationMode },
     CRYPTO: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
     REAL_ESTATE: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
+    COMMODITIES: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
   };
 
   // Initialize from localStorage if available, otherwise use defaults

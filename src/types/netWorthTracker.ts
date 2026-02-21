@@ -5,6 +5,57 @@
 
 import { SupportedCurrency } from './currency';
 
+// Depreciation method for vehicles
+export type DepreciationMethod = 'STRAIGHT_LINE' | 'DECLINING_BALANCE' | 'MANUAL';
+
+// Vehicle depreciation schedule
+export interface VehicleDepreciation {
+  method: DepreciationMethod;
+  purchasePrice: number; // Original purchase price
+  purchaseDate: string; // ISO date string (YYYY-MM-DD)
+  salvageValue: number; // Expected value at end of useful life
+  usefulLifeYears: number; // Expected useful life in years (e.g., 10)
+  currentDepreciation?: number; // Current accumulated depreciation
+  annualDepreciationRate?: number; // For declining balance method (e.g., 20 for 20%)
+}
+
+// Mortgage data for real estate
+export interface MortgageInfo {
+  principalAmount: number; // Original loan amount
+  currentBalance: number; // Current outstanding balance
+  interestRate: number; // Annual interest rate (e.g., 3.5 for 3.5%)
+  termYears: number; // Original term in years (e.g., 30)
+  remainingYears: number; // Remaining years on mortgage
+  monthlyPayment: number; // Monthly payment amount
+  startDate: string; // ISO date string (YYYY-MM-DD)
+  lender?: string; // Name of the lending institution
+}
+
+// Debt entry (negative net worth impact)
+export interface DebtEntry {
+  id: string;
+  name: string;
+  debtType: 'CREDIT_CARD' | 'PERSONAL_LOAN' | 'STUDENT_LOAN' | 'CAR_LOAN' | 'MORTGAGE' | 'OTHER';
+  currentBalance: number; // Positive number representing amount owed
+  interestRate?: number; // Annual interest rate
+  monthlyPayment?: number; // Monthly payment amount
+  currency: SupportedCurrency;
+  note?: string;
+  creditor?: string; // Lender/creditor name
+}
+
+// Tax liability entry (negative net worth impact)
+export interface TaxEntry {
+  id: string;
+  name: string;
+  taxType: 'INCOME_TAX' | 'PROPERTY_TAX' | 'CAPITAL_GAINS_TAX' | 'OTHER';
+  amount: number; // Positive number representing tax liability
+  dueDate?: string; // ISO date string (YYYY-MM-DD)
+  currency: SupportedCurrency;
+  note?: string;
+  isPaid: boolean;
+}
+
 // Asset entry with share count
 export interface AssetHolding {
   id: string;
@@ -13,13 +64,17 @@ export interface AssetHolding {
   shares: number; // Number of shares owned
   pricePerShare: number; // Price per share at the time of entry
   currency: SupportedCurrency;
-  assetClass: 'STOCKS' | 'BONDS' | 'ETF' | 'CRYPTO' | 'REAL_ESTATE' | 'PRIVATE_EQUITY' | 'OTHER';
+  assetClass: 'STOCKS' | 'BONDS' | 'ETF' | 'CRYPTO' | 'REAL_ESTATE' | 'PRIVATE_EQUITY' | 'VEHICLE' | 'COLLECTIBLE' | 'ART' | 'COMMODITIES' | 'OTHER';
   note?: string;
+  // Vehicle-specific data
+  vehicleDepreciation?: VehicleDepreciation;
+  // Real estate-specific data
+  mortgageInfo?: MortgageInfo;
   // Sync metadata (hidden from UI, preserved during sync)
   targetMode?: 'PERCENTAGE' | 'OFF' | 'SET';
   targetPercent?: number;
   targetValue?: number;
-  syncAssetClass?: 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE';
+  syncAssetClass?: 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE' | 'COMMODITIES';
   syncSubAssetType?: string;
   isin?: string;
 }
@@ -92,13 +147,17 @@ export interface MonthlySnapshot {
   cashEntries: CashEntry[];
   pensions: PensionEntry[];
   operations: FinancialOperation[];
+  debts: DebtEntry[];
+  taxes: TaxEntry[];
   
   // Calculated values (computed at display time)
   totalAssetValue?: number; // Sum of (shares * pricePerShare) for all assets
   totalCash?: number; // Sum of all cash balances
   totalPension?: number; // Sum of all pension values
   totalTaxesPaid?: number; // Sum of TAX_PAID operations
-  netWorth?: number; // totalAssetValue + totalCash + totalPension - totalTaxesPaid
+  totalDebt?: number; // Sum of all debt balances
+  totalTaxLiability?: number; // Sum of unpaid taxes
+  netWorth?: number; // totalAssetValue + totalCash + totalPension - totalDebt - totalTaxLiability
   
   // Status
   isFrozen: boolean; // True if month has ended and values are finalized
@@ -135,6 +194,8 @@ export interface MonthlyVariation {
   assetValueChange: number;
   cashChange: number;
   pensionChange: number;
+  debtChange: number;
+  taxLiabilityChange: number;
 }
 
 // Forecast data
@@ -195,6 +256,8 @@ export function createEmptyMonthlySnapshot(year: number, month: number): Monthly
     cashEntries: [],
     pensions: [],
     operations: [],
+    debts: [],
+    taxes: [],
     isFrozen: false,
   };
 }
@@ -261,6 +324,10 @@ export const ASSET_CLASSES: AssetClassInfo[] = [
   { id: 'CRYPTO', name: 'Crypto', icon: 'currency_bitcoin' },
   { id: 'REAL_ESTATE', name: 'Real Estate', icon: 'home' },
   { id: 'PRIVATE_EQUITY', name: 'Private Equity', icon: 'business_center' },
+  { id: 'VEHICLE', name: 'Vehicle', icon: 'directions_car' },
+  { id: 'COLLECTIBLE', name: 'Collectible', icon: 'collections' },
+  { id: 'ART', name: 'Art', icon: 'palette' },
+  { id: 'COMMODITIES', name: 'Commodities', icon: 'grain' },
   { id: 'OTHER', name: 'Other', icon: 'inventory_2' },
 ];
 
@@ -291,4 +358,34 @@ export const PENSION_TYPES: PensionTypeInfo[] = [
   { id: 'PRIVATE', name: 'Private Pension', icon: 'savings' },
   { id: 'EMPLOYER', name: 'Employer Pension', icon: 'business' },
   { id: 'OTHER', name: 'Other Pension', icon: 'elderly' },
+];
+
+// Debt type display info
+export interface DebtTypeInfo {
+  id: DebtEntry['debtType'];
+  name: string;
+  icon: string;
+}
+
+export const DEBT_TYPES: DebtTypeInfo[] = [
+  { id: 'CREDIT_CARD', name: 'Credit Card', icon: 'credit_card' },
+  { id: 'PERSONAL_LOAN', name: 'Personal Loan', icon: 'account_balance_wallet' },
+  { id: 'STUDENT_LOAN', name: 'Student Loan', icon: 'school' },
+  { id: 'CAR_LOAN', name: 'Car Loan', icon: 'directions_car' },
+  { id: 'MORTGAGE', name: 'Mortgage', icon: 'home' },
+  { id: 'OTHER', name: 'Other Debt', icon: 'money_off' },
+];
+
+// Tax type display info
+export interface TaxTypeInfo {
+  id: TaxEntry['taxType'];
+  name: string;
+  icon: string;
+}
+
+export const TAX_TYPES: TaxTypeInfo[] = [
+  { id: 'INCOME_TAX', name: 'Income Tax', icon: 'attach_money' },
+  { id: 'PROPERTY_TAX', name: 'Property Tax', icon: 'home' },
+  { id: 'CAPITAL_GAINS_TAX', name: 'Capital Gains Tax', icon: 'trending_up' },
+  { id: 'OTHER', name: 'Other Tax', icon: 'account_balance' },
 ];
