@@ -126,6 +126,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const [note, setNote] = useState('');
   const [institutionCode, setInstitutionCode] = useState<string>('');
   const [institutionName, setInstitutionName] = useState<string>('');
+  const [isPrimaryResidence, setIsPrimaryResidence] = useState(false);
 
   // Get fallback rates from settings
   const settings = loadSettings();
@@ -150,6 +151,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setTargetPercent(asset.targetPercent?.toString() || '0');
         setInstitutionCode(asset.institutionCode || '');
         setInstitutionName(asset.institutionName || '');
+        setIsPrimaryResidence(asset.isPrimaryResidence || false);
       } else {
         // Net Worth Tracker mode
         const holding = initialData as AssetHolding;
@@ -164,6 +166,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setNote(holding.note || '');
         setInstitutionCode('');
         setInstitutionName('');
+        setIsPrimaryResidence(holding.isPrimaryResidence || false);
       }
     } else {
       // Reset for new entry
@@ -180,6 +183,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       setNote('');
       setInstitutionCode('');
       setInstitutionName('');
+      setIsPrimaryResidence(false);
     }
   }, [initialData, mode, defaultCurrency]);
 
@@ -326,6 +330,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         targetValue: targetMode === 'SET' ? valueInEUR : undefined,
         institutionCode: INSTITUTION_TYPES.includes(subAssetType) && institutionCode ? institutionCode : undefined,
         institutionName: INSTITUTION_TYPES.includes(subAssetType) && institutionName ? institutionName.trim() : undefined,
+        isPrimaryResidence: subAssetType === 'PROPERTY' ? isPrimaryResidence : undefined,
       };
       
       onSubmit(asset);
@@ -340,6 +345,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         currency,
         assetClass: mapToNetWorthAssetClass(assetClass, subAssetType),
         note: note.trim() || undefined,
+        isPrimaryResidence: subAssetType === 'PROPERTY' ? isPrimaryResidence : undefined,
       };
       
       onSubmit(holding);
@@ -356,6 +362,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setNote('');
     setInstitutionCode('');
     setInstitutionName('');
+    setIsPrimaryResidence(false);
     onClose();
   };
 
@@ -587,6 +594,19 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
           {showTargetSettings && (
             <>
+              {/* Primary residence flag for PROPERTY assets */}
+              {subAssetType === 'PROPERTY' && (
+                <div className="form-group checkbox-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={isPrimaryResidence}
+                      onChange={(e) => setIsPrimaryResidence(e.target.checked)}
+                    />
+                    Primary Residence (excluded from FIRE calculation)
+                  </label>
+                </div>
+              )}
               <div className="form-row">
                 <div className="form-group">
                   <label>Target Mode *</label>

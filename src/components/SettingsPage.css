@@ -602,3 +602,62 @@ select:disabled {
   align-items: center;
   text-decoration: none;
 }
+
+/* FIRE Asset Class Grid */
+.fire-asset-class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.fire-asset-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.fire-asset-checkbox:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.fire-asset-checkbox input[type="checkbox"] {
+  accent-color: var(--accent-primary, #5568d4);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+/* Checkbox group for dialogs */
+.checkbox-group {
+  margin: 0.5rem 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: var(--accent-primary, #5568d4);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}

@@ -4,6 +4,7 @@ import { CalculationResult, CalculatorInputs } from '../types/calculator';
 import { DEFAULT_INPUTS } from '../utils/defaults';
 import { calculateFIRE, getEffectiveInputs } from '../utils/fireCalculator';
 import { loadFireCalculatorInputs, loadAssetAllocation } from '../utils/cookieStorage';
+import { calculateFIREPortfolioData } from '../utils/allocationCalculator';
 import { MaterialIcon } from './MaterialIcon';
 import { MonteCarloSimulator } from './MonteCarloSimulator';
 
@@ -32,33 +33,7 @@ export const MonteCarloPage: React.FC = () => {
     if (!saved.assets || saved.assets.length === 0) {
       return undefined;
     }
-    
-    // Calculate total portfolio value (all assets including cash)
-    const totalValue = saved.assets
-      .filter(a => a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    
-    if (totalValue === 0) {
-      return undefined;
-    }
-    
-    // Calculate percentage for each major asset class
-    const stocksValue = saved.assets
-      .filter(a => a.assetClass === 'STOCKS' && a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    const bondsValue = saved.assets
-      .filter(a => a.assetClass === 'BONDS' && a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    const cashValue = saved.assets
-      .filter(a => a.assetClass === 'CASH' && a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    
-    return {
-      totalValue,
-      stocksPercent: (stocksValue / totalValue) * 100,
-      bondsPercent: (bondsValue / totalValue) * 100,
-      cashPercent: (cashValue / totalValue) * 100,
-    };
+    return calculateFIREPortfolioData(saved.assets);
   }, [location.key]);
 
   // Apply asset allocation data if useAssetAllocationValue is enabled,

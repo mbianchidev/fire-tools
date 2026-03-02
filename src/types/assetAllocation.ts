@@ -63,6 +63,7 @@ export interface Asset {
   institutionCode?: string; // Bank/broker code (for SAVINGS_ACCOUNT, CHECKING_ACCOUNT, BROKERAGE_ACCOUNT)
   institutionName?: string; // Custom bank/broker name (when code is 'OTHER' or not using predefined list)
   mortgageData?: MortgageData; // Mortgage information for real estate properties
+  isPrimaryResidence?: boolean; // If true, real estate property is excluded from FIRE calculation
 }
 
 export interface AssetClassSummary {

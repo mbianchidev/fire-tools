@@ -212,6 +212,7 @@ export function syncAssetAllocationToNetWorth(
         syncAssetClass: asset.assetClass,
         syncSubAssetType: asset.subAssetType,
         isin: asset.isin,
+        isPrimaryResidence: asset.isPrimaryResidence,
       };
       newAssets.push(assetHolding);
     }
@@ -278,6 +279,7 @@ export function syncNetWorthToAssetAllocation(
       targetMode: holding.targetMode || 'OFF',
       targetPercent: holding.targetPercent,
       targetValue: holding.targetValue,
+      isPrimaryResidence: holding.isPrimaryResidence,
     };
     assets.push(asset);
   }

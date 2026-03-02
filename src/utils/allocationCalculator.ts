@@ -9,6 +9,50 @@ import {
   ChartData,
 } from '../types/assetAllocation';
 import { formatDisplayCurrency, formatDisplayPercent } from './numberFormatter';
+import { loadSettings } from './cookieSettings';
+
+export interface FIREPortfolioData {
+  totalValue: number;
+  stocksPercent: number;
+  bondsPercent: number;
+  cashPercent: number;
+}
+
+/**
+ * Calculate portfolio data for FIRE calculations, respecting asset class inclusion settings
+ * and primary residence exclusion.
+ */
+export function calculateFIREPortfolioData(assets: Asset[]): FIREPortfolioData | undefined {
+  const settings = loadSettings();
+  const inclusion = settings.fireAssetClassInclusion;
+
+  // Filter: active assets, included asset class, not primary residence
+  const fireAssets = assets.filter(a =>
+    a.targetMode !== 'OFF' &&
+    inclusion[a.assetClass] &&
+    !a.isPrimaryResidence
+  );
+
+  const totalValue = fireAssets.reduce((sum, a) => sum + a.currentValue, 0);
+  if (totalValue === 0) return undefined;
+
+  const stocksValue = fireAssets
+    .filter(a => a.assetClass === 'STOCKS')
+    .reduce((sum, a) => sum + a.currentValue, 0);
+  const bondsValue = fireAssets
+    .filter(a => a.assetClass === 'BONDS')
+    .reduce((sum, a) => sum + a.currentValue, 0);
+  const cashValue = fireAssets
+    .filter(a => a.assetClass === 'CASH')
+    .reduce((sum, a) => sum + a.currentValue, 0);
+
+  return {
+    totalValue,
+    stocksPercent: (stocksValue / totalValue) * 100,
+    bondsPercent: (bondsValue / totalValue) * 100,
+    cashPercent: (cashValue / totalValue) * 100,
+  };
+}
 
 /**
  * Calculate the total portfolio value

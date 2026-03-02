@@ -8,6 +8,7 @@ import {
   CurrencySettings,
   DEFAULT_CURRENCY_SETTINGS,
 } from '../types/currency';
+import { AssetClass } from '../types/assetAllocation';
 import { encryptData, decryptData } from './cookieEncryption';
 
 export type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
@@ -20,7 +21,20 @@ export interface UserSettings {
   privacyMode: boolean;
   country?: string;
   dateFormat: DateFormat;
+  fireAssetClassInclusion: Record<AssetClass, boolean>;
 }
+
+export const DEFAULT_FIRE_ASSET_CLASS_INCLUSION: Record<AssetClass, boolean> = {
+  STOCKS: true,
+  BONDS: true,
+  CASH: true,
+  CRYPTO: false,
+  REAL_ESTATE: true,
+  COMMODITIES: true,
+  VEHICLE: false,
+  COLLECTIBLE: false,
+  ART: false,
+};
 
 export const DEFAULT_SETTINGS: UserSettings = {
   accountName: 'My Portfolio',
@@ -30,6 +44,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   privacyMode: false,
   country: undefined,
   dateFormat: 'DD/MM/YYYY',
+  fireAssetClassInclusion: DEFAULT_FIRE_ASSET_CLASS_INCLUSION,
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
@@ -79,6 +94,10 @@ export function loadSettings(): UserSettings {
               ...DEFAULT_SETTINGS.currencySettings.fallbackRates,
               ...(parsed.currencySettings?.fallbackRates || {}),
             },
+          },
+          fireAssetClassInclusion: {
+            ...DEFAULT_FIRE_ASSET_CLASS_INCLUSION,
+            ...(parsed.fireAssetClassInclusion || {}),
           },
         };
       }

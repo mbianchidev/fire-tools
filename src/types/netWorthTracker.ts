@@ -77,6 +77,7 @@ export interface AssetHolding {
   syncAssetClass?: 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE' | 'COMMODITIES' | 'VEHICLE' | 'COLLECTIBLE' | 'ART';
   syncSubAssetType?: string;
   isin?: string;
+  isPrimaryResidence?: boolean; // If true, real estate property is excluded from FIRE calculation
 }
 
 // Cash/liquidity entry
