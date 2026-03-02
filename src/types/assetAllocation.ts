@@ -6,7 +6,7 @@ import { SupportedCurrency } from './currency';
 
 export type AllocationMode = 'PERCENTAGE' | 'OFF' | 'SET';
 
-export type AssetClass = 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE' | 'COMMODITIES';
+export type AssetClass = 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE' | 'COMMODITIES' | 'VEHICLE' | 'COLLECTIBLE' | 'ART';
 
 export type SubAssetType = 
   | 'ETF' 
@@ -30,6 +30,19 @@ export type SubAssetType =
   | 'PALLADIUM_ETC'
   | 'AGRICULTURAL_ETC'
   | 'COMMODITY_ETF'
+  | 'CAR'
+  | 'MOTORCYCLE'
+  | 'BOAT'
+  | 'OTHER_VEHICLE'
+  | 'WATCH'
+  | 'WINE'
+  | 'JEWELRY'
+  | 'SPORTS_MEMORABILIA'
+  | 'OTHER_COLLECTIBLE'
+  | 'PAINTING'
+  | 'SCULPTURE'
+  | 'DIGITAL_ART'
+  | 'OTHER_ART'
   | 'NONE';
 
 export interface Asset {

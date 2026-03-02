@@ -587,6 +587,9 @@ export function getDemoAssetAllocationData(): {
       REAL_ESTATE: { targetMode: 'OFF' },
       CRYPTO: { targetMode: 'OFF' },
       COMMODITIES: { targetMode: 'OFF' },
+      VEHICLE: { targetMode: 'OFF' },
+      COLLECTIBLE: { targetMode: 'OFF' },
+      ART: { targetMode: 'OFF' },
       CASH: { targetMode: 'SET', targetPercent: 0 }, // SET mode (individual assets have fixed targets)
     },
   };

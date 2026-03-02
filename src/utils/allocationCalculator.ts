@@ -369,6 +369,9 @@ export function prepareAssetClassChartData(assetClasses: AssetClassSummary[]): C
     CRYPTO: '#FF9800',
     REAL_ESTATE: '#9C27B0',
     COMMODITIES: '#FFC107',
+    VEHICLE: '#607D8B',
+    COLLECTIBLE: '#E91E63',
+    ART: '#00BCD4',
   };
   
   return assetClasses

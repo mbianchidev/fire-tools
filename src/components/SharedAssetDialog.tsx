@@ -31,20 +31,26 @@ interface SharedAssetDialogProps {
 const SUB_ASSET_TYPES: Record<AssetClass, SubAssetType[]> = {
   STOCKS: ['ETF', 'SINGLE_STOCK', 'PRIVATE_EQUITY'],
   BONDS: ['ETF', 'SINGLE_BOND'],
-  CASH: ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF', 'PHYSICAL_GOLD'],
+  CASH: ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF'],
   CRYPTO: ['COIN'],
   REAL_ESTATE: ['PROPERTY', 'REIT'],
-  COMMODITIES: ['GOLD_ETC', 'SILVER_ETC', 'OIL_ETC', 'NATURAL_GAS_ETC', 'COPPER_ETC', 'PLATINUM_ETC', 'PALLADIUM_ETC', 'AGRICULTURAL_ETC', 'COMMODITY_ETF'],
+  COMMODITIES: ['PHYSICAL_GOLD', 'GOLD_ETC', 'SILVER_ETC', 'OIL_ETC', 'NATURAL_GAS_ETC', 'COPPER_ETC', 'PLATINUM_ETC', 'PALLADIUM_ETC', 'AGRICULTURAL_ETC', 'COMMODITY_ETF'],
+  VEHICLE: ['CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE'],
+  COLLECTIBLE: ['WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE'],
+  ART: ['PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART'],
 };
 
 // Sub-types that can use SET mode (Asset Allocation only)
-const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF', 'PROPERTY'];
+const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF', 'PROPERTY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'];
 
 // Sub-types that require ISIN code (including MONEY_ETF now)
 const ISIN_REQUIRED: SubAssetType[] = ['ETF', 'SINGLE_STOCK', 'SINGLE_BOND', 'REIT', 'MONEY_ETF'];
 
 // Sub-types that don't need ticker (PRIVATE_EQUITY added - no ticker)
-const NO_TICKER_REQUIRED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'PROPERTY', 'PRIVATE_EQUITY'];
+const NO_TICKER_REQUIRED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'PROPERTY', 'PRIVATE_EQUITY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'];
+
+// Sub-types that show direct value input instead of shares/price (like property)
+const VALUE_ONLY_TYPES: SubAssetType[] = ['PROPERTY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'];
 
 // Sub-types that should show UCITS warning (only ETFs)
 const UCITS_WARNING_TYPES: SubAssetType[] = ['ETF', 'MONEY_ETF'];
@@ -71,6 +77,10 @@ const mapToNetWorthAssetClass = (assetClass: AssetClass, subAssetType: SubAssetT
     return subAssetType === 'REIT' ? 'ETF' : 'REAL_ESTATE';
   }
   if (assetClass === 'CRYPTO') return 'CRYPTO';
+  if (assetClass === 'COMMODITIES') return 'COMMODITIES';
+  if (assetClass === 'VEHICLE') return 'VEHICLE';
+  if (assetClass === 'COLLECTIBLE') return 'COLLECTIBLE';
+  if (assetClass === 'ART') return 'ART';
   if (assetClass === 'CASH') return 'OTHER'; // Cash as assets treated as OTHER
   return 'OTHER';
 };
@@ -83,6 +93,10 @@ const mapFromNetWorthAssetClass = (assetClass: AssetHolding['assetClass']): { as
   if (assetClass === 'CRYPTO') return { assetClass: 'CRYPTO', subAssetType: 'COIN' };
   if (assetClass === 'REAL_ESTATE') return { assetClass: 'REAL_ESTATE', subAssetType: 'PROPERTY' };
   if (assetClass === 'PRIVATE_EQUITY') return { assetClass: 'STOCKS', subAssetType: 'PRIVATE_EQUITY' };
+  if (assetClass === 'COMMODITIES') return { assetClass: 'COMMODITIES', subAssetType: 'COMMODITY_ETF' };
+  if (assetClass === 'VEHICLE') return { assetClass: 'VEHICLE', subAssetType: 'CAR' };
+  if (assetClass === 'COLLECTIBLE') return { assetClass: 'COLLECTIBLE', subAssetType: 'WATCH' };
+  if (assetClass === 'ART') return { assetClass: 'ART', subAssetType: 'PAINTING' };
   return { assetClass: 'STOCKS', subAssetType: 'ETF' };
 };
 
@@ -253,11 +267,11 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       return;
     }
 
-    // Shares and pricePerShare are required EXCEPT for cash accounts (not MONEY_ETF) and PROPERTY assets
+    // Shares and pricePerShare are required EXCEPT for cash accounts (not MONEY_ETF) and value-only assets
     const isCashAccount = mode === 'assetAllocation' && assetClass === 'CASH' && subAssetType !== 'MONEY_ETF';
-    const isPropertyAsset = subAssetType === 'PROPERTY';
+    const isValueOnlyAsset = VALUE_ONLY_TYPES.includes(subAssetType);
     
-    if (!isCashAccount && !isPropertyAsset) {
+    if (!isCashAccount && !isValueOnlyAsset) {
       if (!shares.trim() || parseFloat(shares) <= 0) {
         alert('Please enter a valid number of shares');
         return;
@@ -272,14 +286,14 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     const generatedTicker = ticker.trim().toUpperCase() || 
       `${name.trim().substring(0, 4).toUpperCase()}${Date.now().toString().slice(-4)}`;
 
-    // Calculate value differently for cash accounts (not MONEY_ETF) and PROPERTY assets
+    // Calculate value differently for cash accounts (not MONEY_ETF) and value-only assets
     // For these types, value is directly entered (not shares × price)
     let sharesNum = parseFloat(shares) || 1;
     let priceNum = parseFloat(pricePerShare) || 0;
     let valueNum: number;
     
-    if (isCashAccount || isPropertyAsset) {
-      // For cash and PROPERTY: value is entered directly
+    if (isCashAccount || isValueOnlyAsset) {
+      // For cash and value-only assets: value is entered directly
       // Store as shares=1, pricePerShare=value for consistent data model
       valueNum = parseFloat(shares) || 0; // shares field is repurposed for value input
       sharesNum = 1;
@@ -378,6 +392,10 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                 <option value="CASH">Cash</option>
                 <option value="CRYPTO">Crypto</option>
                 <option value="REAL_ESTATE">Real Estate</option>
+                <option value="COMMODITIES">Commodities</option>
+                <option value="VEHICLE">Vehicle</option>
+                <option value="COLLECTIBLE">Collectible</option>
+                <option value="ART">Art</option>
               </select>
             </div>
 
@@ -492,8 +510,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
             )}
           </div>
 
-          {/* Only show shares and price fields for non-cash accounts, non-PROPERTY assets, or for MONEY_ETF */}
-          {(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && subAssetType !== 'PROPERTY' && (
+          {/* Only show shares and price fields for non-cash accounts, non-value-only assets, or for MONEY_ETF */}
+          {(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && !VALUE_ONLY_TYPES.includes(subAssetType) && (
             <div className="form-row">
               <div className="form-group">
                 <label>Number of Shares *</label>
@@ -527,7 +545,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
           {/* Value is directly editable for cash accounts (not MONEY_ETF) and PROPERTY assets */}
           {(() => {
-            const isValueDirectlyEditable = (assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY';
+            const isValueDirectlyEditable = (assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || VALUE_ONLY_TYPES.includes(subAssetType);
             const showCalculatedLabel = !isValueDirectlyEditable && mode === 'assetAllocation';
             const showCalculatedLabelNetWorth = !isValueDirectlyEditable && mode === 'netWorthTracker';
             
@@ -544,7 +562,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                     } : undefined}
                     className="dialog-input dialog-input-calculated"
                     disabled={!isValueDirectlyEditable || (mode === 'netWorthTracker' && subAssetType !== 'PROPERTY')}
-                    placeholder={isValueDirectlyEditable ? (subAssetType === 'PROPERTY' ? 'Enter property value' : 'Enter cash amount') : ''}
+                    placeholder={isValueDirectlyEditable ? (VALUE_ONLY_TYPES.includes(subAssetType) ? 'Enter estimated value' : 'Enter cash amount') : ''}
                     min={isValueDirectlyEditable ? '0' : undefined}
                     step={isValueDirectlyEditable ? 'any' : undefined}
                     required

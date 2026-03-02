@@ -26,6 +26,9 @@ export const DEFAULT_ASSET_CLASS_TARGETS: Record<AssetClass, { targetMode: Alloc
   CRYPTO: { targetMode: 'OFF' },
   REAL_ESTATE: { targetMode: 'OFF' },
   COMMODITIES: { targetMode: 'OFF' },
+  VEHICLE: { targetMode: 'OFF' },
+  COLLECTIBLE: { targetMode: 'OFF' },
+  ART: { targetMode: 'OFF' },
 };
 
 /**
@@ -43,6 +46,12 @@ function mapAssetClassToNetWorth(assetClass: AssetClass): AssetHolding['assetCla
       return 'REAL_ESTATE';
     case 'COMMODITIES':
       return 'COMMODITIES';
+    case 'VEHICLE':
+      return 'VEHICLE';
+    case 'COLLECTIBLE':
+      return 'COLLECTIBLE';
+    case 'ART':
+      return 'ART';
     case 'CASH':
       return 'OTHER'; // Cash handled separately
     default:
@@ -59,7 +68,6 @@ function isCashAsset(subAssetType: SubAssetType): boolean {
     'CHECKING_ACCOUNT',
     'BROKERAGE_ACCOUNT',
     'MONEY_ETF',
-    'PHYSICAL_GOLD', // Physical gold stored as cash/vault
   ].includes(subAssetType);
 }
 
@@ -99,8 +107,11 @@ function mapNetWorthAssetClassToAllocation(assetClass: AssetHolding['assetClass'
     case 'COMMODITIES':
       return 'COMMODITIES';
     case 'VEHICLE':
+      return 'VEHICLE';
     case 'COLLECTIBLE':
+      return 'COLLECTIBLE';
     case 'ART':
+      return 'ART';
     case 'PRIVATE_EQUITY':
     case 'OTHER':
     default:
@@ -145,8 +156,15 @@ export function syncAssetAllocationToNetWorth(
     yearData.months.sort((a, b) => a.month - b.month);
   }
   
-  // Clear existing assets and cash for sync
-  const newAssets: AssetHolding[] = [];
+  // Preserve physical assets (vehicles, collectibles, art) that only exist in net worth
+  // These are not part of asset allocation and should not be overwritten during sync
+  const physicalAssetClasses = ['VEHICLE', 'COLLECTIBLE', 'ART'];
+  const preservedPhysicalAssets = monthData.assets.filter(
+    a => physicalAssetClasses.includes(a.assetClass)
+  );
+  
+  // Clear existing financial assets and cash for sync (preserve physical assets)
+  const newAssets: AssetHolding[] = [...preservedPhysicalAssets];
   const newCashEntries: CashEntry[] = [];
   
   // Process each asset from Asset Allocation
@@ -202,7 +220,7 @@ export function syncAssetAllocationToNetWorth(
   // Replace current month data
   monthData.assets = newAssets;
   monthData.cashEntries = newCashEntries;
-  // Keep pensions and operations unchanged
+  // Keep pensions, operations, debts, and taxes unchanged
   
   return result;
 }

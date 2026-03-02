@@ -511,7 +511,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
 
                     const isEditing = editingAsset === asset.id;
                     const isCashAsset = asset.assetClass === 'CASH';
-                    const isPropertyAsset = asset.subAssetType === 'PROPERTY';
+                    const isValueOnlyAsset = ['PROPERTY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'].includes(asset.subAssetType);
 
                     return (
                       <tr 
@@ -592,7 +592,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         <td>{formatPercent(delta.currentPercent)}</td>
                         <td>{formatPercent(delta.currentPercentInClass)}</td>
                         <td>
-                          {isCashAsset || isPropertyAsset ? (
+                          {isCashAsset || isValueOnlyAsset ? (
                             '-'
                           ) : isEditing ? (
                             <NumberInput
@@ -607,7 +607,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                           )}
                         </td>
                         <td className="currency-value">
-                          {isCashAsset || isPropertyAsset ? (
+                          {isCashAsset || isValueOnlyAsset ? (
                             '-'
                           ) : isEditing ? (
                             <NumberInput
@@ -623,7 +623,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         </td>
                         <td className="currency-value">
                           {isEditing ? (
-                            isCashAsset || isPropertyAsset ? (
+                            isCashAsset || isValueOnlyAsset ? (
                               <NumberInput
                                 value={editValues.currentValue}
                                 onChange={handleEditCurrentValueChange}
