@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { SearchableSelect, SelectOption } from './SearchableSelect';
 import { useSearchParams } from 'react-router-dom';
 import {
   ExpenseTrackerData,
@@ -15,6 +16,9 @@ import {
   createEmptyYearData,
   generateTransactionId,
   getCategoryInfo,
+  getAllCategories,
+  CustomCategory,
+  CategoryOverride,
 } from '../types/expenseTracker';
 import { SupportedCurrency } from '../types/currency';
 import {
@@ -50,6 +54,7 @@ import { ValidatedNumberInput } from './ValidatedNumberInput';
 import { MaterialIcon } from './MaterialIcon';
 import { ScrollToTopButton } from './ScrollToTopButton';
 import { PrivacyBlur } from './PrivacyBlur';
+import { CategoryManagerDialog } from './CategoryManagerDialog';
 import './ExpenseTrackerPage.css';
 
 // Month names for display
@@ -145,6 +150,7 @@ export function ExpenseTrackerPage() {
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<IncomeEntry | ExpenseEntry | null>(null);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
   
   // Filter/sort state
   const [filter, setFilter] = useState<TransactionFilter>({});
@@ -170,6 +176,12 @@ export function ExpenseTrackerPage() {
   const [dateFormat, setDateFormat] = useState<DateFormat>(() => {
     const settings = loadSettings();
     return settings.dateFormat;
+  });
+  
+  // Search threshold state (loaded from settings)
+  const [searchThreshold] = useState<number>(() => {
+    const settings = loadSettings();
+    return settings.searchThreshold ?? 8;
   });
   
   // Listen for settings changes (e.g., from Settings page)
@@ -571,8 +583,8 @@ export function ExpenseTrackerPage() {
     });
   }, []);
 
-  // Update global budget for a category
-  const handleUpdateBudget = useCallback((category: ExpenseCategory, amount: number) => {
+  // Update global budget for a category (supports both built-in and custom category IDs)
+  const handleUpdateBudget = useCallback((category: ExpenseCategory | string, amount: number) => {
     setData(prev => {
       const newData = deepCloneData(prev);
       
@@ -590,6 +602,91 @@ export function ExpenseTrackerPage() {
       return newData;
     });
   }, []);
+
+  // Add custom category
+  const handleAddCategory = useCallback((category: CustomCategory) => {
+    setData(prev => {
+      const newData = deepCloneData(prev);
+      if (!newData.customCategories) {
+        newData.customCategories = [];
+      }
+      newData.customCategories.push(category);
+      return newData;
+    });
+  }, []);
+
+  // Update custom category
+  const handleUpdateCategory = useCallback((category: CustomCategory) => {
+    setData(prev => {
+      const newData = deepCloneData(prev);
+      if (!newData.customCategories) return newData;
+      
+      const index = newData.customCategories.findIndex(c => c.id === category.id);
+      if (index !== -1) {
+        newData.customCategories[index] = category;
+      }
+      return newData;
+    });
+  }, []);
+
+  // Delete custom category - reassign expenses to the specified category (defaults to NO_CATEGORY)
+  const handleDeleteCategory = useCallback((categoryId: string, reassignTo?: string) => {
+    setData(prev => {
+      const newData = deepCloneData(prev);
+      if (!newData.customCategories) return newData;
+      
+      // If reassignTo is specified, reassign all expenses with this category
+      if (reassignTo) {
+        for (const yearData of newData.years) {
+          for (const monthData of yearData.months) {
+            for (const expense of monthData.expenses) {
+              if (expense.category === categoryId) {
+                expense.category = reassignTo;
+              }
+            }
+          }
+        }
+      }
+      
+      newData.customCategories = newData.customCategories.filter(c => c.id !== categoryId);
+      return newData;
+    });
+  }, []);
+
+  // Update a built-in category with an override
+  const handleUpdateBuiltInCategory = useCallback((override: CategoryOverride) => {
+    setData(prev => {
+      const newData = deepCloneData(prev);
+      if (!newData.categoryOverrides) {
+        newData.categoryOverrides = [];
+      }
+      
+      // Find existing override and update or add new one
+      const existingIndex = newData.categoryOverrides.findIndex(o => o.id === override.id);
+      if (existingIndex >= 0) {
+        // Merge with existing override
+        newData.categoryOverrides[existingIndex] = {
+          ...newData.categoryOverrides[existingIndex],
+          ...override,
+        };
+      } else {
+        newData.categoryOverrides.push(override);
+      }
+      
+      return newData;
+    });
+  }, []);
+
+  // Get count of expenses for a specific category (across all years)
+  const getExpenseCountForCategory = useCallback((categoryId: string): number => {
+    let count = 0;
+    for (const yearData of data.years) {
+      for (const monthData of yearData.months) {
+        count += monthData.expenses.filter(e => e.category === categoryId).length;
+      }
+    }
+    return count;
+  }, [data.years]);
 
   // Export data
   const handleExport = () => {
@@ -962,22 +1059,27 @@ export function ExpenseTrackerPage() {
               </div>
               <div className="filter-group">
                 <label htmlFor="filter-category">Category:</label>
-                <select
-                  id="filter-category"
+                <SearchableSelect
+                  options={[
+                    { id: '', label: 'All Categories' },
+                    ...EXPENSE_CATEGORIES.map(c => ({ id: c.id, label: c.name, icon: c.icon }))
+                  ]}
                   value={filter.category || ''}
-                  onChange={(e) => setFilter({ 
+                  onChange={(val) => setFilter({ 
                     ...filter, 
-                    category: e.target.value as ExpenseCategory || undefined,
-                    // When selecting a category, filter to expenses only; when clearing, reset to all transactions
-                    transactionType: e.target.value ? 'expense' : undefined
+                    category: val as ExpenseCategory || undefined,
+                    transactionType: val ? 'expense' : undefined
                   })}
                   disabled={filter.transactionType === 'income'}
-                >
-                  <option value="">All Categories</option>
-                  {EXPENSE_CATEGORIES.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                  searchThreshold={searchThreshold}
+                  ariaLabel="Filter by category"
+                  renderOption={(option) => (
+                    <>
+                      {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                      <span>{option.label}</span>
+                    </>
+                  )}
+                />
               </div>
               <div className="filter-group">
                 <label htmlFor="filter-date">Date:</label>
@@ -1097,7 +1199,7 @@ export function ExpenseTrackerPage() {
                         <td>
                           {transaction.type === 'income' 
                             ? INCOME_SOURCES.find(s => s.id === (transaction as IncomeEntry).source)?.name
-                            : getCategoryInfo((transaction as ExpenseEntry).category).name
+                            : getCategoryInfo((transaction as ExpenseEntry).category, data.customCategories).name
                           }
                         </td>
                         <td>
@@ -1173,12 +1275,23 @@ export function ExpenseTrackerPage() {
         {/* Budgets Tab */}
         {activeTab === 'budgets' && (
           <section className="budgets-section" role="tabpanel" aria-labelledby="budgets-tab" data-tour="budgets-content">
-            <h3>Monthly Budgets</h3>
-            <p className="section-description">
-              Set monthly spending limits for each category. These budgets apply to all months and help you track your spending across your entire budget.
-            </p>
+            <div className="budgets-header">
+              <div>
+                <h3>Monthly Budgets</h3>
+                <p className="section-description">
+                  Set monthly spending limits for each category. These budgets apply to all months and help you track your spending across your entire budget.
+                </p>
+              </div>
+              <button 
+                className="btn-manage-categories"
+                onClick={() => setShowCategoryManager(true)}
+              >
+                <MaterialIcon name="category" size="small" />
+                Manage Categories
+              </button>
+            </div>
             <div className="budgets-grid">
-              {EXPENSE_CATEGORIES.map(category => {
+              {getAllCategories(data.customCategories).map(category => {
                 const breakdown = categoryBreakdown.find(b => b.category === category.id);
                 const budget = data.globalBudgets.find(b => b.category === category.id);
                 const spent = breakdown?.totalAmount || 0;
@@ -1187,8 +1300,11 @@ export function ExpenseTrackerPage() {
                 const percentUsed = budgeted > 0 ? (spent / budgeted) * 100 : 0;
 
                 return (
-                  <div key={category.id} className="budget-card">
+                  <div key={category.id} className={`budget-card ${category.isCustom ? 'custom' : ''}`}>
                     <div className="budget-header">
+                      {category.isCustom && category.color && (
+                        <span className="custom-category-color" style={{ backgroundColor: category.color }} />
+                      )}
                       <span className="category-icon" aria-hidden="true"><MaterialIcon name={category.icon} size="small" /></span>
                       <span className="category-name">{category.name}</span>
                       <span className={`expense-type-badge ${category.defaultExpenseType.toLowerCase()}`}>
@@ -1279,6 +1395,7 @@ export function ExpenseTrackerPage() {
               <ExpenseBreakdownChart 
                 data={categoryBreakdown}
                 currency={data.currency}
+                customCategories={data.customCategories}
               />
             </div>
 
@@ -1299,6 +1416,7 @@ export function ExpenseTrackerPage() {
               <SpendingTrendChart 
                 data={categoryTrendsData}
                 currency={data.currency}
+                customCategories={data.customCategories}
               />
             </div>
 
@@ -1363,23 +1481,29 @@ export function ExpenseTrackerPage() {
                       <td colSpan={6} className="empty-state">No expenses recorded for this period</td>
                     </tr>
                   ) : (
-                    sortedCategoryBreakdown.map(item => (
-                      <tr key={item.category}>
-                        <td>
-                          <span className="category-icon" aria-hidden="true">
-                            <MaterialIcon name={getCategoryInfo(item.category).icon} size="small" />
-                          </span>
-                          {getCategoryInfo(item.category).name}
-                        </td>
-                        <td>{formatCurrency(item.totalAmount, data.currency)}</td>
-                        <td>{formatDisplayPercent(item.percentage)}</td>
-                        <td>{item.budgeted ? formatCurrency(item.budgeted, data.currency) : '-'}</td>
-                        <td className={item.remaining !== undefined ? (item.remaining >= 0 ? 'positive' : 'negative') : ''}>
-                          {item.remaining !== undefined ? formatCurrency(item.remaining, data.currency) : '-'}
-                        </td>
-                        <td>{item.transactionCount}</td>
-                      </tr>
-                    ))
+                    sortedCategoryBreakdown.map(item => {
+                      const categoryInfo = getCategoryInfo(item.category, data.customCategories);
+                      return (
+                        <tr key={item.category}>
+                          <td>
+                            {categoryInfo.isCustom && categoryInfo.color && (
+                              <span className="custom-category-color" style={{ backgroundColor: categoryInfo.color }} />
+                            )}
+                            <span className="category-icon" aria-hidden="true">
+                              <MaterialIcon name={categoryInfo.icon} size="small" />
+                            </span>
+                            {categoryInfo.name}
+                          </td>
+                          <td>{formatCurrency(item.totalAmount, data.currency)}</td>
+                          <td>{formatDisplayPercent(item.percentage)}</td>
+                          <td>{item.budgeted ? formatCurrency(item.budgeted, data.currency) : '-'}</td>
+                          <td className={item.remaining !== undefined ? (item.remaining >= 0 ? 'positive' : 'negative') : ''}>
+                            {item.remaining !== undefined ? formatCurrency(item.remaining, data.currency) : '-'}
+                          </td>
+                          <td>{item.transactionCount}</td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
@@ -1395,6 +1519,7 @@ export function ExpenseTrackerPage() {
             onClose={() => setShowIncomeForm(false)}
             currency={data.currency}
             defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1406,6 +1531,8 @@ export function ExpenseTrackerPage() {
             onClose={() => setShowExpenseForm(false)}
             currency={data.currency}
             defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
+            customCategories={data.customCategories}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1414,15 +1541,31 @@ export function ExpenseTrackerPage() {
           <TransactionFormDialog
             type={editingTransaction.type}
             initialData={editingTransaction}
-            onSubmit={(data) => {
+            onSubmit={(formData) => {
               if (editingTransaction.type === 'income') {
-                handleUpdateIncome(editingTransaction.id, data as Partial<IncomeEntry>);
+                handleUpdateIncome(editingTransaction.id, formData as Partial<IncomeEntry>);
               } else {
-                handleUpdateExpense(editingTransaction.id, data as Partial<ExpenseEntry>);
+                handleUpdateExpense(editingTransaction.id, formData as Partial<ExpenseEntry>);
               }
             }}
             onClose={() => setEditingTransaction(null)}
             currency={data.currency}
+            customCategories={data.customCategories}
+            searchThreshold={searchThreshold}
+          />
+        )}
+
+        {/* Category Manager Dialog */}
+        {showCategoryManager && (
+          <CategoryManagerDialog
+            customCategories={data.customCategories || []}
+            categoryOverrides={data.categoryOverrides || []}
+            onAddCategory={handleAddCategory}
+            onUpdateCategory={handleUpdateCategory}
+            onDeleteCategory={handleDeleteCategory}
+            onUpdateBuiltInCategory={handleUpdateBuiltInCategory}
+            onClose={() => setShowCategoryManager(false)}
+            getExpenseCountForCategory={getExpenseCountForCategory}
           />
         )}
 
@@ -1440,6 +1583,8 @@ interface TransactionFormDialogProps {
   onClose: () => void;
   currency: SupportedCurrency;
   defaultDate?: string;
+  customCategories?: CustomCategory[];
+  searchThreshold?: number;
 }
 
 function TransactionFormDialog({
@@ -1449,6 +1594,8 @@ function TransactionFormDialog({
   onClose,
   currency,
   defaultDate,
+  customCategories,
+  searchThreshold,
 }: TransactionFormDialogProps) {
   const isEditing = !!initialData;
   const today = new Date().toISOString().split('T')[0];
@@ -1462,8 +1609,8 @@ function TransactionFormDialog({
     (initialData as IncomeEntry)?.source || 'SALARY'
   );
   
-  // Expense-specific
-  const [category, setCategory] = useState<ExpenseCategory>(
+  // Expense-specific (supports both built-in and custom category IDs)
+  const [category, setCategory] = useState<ExpenseCategory | string>(
     (initialData as ExpenseEntry)?.category || 'OTHER'
   );
   const [subCategory, setSubCategory] = useState(
@@ -1471,7 +1618,7 @@ function TransactionFormDialog({
   );
   const [expenseType, setExpenseType] = useState<ExpenseType>(
     (initialData as ExpenseEntry)?.expenseType || 
-    getCategoryInfo((initialData as ExpenseEntry)?.category || 'OTHER').defaultExpenseType
+    getCategoryInfo((initialData as ExpenseEntry)?.category || 'OTHER', customCategories).defaultExpenseType
   );
   
   // Recurring state - common for both income and expense
@@ -1479,26 +1626,17 @@ function TransactionFormDialog({
     initialData?.isRecurring ?? false
   );
   
-  // Custom dropdown state for category with icons
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const categoryDropdownRef = useRef<HTMLDivElement>(null);
-  
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (event.target && categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
-        setIsCategoryDropdownOpen(false);
-      }
-    };
-    
-    if (isCategoryDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isCategoryDropdownOpen]);
+  // Build category options for SearchableSelect
+  const categoryOptions: SelectOption[] = useMemo(() =>
+    getAllCategories(customCategories).map(c => ({
+      id: c.id,
+      label: c.name,
+      icon: c.icon,
+      isCustom: c.isCustom,
+      color: c.color,
+    })),
+    [customCategories]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1532,10 +1670,10 @@ function TransactionFormDialog({
     }
   };
 
-  // Update expense type when category changes
-  const handleCategoryChange = (newCategory: ExpenseCategory) => {
+  // Update expense type when category changes (supports both built-in and custom category IDs)
+  const handleCategoryChange = (newCategory: ExpenseCategory | string) => {
     setCategory(newCategory);
-    setExpenseType(getCategoryInfo(newCategory).defaultExpenseType);
+    setExpenseType(getCategoryInfo(newCategory, customCategories).defaultExpenseType);
   };
 
   return (
@@ -1587,54 +1725,52 @@ function TransactionFormDialog({
           {type === 'income' ? (
             <div className="form-group">
               <label htmlFor="income-source">Source</label>
-              <select
-                id="income-source"
+              <SearchableSelect
+                options={INCOME_SOURCES.map(s => ({ id: s.id, label: s.name, icon: s.icon }))}
                 value={source}
-                onChange={(e) => setSource(e.target.value as IncomeSource)}
-              >
-                {INCOME_SOURCES.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setSource(val as IncomeSource)}
+                searchThreshold={searchThreshold}
+                ariaLabel="Income source"
+                renderOption={(option) => (
+                  <>
+                    {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                    <span>{option.label}</span>
+                  </>
+                )}
+                renderValue={(option) => option ? (
+                  <>
+                    {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                    <span>{option.label}</span>
+                  </>
+                ) : 'Select source'}
+              />
             </div>
           ) : (
             <>
               <div className="form-group">
                 <label htmlFor="expense-category">Category</label>
-                <div className="custom-select-container" ref={categoryDropdownRef}>
-                  <button
-                    type="button"
-                    className="custom-select-trigger"
-                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                    aria-haspopup="listbox"
-                    aria-expanded={isCategoryDropdownOpen}
-                  >
-                    <span className="custom-select-value">
-                      <MaterialIcon name={getCategoryInfo(category).icon} size="small" />
-                      <span>{getCategoryInfo(category).name}</span>
-                    </span>
-                    <MaterialIcon name={isCategoryDropdownOpen ? 'expand_less' : 'expand_more'} size="small" />
-                  </button>
-                  {isCategoryDropdownOpen && (
-                    <ul className="custom-select-dropdown" role="listbox">
-                      {EXPENSE_CATEGORIES.map(c => (
-                        <li
-                          key={c.id}
-                          role="option"
-                          aria-selected={category === c.id}
-                          className={`custom-select-option ${category === c.id ? 'selected' : ''}`}
-                          onClick={() => {
-                            handleCategoryChange(c.id);
-                            setIsCategoryDropdownOpen(false);
-                          }}
-                        >
-                          <MaterialIcon name={c.icon} size="small" />
-                          <span>{c.name}</span>
-                        </li>
-                      ))}
-                    </ul>
+                <SearchableSelect
+                  options={categoryOptions}
+                  value={category}
+                  onChange={(id) => handleCategoryChange(id)}
+                  searchThreshold={searchThreshold}
+                  ariaLabel="Expense category"
+                  renderValue={(option) => option ? (
+                    <>
+                      <MaterialIcon name={option.icon || 'category'} size="small" />
+                      <span>{option.label}</span>
+                    </>
+                  ) : 'Select category'}
+                  renderOption={(option) => (
+                    <>
+                      {option.isCustom && option.color && (
+                        <span className="custom-category-indicator" style={{ backgroundColor: option.color }} />
+                      )}
+                      <MaterialIcon name={option.icon || 'category'} size="small" />
+                      <span>{option.label}</span>
+                    </>
                   )}
-                </div>
+                />
               </div>
               
               <div className="form-group">

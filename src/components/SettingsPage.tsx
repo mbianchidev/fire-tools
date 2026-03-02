@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
@@ -15,8 +15,15 @@ import { exportAllDataAsJSON, importAllDataFromJSON, serializeAllDataExport } fr
 import { loadNotificationState, updateNotificationPreferences, clearNotifications, addNotification } from '../utils/notificationStorage';
 import { type NotificationPreferences, DEFAULT_NOTIFICATION_PREFERENCES } from '../types/notification';
 import { generateDemoTourNotifications } from '../utils/notificationGenerator';
+import { 
+  ExpenseTrackerData, 
+  CustomCategory, 
+  CategoryOverride,
+} from '../types/expenseTracker';
 import { Tooltip } from './Tooltip';
 import { MaterialIcon } from './MaterialIcon';
+import { CategoryManagerDialog } from './CategoryManagerDialog';
+import { SearchableSelect } from './SearchableSelect';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -24,7 +31,7 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['account', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'data', 'support'] as const;
+const SETTINGS_SECTIONS = ['account', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'categories', 'data', 'support'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
@@ -34,6 +41,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const [isLoading, setIsLoading] = useState(true);
   const [rateTextValues, setRateTextValues] = useState<Record<string, string>>({});
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
+  
+  // Category management state
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [expenseData, setExpenseData] = useState<ExpenseTrackerData | null>(null);
   
   // Account section expanded by default, others collapsed
   const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
@@ -76,6 +87,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     const notifState = loadNotificationState();
     setNotificationPrefs(notifState.preferences);
     
+    // Load expense tracker data for category management
+    const expenseTrackerData = loadExpenseTrackerData();
+    if (expenseTrackerData) {
+      setExpenseData(expenseTrackerData);
+    }
+    
     setIsLoading(false);
   }, []);
 
@@ -84,6 +101,105 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 3000);
   };
+  
+  // Open category manager
+  const handleOpenCategoryManager = () => {
+    // Reload expense data in case it changed
+    const data = loadExpenseTrackerData();
+    if (data) {
+      setExpenseData(data);
+    }
+    setShowCategoryManager(true);
+  };
+  
+  // Add custom category
+  const handleAddCategory = useCallback((category: CustomCategory) => {
+    if (!expenseData) return;
+    
+    const newData = {
+      ...expenseData,
+      customCategories: [...(expenseData.customCategories || []), category],
+    };
+    setExpenseData(newData);
+    saveExpenseTrackerData(newData);
+    showMessage('success', `Category "${category.name}" added!`);
+  }, [expenseData]);
+  
+  // Update custom category
+  const handleUpdateCategory = useCallback((category: CustomCategory) => {
+    if (!expenseData) return;
+    
+    const newData = {
+      ...expenseData,
+      customCategories: (expenseData.customCategories || []).map(c =>
+        c.id === category.id ? category : c
+      ),
+    };
+    setExpenseData(newData);
+    saveExpenseTrackerData(newData);
+    showMessage('success', `Category "${category.name}" updated!`);
+  }, [expenseData]);
+  
+  // Delete custom category
+  const handleDeleteCategory = useCallback((categoryId: string, reassignTo?: string) => {
+    if (!expenseData) return;
+    
+    const category = expenseData.customCategories?.find(c => c.id === categoryId);
+    const newData = {
+      ...expenseData,
+      customCategories: (expenseData.customCategories || []).filter(c => c.id !== categoryId),
+      // Also reassign expenses if needed
+      years: reassignTo ? expenseData.years.map(year => ({
+        ...year,
+        months: year.months.map(month => ({
+          ...month,
+          expenses: month.expenses.map(expense =>
+            expense.category === categoryId ? { ...expense, category: reassignTo } : expense
+          ),
+        })),
+      })) : expenseData.years,
+    };
+    setExpenseData(newData);
+    saveExpenseTrackerData(newData);
+    showMessage('success', `Category "${category?.name || 'Unknown'}" deleted!`);
+  }, [expenseData]);
+  
+  // Update built-in category override
+  const handleUpdateBuiltInCategory = useCallback((override: CategoryOverride) => {
+    if (!expenseData) return;
+    
+    const existingOverrides = expenseData.categoryOverrides || [];
+    const existingIndex = existingOverrides.findIndex(o => o.id === override.id);
+    
+    let newOverrides: CategoryOverride[];
+    if (existingIndex >= 0) {
+      newOverrides = existingOverrides.map((o, i) => 
+        i === existingIndex ? { ...o, ...override } : o
+      );
+    } else {
+      newOverrides = [...existingOverrides, override];
+    }
+    
+    const newData = {
+      ...expenseData,
+      categoryOverrides: newOverrides,
+    };
+    setExpenseData(newData);
+    saveExpenseTrackerData(newData);
+    showMessage('success', 'Category updated!');
+  }, [expenseData]);
+  
+  // Get expense count for category
+  const getExpenseCountForCategory = useCallback((categoryId: string): number => {
+    if (!expenseData) return 0;
+    let count = 0;
+    for (const yearData of expenseData.years) {
+      for (const monthData of yearData.months) {
+        count += monthData.expenses.filter(e => e.category === categoryId).length;
+      }
+    }
+    return count;
+  }, [expenseData]);
 
   // Handle settings change
   const handleSettingChange = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
@@ -508,11 +624,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                     <span className="info-icon" aria-label="More information">i</span>
                   </Tooltip>
                 </div>
-                <select
-                  id="defaultCurrency"
+                <SearchableSelect
+                  options={SUPPORTED_CURRENCIES.map(c => ({
+                    id: c.code,
+                    label: `${c.symbol} ${c.name} (${c.code})`,
+                  }))}
                   value={settings.currencySettings.defaultCurrency}
-                  onChange={(e) => {
-                    const newCurrency = e.target.value as SupportedCurrency;
+                  searchThreshold={settings.searchThreshold ?? 8}
+                  onChange={(val) => {
+                    const newCurrency = val as SupportedCurrency;
                     const oldCurrency = settings.currencySettings.defaultCurrency;
                     
                     if (newCurrency === oldCurrency) {
@@ -570,13 +690,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                     onSettingsChange?.(newSettings);
                     showMessage('success', `Default currency changed to ${newCurrency}! All values converted.`);
                   }}
-                >
-                  {SUPPORTED_CURRENCIES.map((currency) => (
-                    <option key={currency.code} value={currency.code}>
-                      {currency.symbol} {currency.name} ({currency.code})
-                    </option>
-                  ))}
-                </select>
+                  ariaLabel="Default currency"
+                />
                 <span className="setting-help">This currency will be used as default across all pages</span>
               </div>
               <div className="setting-item">
@@ -639,6 +754,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 </select>
                 <span className="setting-help">How dates are displayed throughout the app</span>
               </div>
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="searchThreshold">Dropdown Search Threshold</label>
+                  <Tooltip content="Set the minimum number of items a dropdown must have before a search field appears. For example, with a threshold of 8, dropdowns with 8 or more items will include a search box to help you find options quickly.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <select
+                  id="searchThreshold"
+                  value={settings.searchThreshold ?? 8}
+                  onChange={(e) => handleSettingChange('searchThreshold', parseInt(e.target.value, 10))}
+                >
+                  <option value={0}>Always (show search on all dropdowns)</option>
+                  <option value={4}>4 items</option>
+                  <option value={6}>6 items</option>
+                  <option value={8}>8 items (default)</option>
+                  <option value={10}>10 items</option>
+                  <option value={15}>15 items</option>
+                  <option value={999}>Never (disable dropdown search)</option>
+                </select>
+                <span className="setting-help">Dropdowns with this many items or more will show a search box</span>
+              </div>
             </div>
           )}
         </section>
@@ -685,27 +822,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                     <span className="info-icon" aria-label="More information">i</span>
                   </Tooltip>
                 </div>
-                <select
-                  id="country"
+                <SearchableSelect
+                  options={[
+                    { id: '', label: 'Select country (optional)' },
+                    ...ALL_COUNTRIES.map(c => ({
+                      id: c.code,
+                      label: `${c.flag} ${c.name}`,
+                    }))
+                  ]}
                   value={settings.country || ''}
-                  onChange={(e) => handleSettingChange('country', e.target.value || undefined)}
-                >
-                  <option value="">Select country (optional)</option>
-                  <optgroup label="EU Countries">
-                    {ALL_COUNTRIES.filter(c => c.isEU).map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.flag} {country.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Other Countries">
-                    {ALL_COUNTRIES.filter(c => !c.isEU).map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.flag} {country.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
+                  onChange={(val) => handleSettingChange('country', val || undefined)}
+                  searchThreshold={settings.searchThreshold ?? 8}
+                  ariaLabel="Country"
+                />
                 {(() => {
                   const isEU = settings.country && isEUCountry(settings.country);
                   if (isEU) {
@@ -987,6 +1116,31 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           )}
         </section>
 
+        {/* Expense Categories */}
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('categories')}
+            aria-expanded={!collapsedSections.has('categories')}
+            aria-controls="categories-content"
+          >
+            <h2><MaterialIcon name="category" /> Expense Categories <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('categories') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('categories') && (
+            <div id="categories-content" className="collapsible-content">
+              <p className="setting-help">
+                Manage your expense categories. Create custom categories or customize the built-in ones.
+              </p>
+              <div className="setting-group">
+                <button className="primary-btn" onClick={handleOpenCategoryManager}>
+                  <MaterialIcon name="category" size="small" />
+                  Manage Categories
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+
         {/* Data Management */}
         <section className="settings-section collapsible-section">
           <button 
@@ -1236,6 +1390,20 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           )}
         </section>
       </div>
+      
+      {/* Category Manager Dialog */}
+      {showCategoryManager && expenseData && (
+        <CategoryManagerDialog
+          customCategories={expenseData.customCategories || []}
+          categoryOverrides={expenseData.categoryOverrides || []}
+          onAddCategory={handleAddCategory}
+          onUpdateCategory={handleUpdateCategory}
+          onDeleteCategory={handleDeleteCategory}
+          onUpdateBuiltInCategory={handleUpdateBuiltInCategory}
+          onClose={() => setShowCategoryManager(false)}
+          getExpenseCountForCategory={getExpenseCountForCategory}
+        />
+      )}
     </div>
   );
 };
