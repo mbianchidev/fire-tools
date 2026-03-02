@@ -23,6 +23,7 @@ import {
 import { Tooltip } from './Tooltip';
 import { MaterialIcon } from './MaterialIcon';
 import { CategoryManagerDialog } from './CategoryManagerDialog';
+import { SearchableSelect } from './SearchableSelect';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -623,11 +624,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                     <span className="info-icon" aria-label="More information">i</span>
                   </Tooltip>
                 </div>
-                <select
-                  id="defaultCurrency"
+                <SearchableSelect
+                  options={SUPPORTED_CURRENCIES.map(c => ({
+                    id: c.code,
+                    label: `${c.symbol} ${c.name} (${c.code})`,
+                  }))}
                   value={settings.currencySettings.defaultCurrency}
-                  onChange={(e) => {
-                    const newCurrency = e.target.value as SupportedCurrency;
+                  searchThreshold={settings.searchThreshold ?? 8}
+                  onChange={(val) => {
+                    const newCurrency = val as SupportedCurrency;
                     const oldCurrency = settings.currencySettings.defaultCurrency;
                     
                     if (newCurrency === oldCurrency) {
@@ -685,13 +690,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                     onSettingsChange?.(newSettings);
                     showMessage('success', `Default currency changed to ${newCurrency}! All values converted.`);
                   }}
-                >
-                  {SUPPORTED_CURRENCIES.map((currency) => (
-                    <option key={currency.code} value={currency.code}>
-                      {currency.symbol} {currency.name} ({currency.code})
-                    </option>
-                  ))}
-                </select>
+                  ariaLabel="Default currency"
+                />
                 <span className="setting-help">This currency will be used as default across all pages</span>
               </div>
               <div className="setting-item">
@@ -754,6 +754,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 </select>
                 <span className="setting-help">How dates are displayed throughout the app</span>
               </div>
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="searchThreshold">Dropdown Search Threshold</label>
+                  <Tooltip content="Set the minimum number of items a dropdown must have before a search field appears. For example, with a threshold of 8, dropdowns with 8 or more items will include a search box to help you find options quickly.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <select
+                  id="searchThreshold"
+                  value={settings.searchThreshold ?? 8}
+                  onChange={(e) => handleSettingChange('searchThreshold', parseInt(e.target.value, 10))}
+                >
+                  <option value={0}>Always (show search on all dropdowns)</option>
+                  <option value={4}>4 items</option>
+                  <option value={6}>6 items</option>
+                  <option value={8}>8 items (default)</option>
+                  <option value={10}>10 items</option>
+                  <option value={15}>15 items</option>
+                  <option value={999}>Never (disable dropdown search)</option>
+                </select>
+                <span className="setting-help">Dropdowns with this many items or more will show a search box</span>
+              </div>
             </div>
           )}
         </section>
@@ -800,27 +822,19 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                     <span className="info-icon" aria-label="More information">i</span>
                   </Tooltip>
                 </div>
-                <select
-                  id="country"
+                <SearchableSelect
+                  options={[
+                    { id: '', label: 'Select country (optional)' },
+                    ...ALL_COUNTRIES.map(c => ({
+                      id: c.code,
+                      label: `${c.flag} ${c.name}`,
+                    }))
+                  ]}
                   value={settings.country || ''}
-                  onChange={(e) => handleSettingChange('country', e.target.value || undefined)}
-                >
-                  <option value="">Select country (optional)</option>
-                  <optgroup label="EU Countries">
-                    {ALL_COUNTRIES.filter(c => c.isEU).map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.flag} {country.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Other Countries">
-                    {ALL_COUNTRIES.filter(c => !c.isEU).map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.flag} {country.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
+                  onChange={(val) => handleSettingChange('country', val || undefined)}
+                  searchThreshold={settings.searchThreshold ?? 8}
+                  ariaLabel="Country"
+                />
                 {(() => {
                   const isEU = settings.country && isEUCountry(settings.country);
                   if (isEU) {

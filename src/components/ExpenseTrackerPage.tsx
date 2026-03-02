@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { SearchableSelect, SelectOption } from './SearchableSelect';
 import { useSearchParams } from 'react-router-dom';
 import {
   ExpenseTrackerData,
@@ -175,6 +176,12 @@ export function ExpenseTrackerPage() {
   const [dateFormat, setDateFormat] = useState<DateFormat>(() => {
     const settings = loadSettings();
     return settings.dateFormat;
+  });
+  
+  // Search threshold state (loaded from settings)
+  const [searchThreshold] = useState<number>(() => {
+    const settings = loadSettings();
+    return settings.searchThreshold ?? 8;
   });
   
   // Listen for settings changes (e.g., from Settings page)
@@ -1052,22 +1059,27 @@ export function ExpenseTrackerPage() {
               </div>
               <div className="filter-group">
                 <label htmlFor="filter-category">Category:</label>
-                <select
-                  id="filter-category"
+                <SearchableSelect
+                  options={[
+                    { id: '', label: 'All Categories' },
+                    ...EXPENSE_CATEGORIES.map(c => ({ id: c.id, label: c.name, icon: c.icon }))
+                  ]}
                   value={filter.category || ''}
-                  onChange={(e) => setFilter({ 
+                  onChange={(val) => setFilter({ 
                     ...filter, 
-                    category: e.target.value as ExpenseCategory || undefined,
-                    // When selecting a category, filter to expenses only; when clearing, reset to all transactions
-                    transactionType: e.target.value ? 'expense' : undefined
+                    category: val as ExpenseCategory || undefined,
+                    transactionType: val ? 'expense' : undefined
                   })}
                   disabled={filter.transactionType === 'income'}
-                >
-                  <option value="">All Categories</option>
-                  {EXPENSE_CATEGORIES.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                  searchThreshold={searchThreshold}
+                  ariaLabel="Filter by category"
+                  renderOption={(option) => (
+                    <>
+                      {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                      <span>{option.label}</span>
+                    </>
+                  )}
+                />
               </div>
               <div className="filter-group">
                 <label htmlFor="filter-date">Date:</label>
@@ -1507,6 +1519,7 @@ export function ExpenseTrackerPage() {
             onClose={() => setShowIncomeForm(false)}
             currency={data.currency}
             defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1519,6 +1532,7 @@ export function ExpenseTrackerPage() {
             currency={data.currency}
             defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
             customCategories={data.customCategories}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1537,6 +1551,7 @@ export function ExpenseTrackerPage() {
             onClose={() => setEditingTransaction(null)}
             currency={data.currency}
             customCategories={data.customCategories}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1569,6 +1584,7 @@ interface TransactionFormDialogProps {
   currency: SupportedCurrency;
   defaultDate?: string;
   customCategories?: CustomCategory[];
+  searchThreshold?: number;
 }
 
 function TransactionFormDialog({
@@ -1579,6 +1595,7 @@ function TransactionFormDialog({
   currency,
   defaultDate,
   customCategories,
+  searchThreshold,
 }: TransactionFormDialogProps) {
   const isEditing = !!initialData;
   const today = new Date().toISOString().split('T')[0];
@@ -1609,26 +1626,17 @@ function TransactionFormDialog({
     initialData?.isRecurring ?? false
   );
   
-  // Custom dropdown state for category with icons
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const categoryDropdownRef = useRef<HTMLDivElement>(null);
-  
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (event.target && categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
-        setIsCategoryDropdownOpen(false);
-      }
-    };
-    
-    if (isCategoryDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isCategoryDropdownOpen]);
+  // Build category options for SearchableSelect
+  const categoryOptions: SelectOption[] = useMemo(() =>
+    getAllCategories(customCategories).map(c => ({
+      id: c.id,
+      label: c.name,
+      icon: c.icon,
+      isCustom: c.isCustom,
+      color: c.color,
+    })),
+    [customCategories]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1717,57 +1725,52 @@ function TransactionFormDialog({
           {type === 'income' ? (
             <div className="form-group">
               <label htmlFor="income-source">Source</label>
-              <select
-                id="income-source"
+              <SearchableSelect
+                options={INCOME_SOURCES.map(s => ({ id: s.id, label: s.name, icon: s.icon }))}
                 value={source}
-                onChange={(e) => setSource(e.target.value as IncomeSource)}
-              >
-                {INCOME_SOURCES.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setSource(val as IncomeSource)}
+                searchThreshold={searchThreshold}
+                ariaLabel="Income source"
+                renderOption={(option) => (
+                  <>
+                    {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                    <span>{option.label}</span>
+                  </>
+                )}
+                renderValue={(option) => option ? (
+                  <>
+                    {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                    <span>{option.label}</span>
+                  </>
+                ) : 'Select source'}
+              />
             </div>
           ) : (
             <>
               <div className="form-group">
                 <label htmlFor="expense-category">Category</label>
-                <div className="custom-select-container" ref={categoryDropdownRef}>
-                  <button
-                    type="button"
-                    className="custom-select-trigger"
-                    onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
-                    aria-haspopup="listbox"
-                    aria-expanded={isCategoryDropdownOpen}
-                  >
-                    <span className="custom-select-value">
-                      <MaterialIcon name={getCategoryInfo(category, customCategories).icon} size="small" />
-                      <span>{getCategoryInfo(category, customCategories).name}</span>
-                    </span>
-                    <MaterialIcon name={isCategoryDropdownOpen ? 'expand_less' : 'expand_more'} size="small" />
-                  </button>
-                  {isCategoryDropdownOpen && (
-                    <ul className="custom-select-dropdown" role="listbox">
-                      {getAllCategories(customCategories).map(c => (
-                        <li
-                          key={c.id}
-                          role="option"
-                          aria-selected={category === c.id}
-                          className={`custom-select-option ${category === c.id ? 'selected' : ''} ${c.isCustom ? 'custom-category' : ''}`}
-                          onClick={() => {
-                            handleCategoryChange(c.id);
-                            setIsCategoryDropdownOpen(false);
-                          }}
-                        >
-                          {c.isCustom && c.color && (
-                            <span className="custom-category-indicator" style={{ backgroundColor: c.color }} />
-                          )}
-                          <MaterialIcon name={c.icon} size="small" />
-                          <span>{c.name}</span>
-                        </li>
-                      ))}
-                    </ul>
+                <SearchableSelect
+                  options={categoryOptions}
+                  value={category}
+                  onChange={(id) => handleCategoryChange(id)}
+                  searchThreshold={searchThreshold}
+                  ariaLabel="Expense category"
+                  renderValue={(option) => option ? (
+                    <>
+                      <MaterialIcon name={option.icon || 'category'} size="small" />
+                      <span>{option.label}</span>
+                    </>
+                  ) : 'Select category'}
+                  renderOption={(option) => (
+                    <>
+                      {option.isCustom && option.color && (
+                        <span className="custom-category-indicator" style={{ backgroundColor: option.color }} />
+                      )}
+                      <MaterialIcon name={option.icon || 'category'} size="small" />
+                      <span>{option.label}</span>
+                    </>
                   )}
-                </div>
+                />
               </div>
               
               <div className="form-group">

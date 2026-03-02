@@ -20,6 +20,7 @@ export interface UserSettings {
   privacyMode: boolean;
   country?: string;
   dateFormat: DateFormat;
+  searchThreshold: number;
 }
 
 export const DEFAULT_SETTINGS: UserSettings = {
@@ -30,6 +31,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   privacyMode: false,
   country: undefined,
   dateFormat: 'DD/MM/YYYY',
+  searchThreshold: 8,
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
