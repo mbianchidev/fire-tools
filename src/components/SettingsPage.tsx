@@ -506,7 +506,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               <div className="setting-item">
                 <div className="label-with-tooltip">
                   <label>Asset Classes Included in FIRE</label>
-                  <Tooltip content="Select which asset classes count toward your FIRE target. Only included asset classes contribute to portfolio value in FIRE calculations. Primary residence properties are always excluded regardless of this setting.">
+                  <Tooltip content="Select which asset classes count toward your FIRE target. Only included asset classes contribute to portfolio value in FIRE calculations.">
                     <span className="info-icon" aria-label="More information">i</span>
                   </Tooltip>
                 </div>
@@ -536,6 +536,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 >
                   Reset to Defaults
                 </button>
+              </div>
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.includePrimaryResidenceInFIRE ?? true}
+                      onChange={(e) => handleSettingChange('includePrimaryResidenceInFIRE', e.target.checked)}
+                    />
+                    Include Primary Residence in FIRE Calculation
+                  </label>
+                  <Tooltip content="When enabled, real estate properties marked as primary residence will be included in your FIRE portfolio value. When disabled, they are excluded (useful if you don't consider your home as liquid assets for retirement).">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <span className="setting-help">Controls whether your primary residence counts toward your FIRE target</span>
               </div>
             </div>
           )}

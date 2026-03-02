@@ -20,17 +20,18 @@ export interface FIREPortfolioData {
 
 /**
  * Calculate portfolio data for FIRE calculations, respecting asset class inclusion settings
- * and primary residence exclusion.
+ * and primary residence inclusion setting.
  */
 export function calculateFIREPortfolioData(assets: Asset[]): FIREPortfolioData | undefined {
   const settings = loadSettings();
   const inclusion = settings.fireAssetClassInclusion;
+  const includePrimaryResidence = settings.includePrimaryResidenceInFIRE;
 
-  // Filter: active assets, included asset class, not primary residence
+  // Filter: active assets, included asset class, and optionally exclude primary residence
   const fireAssets = assets.filter(a =>
     a.targetMode !== 'OFF' &&
     inclusion[a.assetClass] &&
-    !a.isPrimaryResidence
+    (includePrimaryResidence || !a.isPrimaryResidence)
   );
 
   const totalValue = fireAssets.reduce((sum, a) => sum + a.currentValue, 0);

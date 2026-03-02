@@ -22,6 +22,7 @@ export interface UserSettings {
   country?: string;
   dateFormat: DateFormat;
   fireAssetClassInclusion: Record<AssetClass, boolean>;
+  includePrimaryResidenceInFIRE: boolean;
 }
 
 export const DEFAULT_FIRE_ASSET_CLASS_INCLUSION: Record<AssetClass, boolean> = {
@@ -45,6 +46,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   country: undefined,
   dateFormat: 'DD/MM/YYYY',
   fireAssetClassInclusion: DEFAULT_FIRE_ASSET_CLASS_INCLUSION,
+  includePrimaryResidenceInFIRE: true, // Default to including primary residence
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
