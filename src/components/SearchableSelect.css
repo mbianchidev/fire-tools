@@ -1,6 +1,19 @@
 .searchable-select-container {
   position: relative;
   width: 100%;
+  /* Prevent parent class overrides (e.g. .dialog-select) from adding a second box */
+  border: none;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Higher specificity reset for known conflicting classes */
+.searchable-select-container.dialog-select {
+  border: none;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .searchable-select-trigger {
@@ -20,6 +33,11 @@
 
 .searchable-select-trigger:hover {
   border-color: var(--accent-primary);
+}
+
+.searchable-select-trigger.open {
+  border-color: var(--accent-primary);
+  box-shadow: var(--glow-primary, 0 0 0 3px rgba(102, 126, 234, 0.25));
 }
 
 .searchable-select-trigger:focus {

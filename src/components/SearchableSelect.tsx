@@ -91,7 +91,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     <div className={`searchable-select-container ${className}`} ref={containerRef} onKeyDown={handleKeyDown}>
       <button
         type="button"
-        className="searchable-select-trigger"
+        className={`searchable-select-trigger ${isOpen ? 'open' : ''}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
