@@ -2,7 +2,7 @@
  * CSV Export/Import utilities for FIRE Calculator data
  */
 
-import { CalculatorInputs } from '../types/calculator';
+import { CalculatorInputs, MonteCarloFixedParameters, SimulationLogEntry } from '../types/calculator';
 import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { NetWorthTrackerData } from '../types/netWorthTracker';
 import type { QuestionnaireResults } from '../types/questionnaire';
@@ -660,4 +660,119 @@ export function exportQuestionnaireResultsToCSV(results: QuestionnaireResults): 
   });
 
   return rows.map(row => row.join(',')).join('\n');
+}
+
+/**
+ * Export Monte Carlo simulation logs to CSV format
+ * Includes fixed parameters in header, then each simulation as rows with yearly data
+ */
+export function exportMonteCarloLogsToCSV(
+  logs: SimulationLogEntry[],
+  fixedParameters: MonteCarloFixedParameters
+): string {
+  const escapeCSV = (value: unknown): string => {
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const rows: string[][] = [
+    ['Monte Carlo Simulation Logs'],
+    ['Generated', new Date().toISOString()],
+    [],
+    ['Fixed Parameters (apply to all simulations)'],
+    ['Parameter', 'Value'],
+    ['Initial Savings', escapeCSV(fixedParameters.initialSavings)],
+    ['Stocks Percent', escapeCSV(fixedParameters.stocksPercent)],
+    ['Bonds Percent', escapeCSV(fixedParameters.bondsPercent)],
+    ['Cash Percent', escapeCSV(fixedParameters.cashPercent)],
+    ['Current Annual Expenses', escapeCSV(fixedParameters.currentAnnualExpenses)],
+    ['FIRE Annual Expenses', escapeCSV(fixedParameters.fireAnnualExpenses)],
+    ['Annual Labor Income', escapeCSV(fixedParameters.annualLaborIncome)],
+    ['Savings Rate', escapeCSV(fixedParameters.savingsRate)],
+    ['Desired Withdrawal Rate', escapeCSV(fixedParameters.desiredWithdrawalRate)],
+    ['Expected Stock Return', escapeCSV(fixedParameters.expectedStockReturn)],
+    ['Expected Bond Return', escapeCSV(fixedParameters.expectedBondReturn)],
+    ['Expected Cash Return', escapeCSV(fixedParameters.expectedCashReturn)],
+    ['Number of Simulations', escapeCSV(fixedParameters.numSimulations)],
+    ['Stock Volatility', escapeCSV(fixedParameters.stockVolatility)],
+    ['Bond Volatility', escapeCSV(fixedParameters.bondVolatility)],
+    ['Black Swan Probability', escapeCSV(fixedParameters.blackSwanProbability)],
+    ['Black Swan Impact', escapeCSV(fixedParameters.blackSwanImpact)],
+    ['Stop Working at FIRE', escapeCSV(fixedParameters.stopWorkingAtFIRE)],
+    [],
+    ['Simulation Results Summary'],
+    ['Simulation ID', 'Success', 'Years to FIRE', 'Final Portfolio', 'Timestamp'],
+  ];
+
+  // Add simulation summaries
+  logs.forEach(log => {
+    rows.push([
+      escapeCSV(log.simulationId),
+      escapeCSV(log.success),
+      escapeCSV(log.yearsToFIRE ?? 'N/A'),
+      escapeCSV(log.finalPortfolio.toFixed(2)),
+      escapeCSV(log.timestamp),
+    ]);
+  });
+
+  rows.push([]);
+  rows.push(['Detailed Yearly Data']);
+  rows.push([
+    'Simulation ID',
+    'Year',
+    'Age',
+    'Stock Return (%)',
+    'Bond Return (%)',
+    'Cash Return (%)',
+    'Portfolio Return (%)',
+    'Black Swan Event',
+    'Expenses',
+    'Labor Income',
+    'Total Income',
+    'Portfolio Value',
+    'FIRE Achieved',
+  ]);
+
+  // Add yearly data for each simulation
+  logs.forEach(log => {
+    log.yearlyData.forEach(yearData => {
+      rows.push([
+        escapeCSV(log.simulationId),
+        escapeCSV(yearData.year),
+        escapeCSV(yearData.age),
+        escapeCSV(yearData.stockReturn.toFixed(2)),
+        escapeCSV(yearData.bondReturn.toFixed(2)),
+        escapeCSV(yearData.cashReturn.toFixed(2)),
+        escapeCSV(yearData.portfolioReturn.toFixed(2)),
+        escapeCSV(yearData.isBlackSwan),
+        escapeCSV(yearData.expenses.toFixed(2)),
+        escapeCSV(yearData.laborIncome.toFixed(2)),
+        escapeCSV(yearData.totalIncome.toFixed(2)),
+        escapeCSV(yearData.portfolioValue.toFixed(2)),
+        escapeCSV(yearData.isFIREAchieved),
+      ]);
+    });
+  });
+
+  return rows.map(row => row.join(',')).join('\n');
+}
+
+/**
+ * Export Monte Carlo simulation logs to JSON format
+ */
+export function exportMonteCarloLogsToJSON(
+  logs: SimulationLogEntry[],
+  fixedParameters: MonteCarloFixedParameters
+): string {
+  const exportData = {
+    exportVersion: '1.0',
+    exportDate: new Date().toISOString(),
+    type: 'MonteCarloSimulationLogs',
+    fixedParameters,
+    simulations: logs,
+  };
+  return JSON.stringify(exportData, null, 2);
 }

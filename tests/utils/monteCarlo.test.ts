@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runMonteCarloSimulation } from '../../src/utils/monteCarlo';
+import { runMonteCarloSimulation, runMonteCarloSimulationWithLogs } from '../../src/utils/monteCarlo';
 import { CalculatorInputs, MonteCarloInputs } from '../../src/types/calculator';
 
 describe('Monte Carlo Simulation', () => {
@@ -147,6 +147,84 @@ describe('Monte Carlo Simulation', () => {
       expect(() => {
         runMonteCarloSimulation(invalidInputs, baseMcInputs);
       }).toThrow('desiredWithdrawalRate must be greater than 0');
+    });
+  });
+
+  describe('Simulation with Logging', () => {
+    it('should return detailed logs for each simulation', () => {
+      const mcInputs = { ...baseMcInputs, numSimulations: 10 };
+      const result = runMonteCarloSimulationWithLogs(baseInputs, mcInputs);
+      
+      expect(result).toBeDefined();
+      expect(result.logs).toBeDefined();
+      expect(result.logs.length).toBe(10);
+      expect(result.fixedParameters).toBeDefined();
+    });
+
+    it('should include yearly data in each log entry', () => {
+      const mcInputs = { ...baseMcInputs, numSimulations: 5 };
+      const result = runMonteCarloSimulationWithLogs(baseInputs, mcInputs);
+      
+      result.logs.forEach(log => {
+        expect(log.simulationId).toBeGreaterThan(0);
+        expect(typeof log.success).toBe('boolean');
+        expect(log.timestamp).toBeDefined();
+        expect(log.yearlyData).toBeDefined();
+        expect(log.yearlyData.length).toBeGreaterThan(0);
+      });
+    });
+
+    it('should capture correct data in yearly entries', () => {
+      const mcInputs = { ...baseMcInputs, numSimulations: 3 };
+      const result = runMonteCarloSimulationWithLogs(baseInputs, mcInputs);
+      
+      result.logs.forEach(log => {
+        log.yearlyData.forEach(yearData => {
+          expect(yearData.year).toBeGreaterThan(2000);
+          expect(yearData.age).toBeGreaterThan(0);
+          expect(typeof yearData.stockReturn).toBe('number');
+          expect(typeof yearData.bondReturn).toBe('number');
+          expect(typeof yearData.cashReturn).toBe('number');
+          expect(typeof yearData.portfolioReturn).toBe('number');
+          expect(typeof yearData.isBlackSwan).toBe('boolean');
+          expect(typeof yearData.expenses).toBe('number');
+          expect(typeof yearData.laborIncome).toBe('number');
+          expect(typeof yearData.totalIncome).toBe('number');
+          expect(typeof yearData.portfolioValue).toBe('number');
+          expect(typeof yearData.isFIREAchieved).toBe('boolean');
+        });
+      });
+    });
+
+    it('should include fixed parameters in result', () => {
+      const mcInputs = { ...baseMcInputs, numSimulations: 5 };
+      const result = runMonteCarloSimulationWithLogs(baseInputs, mcInputs);
+      
+      expect(result.fixedParameters.initialSavings).toBe(baseInputs.initialSavings);
+      expect(result.fixedParameters.stocksPercent).toBe(baseInputs.stocksPercent);
+      expect(result.fixedParameters.bondsPercent).toBe(baseInputs.bondsPercent);
+      expect(result.fixedParameters.cashPercent).toBe(baseInputs.cashPercent);
+      expect(result.fixedParameters.numSimulations).toBe(5);
+      expect(result.fixedParameters.stockVolatility).toBe(baseMcInputs.stockVolatility);
+      expect(result.fixedParameters.bondVolatility).toBe(baseMcInputs.bondVolatility);
+      expect(result.fixedParameters.blackSwanProbability).toBe(baseMcInputs.blackSwanProbability);
+      expect(result.fixedParameters.blackSwanImpact).toBe(baseMcInputs.blackSwanImpact);
+    });
+
+    it('should match simulation run data with log entries', () => {
+      const mcInputs = { ...baseMcInputs, numSimulations: 5 };
+      const result = runMonteCarloSimulationWithLogs(baseInputs, mcInputs);
+      
+      // Each simulation should have a corresponding log entry
+      expect(result.simulations.length).toBe(result.logs.length);
+      
+      result.simulations.forEach((sim, index) => {
+        const log = result.logs[index];
+        expect(log.simulationId).toBe(sim.simulationId);
+        expect(log.success).toBe(sim.success);
+        expect(log.yearsToFIRE).toBe(sim.yearsToFIRE);
+        expect(log.finalPortfolio).toBe(sim.finalPortfolio);
+      });
     });
   });
 });
