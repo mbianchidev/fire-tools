@@ -79,7 +79,7 @@ export function HomePage() {
         </p>
         <div className="disclaimer" role="note" aria-label="Important disclaimer">
           <strong><MaterialIcon name="warning" /> Disclaimer:</strong> These tools are for educational and planning purposes only. 
-          Always consult with a qualified financial advisor before making investment decisions.
+          Always consult with a qualified financial advisor or do your own research before making investment decisions.
         </div>
       </section>
 
