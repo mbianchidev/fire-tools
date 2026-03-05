@@ -39,6 +39,7 @@ import { DataManagement } from './DataManagement';
 import { HistoricalNetWorthChart, ChartViewMode } from './HistoricalNetWorthChart';
 import { SharedAssetDialog } from './SharedAssetDialog';
 import { MaterialIcon } from './MaterialIcon';
+import { SearchableSelect } from './SearchableSelect';
 import { ScrollToTopButton } from './ScrollToTopButton';
 import { PrivacyBlur } from './PrivacyBlur';
 import './NetWorthTrackerPage.css';
@@ -165,6 +166,12 @@ export function NetWorthTrackerPage() {
   const [dateFormat, setDateFormat] = useState<DateFormat>(() => {
     const settings = loadSettings();
     return settings.dateFormat;
+  });
+  
+  // Search threshold state (loaded from settings)
+  const [searchThreshold] = useState<number>(() => {
+    const settings = loadSettings();
+    return settings.searchThreshold ?? 8;
   });
   
   // Listen for settings changes (e.g., from Settings page)
@@ -1295,6 +1302,7 @@ export function NetWorthTrackerPage() {
             onClose={() => { setShowCashDialog(false); setEditingItem(null); setEditingItemType(null); }}
             defaultCurrency={data.defaultCurrency}
             isNameDuplicate={(name) => isCashNameDuplicate(name, editingItemType === 'cash' ? (editingItem as CashEntry)?.id : undefined)}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1309,6 +1317,7 @@ export function NetWorthTrackerPage() {
             onClose={() => { setShowPensionDialog(false); setEditingItem(null); setEditingItemType(null); }}
             defaultCurrency={data.defaultCurrency}
             isNameDuplicate={(name) => isPensionNameDuplicate(name, editingItemType === 'pension' ? (editingItem as PensionEntry)?.id : undefined)}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1319,6 +1328,7 @@ export function NetWorthTrackerPage() {
             onClose={() => setShowOperationDialog(false)}
             defaultCurrency={data.defaultCurrency}
             defaultDate={`${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`}
+            searchThreshold={searchThreshold}
           />
         )}
 
@@ -1336,9 +1346,10 @@ interface CashDialogProps {
   onClose: () => void;
   defaultCurrency: SupportedCurrency;
   isNameDuplicate?: (name: string) => boolean;
+  searchThreshold?: number;
 }
 
-function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDuplicate }: CashDialogProps) {
+function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDuplicate, searchThreshold }: CashDialogProps) {
   const [accountName, setAccountName] = useState(initialData?.accountName || '');
   const [accountType, setAccountType] = useState<CashEntry['accountType']>(initialData?.accountType || 'SAVINGS');
   const [balance, setBalance] = useState(initialData?.balance?.toString() || '');
@@ -1447,27 +1458,21 @@ function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDup
                 <label htmlFor="cash-institution">
                   Bank/Institution{!settings.country && ' (Set country in Settings)'}
                 </label>
-                <select
-                  id="cash-institution"
+                <SearchableSelect
+                  options={[
+                    { id: '', label: 'Select Bank/Broker...' },
+                    ...countryBanks.map(bank => ({
+                      id: bank.code,
+                      label: `${bank.name}${bank.supportsOpenBanking ? ' 🔗' : ''}`,
+                    })),
+                    { id: 'OTHER', label: 'Other (specify below)' },
+                  ]}
                   value={institutionCode}
-                  onChange={(e) => handleInstitutionChange(e.target.value)}
+                  onChange={(val) => handleInstitutionChange(val)}
+                  searchThreshold={searchThreshold}
                   className="dialog-select"
-                >
-                  <option value="">Select Bank/Broker...</option>
-                  {countryBanks.length > 0 ? (
-                    <>
-                      {countryBanks.map(bank => (
-                        <option key={bank.code} value={bank.code}>
-                          {bank.name}
-                          {bank.supportsOpenBanking ? ' 🔗' : ''}
-                        </option>
-                      ))}
-                      <option value="OTHER">Other (specify below)</option>
-                    </>
-                  ) : (
-                    <option value="OTHER">Other (specify below)</option>
-                  )}
-                </select>
+                  ariaLabel="Bank or institution"
+                />
               </div>
               
               {/* Custom institution name for "Other" */}
@@ -1502,15 +1507,16 @@ function CashDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDup
             </div>
             <div className="form-group">
               <label htmlFor="cash-currency">Currency</label>
-              <select
-                id="cash-currency"
+              <SearchableSelect
+                options={SUPPORTED_CURRENCIES.map(c => ({
+                  id: c.code,
+                  label: `${c.symbol} ${c.name}`,
+                }))}
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-              >
-                {SUPPORTED_CURRENCIES.map(c => (
-                  <option key={c.code} value={c.code}>{c.symbol} {c.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setCurrency(val as SupportedCurrency)}
+                searchThreshold={searchThreshold}
+                ariaLabel="Currency"
+              />
             </div>
           </div>
           
@@ -1542,9 +1548,10 @@ interface PensionDialogProps {
   onClose: () => void;
   defaultCurrency: SupportedCurrency;
   isNameDuplicate?: (name: string) => boolean;
+  searchThreshold?: number;
 }
 
-function PensionDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDuplicate }: PensionDialogProps) {
+function PensionDialog({ initialData, onSubmit, onClose, defaultCurrency, isNameDuplicate, searchThreshold }: PensionDialogProps) {
   const [name, setName] = useState(initialData?.name || '');
   const [pensionType, setPensionType] = useState<PensionEntry['pensionType']>(initialData?.pensionType || 'STATE');
   const [currentValue, setCurrentValue] = useState(initialData?.currentValue?.toString() || '');
@@ -1637,15 +1644,16 @@ function PensionDialog({ initialData, onSubmit, onClose, defaultCurrency, isName
             </div>
             <div className="form-group">
               <label htmlFor="pension-currency">Currency</label>
-              <select
-                id="pension-currency"
+              <SearchableSelect
+                options={SUPPORTED_CURRENCIES.map(c => ({
+                  id: c.code,
+                  label: `${c.symbol} ${c.name}`,
+                }))}
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-              >
-                {SUPPORTED_CURRENCIES.map(c => (
-                  <option key={c.code} value={c.code}>{c.symbol} {c.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setCurrency(val as SupportedCurrency)}
+                searchThreshold={searchThreshold}
+                ariaLabel="Currency"
+              />
             </div>
           </div>
           
@@ -1676,9 +1684,10 @@ interface OperationDialogProps {
   onClose: () => void;
   defaultCurrency: SupportedCurrency;
   defaultDate: string;
+  searchThreshold?: number;
 }
 
-function OperationDialog({ onSubmit, onClose, defaultCurrency, defaultDate }: OperationDialogProps) {
+function OperationDialog({ onSubmit, onClose, defaultCurrency, defaultDate, searchThreshold }: OperationDialogProps) {
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(defaultDate || today);
   const [type, setType] = useState<OperationType>('DIVIDEND');
@@ -1728,15 +1737,29 @@ function OperationDialog({ onSubmit, onClose, defaultCurrency, defaultDate }: Op
             </div>
             <div className="form-group">
               <label htmlFor="op-type">Operation Type</label>
-              <select
-                id="op-type"
+              <SearchableSelect
+                options={OPERATION_TYPES.map(t => ({
+                  id: t.id,
+                  label: t.name,
+                  icon: t.icon,
+                }))}
                 value={type}
-                onChange={(e) => setType(e.target.value as OperationType)}
-              >
-                {OPERATION_TYPES.map(t => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setType(val as OperationType)}
+                searchThreshold={searchThreshold}
+                ariaLabel="Operation type"
+                renderOption={(option) => (
+                  <>
+                    {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                    <span>{option.label}</span>
+                  </>
+                )}
+                renderValue={(option) => option ? (
+                  <>
+                    {option.icon && <MaterialIcon name={option.icon} size="small" />}
+                    <span>{option.label}</span>
+                  </>
+                ) : 'Select type'}
+              />
             </div>
           </div>
           
@@ -1768,15 +1791,16 @@ function OperationDialog({ onSubmit, onClose, defaultCurrency, defaultDate }: Op
             </div>
             <div className="form-group">
               <label htmlFor="op-currency">Currency</label>
-              <select
-                id="op-currency"
+              <SearchableSelect
+                options={SUPPORTED_CURRENCIES.map(c => ({
+                  id: c.code,
+                  label: `${c.symbol} ${c.name}`,
+                }))}
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
-              >
-                {SUPPORTED_CURRENCIES.map(c => (
-                  <option key={c.code} value={c.code}>{c.symbol} {c.name}</option>
-                ))}
-              </select>
+                onChange={(val) => setCurrency(val as SupportedCurrency)}
+                searchThreshold={searchThreshold}
+                ariaLabel="Currency"
+              />
             </div>
           </div>
           

@@ -57,8 +57,8 @@ export function calculateCategoryBreakdown(
 
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-  // Group expenses by category
-  const categoryMap = new Map<ExpenseCategory, { total: number; count: number }>();
+  // Group expenses by category (supports both built-in and custom category IDs)
+  const categoryMap = new Map<ExpenseCategory | string, { total: number; count: number }>();
   
   for (const expense of expenses) {
     const existing = categoryMap.get(expense.category);
@@ -395,8 +395,8 @@ export function calculateYearToDateAverage(monthsData: MonthData[]): CategoryBre
     return [];
   }
 
-  // Aggregate all expenses
-  const categoryTotals = new Map<ExpenseCategory, { total: number; count: number; months: Set<number> }>();
+  // Aggregate all expenses (supports both built-in and custom category IDs)
+  const categoryTotals = new Map<ExpenseCategory | string, { total: number; count: number; months: Set<number> }>();
 
   for (const month of monthsData) {
     for (const expense of month.expenses) {

@@ -328,7 +328,7 @@ export function HistoricalNetWorthChart({
   const symbol = getCurrencySymbol(currency);
 
   // Custom tick formatter to split "Jan 2024" into two lines
-  const renderCustomAxisTick = ({ x, y, payload }: { x: number; y: number; payload: { value: string } }) => {
+  const renderCustomAxisTick = ({ x, y, payload }: { x: string | number; y: string | number; payload: { value: string } }) => {
     const parts = payload.value.split(' ');
     const month = parts[0] || '';
     const year = parts[1] || '';
@@ -346,7 +346,7 @@ export function HistoricalNetWorthChart({
   };
 
   // Custom tick formatter for "All" view mode - show only years at year changes
-  const renderYearTick = ({ x, y, payload, index }: { x: number; y: number; payload: { value: string }; index: number }) => {
+  const renderYearTick = ({ x, y, payload, index }: { x: string | number; y: string | number; payload: { value: string }; index: number }) => {
     // Only render if this is a year change point
     if (!yearChangeIndices.has(index)) {
       return null;

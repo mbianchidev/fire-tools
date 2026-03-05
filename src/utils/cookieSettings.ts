@@ -23,6 +23,7 @@ export interface UserSettings {
   dateFormat: DateFormat;
   fireAssetClassInclusion: Record<AssetClass, boolean>;
   includePrimaryResidenceInFIRE: boolean;
+  searchThreshold: number;
 }
 
 export const DEFAULT_FIRE_ASSET_CLASS_INCLUSION: Record<AssetClass, boolean> = {
@@ -47,6 +48,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   dateFormat: 'DD/MM/YYYY',
   fireAssetClassInclusion: DEFAULT_FIRE_ASSET_CLASS_INCLUSION,
   includePrimaryResidenceInFIRE: true, // Default to including primary residence
+  searchThreshold: 8,
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';

@@ -14,6 +14,7 @@ import { formatAssetName } from '../utils/allocationCalculator';
 import { convertToEUR } from '../utils/currencyConverter';
 import { loadSettings } from '../utils/cookieSettings';
 import { MaterialIcon } from './MaterialIcon';
+import { SearchableSelect } from './SearchableSelect';
 
 // Sub-types that should show bank/institution selector
 const INSTITUTION_TYPES: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT'];
@@ -441,26 +442,21 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                 <label>
                   Bank/Institution{!settings.country && ' (Set country in Settings)'}
                 </label>
-                <select
+                <SearchableSelect
+                  options={[
+                    { id: '', label: 'Select Bank/Broker...' },
+                    ...countryBanks.map(bank => ({
+                      id: bank.code,
+                      label: `${bank.name}${bank.supportsOpenBanking ? ' 🔗' : ''}`,
+                    })),
+                    { id: 'OTHER', label: 'Other (Custom Name)' },
+                  ]}
                   value={institutionCode}
-                  onChange={(e) => handleInstitutionChange(e.target.value)}
+                  onChange={(val) => handleInstitutionChange(val)}
+                  searchThreshold={settings.searchThreshold ?? 8}
                   className="dialog-select"
-                >
-                  <option value="">Select Bank/Broker...</option>
-                  {countryBanks.length > 0 ? (
-                    <>
-                      {countryBanks.map(bank => (
-                        <option key={bank.code} value={bank.code}>
-                          {bank.name}
-                          {bank.supportsOpenBanking ? ' 🔗' : ''}
-                        </option>
-                      ))}
-                    </>
-                  ) : (
-                    <option value="" disabled>No banks available for your country</option>
-                  )}
-                  <option value="OTHER">Other (Custom Name)</option>
-                </select>
+                  ariaLabel="Bank or institution"
+                />
                 {institutionCode && getBankByCode(institutionCode)?.supportsOpenBanking && (
                   <div className="openbanking-info">
                     <MaterialIcon name="link" size="small" /> Supports OpenBanking PSD2
@@ -578,15 +574,17 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
                 <div className="form-group">
                   <label>Currency *</label>
-                  <select
+                  <SearchableSelect
+                    options={SUPPORTED_CURRENCIES.map(curr => ({
+                      id: curr.code,
+                      label: curr.code,
+                    }))}
                     value={currency}
-                    onChange={(e) => setCurrency(e.target.value as SupportedCurrency)}
+                    onChange={(val) => setCurrency(val as SupportedCurrency)}
+                    searchThreshold={settings.searchThreshold ?? 8}
                     className="dialog-select"
-                  >
-                    {SUPPORTED_CURRENCIES.map(curr => (
-                      <option key={curr.code} value={curr.code}>{curr.code}</option>
-                    ))}
-                  </select>
+                    ariaLabel="Currency"
+                  />
                 </div>
               </div>
             );
