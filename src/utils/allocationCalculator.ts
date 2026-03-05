@@ -9,6 +9,51 @@ import {
   ChartData,
 } from '../types/assetAllocation';
 import { formatDisplayCurrency, formatDisplayPercent } from './numberFormatter';
+import { loadSettings } from './cookieSettings';
+
+export interface FIREPortfolioData {
+  totalValue: number;
+  stocksPercent: number;
+  bondsPercent: number;
+  cashPercent: number;
+}
+
+/**
+ * Calculate portfolio data for FIRE calculations, respecting asset class inclusion settings
+ * and primary residence inclusion setting.
+ */
+export function calculateFIREPortfolioData(assets: Asset[]): FIREPortfolioData | undefined {
+  const settings = loadSettings();
+  const inclusion = settings.fireAssetClassInclusion;
+  const includePrimaryResidence = settings.includePrimaryResidenceInFIRE;
+
+  // Filter: active assets, included asset class, and optionally exclude primary residence
+  const fireAssets = assets.filter(a =>
+    a.targetMode !== 'OFF' &&
+    inclusion[a.assetClass] &&
+    (includePrimaryResidence || !a.isPrimaryResidence)
+  );
+
+  const totalValue = fireAssets.reduce((sum, a) => sum + a.currentValue, 0);
+  if (totalValue === 0) return undefined;
+
+  const stocksValue = fireAssets
+    .filter(a => a.assetClass === 'STOCKS')
+    .reduce((sum, a) => sum + a.currentValue, 0);
+  const bondsValue = fireAssets
+    .filter(a => a.assetClass === 'BONDS')
+    .reduce((sum, a) => sum + a.currentValue, 0);
+  const cashValue = fireAssets
+    .filter(a => a.assetClass === 'CASH')
+    .reduce((sum, a) => sum + a.currentValue, 0);
+
+  return {
+    totalValue,
+    stocksPercent: (stocksValue / totalValue) * 100,
+    bondsPercent: (bondsValue / totalValue) * 100,
+    cashPercent: (cashValue / totalValue) * 100,
+  };
+}
 
 /**
  * Calculate the total portfolio value
@@ -368,6 +413,10 @@ export function prepareAssetClassChartData(assetClasses: AssetClassSummary[]): C
     CASH: '#4CAF50',
     CRYPTO: '#FF9800',
     REAL_ESTATE: '#9C27B0',
+    COMMODITIES: '#FFC107',
+    VEHICLE: '#607D8B',
+    COLLECTIBLE: '#E91E63',
+    ART: '#00BCD4',
   };
   
   return assetClasses

@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, createContext, useContext } from 'react';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';
 import { calculateFIRE } from './utils/fireCalculator';
+import { calculateFIREPortfolioData } from './utils/allocationCalculator';
 import { CalculatorInputsForm } from './components/CalculatorInputsForm';
 import { IncomeExpensesChart } from './components/IncomeExpensesChart';
 import { NetWorthChart } from './components/NetWorthChart';
@@ -177,39 +178,13 @@ function FIRECalculatorPage() {
     saveSettings({ ...settings, privacyMode: newMode });
   };
 
-  // Load asset allocation data for use in calculator
+  // Load asset allocation data for use in calculator (filtered by FIRE settings)
   const assetAllocationData = useMemo(() => {
     const saved = loadAssetAllocation();
     if (!saved.assets || saved.assets.length === 0) {
       return undefined;
     }
-    
-    // Calculate total portfolio value (all assets including cash)
-    const totalValue = saved.assets
-      .filter(a => a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    
-    if (totalValue === 0) {
-      return undefined;
-    }
-    
-    // Calculate percentage for each major asset class
-    const stocksValue = saved.assets
-      .filter(a => a.assetClass === 'STOCKS' && a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    const bondsValue = saved.assets
-      .filter(a => a.assetClass === 'BONDS' && a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    const cashValue = saved.assets
-      .filter(a => a.assetClass === 'CASH' && a.targetMode !== 'OFF')
-      .reduce((sum, a) => sum + a.currentValue, 0);
-    
-    return {
-      totalValue,
-      stocksPercent: (stocksValue / totalValue) * 100,
-      bondsPercent: (bondsValue / totalValue) * 100,
-      cashPercent: (cashValue / totalValue) * 100,
-    };
+    return calculateFIREPortfolioData(saved.assets);
   }, []);
 
   // Update URL when inputs change

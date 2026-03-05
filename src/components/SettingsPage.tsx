@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loadSettings, saveSettings, DEFAULT_SETTINGS, type UserSettings } from '../utils/cookieSettings';
+import { loadSettings, saveSettings, DEFAULT_SETTINGS, DEFAULT_FIRE_ASSET_CLASS_INCLUSION, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
 import { ALL_COUNTRIES, isEUCountry } from '../types/country';
 import { recalculateFallbackRates, convertAssetsToNewCurrency, convertNetWorthDataToNewCurrency, convertExpenseDataToNewCurrency, convertFireCalculatorInputsToNewCurrency } from '../utils/currencyConverter';
@@ -22,6 +22,8 @@ import {
 } from '../types/expenseTracker';
 import { Tooltip } from './Tooltip';
 import { MaterialIcon } from './MaterialIcon';
+import { AssetClass } from '../types/assetAllocation';
+import { formatAssetName } from '../utils/allocationCalculator';
 import { CategoryManagerDialog } from './CategoryManagerDialog';
 import { SearchableSelect } from './SearchableSelect';
 import './SettingsPage.css';
@@ -31,7 +33,7 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['account', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'categories', 'data', 'support'] as const;
+const SETTINGS_SECTIONS = ['account', 'fire', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'categories', 'data', 'support'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
@@ -600,6 +602,72 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   className="account-name-input"
                 />
                 <span className="setting-help">This name will be displayed throughout the app</span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* FIRE Calculation Settings */}
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('fire')}
+            aria-expanded={!collapsedSections.has('fire')}
+            aria-controls="fire-content"
+          >
+            <h2><MaterialIcon name="local_fire_department" /> FIRE Calculation <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('fire') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('fire') && (
+            <div id="fire-content" className="collapsible-content">
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label>Asset Classes Included in FIRE</label>
+                  <Tooltip content="Select which asset classes count toward your FIRE target. Only included asset classes contribute to portfolio value in FIRE calculations.">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <span className="setting-help">Toggle which asset classes are counted in your FIRE portfolio value</span>
+                <div className="fire-asset-class-grid">
+                  {(Object.keys(settings.fireAssetClassInclusion) as AssetClass[]).map(ac => (
+                    <label key={ac} className="checkbox-label fire-asset-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={settings.fireAssetClassInclusion[ac]}
+                        onChange={(e) => {
+                          const newInclusion = {
+                            ...settings.fireAssetClassInclusion,
+                            [ac]: e.target.checked,
+                          };
+                          handleSettingChange('fireAssetClassInclusion', newInclusion);
+                        }}
+                      />
+                      {formatAssetName(ac)}
+                    </label>
+                  ))}
+                </div>
+                <button
+                  className="btn-outline btn-small"
+                  onClick={() => handleSettingChange('fireAssetClassInclusion', DEFAULT_FIRE_ASSET_CLASS_INCLUSION)}
+                  style={{ marginTop: '0.5rem' }}
+                >
+                  Reset to Defaults
+                </button>
+              </div>
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.includePrimaryResidenceInFIRE ?? true}
+                      onChange={(e) => handleSettingChange('includePrimaryResidenceInFIRE', e.target.checked)}
+                    />
+                    Include Primary Residence in FIRE Calculation
+                  </label>
+                  <Tooltip content="When enabled, real estate properties marked as primary residence will be included in your FIRE portfolio value. When disabled, they are excluded (useful if you don't consider your home as liquid assets for retirement).">
+                    <span className="info-icon" aria-label="More information">i</span>
+                  </Tooltip>
+                </div>
+                <span className="setting-help">Controls whether your primary residence counts toward your FIRE target</span>
               </div>
             </div>
           )}

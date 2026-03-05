@@ -6,7 +6,7 @@ import { SupportedCurrency } from './currency';
 
 export type AllocationMode = 'PERCENTAGE' | 'OFF' | 'SET';
 
-export type AssetClass = 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE';
+export type AssetClass = 'STOCKS' | 'BONDS' | 'CASH' | 'CRYPTO' | 'REAL_ESTATE' | 'COMMODITIES' | 'VEHICLE' | 'COLLECTIBLE' | 'ART';
 
 export type SubAssetType = 
   | 'ETF' 
@@ -20,6 +20,29 @@ export type SubAssetType =
   | 'PROPERTY'
   | 'REIT'
   | 'PRIVATE_EQUITY'
+  | 'PHYSICAL_GOLD'
+  | 'GOLD_ETC'
+  | 'SILVER_ETC'
+  | 'OIL_ETC'
+  | 'NATURAL_GAS_ETC'
+  | 'COPPER_ETC'
+  | 'PLATINUM_ETC'
+  | 'PALLADIUM_ETC'
+  | 'AGRICULTURAL_ETC'
+  | 'COMMODITY_ETF'
+  | 'CAR'
+  | 'MOTORCYCLE'
+  | 'BOAT'
+  | 'OTHER_VEHICLE'
+  | 'WATCH'
+  | 'WINE'
+  | 'JEWELRY'
+  | 'SPORTS_MEMORABILIA'
+  | 'OTHER_COLLECTIBLE'
+  | 'PAINTING'
+  | 'SCULPTURE'
+  | 'DIGITAL_ART'
+  | 'OTHER_ART'
   | 'NONE';
 
 export interface Asset {
@@ -39,6 +62,8 @@ export interface Asset {
   targetPercent?: number; // For PERCENTAGE mode
   institutionCode?: string; // Bank/broker code (for SAVINGS_ACCOUNT, CHECKING_ACCOUNT, BROKERAGE_ACCOUNT)
   institutionName?: string; // Custom bank/broker name (when code is 'OTHER' or not using predefined list)
+  mortgageData?: MortgageData; // Mortgage information for real estate properties
+  isPrimaryResidence?: boolean; // If true, real estate property is excluded from FIRE calculation
 }
 
 export interface AssetClassSummary {
@@ -84,6 +109,18 @@ export interface ChartData {
   color?: string;
   ticker?: string; // Used as fallback label for long asset names in charts
   [key: string]: string | number | undefined;
+}
+
+export interface MortgageData {
+  principalAmount: number; // Original loan amount
+  currentBalance: number; // Current outstanding balance
+  interestRate: number; // Annual interest rate (e.g., 3.5 for 3.5%)
+  termYears: number; // Original term in years (e.g., 30)
+  remainingYears: number; // Remaining years on mortgage
+  monthlyPayment: number; // Monthly payment amount
+  startDate: string; // ISO date string (YYYY-MM-DD)
+  propertyValue: number; // Current property value
+  lender?: string; // Name of the lending institution
 }
 
 export interface AssetAllocationConfig {

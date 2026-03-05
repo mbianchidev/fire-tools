@@ -5,8 +5,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Asset, AssetClass, SubAssetType, AllocationMode } from '../types/assetAllocation';
-import { AssetHolding } from '../types/netWorthTracker';
+import { Asset, AssetClass, SubAssetType, AllocationMode, MortgageData } from '../types/assetAllocation';
+import { AssetHolding, VehicleDepreciation, DepreciationMethod, MortgageInfo } from '../types/netWorthTracker';
+import { calculateMonthlyPayment, calculateRemainingYears } from '../utils/mortgageCalculator';
 import { SupportedCurrency, SUPPORTED_CURRENCIES } from '../types/currency';
 import { getUCITSWarning } from '../types/country';
 import { BankInfo, getBanksByCountry, getBankByCode } from '../types/bank';
@@ -35,16 +36,23 @@ const SUB_ASSET_TYPES: Record<AssetClass, SubAssetType[]> = {
   CASH: ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF'],
   CRYPTO: ['COIN'],
   REAL_ESTATE: ['PROPERTY', 'REIT'],
+  COMMODITIES: ['PHYSICAL_GOLD', 'GOLD_ETC', 'SILVER_ETC', 'OIL_ETC', 'NATURAL_GAS_ETC', 'COPPER_ETC', 'PLATINUM_ETC', 'PALLADIUM_ETC', 'AGRICULTURAL_ETC', 'COMMODITY_ETF'],
+  VEHICLE: ['CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE'],
+  COLLECTIBLE: ['WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE'],
+  ART: ['PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART'],
 };
 
 // Sub-types that can use SET mode (Asset Allocation only)
-const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF', 'PROPERTY'];
+const SET_MODE_ALLOWED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'MONEY_ETF', 'PROPERTY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'];
 
 // Sub-types that require ISIN code (including MONEY_ETF now)
 const ISIN_REQUIRED: SubAssetType[] = ['ETF', 'SINGLE_STOCK', 'SINGLE_BOND', 'REIT', 'MONEY_ETF'];
 
 // Sub-types that don't need ticker (PRIVATE_EQUITY added - no ticker)
-const NO_TICKER_REQUIRED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'PROPERTY', 'PRIVATE_EQUITY'];
+const NO_TICKER_REQUIRED: SubAssetType[] = ['SAVINGS_ACCOUNT', 'CHECKING_ACCOUNT', 'BROKERAGE_ACCOUNT', 'PROPERTY', 'PRIVATE_EQUITY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'];
+
+// Sub-types that show direct value input instead of shares/price (like property)
+const VALUE_ONLY_TYPES: SubAssetType[] = ['PROPERTY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'];
 
 // Sub-types that should show UCITS warning (only ETFs)
 const UCITS_WARNING_TYPES: SubAssetType[] = ['ETF', 'MONEY_ETF'];
@@ -71,6 +79,10 @@ const mapToNetWorthAssetClass = (assetClass: AssetClass, subAssetType: SubAssetT
     return subAssetType === 'REIT' ? 'ETF' : 'REAL_ESTATE';
   }
   if (assetClass === 'CRYPTO') return 'CRYPTO';
+  if (assetClass === 'COMMODITIES') return 'COMMODITIES';
+  if (assetClass === 'VEHICLE') return 'VEHICLE';
+  if (assetClass === 'COLLECTIBLE') return 'COLLECTIBLE';
+  if (assetClass === 'ART') return 'ART';
   if (assetClass === 'CASH') return 'OTHER'; // Cash as assets treated as OTHER
   return 'OTHER';
 };
@@ -83,6 +95,10 @@ const mapFromNetWorthAssetClass = (assetClass: AssetHolding['assetClass']): { as
   if (assetClass === 'CRYPTO') return { assetClass: 'CRYPTO', subAssetType: 'COIN' };
   if (assetClass === 'REAL_ESTATE') return { assetClass: 'REAL_ESTATE', subAssetType: 'PROPERTY' };
   if (assetClass === 'PRIVATE_EQUITY') return { assetClass: 'STOCKS', subAssetType: 'PRIVATE_EQUITY' };
+  if (assetClass === 'COMMODITIES') return { assetClass: 'COMMODITIES', subAssetType: 'COMMODITY_ETF' };
+  if (assetClass === 'VEHICLE') return { assetClass: 'VEHICLE', subAssetType: 'CAR' };
+  if (assetClass === 'COLLECTIBLE') return { assetClass: 'COLLECTIBLE', subAssetType: 'WATCH' };
+  if (assetClass === 'ART') return { assetClass: 'ART', subAssetType: 'PAINTING' };
   return { assetClass: 'STOCKS', subAssetType: 'ETF' };
 };
 
@@ -112,6 +128,26 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const [note, setNote] = useState('');
   const [institutionCode, setInstitutionCode] = useState<string>('');
   const [institutionName, setInstitutionName] = useState<string>('');
+  const [isPrimaryResidence, setIsPrimaryResidence] = useState(false);
+
+  // Vehicle depreciation state
+  const [enableDepreciation, setEnableDepreciation] = useState(false);
+  const [depMethod, setDepMethod] = useState<DepreciationMethod>('STRAIGHT_LINE');
+  const [depPurchasePrice, setDepPurchasePrice] = useState<string>('');
+  const [depPurchaseDate, setDepPurchaseDate] = useState<string>('');
+  const [depSalvageValue, setDepSalvageValue] = useState<string>('0');
+  const [depUsefulLife, setDepUsefulLife] = useState<string>('10');
+  const [depAnnualRate, setDepAnnualRate] = useState<string>('20');
+  const [depCurrentDepreciation, setDepCurrentDepreciation] = useState<string>('');
+
+  // Mortgage state
+  const [enableMortgage, setEnableMortgage] = useState(false);
+  const [mortPrincipal, setMortPrincipal] = useState<string>('');
+  const [mortCurrentBalance, setMortCurrentBalance] = useState<string>('');
+  const [mortInterestRate, setMortInterestRate] = useState<string>('');
+  const [mortTermYears, setMortTermYears] = useState<string>('30');
+  const [mortStartDate, setMortStartDate] = useState<string>('');
+  const [mortLender, setMortLender] = useState<string>('');
 
   // Get fallback rates from settings
   const settings = loadSettings();
@@ -136,6 +172,19 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setTargetPercent(asset.targetPercent?.toString() || '0');
         setInstitutionCode(asset.institutionCode || '');
         setInstitutionName(asset.institutionName || '');
+        setIsPrimaryResidence(asset.isPrimaryResidence || false);
+        // Load mortgage data for editing
+        if (asset.mortgageData) {
+          setEnableMortgage(true);
+          setMortPrincipal(asset.mortgageData.principalAmount.toString());
+          setMortCurrentBalance(asset.mortgageData.currentBalance.toString());
+          setMortInterestRate(asset.mortgageData.interestRate.toString());
+          setMortTermYears(asset.mortgageData.termYears.toString());
+          setMortStartDate(asset.mortgageData.startDate);
+          setMortLender(asset.mortgageData.lender || '');
+        } else {
+          setEnableMortgage(false);
+        }
       } else {
         // Net Worth Tracker mode
         const holding = initialData as AssetHolding;
@@ -150,6 +199,32 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setNote(holding.note || '');
         setInstitutionCode('');
         setInstitutionName('');
+        setIsPrimaryResidence(holding.isPrimaryResidence || false);
+        // Load vehicle depreciation for editing
+        if (holding.vehicleDepreciation) {
+          setEnableDepreciation(true);
+          setDepMethod(holding.vehicleDepreciation.method);
+          setDepPurchasePrice(holding.vehicleDepreciation.purchasePrice.toString());
+          setDepPurchaseDate(holding.vehicleDepreciation.purchaseDate);
+          setDepSalvageValue(holding.vehicleDepreciation.salvageValue.toString());
+          setDepUsefulLife(holding.vehicleDepreciation.usefulLifeYears.toString());
+          setDepAnnualRate(holding.vehicleDepreciation.annualDepreciationRate?.toString() || '20');
+          setDepCurrentDepreciation(holding.vehicleDepreciation.currentDepreciation?.toString() || '');
+        } else {
+          setEnableDepreciation(false);
+        }
+        // Load mortgage info for editing
+        if (holding.mortgageInfo) {
+          setEnableMortgage(true);
+          setMortPrincipal(holding.mortgageInfo.principalAmount.toString());
+          setMortCurrentBalance(holding.mortgageInfo.currentBalance.toString());
+          setMortInterestRate(holding.mortgageInfo.interestRate.toString());
+          setMortTermYears(holding.mortgageInfo.termYears.toString());
+          setMortStartDate(holding.mortgageInfo.startDate);
+          setMortLender(holding.mortgageInfo.lender || '');
+        } else {
+          setEnableMortgage(false);
+        }
       }
     } else {
       // Reset for new entry
@@ -166,6 +241,22 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       setNote('');
       setInstitutionCode('');
       setInstitutionName('');
+      setIsPrimaryResidence(false);
+      setEnableDepreciation(false);
+      setDepMethod('STRAIGHT_LINE');
+      setDepPurchasePrice('');
+      setDepPurchaseDate('');
+      setDepSalvageValue('0');
+      setDepUsefulLife('10');
+      setDepAnnualRate('20');
+      setDepCurrentDepreciation('');
+      setEnableMortgage(false);
+      setMortPrincipal('');
+      setMortCurrentBalance('');
+      setMortInterestRate('');
+      setMortTermYears('30');
+      setMortStartDate('');
+      setMortLender('');
     }
   }, [initialData, mode, defaultCurrency]);
 
@@ -179,6 +270,9 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     return '0';
   })();
 
+  // Asset classes that default to OFF target mode
+  const OFF_TARGET_DEFAULT_CLASSES: AssetClass[] = ['VEHICLE', 'COLLECTIBLE', 'ART'];
+
   const handleAssetClassChange = (newClass: AssetClass) => {
     setAssetClass(newClass);
     const availableSubTypes = SUB_ASSET_TYPES[newClass];
@@ -186,6 +280,13 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       setSubAssetType(availableSubTypes[0]);
     }
     setIsin('');
+    // Default to OFF target mode for vehicle, collectible, and art
+    if (OFF_TARGET_DEFAULT_CLASSES.includes(newClass)) {
+      setTargetMode('OFF');
+      setTargetPercent('0');
+    } else if (!isEditing) {
+      setTargetMode('PERCENTAGE');
+    }
     // Reset institution when changing asset class
     if (!INSTITUTION_TYPES.includes(SUB_ASSET_TYPES[newClass][0])) {
       setInstitutionCode('');
@@ -226,6 +327,45 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setPricePerShare(value);
   };
 
+  const buildVehicleDepreciation = (): VehicleDepreciation => {
+    return {
+      method: depMethod,
+      purchasePrice: parseFloat(depPurchasePrice) || 0,
+      purchaseDate: depPurchaseDate,
+      salvageValue: parseFloat(depSalvageValue) || 0,
+      usefulLifeYears: parseFloat(depUsefulLife) || 10,
+      annualDepreciationRate: depMethod === 'DECLINING_BALANCE' ? (parseFloat(depAnnualRate) || 20) : undefined,
+      currentDepreciation: depMethod === 'MANUAL' ? (parseFloat(depCurrentDepreciation) || undefined) : undefined,
+    };
+  };
+
+  const buildMortgageInfo = (): MortgageInfo => {
+    const principal = parseFloat(mortPrincipal) || 0;
+    const balance = parseFloat(mortCurrentBalance) || 0;
+    const rate = parseFloat(mortInterestRate) || 0;
+    const term = parseFloat(mortTermYears) || 30;
+    const monthly = calculateMonthlyPayment(principal, rate, term);
+    const remaining = calculateRemainingYears(balance, monthly, rate);
+    return {
+      principalAmount: principal,
+      currentBalance: balance,
+      interestRate: rate,
+      termYears: term,
+      remainingYears: remaining,
+      monthlyPayment: monthly,
+      startDate: mortStartDate,
+      lender: mortLender.trim() || undefined,
+    };
+  };
+
+  const buildMortgageData = (propertyValueEUR: number): MortgageData => {
+    const info = buildMortgageInfo();
+    return {
+      ...info,
+      propertyValue: propertyValueEUR,
+    };
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -253,11 +393,11 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       return;
     }
 
-    // Shares and pricePerShare are required EXCEPT for cash accounts (not MONEY_ETF) and PROPERTY assets
+    // Shares and pricePerShare are required EXCEPT for cash accounts (not MONEY_ETF) and value-only assets
     const isCashAccount = mode === 'assetAllocation' && assetClass === 'CASH' && subAssetType !== 'MONEY_ETF';
-    const isPropertyAsset = subAssetType === 'PROPERTY';
+    const isValueOnlyAsset = VALUE_ONLY_TYPES.includes(subAssetType);
     
-    if (!isCashAccount && !isPropertyAsset) {
+    if (!isCashAccount && !isValueOnlyAsset) {
       if (!shares.trim() || parseFloat(shares) <= 0) {
         alert('Please enter a valid number of shares');
         return;
@@ -272,14 +412,14 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     const generatedTicker = ticker.trim().toUpperCase() || 
       `${name.trim().substring(0, 4).toUpperCase()}${Date.now().toString().slice(-4)}`;
 
-    // Calculate value differently for cash accounts (not MONEY_ETF) and PROPERTY assets
+    // Calculate value differently for cash accounts (not MONEY_ETF) and value-only assets
     // For these types, value is directly entered (not shares × price)
     let sharesNum = parseFloat(shares) || 1;
     let priceNum = parseFloat(pricePerShare) || 0;
     let valueNum: number;
     
-    if (isCashAccount || isPropertyAsset) {
-      // For cash and PROPERTY: value is entered directly
+    if (isCashAccount || isValueOnlyAsset) {
+      // For cash and value-only assets: value is entered directly
       // Store as shares=1, pricePerShare=value for consistent data model
       valueNum = parseFloat(shares) || 0; // shares field is repurposed for value input
       sharesNum = 1;
@@ -312,6 +452,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         targetValue: targetMode === 'SET' ? valueInEUR : undefined,
         institutionCode: INSTITUTION_TYPES.includes(subAssetType) && institutionCode ? institutionCode : undefined,
         institutionName: INSTITUTION_TYPES.includes(subAssetType) && institutionName ? institutionName.trim() : undefined,
+        isPrimaryResidence: subAssetType === 'PROPERTY' ? isPrimaryResidence : undefined,
+        mortgageData: subAssetType === 'PROPERTY' && enableMortgage ? buildMortgageData(valueInEUR) : undefined,
       };
       
       onSubmit(asset);
@@ -326,6 +468,9 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         currency,
         assetClass: mapToNetWorthAssetClass(assetClass, subAssetType),
         note: note.trim() || undefined,
+        isPrimaryResidence: subAssetType === 'PROPERTY' ? isPrimaryResidence : undefined,
+        vehicleDepreciation: assetClass === 'VEHICLE' && enableDepreciation ? buildVehicleDepreciation() : undefined,
+        mortgageInfo: subAssetType === 'PROPERTY' && enableMortgage ? buildMortgageInfo() : undefined,
       };
       
       onSubmit(holding);
@@ -342,6 +487,9 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setNote('');
     setInstitutionCode('');
     setInstitutionName('');
+    setIsPrimaryResidence(false);
+    setEnableDepreciation(false);
+    setEnableMortgage(false);
     onClose();
   };
 
@@ -378,6 +526,10 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                 <option value="CASH">Cash</option>
                 <option value="CRYPTO">Crypto</option>
                 <option value="REAL_ESTATE">Real Estate</option>
+                <option value="COMMODITIES">Commodities</option>
+                <option value="VEHICLE">Vehicle</option>
+                <option value="COLLECTIBLE">Collectible</option>
+                <option value="ART">Art</option>
               </select>
             </div>
 
@@ -487,8 +639,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
             )}
           </div>
 
-          {/* Only show shares and price fields for non-cash accounts, non-PROPERTY assets, or for MONEY_ETF */}
-          {(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && subAssetType !== 'PROPERTY' && (
+          {/* Only show shares and price fields for non-cash accounts, non-value-only assets, or for MONEY_ETF */}
+          {(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && !VALUE_ONLY_TYPES.includes(subAssetType) && (
             <div className="form-row">
               <div className="form-group">
                 <label>Number of Shares *</label>
@@ -522,7 +674,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
           {/* Value is directly editable for cash accounts (not MONEY_ETF) and PROPERTY assets */}
           {(() => {
-            const isValueDirectlyEditable = (assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || subAssetType === 'PROPERTY';
+            const isValueDirectlyEditable = (assetClass === 'CASH' && subAssetType !== 'MONEY_ETF') || VALUE_ONLY_TYPES.includes(subAssetType);
             const showCalculatedLabel = !isValueDirectlyEditable && mode === 'assetAllocation';
             const showCalculatedLabelNetWorth = !isValueDirectlyEditable && mode === 'netWorthTracker';
             
@@ -538,8 +690,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
                       setPricePerShare('1');
                     } : undefined}
                     className="dialog-input dialog-input-calculated"
-                    disabled={!isValueDirectlyEditable || (mode === 'netWorthTracker' && subAssetType !== 'PROPERTY')}
-                    placeholder={isValueDirectlyEditable ? (subAssetType === 'PROPERTY' ? 'Enter property value' : 'Enter cash amount') : ''}
+                    disabled={!isValueDirectlyEditable}
+                    placeholder={isValueDirectlyEditable ? (VALUE_ONLY_TYPES.includes(subAssetType) ? 'Enter estimated value' : 'Enter cash amount') : ''}
                     min={isValueDirectlyEditable ? '0' : undefined}
                     step={isValueDirectlyEditable ? 'any' : undefined}
                     required
@@ -564,8 +716,235 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
             );
           })()}
 
+          {/* Vehicle Depreciation section - shown for VEHICLE asset class */}
+          {assetClass === 'VEHICLE' && (
+            <fieldset className="dialog-fieldset">
+              <legend>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={enableDepreciation}
+                    onChange={(e) => setEnableDepreciation(e.target.checked)}
+                  />
+                  Track Depreciation
+                </label>
+              </legend>
+              {enableDepreciation && (
+                <div className="fieldset-content">
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Method *</label>
+                      <select
+                        value={depMethod}
+                        onChange={(e) => setDepMethod(e.target.value as DepreciationMethod)}
+                        className="dialog-select"
+                      >
+                        <option value="STRAIGHT_LINE">Straight Line</option>
+                        <option value="DECLINING_BALANCE">Declining Balance</option>
+                        <option value="MANUAL">Manual</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Purchase Price *</label>
+                      <input
+                        type="number"
+                        value={depPurchasePrice}
+                        onChange={(e) => setDepPurchasePrice(e.target.value)}
+                        placeholder="e.g., 25000"
+                        className="dialog-input"
+                        min="0"
+                        step="any"
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Purchase Date *</label>
+                      <input
+                        type="date"
+                        value={depPurchaseDate}
+                        onChange={(e) => setDepPurchaseDate(e.target.value)}
+                        className="dialog-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Useful Life (years) *</label>
+                      <input
+                        type="number"
+                        value={depUsefulLife}
+                        onChange={(e) => setDepUsefulLife(e.target.value)}
+                        placeholder="e.g., 10"
+                        className="dialog-input"
+                        min="1"
+                        step="1"
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Salvage Value</label>
+                      <input
+                        type="number"
+                        value={depSalvageValue}
+                        onChange={(e) => setDepSalvageValue(e.target.value)}
+                        placeholder="e.g., 3000"
+                        className="dialog-input"
+                        min="0"
+                        step="any"
+                      />
+                    </div>
+                    {depMethod === 'DECLINING_BALANCE' && (
+                      <div className="form-group">
+                        <label>Annual Rate (%)</label>
+                        <input
+                          type="number"
+                          value={depAnnualRate}
+                          onChange={(e) => setDepAnnualRate(e.target.value)}
+                          placeholder="e.g., 20"
+                          className="dialog-input"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                        />
+                      </div>
+                    )}
+                    {depMethod === 'MANUAL' && (
+                      <div className="form-group">
+                        <label>Accumulated Depreciation</label>
+                        <input
+                          type="number"
+                          value={depCurrentDepreciation}
+                          onChange={(e) => setDepCurrentDepreciation(e.target.value)}
+                          placeholder="e.g., 5000"
+                          className="dialog-input"
+                          min="0"
+                          step="any"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </fieldset>
+          )}
+
+          {/* Mortgage section - shown for PROPERTY sub-type */}
+          {subAssetType === 'PROPERTY' && (
+            <fieldset className="dialog-fieldset">
+              <legend>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={enableMortgage}
+                    onChange={(e) => setEnableMortgage(e.target.checked)}
+                  />
+                  Has Mortgage
+                </label>
+              </legend>
+              {enableMortgage && (
+                <div className="fieldset-content">
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Original Loan Amount *</label>
+                      <input
+                        type="number"
+                        value={mortPrincipal}
+                        onChange={(e) => setMortPrincipal(e.target.value)}
+                        placeholder="e.g., 200000"
+                        className="dialog-input"
+                        min="0"
+                        step="any"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Current Balance *</label>
+                      <input
+                        type="number"
+                        value={mortCurrentBalance}
+                        onChange={(e) => setMortCurrentBalance(e.target.value)}
+                        placeholder="e.g., 180000"
+                        className="dialog-input"
+                        min="0"
+                        step="any"
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Interest Rate (%) *</label>
+                      <input
+                        type="number"
+                        value={mortInterestRate}
+                        onChange={(e) => setMortInterestRate(e.target.value)}
+                        placeholder="e.g., 3.5"
+                        className="dialog-input"
+                        min="0"
+                        max="30"
+                        step="0.01"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Term (years) *</label>
+                      <input
+                        type="number"
+                        value={mortTermYears}
+                        onChange={(e) => setMortTermYears(e.target.value)}
+                        placeholder="e.g., 30"
+                        className="dialog-input"
+                        min="1"
+                        step="1"
+                      />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Start Date</label>
+                      <input
+                        type="date"
+                        value={mortStartDate}
+                        onChange={(e) => setMortStartDate(e.target.value)}
+                        className="dialog-input"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Lender (optional)</label>
+                      <input
+                        type="text"
+                        value={mortLender}
+                        onChange={(e) => setMortLender(e.target.value)}
+                        placeholder="e.g., ABC Bank"
+                        className="dialog-input"
+                      />
+                    </div>
+                  </div>
+                  {mortPrincipal && mortInterestRate && mortTermYears && (
+                    <div className="mortgage-summary">
+                      <span>Monthly Payment: <strong>{calculateMonthlyPayment(parseFloat(mortPrincipal) || 0, parseFloat(mortInterestRate) || 0, parseFloat(mortTermYears) || 30).toFixed(2)}</strong></span>
+                      {mortCurrentBalance && (
+                        <span>Remaining: <strong>{calculateRemainingYears(parseFloat(mortCurrentBalance) || 0, calculateMonthlyPayment(parseFloat(mortPrincipal) || 0, parseFloat(mortInterestRate) || 0, parseFloat(mortTermYears) || 30), parseFloat(mortInterestRate) || 0)} yrs</strong></span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </fieldset>
+          )}
+
           {showTargetSettings && (
             <>
+              {/* Primary residence flag for PROPERTY assets */}
+              {subAssetType === 'PROPERTY' && (
+                <div className="form-group checkbox-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={isPrimaryResidence}
+                      onChange={(e) => setIsPrimaryResidence(e.target.checked)}
+                    />
+                    Primary Residence (excluded from FIRE calculation)
+                  </label>
+                </div>
+              )}
               <div className="form-row">
                 <div className="form-group">
                   <label>Target Mode *</label>

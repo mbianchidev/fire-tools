@@ -1040,15 +1040,16 @@ export function NetWorthTrackerPage() {
                   </thead>
                   <tbody>
                     {currentMonthData.assets.map(asset => {
-                      // Only hide shares/price for PROPERTY sub-assets, not REITs
-                      const isPropertyAsset = asset.syncSubAssetType === 'PROPERTY';
+                      // Hide shares/price for value-only assets (property, vehicles, collectibles, art, physical gold)
+                      const VALUE_ONLY_SYNC_TYPES = ['PROPERTY', 'CAR', 'MOTORCYCLE', 'BOAT', 'OTHER_VEHICLE', 'WATCH', 'WINE', 'JEWELRY', 'SPORTS_MEMORABILIA', 'OTHER_COLLECTIBLE', 'PAINTING', 'SCULPTURE', 'DIGITAL_ART', 'OTHER_ART', 'PHYSICAL_GOLD'];
+                      const isValueOnlyAsset = VALUE_ONLY_SYNC_TYPES.includes(asset.syncSubAssetType || '') || ['VEHICLE', 'COLLECTIBLE', 'ART'].includes(asset.assetClass);
                       return (
                         <tr key={asset.id}>
                           <td>{asset.name}</td>
                           <td>{asset.ticker}</td>
                           <td>{ASSET_CLASSES.find(c => c.id === asset.assetClass)?.name || asset.assetClass}</td>
-                          <td>{isPropertyAsset ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayNumber(asset.shares)}</PrivacyBlur>}</td>
-                          <td className="amount-col">{isPropertyAsset ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, asset.currency)}</PrivacyBlur>}</td>
+                          <td>{isValueOnlyAsset ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatDisplayNumber(asset.shares)}</PrivacyBlur>}</td>
+                          <td className="amount-col">{isValueOnlyAsset ? '-' : <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, asset.currency)}</PrivacyBlur>}</td>
                           <td className="amount-col"><PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.shares * asset.pricePerShare, asset.currency)}</PrivacyBlur></td>
                           <td className="actions-col">
                             <button
