@@ -64,6 +64,7 @@ export interface Asset {
   institutionName?: string; // Custom bank/broker name (when code is 'OTHER' or not using predefined list)
   mortgageData?: MortgageData; // Mortgage information for real estate properties
   isPrimaryResidence?: boolean; // If true, real estate property is excluded from FIRE calculation
+  marketPrice?: number; // Current market price per share (fetched from API)
 }
 
 export interface AssetClassSummary {

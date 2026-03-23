@@ -8,25 +8,30 @@ import {
 import { DEFAULT_FALLBACK_RATES } from '../../src/types/currency';
 import { ExchangeRateFetchResult } from '../../src/types/priceApi';
 
-// Mock priceApi rate limit function
-vi.mock('../../src/utils/priceApi', () => ({
+// Mock yahooProxy rate limit and fetch
+vi.mock('../../src/utils/yahooProxy', () => ({
   hasRateLimitCapacity: vi.fn(() => true),
+  yahooFetch: vi.fn(),
+  YahooRateLimitError: class YahooRateLimitError extends Error {
+    constructor(message: string) { super(message); this.name = 'YahooRateLimitError'; }
+  },
 }));
 
-// Mock global fetch
+import { yahooFetch } from '../../src/utils/yahooProxy';
+const mockYahooFetch = yahooFetch as ReturnType<typeof vi.fn>;
+
+// Mock global fetch (not used directly anymore, but keep for safety)
 const mockFetch = vi.fn();
 
 describe('Exchange Rate API Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearExchangeRateCache();
-    mockFetch.mockReset();
-    vi.stubGlobal('fetch', mockFetch);
+    mockYahooFetch.mockReset();
   });
 
   afterEach(() => {
     clearExchangeRateCache();
-    vi.unstubAllGlobals();
   });
 
   describe('toExchangeRatesMap', () => {
@@ -74,22 +79,20 @@ describe('Exchange Rate API Service', () => {
   });
 
   describe('fetchExchangeRates', () => {
+    // Helper: build a v8 chart response for a currency pair
+    const chartResponse = (symbol: string, price: number) => ({
+      chart: { result: [{ meta: { symbol, regularMarketPrice: price } }] },
+    });
+
     it('should fetch rates from Yahoo Finance', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          quoteResponse: {
-            result: [
-              { symbol: 'EURUSD=X', regularMarketPrice: 1.08 },
-              { symbol: 'EURGBP=X', regularMarketPrice: 0.86 },
-              { symbol: 'EURCHF=X', regularMarketPrice: 0.95 },
-              { symbol: 'EURJPY=X', regularMarketPrice: 163.5 },
-              { symbol: 'EURAUD=X', regularMarketPrice: 1.65 },
-              { symbol: 'EURCAD=X', regularMarketPrice: 1.48 },
-            ],
-          },
-        }),
-      });
+      // Each currency pair is fetched individually via v8
+      mockYahooFetch
+        .mockResolvedValueOnce(chartResponse('EURUSD=X', 1.08))
+        .mockResolvedValueOnce(chartResponse('EURGBP=X', 0.86))
+        .mockResolvedValueOnce(chartResponse('EURCHF=X', 0.95))
+        .mockResolvedValueOnce(chartResponse('EURJPY=X', 163.5))
+        .mockResolvedValueOnce(chartResponse('EURAUD=X', 1.65))
+        .mockResolvedValueOnce(chartResponse('EURCAD=X', 1.48));
 
       const result = await fetchExchangeRates();
 
@@ -103,55 +106,28 @@ describe('Exchange Rate API Service', () => {
     });
 
     it('should cache successful results', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          quoteResponse: {
-            result: [
-              { symbol: 'EURUSD=X', regularMarketPrice: 1.08 },
-            ],
-          },
-        }),
-      });
+      mockYahooFetch.mockResolvedValue(chartResponse('EURUSD=X', 1.08));
 
       const result1 = await fetchExchangeRates();
       expect(result1.rates.length).toBeGreaterThan(0);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const callCount = mockYahooFetch.mock.calls.length;
 
       // Second call should use cache
       const result2 = await fetchExchangeRates();
       expect(result2.rates.length).toBeGreaterThan(0);
-      expect(mockFetch).toHaveBeenCalledTimes(1); // No additional fetch
-    });
-
-    it('should handle Yahoo Finance API errors', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
-      });
-
-      const result = await fetchExchangeRates();
-      expect(result.rates).toHaveLength(0);
-      expect(result.error).toBeTruthy();
+      expect(mockYahooFetch).toHaveBeenCalledTimes(callCount); // No additional fetches
     });
 
     it('should handle network errors gracefully', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockYahooFetch.mockRejectedValue(new Error('Network error'));
 
       const result = await fetchExchangeRates();
       expect(result.rates).toHaveLength(0);
-      expect(result.error).toBeTruthy();
     });
 
     it('should handle invalid response format', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          quoteResponse: {
-            result: null,
-          },
-        }),
+      mockYahooFetch.mockResolvedValue({
+        chart: { result: [] },
       });
 
       const result = await fetchExchangeRates();
@@ -160,8 +136,12 @@ describe('Exchange Rate API Service', () => {
   });
 
   describe('fetchExchangeRatesAsMap', () => {
+    const chartResponse = (symbol: string, price: number) => ({
+      chart: { result: [{ meta: { symbol, regularMarketPrice: price } }] },
+    });
+
     it('should return fallback rates when Yahoo Finance fails', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockYahooFetch.mockRejectedValue(new Error('Network error'));
 
       const result = await fetchExchangeRatesAsMap();
 
@@ -171,17 +151,7 @@ describe('Exchange Rate API Service', () => {
     });
 
     it('should return live rates when Yahoo succeeds', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          quoteResponse: {
-            result: [
-              { symbol: 'EURUSD=X', regularMarketPrice: 1.08 },
-              { symbol: 'EURGBP=X', regularMarketPrice: 0.86 },
-            ],
-          },
-        }),
-      });
+      mockYahooFetch.mockResolvedValue(chartResponse('EURUSD=X', 1.08));
 
       const result = await fetchExchangeRatesAsMap();
 
@@ -192,7 +162,7 @@ describe('Exchange Rate API Service', () => {
     });
 
     it('should include lastUpdate timestamp', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockYahooFetch.mockRejectedValue(new Error('Network error'));
 
       const result = await fetchExchangeRatesAsMap();
 

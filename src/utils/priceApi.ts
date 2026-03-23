@@ -2,7 +2,7 @@
  * Price API Service
  * 
  * Fetches monthly closing prices of assets using Yahoo Finance.
- * Includes rate limiting and in-memory caching.
+ * Includes in-memory caching. Rate limiting is handled centrally by yahooProxy.
  * 
  * Yahoo Finance is used as the sole data source — free, no API key required.
  */
@@ -10,9 +10,8 @@
 import {
   PriceFetchResult,
   PriceCacheEntry,
-  RateLimitInfo,
-  YAHOO_DAILY_LIMIT,
 } from '../types/priceApi';
+import { yahooFetch, hasRateLimitCapacity, YahooRateLimitError } from './yahooProxy';
 
 // --- Cache Configuration ---
 
@@ -22,55 +21,6 @@ const MONTHLY_PRICE_CACHE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /** In-memory cache for price data */
 const priceCache = new Map<string, PriceCacheEntry>();
-
-/** Rate limit tracking */
-let rateLimitInfo: RateLimitInfo | null = null;
-
-// --- Rate Limiting ---
-
-/**
- * Get or initialize rate limit info
- */
-function getRateLimitInfo(): RateLimitInfo {
-  const today = new Date().toISOString().split('T')[0];
-
-  if (rateLimitInfo && rateLimitInfo.resetDate === today) {
-    return rateLimitInfo;
-  }
-
-  // Reset for new day
-  rateLimitInfo = {
-    requestsToday: 0,
-    dailyLimit: YAHOO_DAILY_LIMIT,
-    lastRequestAt: null,
-    resetDate: today,
-  };
-  return rateLimitInfo;
-}
-
-/**
- * Check if Yahoo Finance has remaining rate limit capacity
- */
-export function hasRateLimitCapacity(): boolean {
-  const info = getRateLimitInfo();
-  return info.requestsToday < info.dailyLimit;
-}
-
-/**
- * Record a request against the rate limit
- */
-function recordRequest(): void {
-  const info = getRateLimitInfo();
-  info.requestsToday++;
-  info.lastRequestAt = new Date().toISOString();
-}
-
-/**
- * Get current rate limit status
- */
-export function getRateLimitStatus(): RateLimitInfo {
-  return getRateLimitInfo();
-}
 
 // --- Cache Management ---
 
@@ -121,9 +71,6 @@ export function clearPriceCache(): void {
 
 // --- Yahoo Finance ---
 
-/** Yahoo Finance chart API endpoint for historical data */
-const YAHOO_CHART_API_URL = 'https://query1.finance.yahoo.com/v8/finance/chart';
-
 /**
  * Fetch monthly closing prices for a ticker from Yahoo Finance.
  * Uses the chart API with monthly interval.
@@ -158,20 +105,9 @@ export async function fetchMonthlyClosingPrices(
     startDateObj.setMonth(startDateObj.getMonth() - months);
     const startDate = Math.floor(startDateObj.getTime() / 1000);
 
-    const url = `${YAHOO_CHART_API_URL}/${encodeURIComponent(ticker)}?interval=1mo&period1=${startDate}&period2=${endDate}`;
-
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' },
-    });
-
-    recordRequest();
-
-    if (!response.ok) {
-      result.error = `Yahoo Finance API error: ${response.status} ${response.statusText}`;
-      return result;
-    }
-
-    const data = await response.json();
+    const data = await yahooFetch<any>(
+      `/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1mo&period1=${startDate}&period2=${endDate}`,
+    );
     const chartResult = data?.chart?.result?.[0];
 
     if (!chartResult) {
@@ -215,7 +151,11 @@ export async function fetchMonthlyClosingPrices(
       setCachedPrice(ticker, 'monthly', result);
     }
   } catch (error) {
-    result.error = `Yahoo Finance fetch failed: ${error instanceof Error ? error.message : String(error)}`;
+    if (error instanceof YahooRateLimitError) {
+      result.error = error.message;
+    } else {
+      result.error = `Yahoo Finance fetch failed: ${error instanceof Error ? error.message : String(error)}`;
+    }
   }
 
   return result;

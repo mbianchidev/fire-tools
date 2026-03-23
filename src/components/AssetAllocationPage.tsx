@@ -13,6 +13,8 @@ import { exportAssetAllocationToCSV, importAssetAllocationFromCSV } from '../uti
 import { loadSettings, saveSettings } from '../utils/cookieSettings';
 import { getDemoAssetAllocationData } from '../utils/defaults';
 import { syncAssetAllocationToNetWorth } from '../utils/dataSync';
+import { useAssetPrices } from '../hooks/useAssetPrices';
+import { useExchangeRates } from '../hooks/useExchangeRates';
 import { MaterialIcon } from './MaterialIcon';
 import { EditableAssetClassTable } from './EditableAssetClassTable';
 import { AllocationChart } from './AllocationChart';
@@ -55,13 +57,13 @@ export const AssetAllocationPage: React.FC = () => {
   const defaultTargets = {
     STOCKS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 60 },
     BONDS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 40 },
-    CASH: { targetMode: 'SET' as AllocationMode },
-    CRYPTO: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
-    REAL_ESTATE: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
-    COMMODITIES: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 0 },
-    VEHICLE: { targetMode: 'OFF' as AllocationMode },
-    COLLECTIBLE: { targetMode: 'OFF' as AllocationMode },
-    ART: { targetMode: 'OFF' as AllocationMode },
+    CASH: { targetMode: 'SET' as AllocationMode, targetPercent: 0 },
+    CRYPTO: { targetMode: 'OFF' as AllocationMode, targetPercent: 0 },
+    REAL_ESTATE: { targetMode: 'OFF' as AllocationMode, targetPercent: 0 },
+    COMMODITIES: { targetMode: 'OFF' as AllocationMode, targetPercent: 0 },
+    VEHICLE: { targetMode: 'OFF' as AllocationMode, targetPercent: 0 },
+    COLLECTIBLE: { targetMode: 'OFF' as AllocationMode, targetPercent: 0 },
+    ART: { targetMode: 'OFF' as AllocationMode, targetPercent: 0 },
   };
 
   // Initialize from localStorage if available, otherwise use defaults
@@ -111,6 +113,33 @@ export const AssetAllocationPage: React.FC = () => {
   
   // Track if we're currently syncing to prevent infinite loops
   const isSyncingRef = useRef(false);
+  // Track whether initial price fetch has been done
+  const hasFetchedPricesRef = useRef(false);
+
+  // Yahoo Finance API hooks
+  const { refreshPrices, isLoading: isPriceLoading, lastRefresh: lastPriceRefresh, error: priceError } = useAssetPrices();
+  const { refresh: refreshRates, isLoading: isRatesLoading, lastUpdate: ratesLastUpdate, error: ratesError } = useExchangeRates();
+
+  // Fetch live prices on mount
+  useEffect(() => {
+    if (hasFetchedPricesRef.current) return;
+    const tickerAssets = assets.filter(a => a.ticker && a.ticker.trim().length > 0);
+    if (tickerAssets.length === 0) return;
+
+    hasFetchedPricesRef.current = true;
+    refreshPrices(assets).then(({ updatedAssets }) => {
+      updateAllocation(updatedAssets);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Manual refresh handler
+  const handleRefreshPrices = async () => {
+    const { updatedAssets } = await refreshPrices(assets);
+    updateAllocation(updatedAssets);
+    // Also refresh exchange rates
+    await refreshRates();
+  };
   
   // Toggle privacy mode and save to settings
   const togglePrivacyMode = () => {
@@ -352,6 +381,35 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleAddAsset = (newAsset: Asset) => {
+    // Check if an asset with the same ticker already exists (merge / "buy more")
+    const existingAsset = newAsset.ticker
+      ? assets.find(a => a.ticker.toUpperCase() === newAsset.ticker.toUpperCase() && a.assetClass === newAsset.assetClass)
+      : undefined;
+
+    if (existingAsset && existingAsset.shares && newAsset.shares) {
+      // Weighted average purchase price: (oldShares×oldPrice + newShares×newPrice) / totalShares
+      const oldShares = existingAsset.shares;
+      const oldPrice = existingAsset.pricePerShare || 0;
+      const addShares = newAsset.shares;
+      const addPrice = newAsset.pricePerShare || 0;
+      const totalShares = oldShares + addShares;
+      const avgPrice = totalShares > 0
+        ? (oldShares * oldPrice + addShares * addPrice) / totalShares
+        : 0;
+
+      const mergedAsset: Asset = {
+        ...existingAsset,
+        shares: totalShares,
+        pricePerShare: Math.round(avgPrice * 100) / 100,
+        currentValue: existingAsset.currentValue + newAsset.currentValue,
+        marketPrice: newAsset.marketPrice ?? existingAsset.marketPrice,
+      };
+
+      const updatedAssets = assets.map(a => a.id === existingAsset.id ? mergedAsset : a);
+      updateAllocation(updatedAssets);
+      return;
+    }
+
     // If the new asset is percentage-based, redistribute existing assets in the same class
     if (newAsset.targetMode === 'PERCENTAGE' && newAsset.targetPercent) {
       const newAssetPercent = newAsset.targetPercent;
@@ -584,6 +642,36 @@ export const AssetAllocationPage: React.FC = () => {
           <div className="portfolio-value-info">
             Total holdings (incl. cash): <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(allocation.totalHoldings, currency)}</PrivacyBlur>
           </div>
+          <div className="price-refresh-row">
+            <button
+              className="action-btn"
+              onClick={handleRefreshPrices}
+              disabled={isPriceLoading || isRatesLoading}
+              aria-label="Refresh asset prices from Yahoo Finance"
+              title="Fetch live prices from Yahoo Finance"
+            >
+              <MaterialIcon name={isPriceLoading || isRatesLoading ? 'hourglass_empty' : 'refresh'} />
+              {isPriceLoading || isRatesLoading ? ' Refreshing…' : ' Refresh Prices'}
+            </button>
+            {lastPriceRefresh && lastPriceRefresh.updatedCount > 0 && (
+              <span className="price-refresh-status" role="status">
+                Updated {lastPriceRefresh.updatedCount} asset{lastPriceRefresh.updatedCount !== 1 ? 's' : ''}
+                {lastPriceRefresh.failedTickers.length > 0 && (
+                  <> · Failed: {lastPriceRefresh.failedTickers.join(', ')}</>
+                )}
+              </span>
+            )}
+            {(priceError || ratesError) && (
+              <span className="price-refresh-error" role="alert">
+                {priceError || ratesError}
+              </span>
+            )}
+            {ratesLastUpdate && !isRatesLoading && (
+              <span className="price-refresh-rates" title="Exchange rates last updated">
+                <MaterialIcon name="currency_exchange" size="small" /> Rates: {new Date(ratesLastUpdate).toLocaleDateString()}
+              </span>
+            )}
+          </div>
         </section>
 
         {/* How to Use - Collapsible at top */}
@@ -751,6 +839,7 @@ export const AssetAllocationPage: React.FC = () => {
         onClose={() => setIsDialogOpen(false)}
         onSubmit={handleAddAsset}
         defaultCurrency={currency as 'EUR' | 'USD'}
+        existingAssets={assets}
       />
 
       <MassEditDialog

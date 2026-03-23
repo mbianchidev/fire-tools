@@ -582,15 +582,15 @@ export function getDemoAssetAllocationData(): {
       },
     ],
     assetClassTargets: {
-      STOCKS: { targetMode: 'PERCENTAGE', targetPercent: 50 }, // 50% of portfolio
-      BONDS: { targetMode: 'PERCENTAGE', targetPercent: 43 }, // 43% of portfolio
-      REAL_ESTATE: { targetMode: 'OFF' },
-      CRYPTO: { targetMode: 'OFF' },
-      COMMODITIES: { targetMode: 'OFF' },
-      VEHICLE: { targetMode: 'OFF' },
-      COLLECTIBLE: { targetMode: 'OFF' },
-      ART: { targetMode: 'OFF' },
-      CASH: { targetMode: 'SET', targetPercent: 0 }, // SET mode (individual assets have fixed targets)
+      STOCKS: { targetMode: 'PERCENTAGE', targetPercent: 54 }, // 54% of portfolio (excl. cash)
+      BONDS: { targetMode: 'PERCENTAGE', targetPercent: 46 }, // 46% of portfolio (excl. cash)
+      REAL_ESTATE: { targetMode: 'OFF', targetPercent: 0 },
+      CRYPTO: { targetMode: 'OFF', targetPercent: 0 },
+      COMMODITIES: { targetMode: 'OFF', targetPercent: 0 },
+      VEHICLE: { targetMode: 'OFF', targetPercent: 0 },
+      COLLECTIBLE: { targetMode: 'OFF', targetPercent: 0 },
+      ART: { targetMode: 'OFF', targetPercent: 0 },
+      CASH: { targetMode: 'SET', targetPercent: 0 },
     },
   };
 }

@@ -16,7 +16,7 @@ import {
   ExchangeRates,
   DEFAULT_FALLBACK_RATES,
 } from '../types/currency';
-import { hasRateLimitCapacity } from './priceApi';
+import { yahooFetch, hasRateLimitCapacity, YahooRateLimitError } from './yahooProxy';
 
 // --- Cache ---
 
@@ -34,8 +34,6 @@ export function clearExchangeRateCache(): void {
 }
 
 // --- Yahoo Finance Exchange Rates ---
-
-const YAHOO_QUOTE_API_URL = 'https://query1.finance.yahoo.com/v7/finance/quote';
 
 /**
  * Currency pairs to fetch from Yahoo Finance.
@@ -78,45 +76,33 @@ export async function fetchExchangeRates(): Promise<ExchangeRateFetchResult> {
   }
 
   try {
-    const symbols = CURRENCY_PAIRS.map(p => p.yahooSymbol).join(',');
-    const url = `${YAHOO_QUOTE_API_URL}?symbols=${symbols}`;
-
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' },
-    });
-
-    if (!response.ok) {
-      result.error = `Yahoo Finance API error: ${response.status} ${response.statusText}`;
-      return result;
-    }
-
-    const data = await response.json();
-    const quotes = data?.quoteResponse?.result;
-
-    if (!Array.isArray(quotes)) {
-      result.error = 'Invalid response from Yahoo Finance';
-      return result;
-    }
-
     const now = new Date().toISOString().split('T')[0];
 
-    for (const quote of quotes) {
-      const pair = CURRENCY_PAIRS.find(p => p.yahooSymbol === quote.symbol);
-      if (!pair) continue;
+    // Fetch each currency pair via v8 chart endpoint
+    for (const pair of CURRENCY_PAIRS) {
+      try {
+        const data = await yahooFetch<any>(
+          `/v8/finance/chart/${encodeURIComponent(pair.yahooSymbol)}?interval=1d&range=1d`,
+        );
+        const meta = data?.chart?.result?.[0]?.meta;
+        const rate = meta?.regularMarketPrice;
 
-      const rate = quote.regularMarketPrice || quote.ask || quote.bid;
-      if (typeof rate !== 'number' || rate <= 0) continue;
+        if (typeof rate !== 'number' || rate <= 0) continue;
 
-      // Yahoo gives EUR→X rate (e.g., EURUSD=X gives 1.18 meaning 1 EUR = 1.18 USD)
-      // We need X→EUR rate (e.g., 1 USD = 1/1.18 EUR ≈ 0.847 EUR)
-      const inverseRate = 1 / rate;
+        // Yahoo gives EUR→X rate (e.g., EURUSD=X gives 1.18 meaning 1 EUR = 1.18 USD)
+        // We need X→EUR rate (e.g., 1 USD = 1/1.18 EUR ≈ 0.847 EUR)
+        const inverseRate = 1 / rate;
 
-      result.rates.push({
-        fromCurrency: pair.to,
-        toCurrency: 'EUR',
-        rate: inverseRate,
-        date: now,
-      });
+        result.rates.push({
+          fromCurrency: pair.to,
+          toCurrency: 'EUR',
+          rate: inverseRate,
+          date: now,
+        });
+      } catch (pairError) {
+        // Skip individual pair failures, continue with others
+        console.error(`Failed to fetch rate for ${pair.yahooSymbol}:`, pairError);
+      }
     }
 
     // Cache successful results
@@ -127,7 +113,11 @@ export async function fetchExchangeRates(): Promise<ExchangeRateFetchResult> {
       };
     }
   } catch (error) {
-    result.error = `Yahoo Finance fetch failed: ${error instanceof Error ? error.message : String(error)}`;
+    if (error instanceof YahooRateLimitError) {
+      result.error = error.message;
+    } else {
+      result.error = `Yahoo Finance fetch failed: ${error instanceof Error ? error.message : String(error)}`;
+    }
   }
 
   return result;
