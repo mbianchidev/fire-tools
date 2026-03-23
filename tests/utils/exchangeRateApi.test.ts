@@ -8,15 +8,6 @@ import {
 import { DEFAULT_FALLBACK_RATES } from '../../src/types/currency';
 import { ExchangeRateFetchResult } from '../../src/types/priceApi';
 
-// Mock apiKeyStorage
-vi.mock('../../src/utils/apiKeyStorage', () => ({
-  loadApiKeyConfig: vi.fn(() => ({
-    alphaVantageKey: undefined,
-    financialDataKey: undefined,
-    lastUpdated: null,
-  })),
-}));
-
 // Mock priceApi rate limit function
 vi.mock('../../src/utils/priceApi', () => ({
   hasRateLimitCapacity: vi.fn(() => true),
@@ -54,7 +45,6 @@ describe('Exchange Rate API Service', () => {
       const fetchResult: ExchangeRateFetchResult = {
         rates: [],
         fetchedAt: new Date().toISOString(),
-        provider: 'yahoo',
         error: 'API failed',
       };
 
@@ -67,11 +57,10 @@ describe('Exchange Rate API Service', () => {
     it('should override defaults with fetched rates', () => {
       const fetchResult: ExchangeRateFetchResult = {
         rates: [
-          { fromCurrency: 'USD', toCurrency: 'EUR', rate: 0.92, date: '2024-01-15', provider: 'yahoo' },
-          { fromCurrency: 'GBP', toCurrency: 'EUR', rate: 1.17, date: '2024-01-15', provider: 'yahoo' },
+          { fromCurrency: 'USD', toCurrency: 'EUR', rate: 0.92, date: '2024-01-15' },
+          { fromCurrency: 'GBP', toCurrency: 'EUR', rate: 1.17, date: '2024-01-15' },
         ],
         fetchedAt: new Date().toISOString(),
-        provider: 'yahoo',
       };
 
       const rates = toExchangeRatesMap(fetchResult);
@@ -80,23 +69,6 @@ describe('Exchange Rate API Service', () => {
       expect(rates.USD).toBe(0.92); // Overridden
       expect(rates.GBP).toBe(1.17); // Overridden
       expect(rates.CHF).toBe(DEFAULT_FALLBACK_RATES.CHF); // Default (not fetched)
-    });
-
-    it('should always keep EUR at 1.0', () => {
-      const fetchResult: ExchangeRateFetchResult = {
-        rates: [
-          { fromCurrency: 'EUR', toCurrency: 'EUR', rate: 0.5, date: '2024-01-15', provider: 'yahoo' },
-        ],
-        fetchedAt: new Date().toISOString(),
-        provider: 'yahoo',
-      };
-
-      const rates = toExchangeRatesMap(fetchResult);
-
-      // EUR rate gets overridden to 0.5 by the data, but default was 1.0
-      // The function respects the data; EUR should be whatever was fetched
-      // but the default is set first then overridden
-      expect(rates.EUR).toBe(0.5);
     });
   });
 
@@ -120,7 +92,6 @@ describe('Exchange Rate API Service', () => {
 
       const result = await fetchExchangeRates();
 
-      expect(result.provider).toBe('yahoo');
       expect(result.rates.length).toBeGreaterThan(0);
       expect(result.error).toBeUndefined();
 
@@ -159,7 +130,6 @@ describe('Exchange Rate API Service', () => {
         statusText: 'Internal Server Error',
       });
 
-      // Yahoo fails, Alpha Vantage also fails (no key)
       const result = await fetchExchangeRates();
       expect(result.rates).toHaveLength(0);
       expect(result.error).toBeTruthy();
@@ -189,13 +159,12 @@ describe('Exchange Rate API Service', () => {
   });
 
   describe('fetchExchangeRatesAsMap', () => {
-    it('should return fallback rates when all providers fail', async () => {
+    it('should return fallback rates when Yahoo Finance fails', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       const result = await fetchExchangeRatesAsMap();
 
       expect(result.isUsingFallback).toBe(true);
-      expect(result.provider).toBeNull();
       expect(result.rates.EUR).toBe(1.0);
       expect(result.rates.USD).toBe(DEFAULT_FALLBACK_RATES.USD);
     });
@@ -216,7 +185,6 @@ describe('Exchange Rate API Service', () => {
       const result = await fetchExchangeRatesAsMap();
 
       expect(result.isUsingFallback).toBe(false);
-      expect(result.provider).toBe('yahoo');
       expect(result.rates.EUR).toBe(1.0);
       // USD rate should be the inverse of EURUSD rate
       expect(result.rates.USD).toBeCloseTo(1 / 1.08, 4);
