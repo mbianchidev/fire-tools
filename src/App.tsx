@@ -480,6 +480,7 @@ function App() {
           <footer className="app-footer">
             <p>
               Fire Tools - Disclaimer: This is for educational purposes only. 
+              Market data is provided as an indication only and may be delayed or inaccurate.
               Consult with a financial advisor for professional advice.
             </p>
             <div className="footer-links">

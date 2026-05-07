@@ -22,6 +22,18 @@ export default defineConfig(({ mode }) => ({
     },
   ],
   base: mode === 'production' ? '/fire-tools/' : '/',
+  server: {
+    proxy: {
+      '/api/yahoo': {
+        target: 'https://query1.finance.yahoo.com',
+        changeOrigin: true,
+        rewrite: (path: string) => path.replace(/^\/api\/yahoo/, ''),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; fire-tools/1.0)',
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

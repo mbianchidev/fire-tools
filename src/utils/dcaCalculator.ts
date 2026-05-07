@@ -6,6 +6,7 @@
  */
 
 import { Asset, AssetClass } from '../types/assetAllocation';
+import { yahooFetch } from './yahooProxy';
 
 export interface DCAAssetAllocation {
   assetId: string;
@@ -105,7 +106,7 @@ export function calculateDCAAllocation(
  * For this implementation, we use Yahoo Finance API.
  * Alternative APIs: Alpha Vantage, Finnhub, IEX Cloud
  * 
- * API Endpoint: https://query1.finance.yahoo.com/v7/finance/quote
+ * API Endpoint: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
  * 
  * Note: This uses a free public API. For production use, consider:
  * - Rate limiting
@@ -113,9 +114,6 @@ export function calculateDCAAllocation(
  * - Fallback to alternative APIs
  * - User-provided prices as fallback
  */
-
-// Yahoo Finance API endpoint
-const YAHOO_FINANCE_API_URL = 'https://query1.finance.yahoo.com/v7/finance/quote';
 
 export async function fetchAssetPrices(tickers: string[]): Promise<Record<string, number | null>> {
   const prices: Record<string, number | null> = {};
@@ -132,38 +130,21 @@ export async function fetchAssetPrices(tickers: string[]): Promise<Record<string
     return prices;
   }
   
-  try {
-    // Use Yahoo Finance API via public endpoint
-    // Format: https://query1.finance.yahoo.com/v7/finance/quote?symbols=TICKER1,TICKER2
-    const tickerList = validTickers.join(',');
-    const url = `${YAHOO_FINANCE_API_URL}?symbols=${tickerList}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      console.error('Failed to fetch prices:', response.statusText);
-      return prices;
+  // Fetch each ticker via v8 chart endpoint (v7 quote endpoint is rate-limited)
+  for (const ticker of validTickers) {
+    try {
+      const data = await yahooFetch<any>(
+        `/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d`,
+      );
+      const meta = data?.chart?.result?.[0]?.meta;
+      const price = meta?.regularMarketPrice;
+
+      if (typeof price === 'number' && price > 0) {
+        prices[ticker] = price;
+      }
+    } catch (error) {
+      console.error(`Error fetching price for ${ticker}:`, error);
     }
-    
-    const data = await response.json();
-    
-    // Parse response
-    if (data?.quoteResponse?.result) {
-      data.quoteResponse.result.forEach((quote: any) => {
-        const symbol = quote.symbol;
-        const price = quote.regularMarketPrice || quote.ask || quote.bid;
-        
-        if (symbol && price && typeof price === 'number') {
-          prices[symbol] = price;
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error fetching asset prices:', error);
   }
   
   return prices;

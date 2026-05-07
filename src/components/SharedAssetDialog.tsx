@@ -14,6 +14,7 @@ import { BankInfo, getBanksByCountry, getBankByCode } from '../types/bank';
 import { formatAssetName } from '../utils/allocationCalculator';
 import { convertToEUR } from '../utils/currencyConverter';
 import { loadSettings } from '../utils/cookieSettings';
+import { lookupTicker } from '../utils/tickerLookup';
 import { MaterialIcon } from './MaterialIcon';
 import { SearchableSelect } from './SearchableSelect';
 
@@ -28,6 +29,7 @@ interface SharedAssetDialogProps {
   initialData?: Asset | AssetHolding; // For editing
   defaultCurrency?: SupportedCurrency;
   isNameDuplicate?: (name: string) => boolean;
+  existingAssets?: Asset[];
 }
 
 const SUB_ASSET_TYPES: Record<AssetClass, SubAssetType[]> = {
@@ -110,6 +112,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   initialData,
   defaultCurrency = 'EUR',
   isNameDuplicate,
+  existingAssets,
 }) => {
   // Determine if editing
   const isEditing = Boolean(initialData);
@@ -122,6 +125,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const [isin, setIsin] = useState('');
   const [shares, setShares] = useState<string>('1');
   const [pricePerShare, setPricePerShare] = useState<string>('');
+  const [acquisitionPrice, setAcquisitionPrice] = useState<string>('');
   const [currency, setCurrency] = useState<SupportedCurrency>(defaultCurrency);
   const [targetMode, setTargetMode] = useState<AllocationMode>('PERCENTAGE');
   const [targetPercent, setTargetPercent] = useState<string>('0');
@@ -149,6 +153,14 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
   const [mortStartDate, setMortStartDate] = useState<string>('');
   const [mortLender, setMortLender] = useState<string>('');
 
+  // Ticker lookup state
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [lookupStatus, setLookupStatus] = useState<string | null>(null);
+
+  // Dropdown vs manual entry state for name/ticker
+  const [isNewAsset, setIsNewAsset] = useState(true);
+  const [isNewTicker, setIsNewTicker] = useState(true);
+
   // Get fallback rates from settings
   const settings = loadSettings();
 
@@ -167,6 +179,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setIsin(asset.isin || '');
         setShares(asset.shares?.toString() || '1');
         setPricePerShare(asset.pricePerShare?.toString() || '');
+        setAcquisitionPrice(asset.acquisitionPrice?.toString() || '');
         setCurrency(asset.originalCurrency || 'EUR');
         setTargetMode(asset.targetMode);
         setTargetPercent(asset.targetPercent?.toString() || '0');
@@ -195,6 +208,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         setTicker(holding.ticker);
         setShares(holding.shares.toString());
         setPricePerShare(holding.pricePerShare.toString());
+        setAcquisitionPrice(holding.acquisitionPrice?.toString() || '');
         setCurrency(holding.currency);
         setNote(holding.note || '');
         setInstitutionCode('');
@@ -235,6 +249,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       setIsin('');
       setShares('1');
       setPricePerShare('');
+      setAcquisitionPrice('');
       setCurrency(defaultCurrency);
       setTargetMode('PERCENTAGE');
       setTargetPercent('0');
@@ -242,6 +257,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       setInstitutionCode('');
       setInstitutionName('');
       setIsPrimaryResidence(false);
+      setLookupStatus(null);
+      setIsLookingUp(false);
       setEnableDepreciation(false);
       setDepMethod('STRAIGHT_LINE');
       setDepPurchasePrice('');
@@ -323,8 +340,74 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setShares(value);
   };
 
-  const handlePricePerShareChange = (value: string) => {
-    setPricePerShare(value);
+  // Map Yahoo Finance currency to SupportedCurrency
+  const mapYahooCurrency = (yahooCurrency: string | undefined): SupportedCurrency | null => {
+    if (!yahooCurrency) return null;
+    const upper = yahooCurrency.toUpperCase();
+    const supported = SUPPORTED_CURRENCIES.find(c => c.code === upper);
+    return supported ? supported.code : null;
+  };
+
+  // Auto-fill fields from an existing asset
+  const autoFillFromAsset = (matchingAsset: Asset) => {
+    setName(matchingAsset.name);
+    setTicker(matchingAsset.ticker);
+    setIsin(matchingAsset.isin || '');
+    setAssetClass(matchingAsset.assetClass);
+    setSubAssetType(matchingAsset.subAssetType);
+    setCurrency(matchingAsset.originalCurrency || defaultCurrency);
+    // Don't set shares — user needs to enter their own
+    // Trigger lookupTicker to get current market price
+    if (matchingAsset.ticker) {
+      lookupTicker(matchingAsset.ticker).then(result => {
+        if (!result.error && result.price > 0) {
+          setPricePerShare(result.price.toString());
+        }
+      });
+    }
+  };
+
+  // Fetch price and metadata from Yahoo Finance for the current ticker
+  const handleTickerLookup = async () => {
+    if (!ticker.trim()) {
+      setLookupStatus('Enter a ticker first');
+      return;
+    }
+
+    setIsLookingUp(true);
+    setLookupStatus(null);
+
+    const result = await lookupTicker(ticker);
+
+    if (result.error) {
+      setLookupStatus(`⚠ ${result.error}`);
+      setIsLookingUp(false);
+      return;
+    }
+
+    // Auto-fill price per share
+    setPricePerShare(result.price.toString());
+
+    // Auto-fill name if empty
+    if (!name.trim() && result.name) {
+      setName(result.name);
+    }
+
+    // Auto-fill currency if available and supported
+    const mappedCurrency = mapYahooCurrency(result.currency);
+    if (mappedCurrency) {
+      setCurrency(mappedCurrency);
+    }
+
+    // Update ticker to canonical form
+    if (result.ticker) {
+      setTicker(result.ticker);
+    }
+
+    const parts = [`${result.currency || ''} ${result.price.toFixed(2)}`];
+    if (result.exchange) parts.push(result.exchange);
+    setLookupStatus(`✓ ${parts.join(' · ')}`);
+    setIsLookingUp(false);
   };
 
   const buildVehicleDepreciation = (): VehicleDepreciation => {
@@ -403,7 +486,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         return;
       }
       if (!pricePerShare.trim() || parseFloat(pricePerShare) <= 0) {
-        alert('Please enter a valid price per share');
+        alert('Please fetch the price first by entering a ticker and clicking the fetch button');
         return;
       }
     }
@@ -435,6 +518,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
     if (mode === 'assetAllocation') {
       // Asset Allocation mode
+      const acqPriceNum = parseFloat(acquisitionPrice) || undefined;
       const asset: Omit<Asset, 'id'> & { id?: string } = {
         ...(initialData && { id: (initialData as Asset).id }),
         name: name.trim(),
@@ -445,6 +529,8 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
         currentValue: valueInEUR,
         shares: sharesNum,
         pricePerShare: priceNum,
+        acquisitionPrice: acqPriceNum,
+        marketPrice: priceNum,
         originalCurrency: currency !== 'EUR' ? currency : undefined,
         originalValue: currency !== 'EUR' ? valueNum : undefined,
         targetMode,
@@ -459,12 +545,14 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
       onSubmit(asset);
     } else {
       // Net Worth Tracker mode
+      const acqPriceNum = parseFloat(acquisitionPrice) || undefined;
       const holding: Omit<AssetHolding, 'id'> & { id?: string } = {
         ...(initialData && { id: (initialData as AssetHolding).id }),
         name: name.trim(),
         ticker: generatedTicker,
         shares: sharesNum,
         pricePerShare: priceNum,
+        acquisitionPrice: acqPriceNum,
         currency,
         assetClass: mapToNetWorthAssetClass(assetClass, subAssetType),
         note: note.trim() || undefined,
@@ -482,6 +570,7 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setIsin('');
     setShares('1');
     setPricePerShare('');
+    setAcquisitionPrice('');
     setCurrency(defaultCurrency);
     setTargetPercent('0');
     setNote('');
@@ -490,6 +579,9 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
     setIsPrimaryResidence(false);
     setEnableDepreciation(false);
     setEnableMortgage(false);
+    setIsNewAsset(true);
+    setIsNewTicker(true);
+    setLookupStatus(null);
     onClose();
   };
 
@@ -551,14 +643,52 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
           <div className="form-group">
             <label>Asset Name *</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., S&P 500 Index Fund"
-              className="dialog-input"
-              required
-            />
+            {!isEditing && existingAssets && existingAssets.length > 0 && !isNewAsset ? (
+              <SearchableSelect
+                options={[
+                  { id: '__new__', label: '+ Add new asset...' },
+                  ...existingAssets.map(a => ({ id: a.id, label: a.name })),
+                ]}
+                value={existingAssets.find(a => a.name === name)?.id || '__new__'}
+                onChange={(val) => {
+                  if (val === '__new__') {
+                    setIsNewAsset(true);
+                    setName('');
+                  } else {
+                    const match = existingAssets.find(a => a.id === val);
+                    if (match) {
+                      autoFillFromAsset(match);
+                      setIsNewTicker(false);
+                    }
+                  }
+                }}
+                searchThreshold={settings.searchThreshold ?? 8}
+                className="dialog-select"
+                ariaLabel="Select existing asset or add new"
+              />
+            ) : (
+              <>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g., S&P 500 Index Fund"
+                  className="dialog-input"
+                  required
+                />
+                {!isEditing && existingAssets && existingAssets.length > 0 && (
+                  <button
+                    type="button"
+                    className="ticker-fetch-btn"
+                    style={{ marginTop: '0.25rem', fontSize: '0.8rem' }}
+                    onClick={() => setIsNewAsset(false)}
+                    title="Select from existing assets"
+                  >
+                    Choose existing
+                  </button>
+                )}
+              </>
+            )}
           </div>
 
           {/* Bank/Institution selector for cash and brokerage accounts */}
@@ -609,13 +739,89 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
             {subAssetType !== 'PRIVATE_EQUITY' && (
               <div className="form-group">
                 <label>{getTickerLabel(subAssetType)}</label>
-                <input
-                  type="text"
-                  value={ticker}
-                  onChange={(e) => setTicker(e.target.value)}
-                  placeholder={needsTicker ? "e.g., SPY" : "Optional"}
-                  className="dialog-input"
-                />
+                {!isEditing && existingAssets && existingAssets.length > 0 && !isNewTicker ? (
+                  <>
+                    <SearchableSelect
+                      options={[
+                        { id: '__new__', label: '+ Enter new ticker...' },
+                        ...Array.from(new Map(
+                          existingAssets
+                            .filter(a => a.ticker && a.ticker.trim().length > 0)
+                            .map(a => [a.ticker.trim().toUpperCase(), a])
+                        ).entries()).map(([tickerKey]) => ({
+                          id: tickerKey,
+                          label: tickerKey,
+                        })),
+                      ]}
+                      value={ticker.trim().toUpperCase() || '__new__'}
+                      onChange={(val) => {
+                        if (val === '__new__') {
+                          setIsNewTicker(true);
+                          setTicker('');
+                          setLookupStatus(null);
+                        } else {
+                          const match = existingAssets!.find(
+                            a => a.ticker.trim().toUpperCase() === val
+                          );
+                          if (match) {
+                            autoFillFromAsset(match);
+                            setIsNewAsset(true);
+                          }
+                          setTicker(val);
+                          setLookupStatus(null);
+                        }
+                      }}
+                      searchThreshold={settings.searchThreshold ?? 8}
+                      className="dialog-select"
+                      ariaLabel="Select existing ticker or enter new"
+                    />
+                    {lookupStatus && (
+                      <div className={`ticker-lookup-status ${lookupStatus.startsWith('⚠') ? 'error' : 'success'}`}>
+                        {lookupStatus}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="ticker-input-row">
+                      <input
+                        type="text"
+                        value={ticker}
+                        onChange={(e) => { setTicker(e.target.value); setLookupStatus(null); }}
+                        onBlur={() => { if (ticker.trim() && needsTicker) handleTickerLookup(); }}
+                        placeholder={needsTicker ? "e.g., SPY" : "Optional"}
+                        className="dialog-input"
+                      />
+                      {needsTicker && (
+                        <button
+                          type="button"
+                          className="ticker-fetch-btn"
+                          onClick={handleTickerLookup}
+                          disabled={isLookingUp || !ticker.trim()}
+                          title="Fetch price and info from Yahoo Finance"
+                        >
+                          <MaterialIcon name={isLookingUp ? 'hourglass_empty' : 'download'} size="small" />
+                        </button>
+                      )}
+                    </div>
+                    {!isEditing && existingAssets && existingAssets.length > 0 && (
+                      <button
+                        type="button"
+                        className="ticker-fetch-btn"
+                        style={{ marginTop: '0.25rem', fontSize: '0.8rem' }}
+                        onClick={() => setIsNewTicker(false)}
+                        title="Select from existing tickers"
+                      >
+                        Choose existing
+                      </button>
+                    )}
+                    {lookupStatus && (
+                      <div className={`ticker-lookup-status ${lookupStatus.startsWith('⚠') ? 'error' : 'success'}`}>
+                        {lookupStatus}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             )}
 
@@ -641,35 +847,61 @@ export const SharedAssetDialog: React.FC<SharedAssetDialogProps> = ({
 
           {/* Only show shares and price fields for non-cash accounts, non-value-only assets, or for MONEY_ETF */}
           {(assetClass !== 'CASH' || subAssetType === 'MONEY_ETF') && !VALUE_ONLY_TYPES.includes(subAssetType) && (
-            <div className="form-row">
-              <div className="form-group">
-                <label>Number of Shares *</label>
-                <input
-                  type="number"
-                  value={shares}
-                  onChange={(e) => handleSharesChange(e.target.value)}
-                  placeholder="e.g., 100"
-                  className="dialog-input"
-                  min="0"
-                  step="any"
-                  required
-                />
+            <>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Number of Shares *</label>
+                  <input
+                    type="number"
+                    value={shares}
+                    onChange={(e) => handleSharesChange(e.target.value)}
+                    placeholder="e.g., 100"
+                    className="dialog-input"
+                    min="0"
+                    step="any"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Price per Share (Market)</label>
+                  <input
+                    type="text"
+                    value={pricePerShare ? `${parseFloat(pricePerShare).toFixed(2)}` : '—'}
+                    className="dialog-input dialog-input-calculated"
+                    disabled
+                    title="Fetched automatically from Yahoo Finance"
+                  />
+                  {!pricePerShare && needsTicker && ticker.trim() && (
+                    <span className="setting-help" style={{ color: 'var(--warning)' }}>
+                      Click the fetch button next to the ticker to get the price
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className="form-group">
-                <label>Price per Share *</label>
-                <input
-                  type="number"
-                  value={pricePerShare}
-                  onChange={(e) => handlePricePerShareChange(e.target.value)}
-                  placeholder="e.g., 450.00"
-                  className="dialog-input"
-                  min="0"
-                  step="any"
-                  required
-                />
-              </div>
-            </div>
+              {/* Acquisition price — editable, shown for share-based assets */}
+              {needsTicker && (
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Acquisition Price per Share</label>
+                    <input
+                      type="number"
+                      value={acquisitionPrice}
+                      onChange={(e) => setAcquisitionPrice(e.target.value)}
+                      placeholder={pricePerShare ? `Defaults to ${parseFloat(pricePerShare).toFixed(2)}` : 'Price you paid'}
+                      className="dialog-input"
+                      min="0"
+                      step="any"
+                      title="The price at which you originally bought this asset"
+                    />
+                    <span className="setting-help">
+                      Leave blank to use market price as acquisition price
+                    </span>
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* Value is directly editable for cash accounts (not MONEY_ETF) and PROPERTY assets */}

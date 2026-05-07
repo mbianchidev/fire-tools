@@ -55,6 +55,7 @@ export interface Asset {
   currentValue: number; // Value in EUR (converted if entered in another currency)
   shares?: number; // Number of shares owned (optional, for stocks/ETFs/bonds)
   pricePerShare?: number; // Price per share (optional, for stocks/ETFs/bonds)
+  acquisitionPrice?: number; // Price per share at which the asset was acquired (editable)
   originalCurrency?: SupportedCurrency; // The currency the value was originally entered in (defaults to EUR)
   originalValue?: number; // The original value before conversion to EUR
   targetMode: AllocationMode;
@@ -64,6 +65,7 @@ export interface Asset {
   institutionName?: string; // Custom bank/broker name (when code is 'OTHER' or not using predefined list)
   mortgageData?: MortgageData; // Mortgage information for real estate properties
   isPrimaryResidence?: boolean; // If true, real estate property is excluded from FIRE calculation
+  marketPrice?: number; // Current market price per share (fetched from API)
 }
 
 export interface AssetClassSummary {

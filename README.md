@@ -16,6 +16,27 @@ Fire Tools is provided for **educational and planning purposes only**. The calcu
 
 **Always do your research or consult with a qualified financial advisor before making investment decisions.**
 
+### Market Data Disclaimer
+
+Fire Tools fetches live asset prices and exchange rates from **Yahoo Finance** through a community open-source integration. This data is provided **as an indication only**:
+
+- Prices may be **delayed, incomplete, or inaccurate**
+- We take **no responsibility** for wrong or delayed market data
+- The Yahoo Finance API is **not officially endorsed** by Yahoo and may **stop working at any time** without notice
+- This is a community-discovered endpoint, not a supported commercial API
+- **Always verify prices** with your broker or a professional financial data provider before making investment decisions
+
+### Rate Limits
+
+To avoid overloading the Yahoo Finance API, Fire Tools enforces the following limits:
+
+| Limit | Value | Description |
+|-------|-------|-------------|
+| **Per-request throttle** | 1 second | Minimum delay between consecutive API calls |
+| **Daily budget** | 500 requests | Maximum requests per calendar day (resets at midnight) |
+
+When limits are reached, the app gracefully falls back to the last known prices and hardcoded default exchange rates. You can check the current rate-limit status in **Settings → Market Data**.
+
 **[Try it live →](https://mbianchidev.github.io/fire-tools/)**
 
 ---
