@@ -11,7 +11,7 @@
  *   - Renders a donut + table per dimension via `BreakdownChart`
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Asset } from '../types/assetAllocation';
 import { BreakdownDimension } from '../types/portfolioBreakdown';
@@ -82,14 +82,12 @@ const DIMENSIONS: DimensionConfig[] = [
 ];
 
 export const PortfolioBreakdownPage: React.FC = () => {
-  const [assets, setAssets] = useState<Asset[]>([]);
+  // Load assets synchronously so the metadata hook sees them on first mount.
+  // Loading them later (via useEffect) would mean the metadata fetch fires
+  // with an empty array and never retries when the real assets arrive.
+  const [assets] = useState<Asset[]>(() => loadAssetAllocation().assets || []);
   const [currency] = useState<string>(() => loadSettings().currencySettings.defaultCurrency);
   const [isPrivacyMode, setIsPrivacyMode] = useState<boolean>(() => loadSettings().privacyMode);
-
-  useEffect(() => {
-    const saved = loadAssetAllocation();
-    setAssets(saved.assets || []);
-  }, []);
 
   const togglePrivacyMode = () => {
     const newMode = !isPrivacyMode;

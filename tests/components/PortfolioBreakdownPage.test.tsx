@@ -104,6 +104,26 @@ describe('PortfolioBreakdownPage', () => {
     expect(screen.getByRole('heading', { name: /By ETF Provider/i })).toBeTruthy();
   });
 
+  it('fetches metadata for tickers that exist on initial render (no async-load race)', async () => {
+    const { fetchAssetMetadataBatch } = await import('../../src/utils/yahooMetadata');
+    render(
+      <MemoryRouter>
+        <PortfolioBreakdownPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(fetchAssetMetadataBatch).toHaveBeenCalled();
+    });
+    // The first (and only) call must include the ticker that was already in
+    // the saved allocation. If the page loads assets asynchronously, the
+    // first call would happen with an empty array and metadata would never
+    // populate.
+    const firstCall = (fetchAssetMetadataBatch as unknown as { mock: { calls: unknown[][] } }).mock
+      .calls[0];
+    expect(firstCall[0]).toContain('VTI');
+  });
+
   it('shows a back link to Asset Allocation', () => {
     render(
       <MemoryRouter>

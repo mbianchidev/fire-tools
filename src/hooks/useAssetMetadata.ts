@@ -89,14 +89,13 @@ export function useAssetMetadata(assets: Asset[]): UseAssetMetadataReturn {
     await fetchFor(assetsRef.current);
   }, [fetchFor]);
 
-  // Initial fetch
-  const hasFetchedRef = useRef(false);
+  // Refetch whenever the set of unique tickers changes. Using a stable string
+  // key avoids spurious refetches when assets are mutated for unrelated reasons.
+  const tickerKey = uniqueTickers(assets).sort().join(',');
   useEffect(() => {
-    if (hasFetchedRef.current) return;
-    hasFetchedRef.current = true;
-    void fetchFor(assets);
+    void fetchFor(assetsRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tickerKey]);
 
   return { metadata, isLoading, lastRefresh, error, refresh };
 }
