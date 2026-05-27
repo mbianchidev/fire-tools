@@ -545,6 +545,52 @@
   cursor: not-allowed !important;
 }
 
+/* Ticker input with fetch button */
+.ticker-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.ticker-input-row .dialog-input {
+  flex: 1;
+}
+
+.ticker-fetch-btn {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--border-subtle);
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.ticker-fetch-btn:hover:not(:disabled) {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.ticker-fetch-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ticker-lookup-status {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.ticker-lookup-status.success {
+  color: var(--success);
+}
+
+.ticker-lookup-status.error {
+  color: var(--error);
+}
+
 .dialog-actions {
   display: flex;
   gap: 1rem;
@@ -2580,5 +2626,81 @@ select:disabled {
 .edit-input:focus {
   border-color: var(--accent-primary) !important;
   outline: none;
+}
+
+/* Price Refresh Row */
+.price-refresh-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.price-refresh-row .action-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.price-refresh-row .action-btn:hover:not(:disabled) {
+  background: var(--accent-primary);
+  color: #fff;
+  border-color: var(--accent-primary);
+}
+
+.price-refresh-row .action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.price-refresh-status {
+  font-size: 0.8rem;
+  color: var(--success);
+}
+
+.price-refresh-error {
+  font-size: 0.8rem;
+  color: var(--error);
+}
+
+.price-refresh-rates {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Market price delta display in price cell */
+.price-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.market-price-delta {
+  font-size: 0.75rem;
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.market-price-delta.gain {
+  color: var(--success);
+}
+
+.market-price-delta.loss {
+  color: var(--error);
+}
+
+.market-price {
+  opacity: 0.8;
+}
+
+.delta-pct {
+  font-weight: 600;
 }
 

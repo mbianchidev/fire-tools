@@ -24,6 +24,8 @@ import { Tooltip } from './Tooltip';
 import { MaterialIcon } from './MaterialIcon';
 import { AssetClass } from '../types/assetAllocation';
 import { formatAssetName } from '../utils/allocationCalculator';
+import { fetchAssetPrices } from '../utils/dcaCalculator';
+import { fetchExchangeRatesAsMap } from '../utils/exchangeRateApi';
 import { CategoryManagerDialog } from './CategoryManagerDialog';
 import { SearchableSelect } from './SearchableSelect';
 import './SettingsPage.css';
@@ -33,7 +35,7 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['account', 'fire', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'categories', 'data', 'support'] as const;
+const SETTINGS_SECTIONS = ['account', 'fire', 'display', 'privacy', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
@@ -47,6 +49,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   // Category management state
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [expenseData, setExpenseData] = useState<ExpenseTrackerData | null>(null);
+  
+  // Market data state
+  const [marketDataPrices, setMarketDataPrices] = useState<Record<string, number | null>>({});
+  const [marketDataRates, setMarketDataRates] = useState<{ rates: Record<string, number>; isUsingFallback: boolean; lastUpdate: string; error?: string } | null>(null);
+  const [isMarketDataLoading, setIsMarketDataLoading] = useState(false);
+  const [marketDataFetchedAt, setMarketDataFetchedAt] = useState<string | null>(null);
   
   // Account section expanded by default, others collapsed
   const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
@@ -202,6 +210,43 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     }
     return count;
   }, [expenseData]);
+
+  // Fetch all market data (asset prices + exchange rates)
+  const handleFetchMarketData = async () => {
+    setIsMarketDataLoading(true);
+
+    // Get all assets with tickers
+    const { assets } = loadAssetAllocation();
+    const tickers = assets
+      ? [...new Set(assets.filter(a => a.ticker && a.ticker.trim()).map(a => a.ticker.trim().toUpperCase()))]
+      : [];
+
+    // Fetch asset prices and exchange rates in parallel
+    const [prices, ratesResult] = await Promise.all([
+      tickers.length > 0 ? fetchAssetPrices(tickers) : Promise.resolve({}),
+      fetchExchangeRatesAsMap(),
+    ]);
+
+    setMarketDataPrices(prices);
+    setMarketDataRates(ratesResult);
+    setMarketDataFetchedAt(new Date().toISOString());
+    setIsMarketDataLoading(false);
+
+    // Persist live exchange rates to settings if available
+    if (!ratesResult.isUsingFallback) {
+      const newSettings = {
+        ...settings,
+        currencySettings: {
+          ...settings.currencySettings,
+          fallbackRates: ratesResult.rates,
+          lastApiUpdate: ratesResult.lastUpdate,
+        },
+      };
+      setSettings(newSettings);
+      saveSettings(newSettings);
+      onSettingsChange?.(newSettings);
+    }
+  };
 
   // Handle settings change
   const handleSettingChange = <K extends keyof UserSettings>(key: K, value: UserSettings[K]) => {
@@ -1138,9 +1183,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               <div className="exchange-rate-warning">
                 <MaterialIcon name="warning" />
                 <p>
-                  Exchange rates are fetched from publicly available APIs and may not reflect real-time rates.
-                  Fallback rates are used when the API is unavailable. For accurate financial decisions,
-                  please verify rates with your financial institution.
+                  Exchange rates are fetched from publicly available Yahoo Finance APIs via a community
+                  open-source package. These rates may not reflect real-time values, may be delayed,
+                  and the APIs could stop working at any time. Fallback rates are used when the API is unavailable.
+                  For accurate financial decisions, please verify rates with your financial institution.
                 </p>
               </div>
               
@@ -1180,6 +1226,134 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               <button className="secondary-btn" onClick={handleResetFallbackRates}>
                 Reset to Default Rates
               </button>
+            </div>
+          )}
+        </section>
+
+        {/* Market Data */}
+        <section className="settings-section collapsible-section">
+          <button 
+            className="collapsible-header" 
+            onClick={() => toggleSection('marketData')}
+            aria-expanded={!collapsedSections.has('marketData')}
+            aria-controls="marketdata-content"
+          >
+            <h2>
+              <MaterialIcon name="trending_up" /> Market Data
+              <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('marketData') ? '▶' : '▼'}</span>
+            </h2>
+          </button>
+          {!collapsedSections.has('marketData') && (
+            <div id="marketdata-content" className="collapsible-content">
+              <div className="market-data-disclaimer" role="note">
+                <MaterialIcon name="info" />
+                <div>
+                  <strong>Disclaimer</strong>
+                  <p>
+                    Market data is fetched from publicly available Yahoo Finance APIs through a community
+                    open-source package. This data is provided as an <strong>indication only</strong> and
+                    may be delayed, incomplete, or inaccurate. We take <strong>no responsibility</strong> for
+                    wrong or delayed market data. These APIs are not officially endorsed by Yahoo Finance
+                    and may stop working at any time without notice. Always verify prices with your broker
+                    or a professional financial data provider before making investment decisions.
+                  </p>
+                </div>
+              </div>
+
+              <div className="setting-item">
+                <button
+                  className="primary-btn"
+                  onClick={handleFetchMarketData}
+                  disabled={isMarketDataLoading}
+                >
+                  <MaterialIcon name={isMarketDataLoading ? 'hourglass_empty' : 'download'} size="small" />
+                  {isMarketDataLoading ? 'Fetching…' : 'Fetch Current Market Data'}
+                </button>
+                {marketDataFetchedAt && (
+                  <span className="setting-help">
+                    Last fetched: {new Date(marketDataFetchedAt).toLocaleString()}
+                  </span>
+                )}
+              </div>
+
+              {/* Exchange Rates */}
+              {marketDataRates && (
+                <div className="setting-item">
+                  <h3>Exchange Rates</h3>
+                  {marketDataRates.error && (
+                    <div className="exchange-rate-warning">
+                      <MaterialIcon name="warning" />
+                      <p>{marketDataRates.error}</p>
+                    </div>
+                  )}
+                  <p className="section-description">
+                    {marketDataRates.isUsingFallback
+                      ? 'Using fallback rates (API unavailable)'
+                      : `Live rates fetched at ${new Date(marketDataRates.lastUpdate).toLocaleString()}`}
+                  </p>
+                  <table className="market-data-table">
+                    <thead>
+                      <tr>
+                        <th>Currency</th>
+                        <th>Rate to {settings.currencySettings.defaultCurrency}</th>
+                        <th>Source</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {SUPPORTED_CURRENCIES.filter(c => c.code !== settings.currencySettings.defaultCurrency).map(currency => {
+                        const liveRate = marketDataRates.rates[currency.code];
+                        const defaultRate = DEFAULT_FALLBACK_RATES[currency.code];
+                        const isLive = !marketDataRates.isUsingFallback && liveRate !== undefined && liveRate !== defaultRate;
+                        return (
+                          <tr key={currency.code}>
+                            <td><strong>{currency.code}</strong> ({currency.name})</td>
+                            <td>{liveRate !== undefined ? liveRate.toFixed(6) : 'N/A'}</td>
+                            <td className={isLive ? 'market-data-live' : 'market-data-fallback'}>
+                              {isLive ? '● Live' : '○ Fallback'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {/* Asset Prices */}
+              {Object.keys(marketDataPrices).length > 0 && (
+                <div className="setting-item">
+                  <h3>Asset Prices</h3>
+                  <p className="section-description">
+                    Current market prices for your portfolio assets. Prices may be delayed.
+                  </p>
+                  <table className="market-data-table">
+                    <thead>
+                      <tr>
+                        <th>Ticker</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(marketDataPrices).sort(([a], [b]) => a.localeCompare(b)).map(([ticker, price]) => (
+                        <tr key={ticker}>
+                          <td><strong>{ticker}</strong></td>
+                          <td>{price !== null ? price.toFixed(2) : 'N/A'}</td>
+                          <td className={price !== null ? 'market-data-live' : 'market-data-fallback'}>
+                            {price !== null ? '● Available' : '✕ Unavailable'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              {!marketDataRates && Object.keys(marketDataPrices).length === 0 && !isMarketDataLoading && (
+                <p className="section-description">
+                  Click "Fetch Current Market Data" to load live prices and exchange rates from Yahoo Finance.
+                </p>
+              )}
             </div>
           )}
         </section>

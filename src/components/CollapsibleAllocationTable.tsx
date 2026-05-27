@@ -233,17 +233,6 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
     });
   };
 
-  // Handle pricePerShare change and update currentValue
-  const handleEditPricePerShareChange = (value: number) => {
-    const sharesNum = editValues.shares || 0;
-    const newCurrentValue = value > 0 && sharesNum > 0 ? sharesNum * value : editValues.currentValue;
-    setEditValues({
-      ...editValues,
-      pricePerShare: value,
-      currentValue: newCurrentValue,
-    });
-  };
-
   // Handle currentValue change and update pricePerShare if shares exists
   const handleEditCurrentValueChange = (value: number) => {
     const sharesNum = editValues.shares || 0;
@@ -493,6 +482,7 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                     <th className="sortable" onClick={() => requestSort(assetClass, 'asset.pricePerShare')}>
                       Price/Share <span className="sort-indicator">{getSortIndicator(assetClass, 'asset.pricePerShare')}</span>
                     </th>
+                    <th>Acq. Price</th>
                     <th className="sortable" onClick={() => requestSort(assetClass, 'delta.currentValue')}>
                       Current Value <span className="sort-indicator">{getSortIndicator(assetClass, 'delta.currentValue')}</span>
                     </th>
@@ -609,16 +599,30 @@ export const CollapsibleAllocationTable: React.FC<CollapsibleAllocationTableProp
                         <td className="currency-value">
                           {isCashAsset || isValueOnlyAsset ? (
                             '-'
-                          ) : isEditing ? (
-                            <NumberInput
-                              value={editValues.pricePerShare || 0}
-                              onChange={handleEditPricePerShareChange}
-                              className="edit-input"
-                            />
                           ) : asset.pricePerShare ? (
-                            <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, currency)}</PrivacyBlur>
+                            <div className="price-cell">
+                              <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.pricePerShare, currency)}</PrivacyBlur>
+                              {asset.marketPrice && asset.marketPrice !== asset.pricePerShare && (
+                                <div className={`market-price-delta ${asset.marketPrice > asset.pricePerShare ? 'gain' : 'loss'}`}>
+                                  <PrivacyBlur isPrivacyMode={isPrivacyMode}>
+                                    <span className="market-price">{formatCurrency(asset.marketPrice, currency)}</span>
+                                  </PrivacyBlur>
+                                  <span className="delta-pct">
+                                    {((asset.marketPrice - asset.pricePerShare) / asset.pricePerShare * 100) > 0 ? '+' : ''}
+                                    {((asset.marketPrice - asset.pricePerShare) / asset.pricePerShare * 100).toFixed(1)}%
+                                  </span>
+                                </div>
+                              )}
+                            </div>
                           ) : (
                             '-'
+                          )}
+                        </td>
+                        <td className="currency-value">
+                          {isCashAsset || isValueOnlyAsset || !asset.acquisitionPrice ? (
+                            '-'
+                          ) : (
+                            <PrivacyBlur isPrivacyMode={isPrivacyMode}>{formatCurrency(asset.acquisitionPrice, currency)}</PrivacyBlur>
                           )}
                         </td>
                         <td className="currency-value">
