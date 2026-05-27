@@ -50,7 +50,7 @@ export const PolicyModalContext = createContext<PolicyModalContextType>({
 
 export const usePolicyModal = () => useContext(PolicyModalContext);
 
-function Navigation({ accountName }: { accountName: string }) {
+function Navigation({ accountName, showPortfolioBreakdown }: { accountName: string; showPortfolioBreakdown: boolean }) {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   
@@ -84,14 +84,16 @@ function Navigation({ accountName }: { accountName: string }) {
         >
           <MaterialIcon name="pie_chart" className="nav-icon" /> Asset Allocation
         </Link>
-        <Link 
-          to="/portfolio-breakdown" 
-          className={`nav-link ${location.pathname === '/portfolio-breakdown' ? 'active' : ''}`}
-          onClick={closeMenu}
-          aria-current={location.pathname === '/portfolio-breakdown' ? 'page' : undefined}
-        >
-          <MaterialIcon name="donut_large" className="nav-icon" /> Portfolio Breakdown
-        </Link>
+        {showPortfolioBreakdown && (
+          <Link 
+            to="/portfolio-breakdown" 
+            className={`nav-link ${location.pathname === '/portfolio-breakdown' ? 'active' : ''}`}
+            onClick={closeMenu}
+            aria-current={location.pathname === '/portfolio-breakdown' ? 'page' : undefined}
+          >
+            <MaterialIcon name="donut_large" className="nav-icon" /> Portfolio Breakdown
+          </Link>
+        )}
         <Link 
           to="/expense-tracker" 
           className={`nav-link ${location.pathname === '/expense-tracker' ? 'active' : ''}`}
@@ -470,14 +472,14 @@ function App() {
             <p>Rocket fuel for your financial planning</p>
           </header>
 
-          <Navigation accountName={settings.accountName} />
+          <Navigation accountName={settings.accountName} showPortfolioBreakdown={settings.experimentalFeatures?.portfolioBreakdown ?? false} />
 
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
             <Route path="/monte-carlo" element={<MonteCarloPage />} />
             <Route path="/asset-allocation" element={<AssetAllocationPage />} />
-            <Route path="/portfolio-breakdown" element={<PortfolioBreakdownPage />} />
+            <Route path="/portfolio-breakdown" element={settings.experimentalFeatures?.portfolioBreakdown ? <PortfolioBreakdownPage /> : <NotFoundPage />} />
             <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
             <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
             <Route path="/questionnaire" element={<QuestionnairePage />} />

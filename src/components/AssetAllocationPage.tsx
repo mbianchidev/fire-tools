@@ -111,6 +111,10 @@ export const AssetAllocationPage: React.FC = () => {
     const settings = loadSettings();
     return settings.privacyMode;
   });
+  // Feature flags from user settings (e.g., experimental Portfolio Breakdown page)
+  const [showPortfolioBreakdown] = useState<boolean>(
+    () => loadSettings().experimentalFeatures?.portfolioBreakdown ?? false,
+  );
   
   // Track if we're currently syncing to prevent infinite loops
   const isSyncingRef = useRef(false);
@@ -791,11 +795,13 @@ export const AssetAllocationPage: React.FC = () => {
               )}
             </div>
           )}
-          <div className="breakdown-link-row">
-            <Link to="/portfolio-breakdown" className="action-btn breakdown-page-link">
-              <MaterialIcon name="donut_large" /> View Detailed Portfolio Breakdown
-            </Link>
-          </div>
+          {showPortfolioBreakdown && (
+            <div className="breakdown-link-row">
+              <Link to="/portfolio-breakdown" className="action-btn breakdown-page-link">
+                <MaterialIcon name="donut_large" /> View Detailed Portfolio Breakdown
+              </Link>
+            </div>
+          )}
         </section>
 
         <section className="allocation-section" aria-labelledby="portfolio-details-heading" data-tour="asset-list">
