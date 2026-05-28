@@ -32,7 +32,36 @@ export interface ExtractedPdf {
 
 let workerConfigured = false;
 
+/**
+ * Safari < 17.4 (and a few other older browsers) ship `ReadableStream` but
+ * not `ReadableStream.prototype[Symbol.asyncIterator]`. pdfjs v5 uses
+ * `for await … of` on internal streams, which crashes with
+ * "undefined is not a function (near '...value of readableStream...')".
+ * We install a tiny polyfill the first time the extractor is used.
+ */
+function ensureReadableStreamAsyncIterator(): void {
+  if (typeof ReadableStream === 'undefined') return;
+  const proto = ReadableStream.prototype as unknown as Record<symbol, unknown>;
+  if (proto[Symbol.asyncIterator]) return;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (proto as any)[Symbol.asyncIterator] = async function* asyncIterator(this: ReadableStream<unknown>) {
+    const reader = this.getReader();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) return;
+        yield value;
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (proto as any).values = (proto as any)[Symbol.asyncIterator];
+}
+
 async function loadPdfJs() {
+  ensureReadableStreamAsyncIterator();
   // Dynamic import so jsdom-based tests (which don't have DOMMatrix) only pay
   // for pdfjs when they actually need it.
   const pdfjsLib = await import('pdfjs-dist');
