@@ -50,6 +50,16 @@
   max-width: 320px;
 }
 
+.pdf-import-llm-toggle.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pdf-import-llm-toggle.is-disabled label,
+.pdf-import-llm-toggle.is-disabled input {
+  cursor: not-allowed;
+}
+
 .pdf-import-llm-toggle input[type="checkbox"] {
   width: auto !important;
   flex: 0 0 auto;
@@ -71,6 +81,20 @@
   margin-top: 0.2rem;
   font-size: 0.75rem;
   color: var(--text-secondary);
+}
+
+.pdf-import-llm-toggle .disabled-tag {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
 }
 
 .pdf-import-status {

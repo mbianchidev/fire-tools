@@ -210,7 +210,7 @@ export function PDFImportDialog({
               />
             </div>
 
-            <div className="form-group pdf-import-llm-toggle">
+            <div className={`form-group pdf-import-llm-toggle${llmConfigured ? '' : ' is-disabled'}`}>
               <input
                 id="pdf-use-llm"
                 type="checkbox"
@@ -220,8 +220,9 @@ export function PDFImportDialog({
               />
               <label htmlFor="pdf-use-llm">
                 Use AI categorization
+                {!llmConfigured && <span className="disabled-tag">Disabled</span>}
                 {!llmConfigured && (
-                  <span className="pdf-row-meta">Configure an OpenAI-compatible endpoint in Settings first.</span>
+                  <span className="pdf-row-meta">Configure an OpenAI-compatible endpoint in Settings → Experimental Features to enable.</span>
                 )}
               </label>
             </div>

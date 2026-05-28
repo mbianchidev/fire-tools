@@ -26,7 +26,7 @@ The doc-type dropdown lets you override the auto-detected parser if it picks the
 If a heuristic category is wrong (e.g. an obscure merchant), an **optional** LLM step can re-categorize the rows.
 
 - You provide an **OpenAI-compatible** `/chat/completions` endpoint, an API key, and a model name in *Settings → Experimental Features*.
-- Works with **OpenAI**, **Azure OpenAI**, **Ollama** (`http://localhost:11434/v1`), **LM Studio**, **OpenRouter**, **Together**, etc.
+- Works with **OpenAI**, **Azure OpenAI**, hosted aggregators (**OpenRouter**, **Together**, …), and — most importantly for privacy — **self-hosted open-source models** running locally via **Ollama** (`http://localhost:11434/v1`), **LM Studio** (`http://localhost:1234/v1`), **llama.cpp**, **vLLM**, etc. For local servers, any non-empty API-key value works.
 - It only runs when you tick **Use AI categorization** inside the import dialog for that import.
 - Only the parsed transaction descriptions, kinds, amounts, and currencies are sent — never the raw PDF bytes.
 - If the request fails, times out, or returns invalid JSON, the heuristic results are used unchanged.
