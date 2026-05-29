@@ -47,9 +47,14 @@ deployments; the portable schema is a strict subset and continues to work.
 ## How to load
 
 ### SQLite
+`PRAGMA foreign_keys` is a **per-connection** setting that is *not* persisted in
+the database file, so it must be enabled on every connection that needs FK
+enforcement (including the one that loads the schema):
 ```sh
-sqlite3 firetools.db < docs/database/schema.sql
-sqlite3 firetools.db "PRAGMA foreign_keys = ON;"
+sqlite3 firetools.db <<'SQL'
+PRAGMA foreign_keys = ON;
+.read docs/database/schema.sql
+SQL
 ```
 
 ### PostgreSQL

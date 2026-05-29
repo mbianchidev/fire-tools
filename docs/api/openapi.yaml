@@ -2026,10 +2026,11 @@ components:
 
     ExpenseEntry:
       type: object
-      required: [externalId, date, amount, description, category, expenseType]
+      required: [externalId, type, date, amount, description, category, expenseType]
       properties:
         id:           { type: integer, format: int64, readOnly: true }
         externalId:   { type: string }
+        type:         { type: string, enum: [expense] }
         date:         { type: string, format: date }
         amount:       { type: number }
         description:  { type: string }
@@ -2041,10 +2042,11 @@ components:
 
     IncomeEntry:
       type: object
-      required: [externalId, date, amount, description, source]
+      required: [externalId, type, date, amount, description, source]
       properties:
         id:          { type: integer, format: int64, readOnly: true }
         externalId:  { type: string }
+        type:        { type: string, enum: [income] }
         date:        { type: string, format: date }
         amount:      { type: number }
         description: { type: string }

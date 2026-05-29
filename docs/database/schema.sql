@@ -255,21 +255,26 @@ CREATE TABLE IF NOT EXISTS expense_years (
     user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     year         INTEGER NOT NULL,
     is_archived  INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0,1)),
-    UNIQUE (user_id, year)
+    UNIQUE (user_id, year),
+    UNIQUE (user_id, id)          -- target for same-user composite FKs
 );
 
 CREATE TABLE IF NOT EXISTS expense_months (
     id              INTEGER PRIMARY KEY,
-    expense_year_id INTEGER NOT NULL REFERENCES expense_years(id) ON DELETE CASCADE,
+    user_id         INTEGER NOT NULL,
+    expense_year_id INTEGER NOT NULL,
     month           INTEGER NOT NULL CHECK (month BETWEEN 1 AND 12),
     is_closed       INTEGER NOT NULL DEFAULT 0 CHECK (is_closed IN (0,1)),
-    UNIQUE (expense_year_id, month)
+    UNIQUE (expense_year_id, month),
+    UNIQUE (user_id, id),         -- target for same-user composite FKs
+    FOREIGN KEY (user_id, expense_year_id)
+        REFERENCES expense_years (user_id, id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS expense_entries (
     id                 INTEGER PRIMARY KEY,
     user_id            INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    expense_month_id   INTEGER NOT NULL REFERENCES expense_months(id) ON DELETE CASCADE,
+    expense_month_id   INTEGER NOT NULL,
     external_id        TEXT    NOT NULL,                          -- txn-...
     date               TEXT    NOT NULL,                          -- YYYY-MM-DD
     amount             REAL    NOT NULL,
@@ -280,7 +285,10 @@ CREATE TABLE IF NOT EXISTS expense_entries (
     sub_category       TEXT,
     expense_type       TEXT    NOT NULL CHECK (expense_type IN ('NEED','WANT')),
     is_recurring       INTEGER NOT NULL DEFAULT 0 CHECK (is_recurring IN (0,1)),
-    UNIQUE (user_id, external_id)
+    UNIQUE (user_id, external_id),
+    -- Ensure the referenced month belongs to the same user (tenant isolation)
+    FOREIGN KEY (user_id, expense_month_id)
+        REFERENCES expense_months (user_id, id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_expense_entries_month ON expense_entries (expense_month_id, date);
 CREATE INDEX IF NOT EXISTS idx_expense_entries_category ON expense_entries (user_id, category);
@@ -358,23 +366,28 @@ CREATE TABLE IF NOT EXISTS net_worth_years (
     user_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     year         INTEGER NOT NULL,
     is_archived  INTEGER NOT NULL DEFAULT 0 CHECK (is_archived IN (0,1)),
-    UNIQUE (user_id, year)
+    UNIQUE (user_id, year),
+    UNIQUE (user_id, id)          -- target for same-user composite FKs
 );
 
 CREATE TABLE IF NOT EXISTS net_worth_months (
     id                  INTEGER PRIMARY KEY,
-    net_worth_year_id   INTEGER NOT NULL REFERENCES net_worth_years(id) ON DELETE CASCADE,
+    user_id             INTEGER NOT NULL,
+    net_worth_year_id   INTEGER NOT NULL,
     month               INTEGER NOT NULL CHECK (month BETWEEN 1 AND 12),
     is_frozen           INTEGER NOT NULL DEFAULT 0 CHECK (is_frozen IN (0,1)),
     frozen_date         TEXT,
     month_note          TEXT,
-    UNIQUE (net_worth_year_id, month)
+    UNIQUE (net_worth_year_id, month),
+    UNIQUE (user_id, id),         -- target for same-user composite FKs
+    FOREIGN KEY (user_id, net_worth_year_id)
+        REFERENCES net_worth_years (user_id, id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS asset_holdings (
     id                          INTEGER PRIMARY KEY,
     user_id                     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    net_worth_month_id          INTEGER NOT NULL REFERENCES net_worth_months(id) ON DELETE CASCADE,
+    net_worth_month_id          INTEGER NOT NULL,
     external_id                 TEXT    NOT NULL,
     ticker                      TEXT    NOT NULL,
     name                        TEXT    NOT NULL,
@@ -415,7 +428,10 @@ CREATE TABLE IF NOT EXISTS asset_holdings (
     mortgage_monthly_payment    REAL,
     mortgage_start_date         TEXT,
     mortgage_lender             TEXT,
-    UNIQUE (user_id, external_id)
+    UNIQUE (user_id, external_id),
+    -- Ensure the referenced month belongs to the same user (tenant isolation)
+    FOREIGN KEY (user_id, net_worth_month_id)
+        REFERENCES net_worth_months (user_id, id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_asset_holdings_month ON asset_holdings (net_worth_month_id);
 
