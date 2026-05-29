@@ -1,4 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route, Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+// Use HashRouter under file:// (Electron) so deep links work without a server.
+const Router = typeof window !== 'undefined' && window.location.protocol === 'file:' ? HashRouter : BrowserRouter;
 import { useState, useEffect, useMemo, createContext, useContext } from 'react';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';

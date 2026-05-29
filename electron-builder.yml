@@ -1,0 +1,52 @@
+appId: dev.mb-consulting.firetools
+productName: Fire Tools
+copyright: Copyright © ${author}
+directories:
+  output: release/${version}
+  buildResources: electron/build
+
+files:
+  - electron/**/*
+  - dist-electron/**/*
+  - package.json
+  - "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}"
+  - "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+  - "!**/node_modules/*.d.ts"
+  - "!**/node_modules/.bin"
+
+extraMetadata:
+  main: electron/main.cjs
+
+asar: true
+
+mac:
+  category: public.app-category.finance
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: electron/build/entitlements.mac.plist
+  entitlementsInherit: electron/build/entitlements.mac.plist
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  # Code-signing & notarization driven via env:
+  #   CSC_LINK, CSC_KEY_PASSWORD (signing cert)
+  #   APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID (notarization)
+  notarize: false
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  # Sign via WINDOWS_CERTIFICATE_LINK / WINDOWS_CERTIFICATE_PASSWORD env when available.
+
+linux:
+  category: Finance
+  target:
+    - target: AppImage
+      arch:
+        - x64
+
+publish: null

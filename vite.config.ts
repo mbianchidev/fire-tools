@@ -21,7 +21,12 @@ export default defineConfig(({ mode }) => ({
       },
     },
   ],
-  base: mode === 'production' ? '/fire-tools/' : '/',
+  // Electron loads index.html via file://, so it needs a relative base.
+  // Production web build keeps /fire-tools/ for GitHub Pages.
+  base: mode === 'electron' ? './' : mode === 'production' ? '/fire-tools/' : '/',
+  build: {
+    outDir: mode === 'electron' ? 'dist-electron' : 'dist',
+  },
   server: {
     proxy: {
       '/api/yahoo': {
