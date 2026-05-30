@@ -1,10 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-vi.mock('../../src/utils/cookieSettings', () => ({
-  loadSettings: vi.fn(() => ({ loggingPiiEnabled: false })),
-}));
-
-import * as cookieSettings from '../../src/utils/cookieSettings';
+import * as loggingPii from '../../src/utils/loggingPii';
 import {
   log,
   logger,
@@ -15,10 +11,10 @@ import {
   formatLogEntry,
 } from '../../src/utils/logger';
 
-const loadSettingsMock = cookieSettings.loadSettings as unknown as ReturnType<typeof vi.fn>;
+const piiFlagSpy = vi.spyOn(loggingPii, 'isPiiLoggingEnabled');
 
 const setPii = (enabled: boolean) => {
-  loadSettingsMock.mockImplementation(() => ({ loggingPiiEnabled: enabled }));
+  piiFlagSpy.mockImplementation(() => enabled);
 };
 
 describe('logger', () => {
@@ -96,8 +92,8 @@ describe('logger', () => {
       }
     });
 
-    it('fails closed if loadSettings throws (treats PII as disabled)', () => {
-      loadSettingsMock.mockImplementation(() => {
+    it('fails closed if the pii flag reader throws (treats PII as disabled)', () => {
+      piiFlagSpy.mockImplementation(() => {
         throw new Error('corrupt cookie');
       });
       log('app', 'system', 'boot', 'started', { pii: { secret: 'shh' } });

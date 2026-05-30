@@ -15,7 +15,7 @@
  * - Logs are kept in-memory only and are never sent anywhere automatically.
  *   The user can choose to export them (sanitised) via the Settings page.
  */
-import { loadSettings } from './cookieSettings';
+import * as loggingPii from './loggingPii';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type LogActor = 'user' | 'system';
@@ -46,7 +46,7 @@ const buffer: LogEntry[] = [];
  */
 const isPiiLoggingEnabled = (): boolean => {
   try {
-    return Boolean(loadSettings().loggingPiiEnabled);
+    return loggingPii.isPiiLoggingEnabled();
   } catch {
     return false;
   }
