@@ -7,8 +7,19 @@
 // if the probe fails. No-op on a healthy local dev environment.
 
 const { execSync, spawnSync } = require('node:child_process');
+const { existsSync } = require('node:fs');
+const { join, resolve } = require('node:path');
 
-function probe() {
+// Locations of better-sqlite3 to verify. Root copy backs vitest at the repo
+// root; server copy backs `npm --prefix server test`. Either can become
+// Electron-ABI-bound after `electron-rebuild` (postinstall) and must be
+// rebuilt for the current Node before running tests.
+const TARGETS = [
+  { label: 'root', cwd: resolve(__dirname, '..') },
+  { label: 'server', cwd: resolve(__dirname, '..', 'server') },
+].filter((t) => existsSync(join(t.cwd, 'node_modules', 'better-sqlite3')));
+
+function probe(cwd) {
   const probeScript = `
     try {
       const Database = require('better-sqlite3');
@@ -24,6 +35,7 @@ function probe() {
   const result = spawnSync(process.execPath, ['-e', probeScript], {
     stdio: 'pipe',
     encoding: 'utf8',
+    cwd,
   });
 
   if (result.error) {
@@ -42,24 +54,23 @@ function probe() {
   return new Error(message);
 }
 
-const initial = probe();
-if (initial === true) {
-  process.exit(0);
+let failed = false;
+for (const target of TARGETS) {
+  const result = probe(target.cwd);
+  if (result === true) {
+    continue;
+  }
+
+  console.log(`[ensure-sqlite-for-node] ${target.label}: better-sqlite3 binding incompatible with current Node runtime; rebuilding…`);
+  console.log(`[ensure-sqlite-for-node] ${target.label}: probe error:`, result && result.message);
+
+  try {
+    execSync('npm rebuild better-sqlite3', { stdio: 'inherit', cwd: target.cwd });
+    console.log(`[ensure-sqlite-for-node] ${target.label}: rebuild succeeded; new binary will be loaded by next process.`);
+  } catch (err) {
+    console.error(`[ensure-sqlite-for-node] ${target.label}: rebuild failed:`, err && err.message);
+    failed = true;
+  }
 }
 
-console.log('[ensure-sqlite-for-node] better-sqlite3 binding incompatible with current Node runtime; rebuilding…');
-console.log('[ensure-sqlite-for-node] probe error:', initial && initial.message);
-
-try {
-  execSync('npm rebuild better-sqlite3', { stdio: 'inherit' });
-} catch (err) {
-  console.error('[ensure-sqlite-for-node] rebuild failed:', err && err.message);
-  process.exit(1);
-}
-
-// Node caches loaded native bindings at the C level — even after deleting
-// the require cache, the original (incompatible) binary stays mapped into
-// this process. The next process (vitest) will pick up the new binary
-// fresh, so don't re-probe here. Trust npm rebuild's exit code.
-console.log('[ensure-sqlite-for-node] rebuild succeeded; new binary will be loaded by next process.');
-process.exit(0);
+process.exit(failed ? 1 : 0);

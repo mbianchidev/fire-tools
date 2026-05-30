@@ -13,6 +13,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "lint:tsc": "tsc --noEmit",
+    "pretest": "node ../scripts/ensure-sqlite-for-node.cjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "migrate": "tsx src/cli-migrate.ts up",
