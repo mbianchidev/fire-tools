@@ -44,6 +44,14 @@ a:hover { text-decoration: underline; }
   font-weight: 800;
   font-size: 1.15rem;
   color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.brand-icon {
+  width: 1.4em;
+  height: 1.4em;
+  display: inline-block;
 }
 
 .site-header nav { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
@@ -198,6 +206,15 @@ main { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem; }
   border: 1px solid var(--border);
 }
 .btn.ghost:hover { background: var(--accent-soft); text-decoration: none; }
+.btn.is-disabled,
+.btn[disabled] {
+  background: var(--panel-2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
+}
 
 .features h2, .download h2 {
   font-family: 'Sora', sans-serif;
@@ -216,9 +233,13 @@ main { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 .grid h3 { font-family: 'Sora', sans-serif; font-size: 1.15rem; margin-bottom: 0.5rem; }
 .grid p { color: var(--muted); font-size: 0.95rem; margin-bottom: 1rem; }
+.grid article .btn,
+.grid article .badge { margin-top: auto; align-self: flex-start; }
 .grid code {
   background: var(--panel-2);
   padding: 0.1rem 0.4rem;

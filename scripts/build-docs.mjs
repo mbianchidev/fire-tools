@@ -83,7 +83,7 @@ function pageHtml({ section, slug, html, pages, siblingSection }) {
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="../../">Fire Tools</a>
+      <a class="brand" href="../../"><img src="../fire-icon.svg" alt="" class="brand-icon" /> Fire Tools</a>
       <nav>
         <a href="../user/">User docs</a>
         <a href="../engineering/">Engineering docs</a>
@@ -196,7 +196,7 @@ export async function buildDocs() {
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="../">Fire Tools</a>
+      <a class="brand" href="../"><img src="./fire-icon.svg" alt="" class="brand-icon" /> Fire Tools</a>
       <nav>
         <a href="./user/">User docs</a>
         <a href="./engineering/">Engineering docs</a>
