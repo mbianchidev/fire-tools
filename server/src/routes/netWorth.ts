@@ -6,7 +6,7 @@ import {
 } from '../http.js';
 
 // =============================================================================
-// Enums (mirror OpenAPI + 0001_initial.sql CHECK constraints)
+// Enums (mirror OpenAPI + 0001_initial.up.sql CHECK constraints)
 // =============================================================================
 
 const CURRENCIES = new Set(['EUR', 'USD', 'GBP', 'CHF', 'JPY', 'AUD', 'CAD']);
