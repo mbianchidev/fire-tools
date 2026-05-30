@@ -15,6 +15,13 @@ import { encryptData, decryptData } from './cookieEncryption';
 export type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
 
 /**
+ * UI language code. Kept here (instead of imported from `src/i18n`) so
+ * cookieSettings has no dependency on the i18n module — avoids a cycle
+ * because the i18n init reads settings to discover the saved language.
+ */
+export type LanguageCode = 'en' | 'it' | 'fr' | 'de' | 'es';
+
+/**
  * Opt-in experimental / preview features. All default to false so they don't
  * appear in the UI for users who haven't explicitly enabled them.
  */
@@ -44,6 +51,8 @@ export interface UserSettings {
   includePrimaryResidenceInFIRE: boolean;
   searchThreshold: number;
   experimentalFeatures: ExperimentalFeatures;
+  /** UI language. Always defaults to English. Independent from currency. */
+  language: LanguageCode;
   /** Optional OpenAI-compatible LLM config for PDF import categorization.
    *  Stored encrypted with the rest of the settings. */
   llmCategorization?: LlmCategorizationConfig;
@@ -73,6 +82,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   includePrimaryResidenceInFIRE: true, // Default to including primary residence
   searchThreshold: 8,
   experimentalFeatures: DEFAULT_EXPERIMENTAL_FEATURES,
+  language: 'en',
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
@@ -218,6 +228,13 @@ export function validateSettings(settings: Partial<UserSettings>): { isValid: bo
     const validFormats = ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD'];
     if (!validFormats.includes(settings.dateFormat)) {
       errors.push('Date format must be "DD/MM/YYYY", "MM/DD/YYYY", or "YYYY-MM-DD"');
+    }
+  }
+
+  if (settings.language !== undefined) {
+    const validLanguages: LanguageCode[] = ['en', 'it', 'fr', 'de', 'es'];
+    if (!validLanguages.includes(settings.language as LanguageCode)) {
+      errors.push('Language must be one of: en, it, fr, de, es');
     }
   }
 

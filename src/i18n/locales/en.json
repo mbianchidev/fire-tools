@@ -1,0 +1,126 @@
+{
+  "app": {
+    "title": "Fire Tools",
+    "tagline": "Rocket fuel for your financial planning",
+    "skipToContent": "Skip to main content",
+    "disclaimer": "Fire Tools - Disclaimer: This is for educational purposes only. Market data is provided as an indication only and may be delayed or inaccurate. Consult with a financial advisor for professional advice.",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "github": "GitHub"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "toggle": "Toggle navigation menu",
+    "home": "Home",
+    "assetAllocation": "Asset Allocation",
+    "portfolioBreakdown": "Portfolio Breakdown",
+    "cashflow": "Cashflow",
+    "netWorth": "Net Worth",
+    "fireCalculator": "FIRE Calculator",
+    "monteCarlo": "Monte Carlo"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "resetToDefaults": "Reset to Defaults",
+    "export": "Export",
+    "import": "Import",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "moreInfo": "More information",
+    "english": "English",
+    "italian": "Italian",
+    "french": "French",
+    "german": "German",
+    "spanish": "Spanish"
+  },
+  "home": {
+    "aboutTitle": "About FIRE Tools",
+    "aboutBody": "FIRE Tools is designed to help you plan and achieve Financial Independence Retire Early. Our suite of calculators and tools provides data-driven insights to make informed decisions about your financial future.",
+    "disclaimer": "Disclaimer:",
+    "disclaimerBody": "These tools are for educational and planning purposes only. Always consult with a qualified financial advisor or do your own research before making investment decisions.",
+    "toolsLabel": "Available tools",
+    "securityTitle": "Security Notice: GitHub Pages Deployment",
+    "securityWarning": "Warning:",
+    "securityWarningBody": "This application is deployed on GitHub Pages, which does not support server-side data storage or HTTP-only cookies. While data is encrypted using AES, it is still vulnerable to XSS attacks and other client-side exploits that could exfiltrate your financial data.",
+    "securityRecommend": "For better security:",
+    "securityRecommendBody": "We strongly recommend deploying this application locally on your own machine. Local deployment provides better isolation and reduces attack surface.",
+    "securitySetupLink": "View Local Setup Instructions",
+    "dismissSecurity": "Dismiss security notice",
+    "cards": {
+      "assetAllocation": {
+        "title": "Asset Allocation Manager",
+        "body": "Manage your investment portfolio with intelligent asset allocation tools, rebalancing strategies, and DCA helper functionality.",
+        "h1": "Portfolio Management",
+        "h2": "Rebalancing Tools",
+        "h3": "DCA Helper",
+        "cta": "Manage Portfolio →"
+      },
+      "cashflow": {
+        "title": "Cashflow Tracker",
+        "body": "Track your income and expenses, set budgets per category, and gain insights into your spending patterns with the 50/30/20 budgeting rule.",
+        "h1": "Transaction Tracking",
+        "h2": "Budget Management",
+        "h3": "Spending Analytics",
+        "cta": "Track Cashflow →"
+      },
+      "netWorth": {
+        "title": "Net Worth Tracker",
+        "body": "Track your financial operations and net worth on a monthly basis. Monitor assets, cash, pensions, and progress toward FIRE.",
+        "h1": "Assets & Holdings",
+        "h2": "Cash & Liquidity",
+        "h3": "Pension Tracking",
+        "cta": "Track Net Worth →"
+      },
+      "fireCalculator": {
+        "title": "FIRE Calculator",
+        "body": "Calculate your path to financial independence with comprehensive projections and detailed analysis of your retirement timeline.",
+        "h1": "Visual Projections",
+        "h2": "Net Worth Tracking",
+        "h3": "Income & Expenses",
+        "cta": "Start Planning →"
+      },
+      "monteCarlo": {
+        "title": "Monte Carlo Simulations",
+        "body": "Run thousands of simulations with randomized market returns to assess the probability of reaching FIRE and account for market volatility.",
+        "h1": "Success Probability",
+        "h2": "Volatility Analysis",
+        "h3": "Black Swan Events",
+        "cta": "Run Simulations →"
+      },
+      "quiz": {
+        "title": "FIRE Persona Quiz",
+        "body": "Discover your FIRE persona and get personalized recommendations based on your financial situation, goals, and risk tolerance.",
+        "h1": "Personalized Analysis",
+        "h2": "Smart Recommendations",
+        "h3": "FIRE Path Guidance",
+        "cta": "Take the Quiz →"
+      }
+    }
+  },
+  "settings": {
+    "language": "Language",
+    "languageHelp": "Choose the language for the user interface. This does not affect your currency.",
+    "sections": {
+      "account": "Account",
+      "fire": "FIRE Calculation",
+      "display": "Display",
+      "privacy": "Privacy & Region",
+      "experimental": "Experimental Features",
+      "notifications": "Notifications",
+      "email": "Email Preferences",
+      "currency": "Conversion Rates",
+      "marketData": "Market Data",
+      "categories": "Expense Categories",
+      "data": "Data Management",
+      "support": "Support & Feedback"
+    }
+  }
+}

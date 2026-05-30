@@ -1,0 +1,126 @@
+{
+  "app": {
+    "title": "Fire Tools",
+    "tagline": "Treibstoff für deine Finanzplanung",
+    "skipToContent": "Zum Hauptinhalt springen",
+    "disclaimer": "Fire Tools – Hinweis: Diese Tools dienen ausschließlich Bildungszwecken. Marktdaten sind nur indikativ und können verzögert oder ungenau sein. Wenden Sie sich für professionelle Beratung an eine Finanzberatung.",
+    "privacyPolicy": "Datenschutzerklärung",
+    "cookiePolicy": "Cookie-Richtlinie",
+    "github": "GitHub"
+  },
+  "nav": {
+    "label": "Hauptnavigation",
+    "toggle": "Navigationsmenü ein-/ausblenden",
+    "home": "Startseite",
+    "assetAllocation": "Asset-Allokation",
+    "portfolioBreakdown": "Portfolio-Aufschlüsselung",
+    "cashflow": "Cashflow",
+    "netWorth": "Nettovermögen",
+    "fireCalculator": "FIRE-Rechner",
+    "monteCarlo": "Monte Carlo"
+  },
+  "common": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "reset": "Zurücksetzen",
+    "resetToDefaults": "Standardwerte wiederherstellen",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "close": "Schließen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "add": "Hinzufügen",
+    "confirm": "Bestätigen",
+    "yes": "Ja",
+    "no": "Nein",
+    "loading": "Wird geladen...",
+    "moreInfo": "Weitere Informationen",
+    "english": "Englisch",
+    "italian": "Italienisch",
+    "french": "Französisch",
+    "german": "Deutsch",
+    "spanish": "Spanisch"
+  },
+  "home": {
+    "aboutTitle": "Über FIRE Tools",
+    "aboutBody": "FIRE Tools hilft dir, finanzielle Unabhängigkeit und frühzeitigen Ruhestand zu planen und zu erreichen. Unsere Rechner und Tools liefern datenbasierte Einblicke für fundierte Finanzentscheidungen.",
+    "disclaimer": "Hinweis:",
+    "disclaimerBody": "Diese Tools dienen ausschließlich Bildungs- und Planungszwecken. Konsultieren Sie immer eine qualifizierte Finanzberatung oder recherchieren Sie selbst, bevor Sie Investitionsentscheidungen treffen.",
+    "toolsLabel": "Verfügbare Tools",
+    "securityTitle": "Sicherheitshinweis: GitHub-Pages-Deployment",
+    "securityWarning": "Warnung:",
+    "securityWarningBody": "Diese Anwendung wird auf GitHub Pages bereitgestellt, was keine serverseitige Datenspeicherung oder HTTP-only-Cookies unterstützt. Obwohl Daten mit AES verschlüsselt sind, bleiben sie anfällig für XSS-Angriffe und andere clientseitige Exploits, die Finanzdaten exfiltrieren könnten.",
+    "securityRecommend": "Für mehr Sicherheit:",
+    "securityRecommendBody": "Wir empfehlen dringend, diese Anwendung lokal auf deinem Rechner zu installieren. Lokale Bereitstellung bietet bessere Isolierung und reduziert die Angriffsfläche.",
+    "securitySetupLink": "Anleitung zur lokalen Installation",
+    "dismissSecurity": "Sicherheitshinweis schließen",
+    "cards": {
+      "assetAllocation": {
+        "title": "Asset-Allokations-Manager",
+        "body": "Verwalte dein Anlageportfolio mit intelligenten Allokations-Tools, Rebalancing-Strategien und DCA-Hilfe.",
+        "h1": "Portfolio-Management",
+        "h2": "Rebalancing-Tools",
+        "h3": "DCA-Hilfe",
+        "cta": "Portfolio verwalten →"
+      },
+      "cashflow": {
+        "title": "Cashflow-Tracker",
+        "body": "Verfolge Einnahmen und Ausgaben, setze Budgets pro Kategorie und analysiere dein Ausgabeverhalten mit der 50/30/20-Regel.",
+        "h1": "Transaktions-Tracking",
+        "h2": "Budget-Verwaltung",
+        "h3": "Ausgaben-Analyse",
+        "cta": "Cashflow verfolgen →"
+      },
+      "netWorth": {
+        "title": "Vermögens-Tracker",
+        "body": "Verfolge monatlich deine Finanzoperationen und dein Nettovermögen. Überwache Anlagen, Bargeld, Renten und Fortschritt Richtung FIRE.",
+        "h1": "Anlagen und Bestände",
+        "h2": "Bargeld und Liquidität",
+        "h3": "Renten-Tracking",
+        "cta": "Vermögen verfolgen →"
+      },
+      "fireCalculator": {
+        "title": "FIRE-Rechner",
+        "body": "Berechne deinen Weg zur finanziellen Unabhängigkeit mit umfassenden Projektionen und detaillierter Analyse deiner Renten-Zeitachse.",
+        "h1": "Visuelle Projektionen",
+        "h2": "Nettovermögens-Tracking",
+        "h3": "Einnahmen und Ausgaben",
+        "cta": "Planung beginnen →"
+      },
+      "monteCarlo": {
+        "title": "Monte-Carlo-Simulationen",
+        "body": "Führe Tausende von Simulationen mit zufälligen Marktrenditen aus, um die Wahrscheinlichkeit zu bewerten, FIRE zu erreichen und Marktvolatilität zu berücksichtigen.",
+        "h1": "Erfolgswahrscheinlichkeit",
+        "h2": "Volatilitätsanalyse",
+        "h3": "Schwarzer-Schwan-Ereignisse",
+        "cta": "Simulationen starten →"
+      },
+      "quiz": {
+        "title": "FIRE-Persona-Quiz",
+        "body": "Entdecke deine FIRE-Persona und erhalte personalisierte Empfehlungen basierend auf deiner finanziellen Situation, deinen Zielen und deiner Risikotoleranz.",
+        "h1": "Personalisierte Analyse",
+        "h2": "Intelligente Empfehlungen",
+        "h3": "FIRE-Weg-Anleitung",
+        "cta": "Quiz starten →"
+      }
+    }
+  },
+  "settings": {
+    "language": "Sprache",
+    "languageHelp": "Wähle die Sprache der Benutzeroberfläche. Dies ändert nicht die Währung.",
+    "sections": {
+      "account": "Konto",
+      "fire": "FIRE-Berechnung",
+      "display": "Anzeige",
+      "privacy": "Datenschutz & Region",
+      "experimental": "Experimentelle Funktionen",
+      "notifications": "Benachrichtigungen",
+      "email": "E-Mail-Einstellungen",
+      "currency": "Umrechnungskurse",
+      "marketData": "Marktdaten",
+      "categories": "Ausgabenkategorien",
+      "data": "Datenverwaltung",
+      "support": "Support & Feedback"
+    }
+  }
+}

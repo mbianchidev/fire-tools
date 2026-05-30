@@ -1,0 +1,126 @@
+{
+  "app": {
+    "title": "Fire Tools",
+    "tagline": "Le pleins de carburant pour votre planification financière",
+    "skipToContent": "Aller au contenu principal",
+    "disclaimer": "Fire Tools - Avertissement : ces outils sont fournis à titre éducatif uniquement. Les données de marché sont indicatives et peuvent être retardées ou inexactes. Consultez un conseiller financier pour des conseils professionnels.",
+    "privacyPolicy": "Politique de confidentialité",
+    "cookiePolicy": "Politique relative aux cookies",
+    "github": "GitHub"
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "toggle": "Afficher ou masquer le menu",
+    "home": "Accueil",
+    "assetAllocation": "Allocation d'actifs",
+    "portfolioBreakdown": "Répartition du portefeuille",
+    "cashflow": "Flux de trésorerie",
+    "netWorth": "Patrimoine net",
+    "fireCalculator": "Calculateur FIRE",
+    "monteCarlo": "Monte-Carlo"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "reset": "Réinitialiser",
+    "resetToDefaults": "Rétablir les valeurs par défaut",
+    "export": "Exporter",
+    "import": "Importer",
+    "close": "Fermer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "loading": "Chargement...",
+    "moreInfo": "Plus d'informations",
+    "english": "Anglais",
+    "italian": "Italien",
+    "french": "Français",
+    "german": "Allemand",
+    "spanish": "Espagnol"
+  },
+  "home": {
+    "aboutTitle": "À propos de FIRE Tools",
+    "aboutBody": "FIRE Tools vous aide à planifier et atteindre l'indépendance financière et la retraite anticipée. Notre suite de calculateurs vous offre des analyses basées sur les données pour des décisions financières éclairées.",
+    "disclaimer": "Avertissement :",
+    "disclaimerBody": "Ces outils sont fournis à des fins éducatives et de planification uniquement. Consultez toujours un conseiller financier qualifié ou faites vos propres recherches avant toute décision d'investissement.",
+    "toolsLabel": "Outils disponibles",
+    "securityTitle": "Avis de sécurité : déploiement sur GitHub Pages",
+    "securityWarning": "Attention :",
+    "securityWarningBody": "Cette application est hébergée sur GitHub Pages, qui ne prend en charge ni stockage côté serveur ni cookies HTTP-only. Bien que les données soient chiffrées en AES, elles restent vulnérables aux attaques XSS et autres exploits côté client pouvant exfiltrer vos données financières.",
+    "securityRecommend": "Pour plus de sécurité :",
+    "securityRecommendBody": "Nous vous recommandons vivement de déployer cette application localement sur votre machine. Le déploiement local offre une meilleure isolation et réduit la surface d'attaque.",
+    "securitySetupLink": "Voir les instructions d'installation locale",
+    "dismissSecurity": "Fermer l'avis de sécurité",
+    "cards": {
+      "assetAllocation": {
+        "title": "Gestionnaire d'allocation",
+        "body": "Gérez votre portefeuille avec des outils intelligents d'allocation d'actifs, des stratégies de rééquilibrage et un assistant DCA.",
+        "h1": "Gestion de portefeuille",
+        "h2": "Outils de rééquilibrage",
+        "h3": "Assistant DCA",
+        "cta": "Gérer le portefeuille →"
+      },
+      "cashflow": {
+        "title": "Suivi de trésorerie",
+        "body": "Suivez revenus et dépenses, fixez des budgets par catégorie et analysez vos habitudes avec la règle 50/30/20.",
+        "h1": "Suivi des transactions",
+        "h2": "Gestion du budget",
+        "h3": "Analyse des dépenses",
+        "cta": "Suivre la trésorerie →"
+      },
+      "netWorth": {
+        "title": "Suivi du patrimoine",
+        "body": "Suivez vos opérations financières et votre patrimoine net chaque mois. Surveillez actifs, liquidités, retraites et progression vers le FIRE.",
+        "h1": "Actifs et placements",
+        "h2": "Liquidités",
+        "h3": "Suivi des retraites",
+        "cta": "Suivre le patrimoine →"
+      },
+      "fireCalculator": {
+        "title": "Calculateur FIRE",
+        "body": "Calculez votre chemin vers l'indépendance financière avec des projections complètes et une analyse détaillée de votre calendrier de retraite.",
+        "h1": "Projections visuelles",
+        "h2": "Suivi du patrimoine",
+        "h3": "Revenus et dépenses",
+        "cta": "Commencer la planification →"
+      },
+      "monteCarlo": {
+        "title": "Simulations Monte-Carlo",
+        "body": "Lancez des milliers de simulations avec des rendements aléatoires pour évaluer la probabilité d'atteindre le FIRE en tenant compte de la volatilité.",
+        "h1": "Probabilité de succès",
+        "h2": "Analyse de volatilité",
+        "h3": "Événements cygne noir",
+        "cta": "Lancer les simulations →"
+      },
+      "quiz": {
+        "title": "Quiz Persona FIRE",
+        "body": "Découvrez votre persona FIRE et obtenez des recommandations personnalisées selon votre situation, vos objectifs et votre tolérance au risque.",
+        "h1": "Analyse personnalisée",
+        "h2": "Recommandations intelligentes",
+        "h3": "Guide vers le FIRE",
+        "cta": "Faire le quiz →"
+      }
+    }
+  },
+  "settings": {
+    "language": "Langue",
+    "languageHelp": "Choisissez la langue de l'interface. Cela n'affecte pas la devise.",
+    "sections": {
+      "account": "Compte",
+      "fire": "Calcul FIRE",
+      "display": "Affichage",
+      "privacy": "Confidentialité et région",
+      "experimental": "Fonctionnalités expérimentales",
+      "notifications": "Notifications",
+      "email": "Préférences e-mail",
+      "currency": "Taux de conversion",
+      "marketData": "Données de marché",
+      "categories": "Catégories de dépenses",
+      "data": "Gestion des données",
+      "support": "Assistance et commentaires"
+    }
+  }
+}

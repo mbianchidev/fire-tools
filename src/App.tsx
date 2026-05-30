@@ -2,6 +2,7 @@ import { BrowserRouter, HashRouter, Routes, Route, Link, useLocation, useSearchP
 // Use HashRouter under file:// (Electron) so deep links work without a server.
 const Router = typeof window !== 'undefined' && window.location.protocol === 'file:' ? HashRouter : BrowserRouter;
 import { useState, useEffect, useMemo, createContext, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';
 import { calculateFIRE } from './utils/fireCalculator';
@@ -54,17 +55,18 @@ export const usePolicyModal = () => useContext(PolicyModalContext);
 
 function Navigation({ accountName, showPortfolioBreakdown }: { accountName: string; showPortfolioBreakdown: boolean }) {
   const location = useLocation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
   
   return (
-    <nav className="app-nav" aria-label="Main navigation">
+    <nav className="app-nav" aria-label={t('nav.label')}>
       <button 
         className="nav-toggle" 
         onClick={toggleMenu} 
-        aria-label="Toggle navigation menu"
+        aria-label={t('nav.toggle')}
         aria-expanded={isOpen}
       >
         {isOpen ? <MaterialIcon name="close" /> : <MaterialIcon name="menu" />}
@@ -76,7 +78,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/' ? 'page' : undefined}
         >
-          <MaterialIcon name="home" className="nav-icon" /> Home
+          <MaterialIcon name="home" className="nav-icon" /> {t('nav.home')}
         </Link>
         <Link 
           to="/asset-allocation" 
@@ -84,7 +86,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/asset-allocation' ? 'page' : undefined}
         >
-          <MaterialIcon name="pie_chart" className="nav-icon" /> Asset Allocation
+          <MaterialIcon name="pie_chart" className="nav-icon" /> {t('nav.assetAllocation')}
         </Link>
         {showPortfolioBreakdown && (
           <Link 
@@ -93,7 +95,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
             onClick={closeMenu}
             aria-current={location.pathname === '/portfolio-breakdown' ? 'page' : undefined}
           >
-            <MaterialIcon name="donut_large" className="nav-icon" /> Portfolio Breakdown
+            <MaterialIcon name="donut_large" className="nav-icon" /> {t('nav.portfolioBreakdown')}
           </Link>
         )}
         <Link 
@@ -102,7 +104,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/expense-tracker' ? 'page' : undefined}
         >
-          <MaterialIcon name="account_balance_wallet" className="nav-icon" /> Cashflow
+          <MaterialIcon name="account_balance_wallet" className="nav-icon" /> {t('nav.cashflow')}
         </Link>
         <Link 
           to="/net-worth-tracker" 
@@ -110,7 +112,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/net-worth-tracker' ? 'page' : undefined}
         >
-          <MaterialIcon name="trending_up" className="nav-icon" /> Net Worth
+          <MaterialIcon name="trending_up" className="nav-icon" /> {t('nav.netWorth')}
         </Link>
         <Link 
           to="/fire-calculator" 
@@ -118,7 +120,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/fire-calculator' ? 'page' : undefined}
         >
-          <MaterialIcon name="local_fire_department" className="nav-icon" /> FIRE Calculator
+          <MaterialIcon name="local_fire_department" className="nav-icon" /> {t('nav.fireCalculator')}
         </Link>
         <Link 
           to="/monte-carlo" 
@@ -126,7 +128,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
         >
-          <MaterialIcon name="casino" className="nav-icon" /> Monte Carlo
+          <MaterialIcon name="casino" className="nav-icon" /> {t('nav.monteCarlo')}
         </Link>
       </div>
       <div className="nav-actions">
@@ -443,6 +445,7 @@ function FIRECalculatorPage() {
 function App() {
   // Use base path only in production (for GitHub Pages), not in local development
   const basename = import.meta.env.MODE === 'production' ? '/fire-tools' : '/';
+  const { t } = useTranslation();
   
   // Load settings from localStorage
   const [settings, setSettings] = useState<UserSettings>(() => loadSettings());
@@ -466,12 +469,12 @@ function App() {
     <Router basename={basename}>
       <PolicyModalContext.Provider value={{ openPolicy, closePolicy }}>
         <div className="app">
-          <a href="#main-content" className="skip-link">Skip to main content</a>
+          <a href="#main-content" className="skip-link">{t('app.skipToContent')}</a>
           
           <header className="app-header">
             <FireIcon size={96} className="header-fire-icon" />
-            <h1>Fire Tools</h1>
-            <p>Rocket fuel for your financial planning</p>
+            <h1>{t('app.title')}</h1>
+            <p>{t('app.tagline')}</p>
           </header>
 
           <Navigation accountName={settings.accountName} showPortfolioBreakdown={settings.experimentalFeatures?.portfolioBreakdown ?? false} />
@@ -493,9 +496,7 @@ function App() {
 
           <footer className="app-footer">
             <p>
-              Fire Tools - Disclaimer: This is for educational purposes only. 
-              Market data is provided as an indication only and may be delayed or inaccurate.
-              Consult with a financial advisor for professional advice.
+              {t('app.disclaimer')}
             </p>
             <div className="footer-links">
               <button 
@@ -503,7 +504,7 @@ function App() {
                 className="footer-link-btn" 
                 onClick={() => openPolicy('privacy')}
               >
-                Privacy Policy
+                {t('app.privacyPolicy')}
               </button>
               <span className="footer-separator">•</span>
               <button 
@@ -511,10 +512,10 @@ function App() {
                 className="footer-link-btn" 
                 onClick={() => openPolicy('cookie')}
               >
-                Cookie Policy
+                {t('app.cookiePolicy')}
               </button>
               <span className="footer-separator">•</span>
-              <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">{t('app.github')}</a>
             </div>
           </footer>
 

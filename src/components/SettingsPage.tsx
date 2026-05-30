@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, DEFAULT_FIRE_ASSET_CLASS_INCLUSION, type UserSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
@@ -28,6 +29,7 @@ import { fetchAssetPrices } from '../utils/dcaCalculator';
 import { fetchExchangeRatesAsMap } from '../utils/exchangeRateApi';
 import { CategoryManagerDialog } from './CategoryManagerDialog';
 import { SearchableSelect } from './SearchableSelect';
+import { LanguageSelector } from './LanguageSelector';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -35,10 +37,11 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['account', 'fire', 'display', 'privacy', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
+const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -618,6 +621,23 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
           </div>
         )}
 
+        {/* Language Settings */}
+        <section className="settings-section collapsible-section">
+          <button
+            className="collapsible-header"
+            onClick={() => toggleSection('language')}
+            aria-expanded={!collapsedSections.has('language')}
+            aria-controls="language-content"
+          >
+            <h2><MaterialIcon name="language" /> {t('settings.language')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('language') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('language') && (
+            <div id="language-content" className="collapsible-content">
+              <LanguageSelector />
+            </div>
+          )}
+        </section>
+
         {/* Account Settings */}
         <section className="settings-section collapsible-section">
           <button 
@@ -626,7 +646,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('account')}
             aria-controls="account-content"
           >
-            <h2><MaterialIcon name="person" /> Account <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('account') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="person" /> {t('settings.sections.account')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('account') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('account') && (
             <div id="account-content" className="collapsible-content">
@@ -660,7 +680,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('fire')}
             aria-controls="fire-content"
           >
-            <h2><MaterialIcon name="local_fire_department" /> FIRE Calculation <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('fire') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="local_fire_department" /> {t('settings.sections.fire')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('fire') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('fire') && (
             <div id="fire-content" className="collapsible-content">
@@ -726,7 +746,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('display')}
             aria-controls="display-content"
           >
-            <h2><MaterialIcon name="palette" /> Display <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('display') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="palette" /> {t('settings.sections.display')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('display') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('display') && (
             <div id="display-content" className="collapsible-content">
@@ -901,7 +921,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('privacy')}
             aria-controls="privacy-content"
           >
-            <h2><MaterialIcon name="privacy_tip" /> Privacy & Region <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('privacy') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="privacy_tip" /> {t('settings.sections.privacy')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('privacy') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('privacy') && (
             <div id="privacy-content" className="collapsible-content">
@@ -976,7 +996,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('experimental')}
             aria-controls="experimental-content"
           >
-            <h2><MaterialIcon name="science" /> Experimental Features <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('experimental') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="science" /> {t('settings.sections.experimental')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('experimental') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('experimental') && (
             <div id="experimental-content" className="collapsible-content">
@@ -1101,7 +1121,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('notifications')}
             aria-controls="notifications-content"
           >
-            <h2><MaterialIcon name="notifications" /> Notifications <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('notifications') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="notifications" /> {t('settings.sections.notifications')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('notifications') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('notifications') && (
             <div id="notifications-content" className="collapsible-content">
@@ -1227,7 +1247,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('email')}
             aria-controls="email-content"
           >
-            <h2><MaterialIcon name="email" /> Email Preferences <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('email') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="email" /> {t('settings.sections.email')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('email') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('email') && (
             <div id="email-content" className="collapsible-content">
@@ -1299,7 +1319,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-controls="currency-content"
           >
             <h2>
-              <MaterialIcon name="currency_exchange" /> Conversion Rates
+              <MaterialIcon name="currency_exchange" /> {t('settings.sections.currency')}
               <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('currency') ? '▶' : '▼'}</span>
             </h2>
           </button>
@@ -1364,7 +1384,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-controls="marketdata-content"
           >
             <h2>
-              <MaterialIcon name="trending_up" /> Market Data
+              <MaterialIcon name="trending_up" /> {t('settings.sections.marketData')}
               <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('marketData') ? '▶' : '▼'}</span>
             </h2>
           </button>
@@ -1491,7 +1511,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('categories')}
             aria-controls="categories-content"
           >
-            <h2><MaterialIcon name="category" /> Expense Categories <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('categories') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="category" /> {t('settings.sections.categories')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('categories') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('categories') && (
             <div id="categories-content" className="collapsible-content">
@@ -1516,7 +1536,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('data')}
             aria-controls="data-content"
           >
-            <h2><MaterialIcon name="save" /> Data Management <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('data') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="save" /> {t('settings.sections.data')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('data') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('data') && (
             <div id="data-content" className="collapsible-content">
@@ -1642,7 +1662,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
             aria-expanded={!collapsedSections.has('support')}
             aria-controls="support-content"
           >
-            <h2><MaterialIcon name="help" /> Support & Feedback <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('support') ? '▶' : '▼'}</span></h2>
+            <h2><MaterialIcon name="help" /> {t('settings.sections.support')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('support') ? '▶' : '▼'}</span></h2>
           </button>
           {!collapsedSections.has('support') && (
             <div id="support-content" className="collapsible-content">

@@ -73,6 +73,9 @@ All data is encrypted with AES-256 and stored locally in your browser. No server
 **📥 Export & Import**  
 Back up your data anytime with CSV export. Import previously saved data to restore your settings across devices or after clearing cookies.
 
+**🌍 Multi-language UI**  
+The interface ships in English (default), Italian, French, German, and Spanish. Change the language from **Settings → Language**; the choice is stored alongside your other (encrypted) preferences and is independent of the display currency. See [Internationalization (i18n)](#-internationalization-i18n) for coverage details.
+
 ---
 
 ## 🚀 Quick Start
@@ -213,6 +216,7 @@ Tracking issues: [#133](https://github.com/mbianchidev/fire-tools/issues/133) (t
 - **Recharts** - Beautiful data visualizations
 - **crypto-js** - AES encryption for data security
 - **js-cookie** - Secure cookie management
+- **react-i18next** + **i18next** - UI translation framework (EN / IT / FR / DE / ES)
 
 ### Backend ([`server/`](server/))
 - **Node.js 22** + **Express 4** + **TypeScript** (strict, ESM)
@@ -241,6 +245,77 @@ Fire Tools takes your privacy seriously:
 - ✅ **Open source** - Full transparency, audit the code yourself
 
 Learn more in our [Security Policy](SECURITY.md).
+
+---
+
+## 🌍 Internationalization (i18n)
+
+Fire Tools ships with a built-in translation layer powered by
+[`react-i18next`](https://react.i18next.com/).
+
+**Supported languages**
+
+| Code | Language |
+| ---- | -------- |
+| `en` | English (default & fallback) |
+| `it` | Italian |
+| `fr` | French |
+| `de` | German |
+| `es` | Spanish |
+
+**Switching language** — open **Settings → Language**. The selection is
+persisted to the same AES-encrypted cookie as the rest of your preferences
+(`UserSettings.language`) and is **independent of the display currency**
+(changing language never changes the currency, and vice versa).
+
+**Where translations live**
+
+```
+src/i18n/
+├── index.ts              # i18next bootstrap, setLanguage(), SUPPORTED_LANGUAGES
+└── locales/
+    ├── en.json           # baseline — every key must exist here first
+    ├── it.json
+    ├── fr.json
+    ├── de.json
+    └── es.json
+```
+
+All five locale files MUST contain the exact same set of keys. A test in
+`tests/shared/i18n.test.ts` enforces this — missing or extra keys fail CI.
+
+**Coverage caveat** — the navigation, header/footer, homepage, settings
+section headers, and the language selector itself are fully translated.
+Many in-app strings inside the calculators and trackers are still
+English-only and will be migrated incrementally; until they are, any
+untranslated string automatically falls back to English thanks to the
+`fallbackLng: 'en'` configuration, so the UI is never broken.
+
+**Adding a new language**
+
+1. Add the locale code to `SUPPORTED_LANGUAGES` in `src/i18n/index.ts`.
+2. Add the code to the `LanguageCode` union in
+   `src/utils/cookieSettings.ts`.
+3. Copy `src/i18n/locales/en.json` to `src/i18n/locales/<code>.json` and
+   translate the values (keep the keys identical).
+4. Register the new resource in the `resources` map in
+   `src/i18n/index.ts`.
+5. Add a label entry (e.g. `common.dutch`) to **every** locale file and a
+   matching entry in `LABEL_KEYS` inside
+   `src/components/LanguageSelector.tsx`.
+6. Run `npm test` — the parity test will fail if any key is missing.
+
+**Adding a new translatable string**
+
+1. Add the key to `src/i18n/locales/en.json` first.
+2. Add a translation for the same key to `it.json`, `fr.json`, `de.json`,
+   and `es.json`.
+3. Use the `useTranslation()` hook in the component:
+   ```tsx
+   import { useTranslation } from 'react-i18next';
+   const { t } = useTranslation();
+   return <button>{t('my.new.key')}</button>;
+   ```
 
 ---
 
