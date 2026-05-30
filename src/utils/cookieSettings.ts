@@ -3,7 +3,8 @@
  * Handles saving/loading user preferences to/from encrypted cookies
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import {
   CurrencySettings,
   DEFAULT_CURRENCY_SETTINGS,
@@ -108,15 +109,15 @@ export const DEFAULT_SETTINGS: UserSettings = {
 const SETTINGS_KEY = 'fire-calculator-settings';
 
 // Cookie options
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365, // 1 year
   sameSite: 'strict',
-  secure: window.location.protocol === 'https:',
+  secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
   path: '/',
 };
 
 /**
- * Save user settings to encrypted cookies
+ * Save user settings to encrypted storage
  * @param settings - The settings to save
  */
 export function saveSettings(settings: UserSettings): void {
@@ -124,20 +125,20 @@ export function saveSettings(settings: UserSettings): void {
   try {
     const settingsJson = JSON.stringify(settings);
     const encryptedSettings = encryptData(settingsJson);
-    Cookies.set(SETTINGS_KEY, encryptedSettings, COOKIE_OPTIONS);
+    SafeCookies.set(SETTINGS_KEY, encryptedSettings, COOKIE_OPTIONS);
   } catch (error) {
-    console.error('Failed to save settings to cookies:', error);
-    throw new Error('Failed to save settings to cookies. Cookies may be disabled.');
+    console.error('Failed to save settings:', error);
+    throw new Error('Failed to save settings.');
   }
 }
 
 /**
- * Load user settings from encrypted cookies
+ * Load user settings from encrypted storage
  * @returns The saved settings, or DEFAULT_SETTINGS if none saved
  */
 export function loadSettings(): UserSettings {
   try {
-    const encryptedSettings = Cookies.get(SETTINGS_KEY);
+    const encryptedSettings = SafeCookies.get(SETTINGS_KEY);
     if (encryptedSettings) {
       const decryptedSettings = decryptData(encryptedSettings);
       if (decryptedSettings) {
@@ -177,13 +178,13 @@ export function loadSettings(): UserSettings {
 }
 
 /**
- * Clear user settings from cookies
+ * Clear user settings from storage
  */
 export function clearSettings(): void {
   try {
-    Cookies.remove(SETTINGS_KEY, { path: '/' });
+    SafeCookies.remove(SETTINGS_KEY, { path: '/' });
   } catch (error) {
-    console.error('Failed to clear settings from cookies:', error);
+    console.error('Failed to clear settings:', error);
   }
 }
 

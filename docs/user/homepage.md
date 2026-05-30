@@ -18,4 +18,5 @@ calculator, the asset allocation manager or any of the trackers.
 - The site is keyboard accessible. Use `Tab` to move between cards and `Enter`
   to open the highlighted tool.
 - Need to start fresh? Open [Settings](./settings.md) and use **Clear all
-  data** — your encrypted cookie is removed and the app reloads empty.
+  data** — your local store is wiped (SQLite DB on desktop, encrypted cookies
+  in browser) and the app reloads empty.

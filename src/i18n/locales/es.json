@@ -147,7 +147,8 @@
       "support": "Soporte y comentarios",
       "language": "Idioma",
       "disclaimer": "Aviso legal",
-      "backend": "Backend"
+      "backend": "Backend",
+      "advanced": "Avanzado"
     },
     "accountName": "Nombre de cuenta",
     "accountNameHelp": "Este nombre se mostrará en toda la aplicación",
@@ -391,6 +392,20 @@
       "testing": "Probando…",
       "testSuccess": "Conexión exitosa",
       "testError": "Conexión fallida"
+    },
+    "advanced": {
+      "description": "Inspecciona o prueba la API REST del backend integrado. Útil para depurar y verificar la conectividad.",
+      "endpoint": "Endpoint",
+      "method": "Método HTTP",
+      "path": "Ruta de solicitud",
+      "pathHelp": "La ruta se añade a la URL base /api/v1 del backend.",
+      "body": "Cuerpo de la solicitud (JSON)",
+      "send": "Enviar solicitud",
+      "sending": "Enviando…",
+      "response": "Respuesta",
+      "noBackend": "No hay backend configurado. Configura uno en la sección Backend arriba.",
+      "pathMustStartWithSlash": "La ruta debe comenzar con /",
+      "invalidJson": "El cuerpo de la solicitud no es un JSON válido"
     }
   },
   "assetAllocation": {

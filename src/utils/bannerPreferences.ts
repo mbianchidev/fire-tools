@@ -1,4 +1,5 @@
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { encryptData, decryptData } from './cookieEncryption';
 import {
   PREF_KEY_SECURITY_BANNER_DISMISSED,
@@ -8,7 +9,7 @@ import {
 
 const SECURITY_BANNER_KEY = 'fire-tools-security-banner-dismissed';
 
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365,
   sameSite: 'strict',
   secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
@@ -19,7 +20,7 @@ export function saveSecurityBannerDismissed(dismissed: boolean): void {
   try {
     const payload = JSON.stringify({ dismissed });
     const encrypted = encryptData(payload);
-    Cookies.set(SECURITY_BANNER_KEY, encrypted, COOKIE_OPTIONS);
+    SafeCookies.set(SECURITY_BANNER_KEY, encrypted, COOKIE_OPTIONS);
     pushPreferenceToBackend(PREF_KEY_SECURITY_BANNER_DISMISSED, payload);
   } catch (error) {
     console.error('Failed to save security banner preference:', error);
@@ -28,7 +29,7 @@ export function saveSecurityBannerDismissed(dismissed: boolean): void {
 
 export function loadSecurityBannerDismissed(): boolean {
   try {
-    const encrypted = Cookies.get(SECURITY_BANNER_KEY);
+    const encrypted = SafeCookies.get(SECURITY_BANNER_KEY);
     if (!encrypted) {
       return false;
     }
@@ -48,7 +49,7 @@ export function loadSecurityBannerDismissed(): boolean {
 
 export function clearSecurityBannerPreference(): void {
   try {
-    Cookies.remove(SECURITY_BANNER_KEY, { path: '/' });
+    SafeCookies.remove(SECURITY_BANNER_KEY, { path: '/' });
     deletePreferenceFromBackend(PREF_KEY_SECURITY_BANNER_DISMISSED);
   } catch (error) {
     console.error('Failed to clear security banner preference:', error);

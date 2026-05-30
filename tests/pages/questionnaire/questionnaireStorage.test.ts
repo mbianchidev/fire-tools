@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import Cookies from 'js-cookie';
+import SafeCookies from '../../../src/utils/safeCookies';
 import {
   saveQuestionnaireResults,
   loadQuestionnaireResults,
@@ -12,14 +12,16 @@ import {
 } from '../../../src/utils/questionnaireStorage';
 import { QuestionnaireResults } from '../../../src/types/questionnaire';
 
-// Mock cookies
-vi.mock('js-cookie', () => ({
+// Mock the storage shim (replaces former js-cookie mock)
+vi.mock('../../../src/utils/safeCookies', () => ({
   default: {
     get: vi.fn(),
     set: vi.fn(),
     remove: vi.fn(),
   },
 }));
+
+const Cookies = SafeCookies;
 
 // Mock cookieEncryption
 vi.mock('../../../src/utils/cookieEncryption', () => ({
@@ -66,7 +68,7 @@ describe('questionnaireStorage', () => {
       });
 
       expect(() => saveQuestionnaireResults(mockResults)).toThrow(
-        'Failed to save questionnaire results. Cookies may be disabled.'
+        'Failed to save questionnaire results.'
       );
     });
   });

@@ -3,7 +3,8 @@
  * Handles saving/loading tour completion state to/from encrypted cookies
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { encryptData, decryptData } from './cookieEncryption';
 import {
   PREF_KEY_TOUR_COMPLETED,
@@ -13,7 +14,7 @@ import {
 
 const TOUR_COMPLETED_KEY = 'fire-tools-tour-completed';
 
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365,
   sameSite: 'strict',
   secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
@@ -24,7 +25,7 @@ export function saveTourCompleted(completed: boolean): void {
   try {
     const payload = JSON.stringify({ completed });
     const encrypted = encryptData(payload);
-    Cookies.set(TOUR_COMPLETED_KEY, encrypted, COOKIE_OPTIONS);
+    SafeCookies.set(TOUR_COMPLETED_KEY, encrypted, COOKIE_OPTIONS);
     pushPreferenceToBackend(PREF_KEY_TOUR_COMPLETED, payload);
   } catch (error) {
     console.error('Failed to save tour preference:', error);
@@ -33,7 +34,7 @@ export function saveTourCompleted(completed: boolean): void {
 
 export function loadTourCompleted(): boolean {
   try {
-    const encrypted = Cookies.get(TOUR_COMPLETED_KEY);
+    const encrypted = SafeCookies.get(TOUR_COMPLETED_KEY);
     if (!encrypted) {
       return false;
     }
@@ -53,7 +54,7 @@ export function loadTourCompleted(): boolean {
 
 export function clearTourPreference(): void {
   try {
-    Cookies.remove(TOUR_COMPLETED_KEY, { path: '/' });
+    SafeCookies.remove(TOUR_COMPLETED_KEY, { path: '/' });
     deletePreferenceFromBackend(PREF_KEY_TOUR_COMPLETED);
   } catch (error) {
     console.error('Failed to clear tour preference:', error);

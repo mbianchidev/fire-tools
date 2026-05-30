@@ -13,7 +13,8 @@
  *  - `deletePreferenceFromBackend()` mirrors `clearXxx()` calls.
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { encryptData } from './cookieEncryption';
 import { getApiBaseUrl } from './apiBase';
 
@@ -21,14 +22,14 @@ export const PREF_KEY_TOUR_COMPLETED = 'tour_completed';
 export const PREF_KEY_QUESTIONNAIRE_PROMPT_DISMISSED = 'questionnaire_prompt_dismissed';
 export const PREF_KEY_SECURITY_BANNER_DISMISSED = 'security_banner_dismissed';
 
-// Map server key → cookie name used by the sync layer.
+// Map server key → local storage key used by the sync layer.
 const COOKIE_NAMES: Record<string, string> = {
   [PREF_KEY_TOUR_COMPLETED]: 'fire-tools-tour-completed',
   [PREF_KEY_QUESTIONNAIRE_PROMPT_DISMISSED]: 'fire-tools-questionnaire-prompt-dismissed',
   [PREF_KEY_SECURITY_BANNER_DISMISSED]: 'fire-tools-security-banner-dismissed',
 };
 
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365,
   sameSite: 'strict',
   secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
@@ -38,9 +39,9 @@ const COOKIE_OPTIONS: Cookies.CookieAttributes = {
 const writeMirroredCookie = (cookieName: string, plaintextJson: string): void => {
   try {
     const encrypted = encryptData(plaintextJson);
-    Cookies.set(cookieName, encrypted, COOKIE_OPTIONS);
+    SafeCookies.set(cookieName, encrypted, COOKIE_OPTIONS);
   } catch (error) {
-    console.error(`Failed to mirror preference into cookie ${cookieName}:`, error);
+    console.error(`Failed to mirror preference into ${cookieName}:`, error);
   }
 };
 

@@ -68,10 +68,10 @@ Track your income and expenses with detailed categorization, set monthly budgets
 Track your complete financial picture on a monthly basis. Log assets (stocks, ETFs, bonds), cash & liquidity (bank accounts, credit cards), and pensions (state, private, employer). Record financial operations like dividends, purchases, sales, and taxes. View historical net worth charts with YTD and all-time views, plus forecasts with confidence indicators.
 
 **🔒 Privacy-First & Secure**  
-All data is encrypted with AES-256 and stored locally in your browser. No servers, no accounts, no data transmission—complete privacy guaranteed.
+All data is stored locally — a SQLite database in the desktop app, or AES-256-encrypted cookies in the browser. No servers, no accounts, no data transmission—complete privacy guaranteed.
 
 **📥 Export & Import**  
-Back up your data anytime with CSV export. Import previously saved data to restore your settings across devices or after clearing cookies.
+Back up your data anytime with CSV export. Import previously saved data to restore your settings across devices or after clearing your local store.
 
 **🌍 Multi-language UI**  
 The interface ships in English (default), Italian, French, German, and Spanish. Change the language from **Settings → Language**; the choice is stored alongside your other (encrypted) preferences and is independent of the display currency. See [Internationalization (i18n)](#-internationalization-i18n) for coverage details.
@@ -228,11 +228,18 @@ issue [#134](https://github.com/mbianchidev/fire-tools/issues/134).
 
 ## Architecture & APIs
 
-Fire Tools today runs **entirely client-side** with encrypted cookies. A
-**local-deployment backend** (Docker / Electron) is available so users who
-prefer a real database can run their data on their own machine. The backend
-implements the full OpenAPI contract against SQLite, with forward-only
-migrations applied automatically on boot:
+Fire Tools ships in two storage flavours:
+
+- **Desktop app (Electron)** — bundles a local Node/Express backend in-process
+  and stores everything in a real SQLite database under the OS `userData`
+  directory. This is the recommended way to use Fire Tools.
+- **Browser / hosted demo** — pure client-side, with state held in
+  AES-256-encrypted cookies (plus a `localStorage` fallback) so the app stays
+  fully functional even without a backend.
+
+The local-deployment backend (Docker / Electron) implements the full OpenAPI
+contract against SQLite, with forward-only migrations applied automatically on
+boot:
 
 - **OpenAPI 3.0.3 spec**: [`docs/api/openapi.yaml`](docs/api/openapi.yaml) — see [`docs/api/README.md`](docs/api/README.md)
 - **Database schema**: [`docs/database/schema.sql`](docs/database/schema.sql) — **SQLite is the first-class target**, **PostgreSQL is fully compatible**. See [`docs/database/README.md`](docs/database/README.md).
@@ -263,7 +270,8 @@ Tracking issues: [#133](https://github.com/mbianchidev/fire-tools/issues/133) (t
 - **Vite** - Lightning-fast build tool
 - **Recharts** - Beautiful data visualizations
 - **crypto-js** - AES encryption for data security
-- **js-cookie** - Secure cookie management
+- **js-cookie** + **localStorage** - Browser-mode persistence layer (the
+  desktop app stores state in SQLite via the embedded backend instead)
 - **react-i18next** + **i18next** - UI translation framework (EN / IT / FR / DE / ES)
 
 ### Backend ([`server/`](server/))
@@ -286,10 +294,13 @@ Tracking issues: [#133](https://github.com/mbianchidev/fire-tools/issues/133) (t
 
 Fire Tools takes your privacy seriously:
 
-- ✅ **Client-side only** - No backend servers, all processing happens in your browser
-- ✅ **AES-256 encryption** - All financial data is encrypted before storage
-- ✅ **No data transmission** - Your data never leaves your device
-- ✅ **Secure cookies** - `SameSite=Strict` and `Secure` flags protect against attacks
+- ✅ **Local-only by default** - Desktop app stores everything in a local
+  SQLite database; browser mode keeps state in your browser. Nothing leaves
+  your device unless you explicitly opt in.
+- ✅ **AES-256 encryption (browser)** - Cookie-stored values are encrypted
+  before being written
+- ✅ **Secure cookies (browser)** - `SameSite=Strict` and `Secure` flags
+  protect against attacks
 - ✅ **Open source** - Full transparency, audit the code yourself
 
 Learn more in our [Security Policy](SECURITY.md).
@@ -312,8 +323,8 @@ Fire Tools ships with a built-in translation layer powered by
 | `es` | Spanish |
 
 **Switching language** — open **Settings → Language**. The selection is
-persisted to the same AES-encrypted cookie as the rest of your preferences
-(`UserSettings.language`) and is **independent of the display currency**
+persisted to your local store (SQLite on desktop, encrypted cookie in browser
+— `UserSettings.language`) and is **independent of the display currency**
 (changing language never changes the currency, and vice versa).
 
 **Where translations live**

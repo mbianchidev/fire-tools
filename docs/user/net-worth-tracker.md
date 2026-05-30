@@ -22,6 +22,6 @@ above the trend.
 
 ## Export / Import
 
-Snapshots round-trip via CSV so you can keep a backup outside the encrypted
-cookie. Use the **Export CSV** button to grab a snapshot of all entries; use
-**Import CSV** to restore.
+Snapshots round-trip via CSV so you can keep a backup outside the local store
+(SQLite on desktop, encrypted cookies in browser). Use the **Export CSV**
+button to grab a snapshot of all entries; use **Import CSV** to restore.

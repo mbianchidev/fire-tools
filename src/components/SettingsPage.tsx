@@ -31,7 +31,8 @@ import { fetchExchangeRatesAsMap } from '../utils/exchangeRateApi';
 import { CategoryManagerDialog } from './CategoryManagerDialog';
 import { SearchableSelect } from './SearchableSelect';
 import { LanguageSelector } from './LanguageSelector';
-import { probeBackend, getEmbeddedBackendInfo } from '../utils/apiBase';
+import { probeBackend, getEmbeddedBackendInfo, getApiBaseUrl } from '../utils/apiBase';
+import { API_ENDPOINTS, type ApiEndpoint } from '../utils/apiCatalog';
 import { IS_DEMO_MODE } from '../utils/demoMode';
 import './SettingsPage.css';
 
@@ -40,7 +41,7 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'backend', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
+const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'backend', 'advanced', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
@@ -68,6 +69,15 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const [embeddedBackendUrl, setEmbeddedBackendUrl] = useState<string | null>(null);
   const [embeddedBackendError, setEmbeddedBackendError] = useState<string | null>(null);
   const isElectron = typeof window !== 'undefined' && !!window.fireTools?.getEmbeddedBackend;
+
+  // API explorer state (advanced settings)
+  const [apiSelectedIndex, setApiSelectedIndex] = useState<number>(0);
+  const [apiPath, setApiPath] = useState<string>(API_ENDPOINTS[0]?.path ?? '/health');
+  const [apiMethod, setApiMethod] = useState<ApiEndpoint['method']>(API_ENDPOINTS[0]?.method ?? 'GET');
+  const [apiBody, setApiBody] = useState<string>('');
+  const [apiResponse, setApiResponse] = useState<{ status: number; body: string; ms: number } | null>(null);
+  const [apiBusy, setApiBusy] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
   
   // Account section expanded by default, others collapsed
   const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
@@ -346,6 +356,65 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setBackendTestState({ status: 'error', message: `${t('settings.backend.testError')}: ${msg}` });
+    }
+  };
+
+  // API explorer: send arbitrary request to embedded/custom backend
+  const handleApiSelect = (idx: number) => {
+    const ep = API_ENDPOINTS[idx];
+    if (!ep) return;
+    setApiSelectedIndex(idx);
+    setApiPath(ep.path);
+    setApiMethod(ep.method);
+    setApiBody('');
+    setApiResponse(null);
+    setApiError(null);
+  };
+
+  const handleApiSend = async () => {
+    setApiBusy(true);
+    setApiError(null);
+    setApiResponse(null);
+    try {
+      const base = await getApiBaseUrl();
+      if (!base) {
+        setApiError(t('settings.advanced.noBackend'));
+        return;
+      }
+      const trimmedPath = apiPath.trim();
+      if (!trimmedPath.startsWith('/')) {
+        setApiError(t('settings.advanced.pathMustStartWithSlash'));
+        return;
+      }
+      let bodyPayload: string | undefined;
+      if (apiMethod !== 'GET' && apiMethod !== 'DELETE' && apiBody.trim()) {
+        try {
+          JSON.parse(apiBody);
+          bodyPayload = apiBody;
+        } catch {
+          setApiError(t('settings.advanced.invalidJson'));
+          return;
+        }
+      }
+      const started = performance.now();
+      const res = await fetch(`${base}${trimmedPath}`, {
+        method: apiMethod,
+        headers: bodyPayload ? { 'Content-Type': 'application/json' } : undefined,
+        body: bodyPayload,
+      });
+      const ms = Math.round(performance.now() - started);
+      const text = await res.text();
+      let pretty = text;
+      try {
+        pretty = JSON.stringify(JSON.parse(text), null, 2);
+      } catch {
+        // not JSON; show as-is
+      }
+      setApiResponse({ status: res.status, body: pretty, ms });
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setApiBusy(false);
     }
   };
 
@@ -826,7 +895,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   ))}
                 </div>
                 <button
-                  className="btn-outline btn-small"
+                  className="secondary-btn btn-small"
                   onClick={() => handleSettingChange('fireAssetClassInclusion', DEFAULT_FIRE_ASSET_CLASS_INCLUSION)}
                   style={{ marginTop: '0.5rem' }}
                 >
@@ -1194,6 +1263,134 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   </span>
                 )}
               </div>
+            </div>
+          )}
+        </section>
+
+        {/* Advanced — API explorer */}
+        <section className="settings-section collapsible-section">
+          <button
+            className="collapsible-header"
+            onClick={() => toggleSection('advanced')}
+            aria-expanded={!collapsedSections.has('advanced')}
+            aria-controls="advanced-content"
+          >
+            <h2><MaterialIcon name="terminal" /> {t('settings.sections.advanced')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('advanced') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('advanced') && (
+            <div id="advanced-content" className="collapsible-content">
+              <p className="setting-help">{t('settings.advanced.description')}</p>
+
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="apiEndpointSelect">{t('settings.advanced.endpoint')}</label>
+                </div>
+                <select
+                  id="apiEndpointSelect"
+                  value={apiSelectedIndex}
+                  onChange={(e) => handleApiSelect(Number(e.target.value))}
+                >
+                  {API_ENDPOINTS.map((ep, idx) => (
+                    <option key={`${ep.method}-${ep.path}`} value={idx}>
+                      {ep.method} {ep.path} — {ep.summary}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="apiMethodInput">{t('settings.advanced.method')}</label>
+                </div>
+                <select
+                  id="apiMethodInput"
+                  value={apiMethod}
+                  onChange={(e) => setApiMethod(e.target.value as ApiEndpoint['method'])}
+                >
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                  <option value="PUT">PUT</option>
+                  <option value="PATCH">PATCH</option>
+                  <option value="DELETE">DELETE</option>
+                </select>
+              </div>
+
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label htmlFor="apiPathInput">{t('settings.advanced.path')}</label>
+                </div>
+                <input
+                  id="apiPathInput"
+                  type="text"
+                  value={apiPath}
+                  onChange={(e) => setApiPath(e.target.value)}
+                  placeholder="/health"
+                />
+                <span className="setting-help">{t('settings.advanced.pathHelp')}</span>
+              </div>
+
+              {(apiMethod === 'POST' || apiMethod === 'PUT' || apiMethod === 'PATCH') && (
+                <div className="setting-item">
+                  <div className="label-with-tooltip">
+                    <label htmlFor="apiBodyInput">{t('settings.advanced.body')}</label>
+                  </div>
+                  <textarea
+                    id="apiBodyInput"
+                    value={apiBody}
+                    onChange={(e) => setApiBody(e.target.value)}
+                    placeholder='{"key": "value"}'
+                    rows={4}
+                    style={{ width: '100%', fontFamily: 'monospace', fontSize: '0.85rem' }}
+                  />
+                </div>
+              )}
+
+              <div className="setting-item">
+                <div className="toggle-group">
+                  <button
+                    className="toggle-btn"
+                    onClick={handleApiSend}
+                    disabled={apiBusy}
+                  >
+                    <MaterialIcon name="send" size="small" /> {apiBusy ? t('settings.advanced.sending') : t('settings.advanced.send')}
+                  </button>
+                </div>
+                {apiError && (
+                  <span className="setting-help" style={{ color: 'var(--error-color, #ef4444)' }}>
+                    <MaterialIcon name="error" size="small" /> {apiError}
+                  </span>
+                )}
+              </div>
+
+              {apiResponse && (
+                <div className="setting-item">
+                  <div className="label-with-tooltip">
+                    <label>
+                      {t('settings.advanced.response')} —{' '}
+                      <span style={{ color: apiResponse.status >= 200 && apiResponse.status < 300 ? 'var(--success-color, #22c55e)' : 'var(--error-color, #ef4444)' }}>
+                        {apiResponse.status}
+                      </span>{' '}
+                      <span style={{ color: 'var(--text-secondary, #888)' }}>({apiResponse.ms}ms)</span>
+                    </label>
+                  </div>
+                  <pre
+                    style={{
+                      maxHeight: '300px',
+                      overflow: 'auto',
+                      padding: '0.75rem',
+                      background: 'var(--bg-secondary, #1a1a1a)',
+                      border: '1px solid var(--border-color, #333)',
+                      borderRadius: '4px',
+                      fontFamily: 'monospace',
+                      fontSize: '0.8rem',
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word',
+                    }}
+                  >
+                    {apiResponse.body || '(empty)'}
+                  </pre>
+                </div>
+              )}
             </div>
           )}
         </section>

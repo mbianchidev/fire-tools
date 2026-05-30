@@ -147,7 +147,8 @@
       "support": "Support & Feedback",
       "language": "Sprache",
       "disclaimer": "Haftungsausschluss",
-      "backend": "Backend"
+      "backend": "Backend",
+      "advanced": "Erweitert"
     },
     "accountName": "Kontoname",
     "accountNameHelp": "Dieser Name wird in der gesamten App angezeigt",
@@ -391,6 +392,20 @@
       "testing": "Test läuft…",
       "testSuccess": "Verbindung erfolgreich",
       "testError": "Verbindung fehlgeschlagen"
+    },
+    "advanced": {
+      "description": "Inspizieren oder testen Sie die REST-API des eingebetteten Backends. Nützlich zum Debuggen und Überprüfen der Konnektivität.",
+      "endpoint": "Endpunkt",
+      "method": "HTTP-Methode",
+      "path": "Anfragepfad",
+      "pathHelp": "Der Pfad wird an die /api/v1-Basis-URL des Backends angehängt.",
+      "body": "Anfragetext (JSON)",
+      "send": "Anfrage senden",
+      "sending": "Senden…",
+      "response": "Antwort",
+      "noBackend": "Kein Backend konfiguriert. Konfigurieren Sie eines im Abschnitt Backend oben.",
+      "pathMustStartWithSlash": "Pfad muss mit / beginnen",
+      "invalidJson": "Anfragetext ist kein gültiges JSON"
     }
   },
   "assetAllocation": {

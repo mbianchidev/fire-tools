@@ -3,7 +3,8 @@
  * Handles Asset Allocation and FIRE Calculator data with encryption
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { Asset, AssetClass, AllocationMode } from '../types/assetAllocation';
 import { CalculatorInputs } from '../types/calculator';
 import { ExpenseTrackerData, YearData, MonthData, IncomeEntry, ExpenseEntry } from '../types/expenseTracker';
@@ -26,7 +27,7 @@ const EXPENSE_TRACKER_KEY = 'fire-tools-expense-tracker';
 const NET_WORTH_TRACKER_KEY = 'fire-tools-net-worth-tracker';
 
 // Cookie options - secure settings for production
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365, // 1 year
   sameSite: 'strict',
   secure: window.location.protocol === 'https:', // Only secure in HTTPS
@@ -87,8 +88,8 @@ export function saveAssetAllocation(
     const encryptedAssets = encryptData(assetsJson);
     const encryptedTargets = encryptData(targetsJson);
     
-    Cookies.set(ASSET_ALLOCATION_KEY, encryptedAssets, COOKIE_OPTIONS);
-    Cookies.set(ASSET_CLASS_TARGETS_KEY, encryptedTargets, COOKIE_OPTIONS);
+    SafeCookies.set(ASSET_ALLOCATION_KEY, encryptedAssets, COOKIE_OPTIONS);
+    SafeCookies.set(ASSET_CLASS_TARGETS_KEY, encryptedTargets, COOKIE_OPTIONS);
   } catch (error) {
     console.error('Failed to save asset allocation to cookies:', error);
     throw new Error('Failed to save data to cookies. Cookies may be disabled.');
@@ -106,8 +107,8 @@ export function loadAssetAllocation(): {
     return getDemoAssetAllocation();
   }
   try {
-    const encryptedAssets = Cookies.get(ASSET_ALLOCATION_KEY);
-    const encryptedTargets = Cookies.get(ASSET_CLASS_TARGETS_KEY);
+    const encryptedAssets = SafeCookies.get(ASSET_ALLOCATION_KEY);
+    const encryptedTargets = SafeCookies.get(ASSET_CLASS_TARGETS_KEY);
 
     let assets: Asset[] | null = null;
     let assetClassTargets: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }> | null = null;
@@ -150,8 +151,8 @@ export function loadAssetAllocation(): {
  */
 export function clearAssetAllocation(): void {
   try {
-    Cookies.remove(ASSET_ALLOCATION_KEY, { path: '/' });
-    Cookies.remove(ASSET_CLASS_TARGETS_KEY, { path: '/' });
+    SafeCookies.remove(ASSET_ALLOCATION_KEY, { path: '/' });
+    SafeCookies.remove(ASSET_CLASS_TARGETS_KEY, { path: '/' });
   } catch (error) {
     console.error('Failed to clear asset allocation from cookies:', error);
   }
@@ -166,7 +167,7 @@ export function saveFireCalculatorInputs(inputs: CalculatorInputs): void {
     const inputsJson = JSON.stringify(inputs);
     const encryptedInputs = encryptData(inputsJson);
     
-    Cookies.set(FIRE_CALCULATOR_INPUTS_KEY, encryptedInputs, COOKIE_OPTIONS);
+    SafeCookies.set(FIRE_CALCULATOR_INPUTS_KEY, encryptedInputs, COOKIE_OPTIONS);
   } catch (error) {
     console.error('Failed to save FIRE calculator inputs to cookies:', error);
     throw new Error('Failed to save data to cookies. Cookies may be disabled.');
@@ -181,7 +182,7 @@ export function loadFireCalculatorInputs(): CalculatorInputs | null {
     return getDemoCalculatorInputs();
   }
   try {
-    const encryptedInputs = Cookies.get(FIRE_CALCULATOR_INPUTS_KEY);
+    const encryptedInputs = SafeCookies.get(FIRE_CALCULATOR_INPUTS_KEY);
     if (encryptedInputs) {
       const decryptedInputs = decryptData(encryptedInputs);
       if (decryptedInputs) {
@@ -204,7 +205,7 @@ export function loadFireCalculatorInputs(): CalculatorInputs | null {
  */
 export function clearFireCalculatorInputs(): void {
   try {
-    Cookies.remove(FIRE_CALCULATOR_INPUTS_KEY, { path: '/' });
+    SafeCookies.remove(FIRE_CALCULATOR_INPUTS_KEY, { path: '/' });
   } catch (error) {
     console.error('Failed to clear FIRE calculator inputs from cookies:', error);
   }
@@ -300,13 +301,13 @@ export function loadExpenseTrackerData(): ExpenseTrackerData | null {
     
     // Migration: If not in localStorage, try to load from cookie and migrate
     if (!encryptedData) {
-      const cookieData = Cookies.get(EXPENSE_TRACKER_KEY);
+      const cookieData = SafeCookies.get(EXPENSE_TRACKER_KEY);
       if (cookieData) {
         console.log('Migrating expense tracker data from cookies to localStorage...');
         // Save to localStorage
         localStorage.setItem(EXPENSE_TRACKER_KEY, cookieData);
         // Remove from cookie
-        Cookies.remove(EXPENSE_TRACKER_KEY, { path: '/' });
+        SafeCookies.remove(EXPENSE_TRACKER_KEY, { path: '/' });
         encryptedData = cookieData;
       }
     }
@@ -477,13 +478,13 @@ export function loadNetWorthTrackerData(): NetWorthTrackerData | null {
     
     // Migration: If not in localStorage, try to load from cookie and migrate
     if (!encryptedData) {
-      const cookieData = Cookies.get(NET_WORTH_TRACKER_KEY);
+      const cookieData = SafeCookies.get(NET_WORTH_TRACKER_KEY);
       if (cookieData) {
         console.log('Migrating net worth tracker data from cookies to localStorage...');
         // Save to localStorage
         localStorage.setItem(NET_WORTH_TRACKER_KEY, cookieData);
         // Remove from cookie
-        Cookies.remove(NET_WORTH_TRACKER_KEY, { path: '/' });
+        SafeCookies.remove(NET_WORTH_TRACKER_KEY, { path: '/' });
         encryptedData = cookieData;
       }
     }
@@ -513,7 +514,7 @@ export function clearNetWorthTrackerData(): void {
   try {
     localStorage.removeItem(NET_WORTH_TRACKER_KEY);
     // Also remove from cookies in case there's legacy data
-    Cookies.remove(NET_WORTH_TRACKER_KEY, { path: '/' });
+    SafeCookies.remove(NET_WORTH_TRACKER_KEY, { path: '/' });
   } catch (error) {
     console.error('Failed to clear net worth tracker data from localStorage:', error);
   }
@@ -539,9 +540,9 @@ export function isCookieStorageAvailable(): boolean {
   try {
     const testKey = '__test__';
     const testValue = 'test';
-    Cookies.set(testKey, testValue);
-    const retrieved = Cookies.get(testKey);
-    Cookies.remove(testKey);
+    SafeCookies.set(testKey, testValue);
+    const retrieved = SafeCookies.get(testKey);
+    SafeCookies.remove(testKey);
     return retrieved === testValue;
   } catch {
     return false;

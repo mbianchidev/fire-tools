@@ -147,7 +147,8 @@
       "support": "Support & Feedback",
       "language": "Language",
       "disclaimer": "Disclaimer",
-      "backend": "Backend"
+      "backend": "Backend",
+      "advanced": "Advanced"
     },
     "accountName": "Account Name",
     "accountNameHelp": "This name will be displayed throughout the app",
@@ -391,6 +392,20 @@
       "testing": "Testing…",
       "testSuccess": "Connection successful",
       "testError": "Connection failed"
+    },
+    "advanced": {
+      "description": "Inspect or smoke-test the embedded backend's REST API. Useful for debugging and verifying connectivity.",
+      "endpoint": "Endpoint",
+      "method": "HTTP method",
+      "path": "Request path",
+      "pathHelp": "Path is appended to the backend's /api/v1 base URL.",
+      "body": "Request body (JSON)",
+      "send": "Send request",
+      "sending": "Sending…",
+      "response": "Response",
+      "noBackend": "No backend is configured. Set one in the Backend section above.",
+      "pathMustStartWithSlash": "Path must start with /",
+      "invalidJson": "Request body is not valid JSON"
     }
   },
   "assetAllocation": {

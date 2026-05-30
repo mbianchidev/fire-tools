@@ -3,7 +3,8 @@
  * Handles saving/loading notification state to/from encrypted cookies
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { encryptData, decryptData } from './cookieEncryption';
 import {
   type Notification,
@@ -34,33 +35,33 @@ const emitNotificationsChanged = (): void => {
   }
 };
 
-// Cookie options
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+// Cookie options (only used when SafeCookies routes to real cookies)
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365, // 1 year
   sameSite: 'strict',
-  secure: window.location.protocol === 'https:',
+  secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
   path: '/',
 };
 
 /**
- * Save notification state to encrypted cookies
+ * Save notification state to encrypted storage
  */
 export function saveNotificationState(state: NotificationState): void {
   try {
     const stateJson = JSON.stringify(state);
     const encryptedState = encryptData(stateJson);
-    Cookies.set(NOTIFICATIONS_KEY, encryptedState, COOKIE_OPTIONS);
+    SafeCookies.set(NOTIFICATIONS_KEY, encryptedState, COOKIE_OPTIONS);
   } catch (error) {
-    console.error('Failed to save notification state to cookies:', error);
+    console.error('Failed to save notification state:', error);
   }
 }
 
 /**
- * Load notification state from encrypted cookies
+ * Load notification state from encrypted storage
  */
 export function loadNotificationState(): NotificationState {
   try {
-    const encryptedState = Cookies.get(NOTIFICATIONS_KEY);
+    const encryptedState = SafeCookies.get(NOTIFICATIONS_KEY);
     if (encryptedState) {
       const decryptedState = decryptData(encryptedState);
       if (decryptedState) {
@@ -78,7 +79,7 @@ export function loadNotificationState(): NotificationState {
     }
     return DEFAULT_NOTIFICATION_STATE;
   } catch (error) {
-    console.error('Failed to load notification state from cookies:', error);
+    console.error('Failed to load notification state:', error);
     return DEFAULT_NOTIFICATION_STATE;
   }
 }

@@ -37,12 +37,18 @@ they're opt-in until they stabilise.
   CSV per tool. Use this for backups.
 - **Import data** — restores a previously exported bundle. Use it on a new
   device or after **Clear all data**.
-- **Clear all data** — deletes the encrypted cookie. The app reloads empty.
-  There is no undo; export first if you might want the data back.
+- **Clear all data** — wipes your local store (SQLite DB on desktop, encrypted
+  cookies in browser). The app reloads empty. There is no undo; export first
+  if you might want the data back.
 
 ## Privacy
 
-Sensitive data is AES-256-encrypted and stored in a cookie on your device.
-The cookie is flagged `Secure` and `SameSite=Strict`. Nothing is transmitted
-to a server unless you opt in (e.g. the on-demand price refresh on the
-[Asset allocation page](./asset-allocation.md)).
+- **Desktop app** — data lives in a local SQLite database under the OS
+  `userData` directory. Migrations run automatically on startup. Nothing is
+  transmitted to a server unless you opt in.
+- **Browser** — sensitive data is AES-256-encrypted and stored in cookies
+  (with a localStorage fallback for environments where cookies are blocked).
+  Cookies are flagged `Secure` and `SameSite=Strict`.
+
+The only outbound calls are explicit opt-ins (e.g. the on-demand price refresh
+on the [Asset allocation page](./asset-allocation.md)).

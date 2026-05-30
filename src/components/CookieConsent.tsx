@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
+import SafeCookies from '../utils/safeCookies';
 import { useTranslation } from 'react-i18next';
 import { usePolicyModal } from '../App';
 import { IS_DEMO_MODE } from '../utils/demoMode';
@@ -26,7 +26,7 @@ export function CookieConsent() {
       return;
     }
     // Check if user has already acknowledged the cookie notice
-    const stored = Cookies.get(CONSENT_COOKIE);
+    const stored = SafeCookies.get(CONSENT_COOKIE);
     if (!stored) {
       setVisible(true);
     } else {
@@ -49,14 +49,14 @@ export function CookieConsent() {
       acknowledged: true,
       timestamp: new Date().toISOString(),
     };
-    
-    Cookies.set(CONSENT_COOKIE, JSON.stringify(consentData), {
+
+    SafeCookies.set(CONSENT_COOKIE, JSON.stringify(consentData), {
       expires: 365,
       sameSite: 'strict',
       secure: window.location.protocol === 'https:',
       path: '/',
     });
-    
+
     setVisible(false);
   };
 

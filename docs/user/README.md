@@ -28,10 +28,15 @@ walkthrough and a screenshot so you can see exactly what to expect.
 
 ## Where your data lives
 
-Your inputs are encrypted with AES-256 and stored in a cookie on your device.
-Cookies are flagged `Secure` and `SameSite=Strict` and the encryption key never
-leaves the browser. You can wipe everything from the
-[Settings page](./settings.md) — clearing data is a single click.
+- **Desktop app (Electron)** — your inputs are stored in a local SQLite database
+  inside the OS-managed `userData` directory (e.g. `~/Library/Application
+  Support/Fire Tools/firetools.db` on macOS). Nothing leaves the machine.
+- **Browser / hosted demo** — your inputs are encrypted with AES-256 and stored
+  in cookies + localStorage on your device. Cookies are flagged `Secure` and
+  `SameSite=Strict` and the encryption key never leaves the browser.
+
+You can wipe everything from the [Settings page](./settings.md) — clearing
+data is a single click.
 
 ## Currency, language, regional formatting
 
