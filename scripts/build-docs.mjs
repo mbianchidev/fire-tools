@@ -83,13 +83,13 @@ function pageHtml({ section, slug, html, pages, siblingSection }) {
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="../../landing/">Fire Tools</a>
+      <a class="brand" href="../../">Fire Tools</a>
       <nav>
         <a href="../user/">User docs</a>
         <a href="../engineering/">Engineering docs</a>
         <a href="../../api/">API reference</a>
         <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener">GitHub</a>
-        <a class="cta" href="../../">Open the app</a>
+        <a class="cta" href="../../demo/">Open the demo</a>
       </nav>
     </header>
     <div class="docs-shell">
@@ -102,11 +102,11 @@ function pageHtml({ section, slug, html, pages, siblingSection }) {
         <ul>
           <li><a href="../${siblingSection.id}/">${siblingSection.title}</a></li>
           <li><a href="../../api/">API reference</a></li>
-          <li><a href="../../landing/">Landing</a></li>
+          <li><a href="../../">Landing</a></li>
         </ul>
       </aside>
       <article class="docs-content">
-        <nav class="docs-breadcrumb"><a href="../../landing/">Home</a> &rsaquo; <a href="./">${section.title}</a></nav>
+        <nav class="docs-breadcrumb"><a href="../../">Home</a> &rsaquo; <a href="./">${section.title}</a></nav>
         ${html}
       </article>
     </div>
@@ -196,13 +196,13 @@ export async function buildDocs() {
   </head>
   <body>
     <header class="site-header">
-      <a class="brand" href="../landing/">Fire Tools</a>
+      <a class="brand" href="../">Fire Tools</a>
       <nav>
         <a href="./user/">User docs</a>
         <a href="./engineering/">Engineering docs</a>
         <a href="../api/">API reference</a>
         <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener">GitHub</a>
-        <a class="cta" href="../">Open the app</a>
+        <a class="cta" href="../demo/">Open the demo</a>
       </nav>
     </header>
     <main>

@@ -20,7 +20,7 @@ walkthrough and a screenshot so you can see exactly what to expect.
 
 ## How to install
 
-- **Web** — open <https://mbianchidev.github.io/fire-tools/>. Nothing to install.
+- **Web** — open <https://mbianchidev.github.io/fire-tools/demo/>. Nothing to install.
 - **Desktop** — grab the `.dmg` (macOS), `.exe` (Windows) or `.AppImage` (Linux)
   from the [releases page](https://github.com/mbianchidev/fire-tools/releases).
 - **Self-hosted** — see the

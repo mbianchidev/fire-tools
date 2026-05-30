@@ -6,16 +6,12 @@ step, no framework. Tracks issue
 
 ## Where it lives in production
 
-`npm run build:landing` copies the contents of `website/` to
-`dist/landing/`, which the existing GitHub Pages workflow publishes
-alongside the SPA. The live URLs are:
+`npm run build:landing` copies the contents of `website/` to `dist/`
+(the site root) so it ships at the GitHub Pages root. The SPA lives
+under `dist/demo/`. The live URLs are:
 
-- `https://mbianchidev.github.io/fire-tools/` — the app (unchanged)
-- `https://mbianchidev.github.io/fire-tools/landing/` — this landing page
-
-If you want the landing page to be the default (`/`), point the
-workflow to copy `website/index.html` to `dist/index.html` *before*
-copying the app build — out of scope for this PR.
+- `https://mbianchidev.github.io/fire-tools/` — this landing page
+- `https://mbianchidev.github.io/fire-tools/demo/` — the read-only demo app
 
 ## Local preview
 

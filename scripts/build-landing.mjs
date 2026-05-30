@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// Copies website/ -> dist/landing/ and publishes the OpenAPI contract under
-// dist/api/ (yaml + ReDoc viewer) so GitHub Pages serves it alongside the SPA.
+// Copies website/ -> dist/ (landing now sits at the site root) and publishes
+// the OpenAPI contract under dist/api/ (yaml + ReDoc viewer). The SPA lives in
+// dist/demo/ (vite outDir), so the two never collide.
 import { cp, mkdir, access, copyFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,7 +11,7 @@ const repoRoot = resolve(__dirname, '..');
 const src = resolve(repoRoot, 'website');
 // PAGES_OUT_DIR lets dev-all build into a sibling dir so we don't pollute dist/.
 const outRoot = resolve(repoRoot, process.env.PAGES_OUT_DIR || 'dist');
-const dest = resolve(outRoot, 'landing');
+const dest = outRoot;
 const openapiSrc = resolve(repoRoot, 'docs', 'api', 'openapi.yaml');
 const apiDest = resolve(outRoot, 'api');
 
@@ -24,7 +25,6 @@ if (!process.env.PAGES_OUT_DIR) {
 }
 await mkdir(outRoot, { recursive: true });
 
-await mkdir(dest, { recursive: true });
 await cp(src, dest, { recursive: true, filter: (s) => !s.endsWith('README.md') });
 // Favicon shared across SPA, landing, docs and API viewer.
 const faviconSrc = resolve(repoRoot, 'public', 'fire-icon.svg');

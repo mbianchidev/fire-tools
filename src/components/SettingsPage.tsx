@@ -695,7 +695,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 <span className="setting-help">{t('settings.fireAssetClassesHelp')}</span>
                 <div className="fire-asset-class-grid">
                   {(Object.keys(settings.fireAssetClassInclusion) as AssetClass[]).map(ac => (
-                    <label key={ac} className="checkbox-label fire-asset-checkbox">
+                    <label key={ac} className="toggle-switch-label fire-asset-checkbox">
                       <input
                         type="checkbox"
                         checked={settings.fireAssetClassInclusion[ac]}
@@ -707,7 +707,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                           handleSettingChange('fireAssetClassInclusion', newInclusion);
                         }}
                       />
-                      {formatAssetName(ac)}
+                      <span className="toggle-switch"></span>
+                      <span>{formatAssetName(ac)}</span>
                     </label>
                   ))}
                 </div>
@@ -721,13 +722,14 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
               </div>
               <div className="setting-item">
                 <div className="label-with-tooltip">
-                  <label className="checkbox-label">
+                  <label className="toggle-switch-label">
                     <input
                       type="checkbox"
                       checked={settings.includePrimaryResidenceInFIRE ?? true}
                       onChange={(e) => handleSettingChange('includePrimaryResidenceInFIRE', e.target.checked)}
                     />
-                    {t('settings.includePrimaryResidence')}
+                    <span className="toggle-switch"></span>
+                    <span>{t('settings.includePrimaryResidence')}</span>
                   </label>
                   <Tooltip content={t('settings.tooltips.primaryResidence')}>
                     <span className="info-icon" aria-label={t('common.moreInfo')}>i</span>

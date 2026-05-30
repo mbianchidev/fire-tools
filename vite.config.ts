@@ -4,17 +4,21 @@ import { existsSync, statSync, createReadStream } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 // Lightweight static handler used in `npm run dev:all` to serve the pre-built
-// landing page, OpenAPI viewer and docs from a sibling dir under their
-// production paths. Only mounted when DEV_PAGES_DIR is set.
+// landing page (at /), OpenAPI viewer (at /api) and docs (at /docs) from a
+// sibling dir under their production paths. SPA stays at /demo. Only mounted
+// when DEV_PAGES_DIR is set.
 function devPagesPlugin() {
   const pagesDir = process.env.DEV_PAGES_DIR
     ? resolve(process.cwd(), process.env.DEV_PAGES_DIR)
     : null;
+  // Paths that Vite (or our SPA at /demo) must handle — never intercept these.
+  const reservedPrefixes = ['/demo', '/@', '/src/', '/node_modules/', '/api/yahoo'];
   return {
     name: 'serve-dev-pages',
     configureServer(server: { middlewares: { use: (fn: (req: { url?: string }, res: { setHeader: (k: string, v: string) => void; statusCode: number; end: (b?: string) => void }, next: () => void) => void) => void } }) {
       if (!pagesDir) return;
-      const mounts = ['/landing', '/api', '/docs'];
+      // Explicit mounts always handled here (under their prefixes).
+      const explicitMounts = ['/api', '/docs'];
       const mime: Record<string, string> = {
         '.html': 'text/html; charset=utf-8',
         '.css': 'text/css; charset=utf-8',
@@ -30,24 +34,7 @@ function devPagesPlugin() {
         '.gif': 'image/gif',
         '.ico': 'image/x-icon',
       };
-      server.middlewares.use((req, res, next) => {
-        const url = req.url || '';
-        const pathname = url.split('?')[0];
-        if (!mounts.some((m) => pathname === m || pathname.startsWith(m + '/'))) {
-          next();
-          return;
-        }
-        // Strip query string and resolve against pagesDir; pagesDir is project-relative.
-        let filePath = join(pagesDir, pathname);
-        if (existsSync(filePath) && statSync(filePath).isDirectory()) {
-          filePath = join(filePath, 'index.html');
-        } else if (!existsSync(filePath) && existsSync(filePath + '/index.html')) {
-          filePath = filePath + '/index.html';
-        }
-        if (!existsSync(filePath) || statSync(filePath).isDirectory()) {
-          next();
-          return;
-        }
+      const serveFile = (filePath: string, res: Parameters<Parameters<typeof server.middlewares.use>[0]>[1]) => {
         const ext = filePath.slice(filePath.lastIndexOf('.')).toLowerCase();
         res.setHeader('content-type', mime[ext] || 'application/octet-stream');
         res.setHeader('cache-control', 'no-store');
@@ -55,6 +42,43 @@ function devPagesPlugin() {
         const stream = createReadStream(filePath);
         stream.on('error', () => { res.statusCode = 500; res.end('read error'); });
         stream.pipe(res as unknown as NodeJS.WritableStream);
+      };
+      server.middlewares.use((req, res, next) => {
+        const url = req.url || '';
+        const pathname = url.split('?')[0];
+        if (reservedPrefixes.some((p) => pathname === p || pathname.startsWith(p === '/api/yahoo' ? p : p.endsWith('/') ? p : p + '/'))) {
+          next();
+          return;
+        }
+        const isExplicit = explicitMounts.some((m) => pathname === m || pathname.startsWith(m + '/'));
+        // Landing root: serve pagesDir/index.html when hitting /.
+        if (pathname === '/') {
+          const indexPath = join(pagesDir, 'index.html');
+          if (existsSync(indexPath)) {
+            serveFile(indexPath, res);
+            return;
+          }
+          next();
+          return;
+        }
+        // For explicit mounts (/api, /docs) and landing-relative assets at root,
+        // resolve against pagesDir; fall through otherwise so Vite can handle it.
+        let filePath = join(pagesDir, pathname);
+        if (existsSync(filePath) && statSync(filePath).isDirectory()) {
+          filePath = join(filePath, 'index.html');
+        } else if (!existsSync(filePath) && existsSync(filePath + '/index.html')) {
+          filePath = filePath + '/index.html';
+        }
+        if (!existsSync(filePath) || statSync(filePath).isDirectory()) {
+          if (isExplicit) {
+            // No match under /api or /docs — 404 is fine, but defer to Vite.
+            next();
+            return;
+          }
+          next();
+          return;
+        }
+        serveFile(filePath, res);
       });
     },
   };
@@ -69,12 +93,20 @@ export default defineConfig(({ mode }) => ({
       name: 'handle-trailing-slash',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
-          // Handle /fire-calculator?params by rewriting to /fire-calculator/?params
-          // Only process exact /fire-calculator or /fire-calculator? paths
-          if (req.url === '/fire-calculator') {
-            req.url = '/fire-calculator/';
-          } else if (req.url?.startsWith('/fire-calculator?')) {
-            req.url = '/fire-calculator/' + req.url.slice('/fire-calculator'.length);
+          // SPA lives under /demo in web builds. Normalise the calculator route
+          // so URLs like /demo/fire-calculator?params resolve to /demo/fire-calculator/?params.
+          if (req.url === '/demo/fire-calculator') {
+            req.url = '/demo/fire-calculator/';
+          } else if (req.url?.startsWith('/demo/fire-calculator?')) {
+            req.url = '/demo/fire-calculator/' + req.url.slice('/demo/fire-calculator'.length);
+          }
+          // For plain `npm run dev` (no DEV_PAGES_DIR landing), redirect / -> /demo/
+          // so opening localhost:5173 lands the developer inside the SPA.
+          if (req.url === '/' && !process.env.DEV_PAGES_DIR) {
+            res.statusCode = 302;
+            res.setHeader('location', '/demo/');
+            res.end();
+            return;
           }
           next();
         });
@@ -82,10 +114,11 @@ export default defineConfig(({ mode }) => ({
     },
   ],
   // Electron loads index.html via file://, so it needs a relative base.
-  // Production web build keeps /fire-tools/ for GitHub Pages.
-  base: mode === 'electron' ? './' : mode === 'production' ? '/fire-tools/' : '/',
+  // Web builds: landing sits at the site root; SPA lives under /demo so the
+  // landing page can market the project. Production = GitHub Pages.
+  base: mode === 'electron' ? './' : mode === 'production' ? '/fire-tools/demo/' : '/demo/',
   build: {
-    outDir: mode === 'electron' ? 'dist-electron' : 'dist',
+    outDir: mode === 'electron' ? 'dist-electron' : 'dist/demo',
   },
   server: {
     proxy: {

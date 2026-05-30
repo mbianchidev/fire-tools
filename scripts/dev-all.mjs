@@ -63,7 +63,7 @@ async function main() {
     }
   }
 
-  console.log('[dev:all] starting vite — SPA at /, landing at /landing, api at /api, docs at /docs');
+  console.log('[dev:all] starting vite — landing at /, SPA at /demo, api at /api, docs at /docs');
   const vite = spawn('npx', ['vite'], { cwd: repoRoot, env, stdio: 'inherit' });
   vite.on('exit', (code) => process.exit(code ?? 0));
   process.on('SIGINT', () => vite.kill('SIGINT'));

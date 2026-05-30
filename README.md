@@ -37,7 +37,7 @@ To avoid overloading the Yahoo Finance API, Fire Tools enforces the following li
 
 When limits are reached, the app gracefully falls back to the last known prices and hardcoded default exchange rates. You can check the current rate-limit status in **Settings → Market Data**.
 
-**[Try it live →](https://mbianchidev.github.io/fire-tools/)**
+**[Try it live →](https://mbianchidev.github.io/fire-tools/demo/)**
 
 ---
 
@@ -115,8 +115,8 @@ npm run dev:all
 That builds `website/`, `docs/api/openapi.yaml` and `docs/{user,engineering}/`
 into `.dev-pages/` (gitignored) and serves them alongside Vite at:
 
-- SPA — http://localhost:5173/
-- Landing — http://localhost:5173/landing/
+- Landing — http://localhost:5173/
+- Demo SPA — http://localhost:5173/demo/
 - OpenAPI — http://localhost:5173/api/
 - Docs index — http://localhost:5173/docs/
 - User docs — http://localhost:5173/docs/user/
@@ -168,17 +168,18 @@ Code-signing + notarization are env-driven; see
 
 Marketing landing page lives in [`website/`](website/) (issue
 [#138](https://github.com/mbianchidev/fire-tools/issues/138)) and is
-copied into `dist/landing/` as a `postbuild` step. The OpenAPI ReDoc
+copied to `dist/` (the site root) as a `postbuild` step. The OpenAPI ReDoc
 viewer is published next to it at `dist/api/`, and the user / engineering
 guides are rendered from the markdown in [`docs/user/`](docs/user/) +
 [`docs/engineering/`](docs/engineering/) into `dist/docs/{user,engineering}/`.
+The SPA (Vite build) sits under `dist/demo/`.
 
 ### Published documentation paths (GitHub Pages)
 
 | Path                                  | What you get                                            | Source                                  |
 |---------------------------------------|---------------------------------------------------------|-----------------------------------------|
-| `/fire-tools/`                        | The single-page app (the actual tool)                   | `src/`                                  |
-| `/fire-tools/landing/`                | Marketing landing page + download links                 | [`website/`](website/)                  |
+| `/fire-tools/`                        | Marketing landing page + download links                 | [`website/`](website/)                  |
+| `/fire-tools/demo/`                   | The single-page app (read-only demo)                    | `src/`                                  |
 | `/fire-tools/api/`                    | OpenAPI 3.0.3 reference (ReDoc)                         | [`docs/api/openapi.yaml`](docs/api/openapi.yaml) |
 | `/fire-tools/docs/user/`              | End-user how-tos (with screenshots)                     | [`docs/user/`](docs/user/)              |
 | `/fire-tools/docs/engineering/`       | Backend deploy, custom client, migrations, schema       | [`docs/engineering/`](docs/engineering/) |

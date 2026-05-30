@@ -217,7 +217,7 @@
     "fallbackRates": "Taux de repli",
     "fallbackRatesDescription": "These rates are used when the live exchange rate API is unavailable. All values convert to {{currency}} (the default currency).",
     "fetchCurrentMarketData": "Récupérer les données de marché",
-    "fetchMarketDataPrompt": "Demande de récupération des données de marché",
+    "fetchMarketDataPrompt": "Cliquez sur le bouton ci-dessus pour récupérer les taux de change et les prix des actifs actuels. Vos données restent sur votre appareil — seuls les points de terminaison publics du marché sont contactés.",
     "fetching": "Récupération",
     "fireAssetClassesHelp": "Activer/désactiver les classes d'actifs comptées dans la valeur de votre portefeuille FIRE",
     "fireAssetClassesIncluded": "Classes d'actifs FIRE incluses",
@@ -249,7 +249,7 @@
     "loadDemoData": "Charger les données de démo",
     "loadingSettings": "Chargement des paramètres...",
     "manageCategories": "Gérer les catégories",
-    "marketDataDisclaimer": "Avertissement données de marché",
+    "marketDataDisclaimer": "Les données de marché proviennent d'API publiques gratuites (Yahoo Finance, exchangerate.host). Les valeurs peuvent être retardées, incomplètes ou inexactes, et ne constituent pas un conseil financier. Vérifiez les chiffres critiques auprès de sources autorisées avant toute décision.",
     "messages": {
       "allDataExportedJson": "Toutes les données exportées en JSON",
       "allDataImported": "Toutes les données importées",

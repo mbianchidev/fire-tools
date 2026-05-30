@@ -19,14 +19,14 @@ const PORT = 5179;
 const BASE = `http://${HOST}:${PORT}`;
 
 const routes = [
-  { slug: 'homepage',           path: '/' },
-  { slug: 'fire-calculator',    path: '/fire-calculator' },
-  { slug: 'monte-carlo',        path: '/monte-carlo' },
-  { slug: 'asset-allocation',   path: '/asset-allocation' },
-  { slug: 'expense-tracker',    path: '/expense-tracker' },
-  { slug: 'net-worth-tracker',  path: '/net-worth-tracker' },
-  { slug: 'questionnaire',      path: '/questionnaire' },
-  { slug: 'settings',           path: '/settings' },
+  { slug: 'homepage',           path: '/demo/' },
+  { slug: 'fire-calculator',    path: '/demo/fire-calculator' },
+  { slug: 'monte-carlo',        path: '/demo/monte-carlo' },
+  { slug: 'asset-allocation',   path: '/demo/asset-allocation' },
+  { slug: 'expense-tracker',    path: '/demo/expense-tracker' },
+  { slug: 'net-worth-tracker',  path: '/demo/net-worth-tracker' },
+  { slug: 'questionnaire',      path: '/demo/questionnaire' },
+  { slug: 'settings',           path: '/demo/settings' },
 ];
 
 let chromium;
