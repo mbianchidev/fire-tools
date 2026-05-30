@@ -148,9 +148,27 @@ Code-signing + notarization are env-driven; see
 Marketing landing page lives in [`website/`](website/) (issue
 [#138](https://github.com/mbianchidev/fire-tools/issues/138)) and is
 copied into `dist/landing/` as a `postbuild` step. The OpenAPI ReDoc
-viewer is published next to it at `dist/api/`. The existing GitHub
-Pages workflow then serves them at `/fire-tools/landing/` and
-`/fire-tools/api/`.
+viewer is published next to it at `dist/api/`, and the user / engineering
+guides are rendered from the markdown in [`docs/user/`](docs/user/) +
+[`docs/engineering/`](docs/engineering/) into `dist/docs/{user,engineering}/`.
+
+### Published documentation paths (GitHub Pages)
+
+| Path                                  | What you get                                            | Source                                  |
+|---------------------------------------|---------------------------------------------------------|-----------------------------------------|
+| `/fire-tools/`                        | The single-page app (the actual tool)                   | `src/`                                  |
+| `/fire-tools/landing/`                | Marketing landing page + download links                 | [`website/`](website/)                  |
+| `/fire-tools/api/`                    | OpenAPI 3.0.3 reference (ReDoc)                         | [`docs/api/openapi.yaml`](docs/api/openapi.yaml) |
+| `/fire-tools/docs/user/`              | End-user how-tos (with screenshots)                     | [`docs/user/`](docs/user/)              |
+| `/fire-tools/docs/engineering/`       | Backend deploy, custom client, migrations, schema       | [`docs/engineering/`](docs/engineering/) |
+
+Regenerate the user-docs screenshots after material UI changes:
+
+```bash
+npx playwright install chromium   # first time only
+npm run build                     # produces SPA bundle for the dev server route table
+npm run docs:screenshots          # writes docs/user/screenshots/*.png
+```
 
 ### Mobile
 
@@ -171,6 +189,8 @@ issue [#134](https://github.com/mbianchidev/fire-tools/issues/134).
 - **[docs/api/](docs/api/)** - OpenAPI contract for the local-deployment backend (also published at `/fire-tools/api/` on Pages)
 - **[docs/database/](docs/database/)** - Database schema (SQLite-first, Postgres-compatible)
 - **[docs/deployment/](docs/deployment/)** - Docker Compose deployment guide
+- **[docs/user/](docs/user/)** - End-user guides (published at `/fire-tools/docs/user/`)
+- **[docs/engineering/](docs/engineering/)** - Backend deploy, custom client, schema, migrations (published at `/fire-tools/docs/engineering/`)
 - **[docs/mobile/](docs/mobile/)** - Flutter mobile app plan (separate repo)
 - **[electron/README.md](electron/README.md)** - Desktop app build, signing, security posture
 - **[server/README.md](server/README.md)** - Local-deployment backend (Node + Express + SQLite)

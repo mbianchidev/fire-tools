@@ -9,9 +9,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "postbuild": "node scripts/build-landing.mjs",
+    "postbuild": "node scripts/build-landing.mjs && node scripts/build-docs.mjs",
     "build:electron": "tsc && vite build --mode electron",
     "build:landing": "node scripts/build-landing.mjs",
+    "build:docs": "node scripts/build-docs.mjs",
+    "docs:screenshots": "node scripts/take-screenshots.mjs",
     "preview": "vite preview",
     "test": "vitest run --coverage --reporter=default --reporter=json --outputFile=test-results.json",
     "test:watch": "vitest",
@@ -29,6 +31,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@testing-library/react": "^16.3.2",
     "@types/crypto-js": "^4.2.2",
     "@types/js-cookie": "^3.0.6",
@@ -39,6 +42,7 @@
     "electron": "^33.2.0",
     "electron-builder": "^25.1.8",
     "jsdom": "^29.1.1",
+    "marked": "^18.0.4",
     "typescript": "^6.0.3",
     "vite": "^8.0.14",
     "vitest": "^4.0.18"
