@@ -15,6 +15,7 @@ dist
 dist-ssr
 .dev-pages
 build
+!electron/build
 *.local
 
 # Environment variables
