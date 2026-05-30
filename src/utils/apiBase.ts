@@ -56,8 +56,11 @@ export const getEmbeddedBackendInfo = async (): Promise<EmbeddedBackendInfo | nu
 export const getApiBaseUrl = async (): Promise<string | null> => {
   const { backend } = loadSettings();
 
-  if (backend.mode === 'custom' && backend.customUrl) {
-    return withVersion(backend.customUrl);
+  // In custom mode honor the user's intent: never silently fall back to
+  // embedded when the custom URL is missing — return null so callers surface
+  // a clear "backend unreachable" error instead of querying an unexpected one.
+  if (backend.mode === 'custom') {
+    return backend.customUrl ? withVersion(backend.customUrl) : null;
   }
 
   const info = await getEmbeddedBackendInfo();
