@@ -146,7 +146,8 @@
       "data": "Data Management",
       "support": "Support & Feedback",
       "language": "Language",
-      "disclaimer": "Disclaimer"
+      "disclaimer": "Disclaimer",
+      "backend": "Backend"
     },
     "accountName": "Account Name",
     "accountNameHelp": "This name will be displayed throughout the app",
@@ -366,7 +367,26 @@
     "unavailable": "Unavailable",
     "usingFallbackRates": "Using Fallback Rates",
     "uxUiSuggestion": "Ux Ui Suggestion",
-    "uxUiSuggestionHelp": "Suggest improvements to the user interface or experience"
+    "uxUiSuggestionHelp": "Suggest improvements to the user interface or experience",
+    "backend": {
+      "description": "Choose where the app stores and reads your data. By default Fire Tools runs an embedded backend inside the desktop app, with local-only SQLite storage. Advanced users can point the app at a separately-running backend instance.",
+      "mode": "Mode",
+      "embedded": "Embedded (default)",
+      "custom": "Custom URL",
+      "embeddedOnlyDesktop": "Embedded backend is only available in the desktop app.",
+      "embeddedRunningAt": "Embedded backend running at",
+      "embeddedStarting": "Embedded backend is starting…",
+      "embeddedUnavailable": "Embedded backend is unavailable",
+      "customUrl": "Custom backend URL",
+      "customUrlPlaceholder": "http://localhost:3000",
+      "customUrlHelp": "Enter the origin (scheme + host + port) of a running Fire Tools backend. The app will append /api/v1 automatically.",
+      "urlRequired": "Please enter a URL",
+      "urlInvalid": "URL is not valid",
+      "test": "Test connection",
+      "testing": "Testing…",
+      "testSuccess": "Connection successful",
+      "testError": "Connection failed"
+    }
   },
   "assetAllocation": {
     "addAsset": "Add Asset",

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { loadSettings, saveSettings, DEFAULT_SETTINGS, DEFAULT_FIRE_ASSET_CLASS_INCLUSION, type UserSettings } from '../utils/cookieSettings';
+import { loadSettings, saveSettings, DEFAULT_SETTINGS, DEFAULT_FIRE_ASSET_CLASS_INCLUSION, DEFAULT_BACKEND_SETTINGS, type UserSettings, type BackendSettings } from '../utils/cookieSettings';
 import { SUPPORTED_CURRENCIES, DEFAULT_FALLBACK_RATES, type SupportedCurrency } from '../types/currency';
 import { ALL_COUNTRIES, isEUCountry } from '../types/country';
 import { recalculateFallbackRates, convertAssetsToNewCurrency, convertNetWorthDataToNewCurrency, convertExpenseDataToNewCurrency, convertFireCalculatorInputsToNewCurrency } from '../utils/currencyConverter';
@@ -30,6 +30,7 @@ import { fetchExchangeRatesAsMap } from '../utils/exchangeRateApi';
 import { CategoryManagerDialog } from './CategoryManagerDialog';
 import { SearchableSelect } from './SearchableSelect';
 import { LanguageSelector } from './LanguageSelector';
+import { probeBackend, getEmbeddedBackendInfo } from '../utils/apiBase';
 import { IS_DEMO_MODE } from '../utils/demoMode';
 import './SettingsPage.css';
 
@@ -38,7 +39,7 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
+const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'backend', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
@@ -59,6 +60,13 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const [marketDataRates, setMarketDataRates] = useState<{ rates: Record<string, number>; isUsingFallback: boolean; lastUpdate: string; error?: string } | null>(null);
   const [isMarketDataLoading, setIsMarketDataLoading] = useState(false);
   const [marketDataFetchedAt, setMarketDataFetchedAt] = useState<string | null>(null);
+
+  // Backend connection state
+  const [backendDraftUrl, setBackendDraftUrl] = useState<string>('');
+  const [backendTestState, setBackendTestState] = useState<{ status: 'idle' | 'testing' | 'success' | 'error'; message?: string }>({ status: 'idle' });
+  const [embeddedBackendUrl, setEmbeddedBackendUrl] = useState<string | null>(null);
+  const [embeddedBackendError, setEmbeddedBackendError] = useState<string | null>(null);
+  const isElectron = typeof window !== 'undefined' && !!window.fireTools?.getEmbeddedBackend;
   
   // Account section expanded by default, others collapsed
   const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
@@ -109,6 +117,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     
     setIsLoading(false);
   }, []);
+
+  // Seed backend draft URL from loaded settings & fetch embedded info
+  useEffect(() => {
+    setBackendDraftUrl(settings.backend?.customUrl ?? '');
+  }, [settings.backend?.customUrl]);
+
+  useEffect(() => {
+    if (!isElectron) return;
+    let cancelled = false;
+    (async () => {
+      const info = await getEmbeddedBackendInfo();
+      if (cancelled) return;
+      if (info?.error) {
+        setEmbeddedBackendError(info.error);
+        setEmbeddedBackendUrl(null);
+      } else if (info?.url) {
+        setEmbeddedBackendUrl(info.url);
+        setEmbeddedBackendError(null);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isElectron]);
 
   // Show temporary message
   const showMessage = (type: 'success' | 'error', text: string) => {
@@ -259,6 +289,63 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     saveSettings(newSettings);
     onSettingsChange?.(newSettings);
     showMessage('success', t('settings.messages.settingsSaved'));
+  };
+
+  // Backend mode change
+  const handleBackendModeChange = (mode: BackendSettings['mode']) => {
+    const next: BackendSettings = mode === 'custom'
+      ? { mode: 'custom', customUrl: settings.backend?.customUrl ?? backendDraftUrl ?? '' }
+      : { mode: 'embedded' };
+    handleSettingChange('backend', next);
+    setBackendTestState({ status: 'idle' });
+  };
+
+  // Save custom URL (commit draft)
+  const handleSaveBackendUrl = () => {
+    const trimmed = backendDraftUrl.trim();
+    if (!trimmed) {
+      showMessage('error', t('settings.backend.urlRequired'));
+      return;
+    }
+    try {
+      new URL(trimmed);
+    } catch {
+      showMessage('error', t('settings.backend.urlInvalid'));
+      return;
+    }
+    handleSettingChange('backend', { mode: 'custom', customUrl: trimmed });
+  };
+
+  // Test backend connection (uses draft URL when in custom mode, else embedded)
+  const handleTestBackend = async () => {
+    setBackendTestState({ status: 'testing' });
+    let origin: string | null = null;
+    const mode = settings.backend?.mode ?? 'embedded';
+    if (mode === 'custom') {
+      const trimmed = backendDraftUrl.trim();
+      if (!trimmed) {
+        setBackendTestState({ status: 'error', message: t('settings.backend.urlRequired') });
+        return;
+      }
+      try { new URL(trimmed); } catch {
+        setBackendTestState({ status: 'error', message: t('settings.backend.urlInvalid') });
+        return;
+      }
+      origin = trimmed;
+    } else {
+      if (!embeddedBackendUrl) {
+        setBackendTestState({ status: 'error', message: embeddedBackendError || t('settings.backend.embeddedUnavailable') });
+        return;
+      }
+      origin = embeddedBackendUrl;
+    }
+    try {
+      await probeBackend(origin);
+      setBackendTestState({ status: 'success', message: t('settings.backend.testSuccess') });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setBackendTestState({ status: 'error', message: `${t('settings.backend.testError')}: ${msg}` });
+    }
   };
 
   // Handle fallback rate change
@@ -986,6 +1073,100 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   }
                   return null;
                 })()}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Backend */}
+        <section className="settings-section collapsible-section">
+          <button
+            className="collapsible-header"
+            onClick={() => toggleSection('backend')}
+            aria-expanded={!collapsedSections.has('backend')}
+            aria-controls="backend-content"
+          >
+            <h2><MaterialIcon name="dns" /> {t('settings.sections.backend')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('backend') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('backend') && (
+            <div id="backend-content" className="collapsible-content">
+              <p className="setting-help">{t('settings.backend.description')}</p>
+
+              <div className="setting-item">
+                <div className="label-with-tooltip">
+                  <label>{t('settings.backend.mode')}</label>
+                </div>
+                <div className="toggle-group">
+                  <button
+                    className={`toggle-btn ${(settings.backend?.mode ?? DEFAULT_BACKEND_SETTINGS.mode) === 'embedded' ? 'active' : ''}`}
+                    onClick={() => handleBackendModeChange('embedded')}
+                    disabled={!isElectron}
+                    title={!isElectron ? t('settings.backend.embeddedOnlyDesktop') : undefined}
+                  >
+                    <MaterialIcon name="memory" size="small" /> {t('settings.backend.embedded')}
+                  </button>
+                  <button
+                    className={`toggle-btn ${(settings.backend?.mode ?? DEFAULT_BACKEND_SETTINGS.mode) === 'custom' ? 'active' : ''}`}
+                    onClick={() => handleBackendModeChange('custom')}
+                  >
+                    <MaterialIcon name="cloud" size="small" /> {t('settings.backend.custom')}
+                  </button>
+                </div>
+              </div>
+
+              {(settings.backend?.mode ?? DEFAULT_BACKEND_SETTINGS.mode) === 'embedded' ? (
+                <div className="setting-item">
+                  <span className="setting-help">
+                    {isElectron
+                      ? (embeddedBackendError
+                        ? `${t('settings.backend.embeddedUnavailable')}: ${embeddedBackendError}`
+                        : embeddedBackendUrl
+                          ? `${t('settings.backend.embeddedRunningAt')}: ${embeddedBackendUrl}`
+                          : t('settings.backend.embeddedStarting'))
+                      : t('settings.backend.embeddedOnlyDesktop')}
+                  </span>
+                </div>
+              ) : (
+                <div className="setting-item">
+                  <div className="label-with-tooltip">
+                    <label htmlFor="backendCustomUrl">{t('settings.backend.customUrl')}</label>
+                  </div>
+                  <input
+                    id="backendCustomUrl"
+                    type="url"
+                    value={backendDraftUrl}
+                    onChange={(e) => setBackendDraftUrl(e.target.value)}
+                    placeholder={t('settings.backend.customUrlPlaceholder')}
+                  />
+                  <div className="toggle-group" style={{ marginTop: '0.5rem' }}>
+                    <button className="toggle-btn" onClick={handleSaveBackendUrl}>
+                      <MaterialIcon name="save" size="small" /> {t('common.save')}
+                    </button>
+                  </div>
+                  <span className="setting-help">{t('settings.backend.customUrlHelp')}</span>
+                </div>
+              )}
+
+              <div className="setting-item">
+                <div className="toggle-group">
+                  <button
+                    className="toggle-btn"
+                    onClick={handleTestBackend}
+                    disabled={backendTestState.status === 'testing'}
+                  >
+                    <MaterialIcon name="wifi_tethering" size="small" /> {backendTestState.status === 'testing' ? t('settings.backend.testing') : t('settings.backend.test')}
+                  </button>
+                </div>
+                {backendTestState.status === 'success' && (
+                  <span className="setting-help" style={{ color: 'var(--success-color, #22c55e)' }}>
+                    <MaterialIcon name="check_circle" size="small" /> {backendTestState.message}
+                  </span>
+                )}
+                {backendTestState.status === 'error' && (
+                  <span className="setting-help" style={{ color: 'var(--error-color, #ef4444)' }}>
+                    <MaterialIcon name="error" size="small" /> {backendTestState.message}
+                  </span>
+                )}
               </div>
             </div>
           )}

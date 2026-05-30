@@ -146,7 +146,8 @@
       "data": "Gestión de datos",
       "support": "Soporte y comentarios",
       "language": "Idioma",
-      "disclaimer": "Aviso legal"
+      "disclaimer": "Aviso legal",
+      "backend": "Backend"
     },
     "accountName": "Nombre de cuenta",
     "accountNameHelp": "Este nombre se mostrará en toda la aplicación",
@@ -366,7 +367,26 @@
     "unavailable": "Unavailable",
     "usingFallbackRates": "Using Fallback Rates",
     "uxUiSuggestion": "Ux Ui Suggestion",
-    "uxUiSuggestionHelp": "Sugerir mejoras a la interfaz de usuario o la experiencia de uso"
+    "uxUiSuggestionHelp": "Sugerir mejoras a la interfaz de usuario o la experiencia de uso",
+    "backend": {
+      "description": "Elige dónde almacena y lee tus datos la aplicación. De forma predeterminada, Fire Tools ejecuta un backend integrado dentro de la aplicación de escritorio, con almacenamiento local en SQLite. Los usuarios avanzados pueden apuntar la aplicación a una instancia de backend separada.",
+      "mode": "Modo",
+      "embedded": "Integrado (predeterminado)",
+      "custom": "URL personalizada",
+      "embeddedOnlyDesktop": "El backend integrado solo está disponible en la aplicación de escritorio.",
+      "embeddedRunningAt": "Backend integrado en ejecución en",
+      "embeddedStarting": "Iniciando el backend integrado…",
+      "embeddedUnavailable": "Backend integrado no disponible",
+      "customUrl": "URL del backend personalizado",
+      "customUrlPlaceholder": "http://localhost:3000",
+      "customUrlHelp": "Ingresa el origen (esquema + host + puerto) de un backend Fire Tools en ejecución. La aplicación añadirá /api/v1 automáticamente.",
+      "urlRequired": "Ingresa una URL",
+      "urlInvalid": "URL no válida",
+      "test": "Probar conexión",
+      "testing": "Probando…",
+      "testSuccess": "Conexión exitosa",
+      "testError": "Conexión fallida"
+    }
   },
   "assetAllocation": {
     "addAsset": "Añadir activo",

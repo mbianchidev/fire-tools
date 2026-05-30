@@ -4,11 +4,15 @@ Wraps the existing React SPA so it ships as a signed binary on macOS,
 Windows and Linux. Tracks issue
 [#132](https://github.com/mbianchidev/fire-tools/issues/132).
 
-> **Scope of this scaffold.** Wrapper only. The renderer is the same
-> client-side React app (cookie-encrypted storage) that runs on the web.
-> Bundling the local backend (#129/#195) inside the same binary is a
-> follow-up; for now, Electron users either run with cookies only or
-> point the bundled web app at a self-hosted backend.
+> **Scope of this scaffold.** Wraps the React SPA **and bundles the
+> Node + Express + SQLite backend in-process**: the main process starts the
+> embedded server on a random localhost port at boot, the renderer talks to
+> it like any other API, and SQLite lives at the OS userData path
+> (`~/Library/Application Support/fire-tools/firetools.db` on macOS,
+> `%APPDATA%\fire-tools\firetools.db` on Windows,
+> `~/.config/fire-tools/firetools.db` on Linux). Users who prefer to run
+> the backend elsewhere (Docker, remote box) can switch to a custom URL via
+> **Settings → Backend → Custom URL** without rebuilding the app.
 
 ## Run in dev
 

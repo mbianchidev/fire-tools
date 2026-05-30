@@ -8,11 +8,17 @@ directories:
 files:
   - electron/**/*
   - dist-electron/**/*
+  - server/dist/**/*
+  - server/migrations/**/*
   - package.json
   - "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}"
   - "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
   - "!**/node_modules/*.d.ts"
   - "!**/node_modules/.bin"
+
+asarUnpack:
+  - "**/*.{node,dll,dylib,so}"
+  - "node_modules/better-sqlite3/**/*"
 
 extraMetadata:
   main: electron/main.cjs

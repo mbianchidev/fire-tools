@@ -40,6 +40,22 @@ export const DEFAULT_EXPERIMENTAL_FEATURES: ExperimentalFeatures = {
   pdfImport: false,
 };
 
+export type BackendMode = 'embedded' | 'custom';
+
+/** Local-deployment backend connection settings.
+ * - `embedded`: app uses the in-process backend bundled with Electron
+ *   (no-op for non-Electron browser builds).
+ * - `custom`: app talks to a separately-running backend at `customUrl`.
+ *   Useful when running a shared backend on the LAN, in Docker, etc. */
+export interface BackendSettings {
+  mode: BackendMode;
+  customUrl?: string;
+}
+
+export const DEFAULT_BACKEND_SETTINGS: BackendSettings = {
+  mode: 'embedded',
+};
+
 export interface UserSettings {
   accountName: string;
   decimalSeparator: '.' | ',';
@@ -57,6 +73,8 @@ export interface UserSettings {
   /** Optional OpenAI-compatible LLM config for PDF import categorization.
    *  Stored encrypted with the rest of the settings. */
   llmCategorization?: LlmCategorizationConfig;
+  /** Where the app finds its backend API (embedded vs. custom URL). */
+  backend: BackendSettings;
 }
 
 export const DEFAULT_FIRE_ASSET_CLASS_INCLUSION: Record<AssetClass, boolean> = {
@@ -84,6 +102,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   searchThreshold: 8,
   experimentalFeatures: DEFAULT_EXPERIMENTAL_FEATURES,
   language: 'en',
+  backend: DEFAULT_BACKEND_SETTINGS,
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
@@ -142,6 +161,10 @@ export function loadSettings(): UserSettings {
           experimentalFeatures: {
             ...DEFAULT_EXPERIMENTAL_FEATURES,
             ...(parsed.experimentalFeatures || {}),
+          },
+          backend: {
+            ...DEFAULT_BACKEND_SETTINGS,
+            ...(parsed.backend || {}),
           },
         };
       }
@@ -237,6 +260,25 @@ export function validateSettings(settings: Partial<UserSettings>): { isValid: bo
     const validLanguages: LanguageCode[] = ['en', 'it', 'fr', 'de', 'es'];
     if (!validLanguages.includes(settings.language as LanguageCode)) {
       errors.push('Language must be one of: en, it, fr, de, es');
+    }
+  }
+
+  if (settings.backend !== undefined) {
+    if (settings.backend.mode !== 'embedded' && settings.backend.mode !== 'custom') {
+      errors.push('Backend mode must be "embedded" or "custom"');
+    }
+    if (settings.backend.mode === 'custom') {
+      const url = settings.backend.customUrl;
+      if (!url || typeof url !== 'string') {
+        errors.push('Custom backend URL is required when mode is "custom"');
+      } else {
+        try {
+          // eslint-disable-next-line no-new
+          new URL(url);
+        } catch {
+          errors.push('Custom backend URL must be a valid absolute URL');
+        }
+      }
     }
   }
 
