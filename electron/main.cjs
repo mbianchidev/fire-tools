@@ -152,11 +152,20 @@ ipcMain.handle('fire-tools:open-external', (_event, url) => {
   return true;
 });
 
+// Hold strong references to in-flight Notifications. Electron's docs warn
+// that without this the GC can collect them before they're displayed,
+// which is exactly what was happening on macOS — show() returned but the
+// toast never reached NotificationCenter.
+const liveNotifications = new Set();
+
 // Show a native OS notification (macOS NotificationCenter / Windows Action
 // Center / Linux libnotify). Title is required; everything else is opt-in.
 ipcMain.handle('fire-tools:show-native-notification', (_event, opts) => {
   try {
-    if (!Notification.isSupported()) return false;
+    if (!Notification.isSupported()) {
+      console.warn('[fire-tools] native notifications not supported on this platform');
+      return false;
+    }
     if (!opts || typeof opts.title !== 'string' || opts.title.length === 0) {
       return false;
     }
@@ -171,9 +180,20 @@ ipcMain.handle('fire-tools:show-native-notification', (_event, opts) => {
       silent: false,
       urgency, // Linux only; ignored elsewhere
     });
+    liveNotifications.add(notification);
+    const release = () => liveNotifications.delete(notification);
     notification.on('click', () => {
       focusMainWindow();
+      release();
     });
+    notification.on('close', release);
+    notification.on('failed', (_e, error) => {
+      console.error('[fire-tools] native notification failed:', error);
+      release();
+    });
+    // Belt-and-braces: free the reference after a reasonable display window
+    // even if the OS never fires close (some Linux notifiers don't).
+    setTimeout(release, 30_000);
     notification.show();
     return true;
   } catch (err) {
