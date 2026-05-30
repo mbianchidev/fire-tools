@@ -446,7 +446,8 @@ function FIRECalculatorPage() {
 function App() {
   // SPA lives under /demo on the web so the landing page can sit at the root.
   // Production = GitHub Pages under /fire-tools.
-  const basename = import.meta.env.MODE === 'production' ? '/fire-tools/demo' : '/demo';
+  const isElectron = typeof window !== 'undefined' && window.location.protocol === 'file:';
+  const basename = isElectron ? '/' : import.meta.env.MODE === 'production' ? '/fire-tools/demo' : '/demo';
   const { t } = useTranslation();
   
   // Load settings from localStorage
