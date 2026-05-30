@@ -20,7 +20,16 @@ export interface InitDbResult {
   dbPath: string;
 }
 
-export const initDb = (env: ServerEnv): InitDbResult => {
+export interface InitDbOptions {
+  /**
+   * Skip auto-applying pending migrations on boot. Used by the migrate CLI
+   * for `down` and `status` so it can manage migrations explicitly without
+   * `initDb` racing ahead.
+   */
+  skipMigrations?: boolean;
+}
+
+export const initDb = (env: ServerEnv, opts: InitDbOptions = {}): InitDbResult => {
   if (env.databaseUrl.startsWith('postgres://') || env.databaseUrl.startsWith('postgresql://')) {
     throw new Error(
       'PostgreSQL driver not yet implemented in this scaffold. ' +
@@ -35,6 +44,8 @@ export const initDb = (env: ServerEnv): InitDbResult => {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
 
-  const migrationsResult = runMigrations(db, env.migrationsPath);
+  const migrationsResult: RunMigrationsResult = opts.skipMigrations
+    ? { migrationsApplied: [], totalMigrations: 0, migrationsDir: env.migrationsPath }
+    : runMigrations(db, env.migrationsPath);
   return { db, migrationsResult, dbPath };
 };
