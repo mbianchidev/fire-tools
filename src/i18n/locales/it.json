@@ -1,0 +1,2418 @@
+{
+  "app": {
+    "title": "Fire Tools",
+    "tagline": "Carburante per la tua pianificazione finanziaria",
+    "skipToContent": "Salta al contenuto principale",
+    "disclaimer": "Fire Tools - Avvertenza: questo strumento ha scopo puramente educativo. I dati di mercato sono forniti a titolo indicativo e potrebbero essere ritardati o inesatti. Per consigli professionali rivolgiti a un consulente finanziario.",
+    "privacyPolicy": "Informativa sulla privacy",
+    "cookiePolicy": "Informativa sui cookie",
+    "github": "GitHub"
+  },
+  "nav": {
+    "label": "Navigazione principale",
+    "toggle": "Apri/chiudi il menu di navigazione",
+    "home": "Home",
+    "assetAllocation": "Allocazione del portafoglio",
+    "portfolioBreakdown": "Composizione del portafoglio",
+    "cashflow": "Flussi di cassa",
+    "netWorth": "Patrimonio netto",
+    "fireCalculator": "Calcolatore FIRE",
+    "monteCarlo": "Monte Carlo"
+  },
+  "common": {
+    "save": "Salva",
+    "cancel": "Annulla",
+    "reset": "Reimposta",
+    "resetToDefaults": "Ripristina valori predefiniti",
+    "export": "Esporta",
+    "import": "Importa",
+    "close": "Chiudi",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "add": "Aggiungi",
+    "confirm": "Conferma",
+    "yes": "Sì",
+    "no": "No",
+    "loading": "Caricamento...",
+    "moreInfo": "Maggiori informazioni",
+    "english": "Inglese",
+    "italian": "Italiano",
+    "french": "Francese",
+    "german": "Tedesco",
+    "spanish": "Spagnolo",
+    "hideValues": "Nascondi valori",
+    "notAvailable": "N/D",
+    "months": {
+      "april": "Aprile",
+      "august": "Agosto",
+      "december": "Dicembre",
+      "february": "Febbraio",
+      "january": "Gennaio",
+      "july": "Luglio",
+      "june": "Giugno",
+      "march": "Marzo",
+      "may": "Maggio",
+      "november": "Novembre",
+      "october": "Ottobre",
+      "september": "Settembre"
+    },
+    "showValues": "Mostra valori",
+    "unknown": "Sconosciuto",
+    "unknownError": "Unknown error",
+    "update": "Aggiorna",
+    "shortMonths": {
+      "december": "Dic"
+    }
+  },
+  "home": {
+    "aboutTitle": "Informazioni su FIRE Tools",
+    "aboutBody": "FIRE Tools ti aiuta a pianificare e raggiungere l'indipendenza finanziaria e il pensionamento anticipato. La nostra suite di calcolatori e strumenti offre analisi basate sui dati per scelte finanziarie consapevoli.",
+    "disclaimer": "Avvertenza:",
+    "disclaimerBody": "Questi strumenti hanno solo scopo educativo e di pianificazione. Consulta sempre un consulente finanziario qualificato o fai le tue valutazioni prima di prendere decisioni di investimento.",
+    "toolsLabel": "Strumenti disponibili",
+    "securityTitle": "Avviso di sicurezza: deployment su GitHub Pages",
+    "securityWarning": "Attenzione:",
+    "securityWarningBody": "Questa applicazione è ospitata su GitHub Pages, che non supporta archiviazione lato server né cookie HTTP-only. Sebbene i dati siano cifrati con AES, restano vulnerabili ad attacchi XSS e ad altri exploit lato client che potrebbero esfiltrare i tuoi dati finanziari.",
+    "securityRecommend": "Per maggiore sicurezza:",
+    "securityRecommendBody": "Ti consigliamo vivamente di installare l'applicazione localmente sul tuo computer. Il deployment locale offre maggiore isolamento e riduce la superficie d'attacco.",
+    "securitySetupLink": "Istruzioni per l'installazione locale",
+    "dismissSecurity": "Chiudi l'avviso di sicurezza",
+    "cards": {
+      "assetAllocation": {
+        "title": "Gestore dell'allocazione",
+        "body": "Gestisci il portafoglio di investimenti con strumenti intelligenti di allocazione, strategie di ribilanciamento e supporto al DCA.",
+        "h1": "Gestione del portafoglio",
+        "h2": "Strumenti di ribilanciamento",
+        "h3": "Assistente DCA",
+        "cta": "Gestisci il portafoglio →"
+      },
+      "cashflow": {
+        "title": "Tracker dei flussi di cassa",
+        "body": "Monitora entrate e uscite, imposta budget per categoria e analizza le tue abitudini di spesa con la regola 50/30/20.",
+        "h1": "Tracciamento delle transazioni",
+        "h2": "Gestione del budget",
+        "h3": "Analisi delle spese",
+        "cta": "Monitora i flussi →"
+      },
+      "netWorth": {
+        "title": "Tracker del patrimonio",
+        "body": "Monitora le tue operazioni finanziarie e il patrimonio netto mese per mese. Tieni d'occhio asset, liquidità, pensioni e progressi verso il FIRE.",
+        "h1": "Asset e investimenti",
+        "h2": "Liquidità",
+        "h3": "Tracciamento pensioni",
+        "cta": "Monitora il patrimonio →"
+      },
+      "fireCalculator": {
+        "title": "Calcolatore FIRE",
+        "body": "Calcola il tuo percorso verso l'indipendenza finanziaria con proiezioni complete e analisi dettagliate del piano pensionistico.",
+        "h1": "Proiezioni visive",
+        "h2": "Tracciamento patrimonio",
+        "h3": "Entrate e uscite",
+        "cta": "Inizia la pianificazione →"
+      },
+      "monteCarlo": {
+        "title": "Simulazioni Monte Carlo",
+        "body": "Esegui migliaia di simulazioni con rendimenti di mercato casuali per stimare la probabilità di raggiungere il FIRE tenendo conto della volatilità.",
+        "h1": "Probabilità di successo",
+        "h2": "Analisi della volatilità",
+        "h3": "Eventi cigno nero",
+        "cta": "Avvia le simulazioni →"
+      },
+      "quiz": {
+        "title": "Quiz Persona FIRE",
+        "body": "Scopri la tua persona FIRE e ricevi consigli personalizzati in base alla tua situazione finanziaria, agli obiettivi e alla tolleranza al rischio.",
+        "h1": "Analisi personalizzata",
+        "h2": "Consigli intelligenti",
+        "h3": "Guida al percorso FIRE",
+        "cta": "Fai il quiz →"
+      }
+    },
+    "disclaimerAriaLabel": "Avviso importante"
+  },
+  "settings": {
+    "language": "Lingua",
+    "languageHelp": "Scegli la lingua dell'interfaccia. Non influisce sulla valuta.",
+    "sections": {
+      "account": "Conto",
+      "fire": "Calcolo FIRE",
+      "display": "Visualizzazione",
+      "privacy": "Privacy e regione",
+      "experimental": "Funzionalità sperimentali",
+      "notifications": "Notifiche",
+      "email": "Preferenze email",
+      "currency": "Tassi di conversione",
+      "marketData": "Dati di mercato",
+      "categories": "Categorie di spesa",
+      "data": "Gestione dei dati",
+      "support": "Supporto e feedback",
+      "language": "Lingua",
+      "disclaimer": "Disclaimer",
+      "backend": "Backend",
+      "advanced": "Avanzate"
+    },
+    "accountName": "Nome account",
+    "accountNameHelp": "Questo nome verrà visualizzato in tutta l'applicazione",
+    "actionCannotBeUndone": "Azione irreversibile",
+    "aiCategorizationHelp": "Collegate qualsiasi endpoint compatibile con OpenAI — cloud (OpenAI, Azure OpenAI, OpenRouter, Together…) o un modello open-source self-hosted tramite Ollama, LM Studio, llama.cpp, vLLM, ecc. Per la categorizzazione completamente locale, puntate il Base URL a es. http://localhost:11434/v1, lasciate la chiave API come qualsiasi stringa non vuota e usate un modello già scaricato (llama3.1:8b, qwen2.5, …).",
+    "aiCategorizationOptional": "Categorizzazione AI opzionale",
+    "aiCategorizationStoredHelp": "Conservato cifrato insieme alle altre impostazioni. Usato solo quando si spunta «Usa categorizzazione AI» nella finestra di importazione PDF.",
+    "apiKey": "Chiave API",
+    "assetPrices": "Prezzi degli asset",
+    "assetPricesDescription": "Prezzi di mercato attuali per i beni del portafoglio. I prezzi possono essere ritardati.",
+    "available": "Disponibile",
+    "back": "← Indietro",
+    "baseUrl": "URL base",
+    "categoriesDescription": "Gestite le categorie di spesa. Create categorie personalizzate o personalizzate quelle predefinite.",
+    "clearAllNotifications": "Cancella tutte le notifiche",
+    "commaFormat": "Formato virgola",
+    "confirm": {
+      "clearNotifications": "Are you sure you want to clear all notifications? This cannot be undone.",
+      "loadDemo": "This will overwrite your current data with demo data. Are you sure you want to continue?",
+      "resetAll": "Are you sure you want to reset ALL data? This will clear all saved data from cookies and cannot be undone."
+    },
+    "contributingGuide": "Guida ai contributi",
+    "country": "Paese",
+    "countrySetTo": "Country set to {{country}}",
+    "currency": "Valuta",
+    "dangerZone": "Zona pericolosa",
+    "dateFormat": "Formato data",
+    "dateFormatHelp": "Come vengono visualizzate le date nell'app",
+    "dateFormatOptions": {
+      "dmy": "Dmy",
+      "iso": "Iso",
+      "mdy": "Mdy"
+    },
+    "dcaInvestmentReminders": "Promemoria investimenti DCA",
+    "dcaInvestmentRemindersHelp": "Ricorda i contributi regolari agli investimenti",
+    "decimalPlaceOptions": {
+      "four": "Quattro",
+      "one": "Uno",
+      "three": "Tre",
+      "two": "Due",
+      "zero": "Zero"
+    },
+    "decimalPlaces": "Cifre decimali",
+    "decimalPlacesHelp": "Numero di decimali visualizzati per valori inferiori a 1.000. I valori pari o superiori a 1.000 non mostrano decimali.",
+    "decimalSeparator": "Separatore decimale",
+    "defaultCurrency": "Valuta predefinita",
+    "defaultCurrencyHelp": "Questa valuta verrà usata come predefinita in tutte le pagine",
+    "demoData": "Dati demo",
+    "demoDataHelp": "Carica dati di esempio per esplorare l'applicazione",
+    "disabled": "Disabilitato",
+    "disclaimer": "Disclaimer",
+    "documentation": "Documentazione",
+    "documentationHelp": "Visualizza la documentazione e le risorse di supporto",
+    "emailAddress": "Indirizzo email",
+    "emailFrequency": "Frequenza email",
+    "emailNotifications": "Notifiche email",
+    "emailNotificationsUnavailable": "Notifiche email non disponibili",
+    "enableInAppNotifications": "Abilita notifiche in-app",
+    "enableNativeNotifications": "Abilita notifiche native del sistema",
+    "enableNativeNotificationsHelp": "Mostra avvisi sul desktop di macOS / Windows / Linux in aggiunta a quelli in-app. Nel browser verrà richiesto il permesso.",
+    "enabled": "Abilitato",
+    "euResidentNotice": "Avviso per residenti UE",
+    "exchangeRateWarning": "Avviso tasso di cambio",
+    "exchangeRates": "Tassi di cambio",
+    "experimentalPreviewWarning": "Avviso anteprima sperimentale",
+    "exportAllData": "Esporta tutti i dati",
+    "exportAllDataHelp": "Esporta tutti i dati in un unico file o in file separati",
+    "exportJsonSingleFile": "Esporta JSON file singolo",
+    "exportSeparateFiles": "Esporta file separati",
+    "fallback": "Fallback",
+    "fallbackRates": "Tassi di fallback",
+    "fallbackRatesDescription": "These rates are used when the live exchange rate API is unavailable. All values convert to {{currency}} (the default currency).",
+    "fetchCurrentMarketData": "Recupera dati di mercato correnti",
+    "fetchMarketDataPrompt": "Clicca il pulsante qui sopra per recuperare tassi di cambio e prezzi degli asset aggiornati. I tuoi dati restano sul dispositivo — vengono contattati solo gli endpoint pubblici di mercato.",
+    "fetching": "Recupero in corso",
+    "fireAssetClassesHelp": "Attiva/disattiva le classi di attivi conteggiate nel valore del portafoglio FIRE",
+    "fireAssetClassesIncluded": "Classi di asset FIRE incluse",
+    "fireMilestoneAlerts": "Avvisi pietre miliari FIRE",
+    "fireMilestoneAlertsHelp": "Ricevi notifiche quando raggiungi i traguardi FIRE (25%, 50%, 75%, 100%)",
+    "fireQuestionnaire": "Questionario FIRE",
+    "fireQuestionnaireHelp": "Rifai il questionario per aggiornare il profilo FIRE e le raccomandazioni",
+    "frequency": {
+      "daily": "Giornaliero",
+      "monthly": "Mensile",
+      "never": "Mai",
+      "weekly": "Settimanale"
+    },
+    "guidedTour": "Tour guidato",
+    "guidedTourHelp": "Riavvia il tour guidato per scoprire le funzionalità di Fire Tools",
+    "importAllData": "Importa tutti i dati",
+    "importAllDataHelp": "Importa tutti i dati da un unico file JSON. I dati verranno convertiti nella valuta attuale.",
+    "importAllDataJson": "Importa tutti i dati JSON",
+    "importAssetAllocation": "Importa allocazione asset",
+    "importCashflowTracker": "Importa tracker flussi di cassa",
+    "importFireCalculator": "Importa calcolatore FIRE",
+    "importIndividualFiles": "Importa file individuali",
+    "importIndividualFilesHelp": "Importa dati da file CSV/JSON individuali per ogni strumento.",
+    "importNetWorthTracker": "Importa tracker patrimonio netto",
+    "includePrimaryResidence": "Includi residenza principale",
+    "lastFetched": "Ultimo recupero",
+    "live": "Live",
+    "liveRatesFetchedAt": "Live rates fetched at {{date}}",
+    "loadDemoData": "Carica dati demo",
+    "loadingSettings": "Caricamento impostazioni...",
+    "manageCategories": "Gestisci categorie",
+    "marketDataDisclaimer": "I dati di mercato sono recuperati da API pubbliche gratuite (Yahoo Finance, exchangerate.host). I valori possono essere in ritardo, incompleti o inaccurati, e non costituiscono consulenza finanziaria. Verifica i numeri critici da fonti autorevoli prima di prendere decisioni.",
+    "messages": {
+      "allDataExportedJson": "Tutti i dati esportati in JSON",
+      "allDataImported": "Tutti i dati importati",
+      "allDataReset": "Tutti i dati resettati",
+      "assetAllocationImported": "Allocazione asset importata",
+      "cashflowImported": "Flusso di cassa importato",
+      "categoryAdded": "Category \"{{name}}\" added!",
+      "categoryDeleted": "Category \"{{name}}\" deleted!",
+      "categoryUpdated": "Categoria aggiornata",
+      "categoryUpdatedWithName": "Category \"{{name}}\" updated!",
+      "dataExportedSeparate": "Dati esportati separatamente",
+      "defaultCurrencyChanged": "Default currency changed to {{currency}}! All values converted.",
+      "demoLoadFailed": "Failed to load demo data: {{message}}",
+      "demoLoaded": "Demo caricato",
+      "exportFailed": "Export failed: {{message}}",
+      "fallbackRatesReset": "Fallback Rates Reset",
+      "fireImported": "Fire Imported",
+      "importFailed": "Import failed: {{message}}",
+      "netWorthImported": "Net Worth Imported",
+      "notificationPreferencesSaved": "Notification Preferences Saved",
+      "notificationsCleared": "Notifications Cleared",
+      "ratePositive": "Rate must be a positive number",
+      "rateUpdated": "Tasso {{currency}} aggiornato!",
+      "settingsSaved": "Settings saved!",
+      "testNotificationsCreated": "{{count}} test notifications created! Check the notification bell."
+    },
+    "model": "Modello",
+    "newMonthReminders": "New Month Reminders",
+    "newMonthRemindersHelp": "Ricorda di aggiornare i dati finanziari all'inizio di ogni mese",
+    "newQuarterReminders": "New Quarter Reminders",
+    "newQuarterRemindersHelp": "Ricorda di rivedere le performance trimestrali",
+    "oneCurrencyEquals": "1 {{currency}} =",
+    "pdfImport": "Importazione PDF",
+    "pdfImportHelp": "Analizza localmente ricevute, fatture, estratti conto e buste paga. Nessuna chiamata di rete salvo se si attiva la categorizzazione AI — che può essere puntata a un modello open-source self-hosted, così nulla lascia il dispositivo.",
+    "placeholders": {
+      "apiKey": "Chiave API",
+      "myPortfolio": "My Portfolio",
+      "llmBaseUrl": "https://api.openai.com/v1 or http://localhost:11434/v1",
+      "llmModel": "gpt-4o-mini, llama3.1:8b, qwen2.5, …",
+      "email": "your@email.com"
+    },
+    "pointFormat": "Point Format",
+    "portfolioBreakdownHelp": "Abilita la pagina Analisi del portafoglio nella navigazione",
+    "portfolioBreakdownPage": "Portfolio Breakdown Page",
+    "price": "Prezzo",
+    "primaryResidenceHelp": "Determina se la residenza principale viene conteggiata nell'obiettivo FIRE",
+    "privacyMode": "Modalità privacy",
+    "privacyModeHelp": "Offusca i dati finanziari sensibili sullo schermo per la privacy",
+    "rateTo": "Rate to {{currency}}",
+    "reportBug": "Segnala bug",
+    "reportBugHelp": "Segnala bug, problemi dell'interfaccia o errori di calcolo",
+    "reportSecurityIssue": "Report Security Issue",
+    "reportSecurityIssueHelp": "Segnala vulnerabilità di sicurezza in modo privato",
+    "requestFeature": "Request Feature",
+    "requestFeatureHelp": "Suggerisci nuove funzionalità o miglioramenti",
+    "resetAllData": "Reimposta tutti i dati",
+    "resetToDefaultRates": "Reset to Default Rates",
+    "restartTour": "Riavvia il tour",
+    "retakeQuestionnaire": "Rifai il questionario",
+    "searchThreshold": "Search Threshold",
+    "searchThresholdHelp": "I menu a tendina con questo numero di elementi o più mostreranno una casella di ricerca",
+    "searchThresholdOptions": {
+      "always": "Sempre",
+      "eight": "Otto",
+      "fifteen": "Quindici",
+      "four": "Quattro",
+      "never": "Mai",
+      "six": "Sei",
+      "ten": "Dieci"
+    },
+    "selectCountryOptional": "Select Country Optional",
+    "source": "Fonte",
+    "status": "Stato",
+    "suggestUxUiImprovement": "Suggest Ux Ui Improvement",
+    "support": "Supporto",
+    "taxPaymentReminders": "Tax Payment Reminders",
+    "taxPaymentRemindersHelp": "Ricorda le scadenze fiscali imminenti",
+    "testMode": "Modalità test",
+    "testModeHelp": "Crea notifiche di esempio per testare l'interfaccia delle notifiche",
+    "testNotificationNativeTitle": "Fire Tools",
+    "testNotificationNativeBody": "Questa è una notifica di prova nativa del desktop.",
+    "ticker": "Ticker",
+    "title": "Settings",
+    "tooltips": {
+      "accountName": "Nome account",
+      "aiCategorization": "Ai Categorization",
+      "country": "Paese",
+      "dateFormat": "Formato data",
+      "decimalPlaces": "Cifre decimali",
+      "decimalSeparator": "Separatore decimale",
+      "defaultCurrency": "Valuta predefinita",
+      "demoData": "Dati demo",
+      "documentation": "Documentazione",
+      "emailNotifications": "Notifiche email",
+      "exportAllData": "Esporta tutti i dati",
+      "fallbackRates": "Tassi di fallback",
+      "fireAssetClasses": "Fire Asset Classes",
+      "fireQuestionnaire": "Questionario FIRE",
+      "guidedTour": "Tour guidato",
+      "importAllData": "Importa tutti i dati",
+      "importIndividualFiles": "Importa file individuali",
+      "inAppNotifications": "in App Notifications",
+      "nativeNotifications": "Notifiche native del sistema",
+      "pdfImport": "Importazione PDF",
+      "portfolioBreakdown": "Portfolio Breakdown",
+      "primaryResidence": "Primary Residence",
+      "privacyMode": "Modalità privacy",
+      "reportBug": "Segnala bug",
+      "reportSecurityIssue": "Report Security Issue",
+      "requestFeature": "Request Feature",
+      "searchThreshold": "Search Threshold",
+      "testMode": "Modalità test",
+      "uxUiSuggestion": "Ux Ui Suggestion"
+    },
+    "triggerTestNotifications": "Invia notifiche di prova",
+    "unavailable": "Unavailable",
+    "usingFallbackRates": "Using Fallback Rates",
+    "uxUiSuggestion": "Ux Ui Suggestion",
+    "uxUiSuggestionHelp": "Suggerisci miglioramenti all'interfaccia utente o all'esperienza d'uso",
+    "backend": {
+      "description": "Scegli dove l'app salva e legge i tuoi dati. Per impostazione predefinita Fire Tools esegue un backend integrato nell'app desktop, con archiviazione locale in SQLite. Gli utenti avanzati possono puntare l'app a un'istanza di backend separata.",
+      "mode": "Modalità",
+      "embedded": "Integrato (predefinito)",
+      "custom": "URL personalizzato",
+      "embeddedOnlyDesktop": "Il backend integrato è disponibile solo nell'app desktop.",
+      "embeddedRunningAt": "Backend integrato in esecuzione su",
+      "embeddedStarting": "Avvio del backend integrato in corso…",
+      "embeddedUnavailable": "Backend integrato non disponibile",
+      "customUrl": "URL backend personalizzato",
+      "customUrlPlaceholder": "http://localhost:3000",
+      "customUrlHelp": "Inserisci l'origine (schema + host + porta) di un backend Fire Tools in esecuzione. L'app aggiungerà /api/v1 automaticamente.",
+      "urlRequired": "Inserisci un URL",
+      "urlInvalid": "URL non valido",
+      "test": "Verifica connessione",
+      "testing": "Verifica in corso…",
+      "testSuccess": "Connessione riuscita",
+      "testError": "Connessione non riuscita"
+    },
+    "advanced": {
+      "description": "Ispeziona o testa l'API REST del backend incorporato. Utile per il debug e la verifica della connettività.",
+      "endpoint": "Endpoint",
+      "method": "Metodo HTTP",
+      "path": "Percorso della richiesta",
+      "pathHelp": "Il percorso viene aggiunto all'URL base /api/v1 del backend.",
+      "body": "Corpo della richiesta (JSON)",
+      "send": "Invia richiesta",
+      "sending": "Invio in corso…",
+      "response": "Risposta",
+      "noBackend": "Nessun backend configurato. Configurane uno nella sezione Backend sopra.",
+      "pathMustStartWithSlash": "Il percorso deve iniziare con /",
+      "invalidJson": "Il corpo della richiesta non è un JSON valido"
+    }
+  },
+  "assetAllocation": {
+    "addAsset": "Aggiungi asset",
+    "addNewAssetAria": "Add New Asset Aria",
+    "assetClassSummary": "Riepilogo classi di attivi",
+    "assetClasses": "Asset Classes",
+    "charts": {
+      "breakdown": "{{assetClass}} Breakdown",
+      "byAssetClass": "Portfolio Allocation by Asset Class",
+      "byAssetClassLower": "Portfolio allocation by asset class"
+    },
+    "confirm": {
+      "loadDemo": "This will overwrite your current asset allocation data with demo data. Are you sure you want to continue?",
+      "reset": "Are you sure you want to reset all Asset Allocation data? This will clear all saved assets.",
+      "resetWithSync": "Are you sure you want to reset all Asset Allocation data?\n\nWARNING: With sync enabled, this will also clear the Net Worth Tracker data for the current month (assets and cash).\n\nHistorical Net Worth data will NOT be affected."
+    },
+    "dcaHelper": "Helper DCA",
+    "defaultNewAssetName": "Nuovo asset",
+    "description": "Manage and visualize your portfolio asset allocation. Set target allocations, track current positions, and see recommended actions to rebalance your portfolio.",
+    "detailedAssetAllocation": "Detailed Asset Allocation",
+    "editAll": "Modifica tutto",
+    "editAllAssetClassAllocations": "Edit All Asset Class Allocations",
+    "exchangeRatesLastUpdated": "Exchange rates last updated",
+    "exportCsv": "Esporta CSV",
+    "failedTickers": "· Failed: {{tickers}}",
+    "graphs": "Graphs",
+    "howToUse": {
+      "actionsLabel": "Azioni:",
+      "addAssetLabel": "Aggiungi asset:",
+      "addAssetText": "Click the \"Add Asset\" button to add a new asset with type selection",
+      "cashAssetsLabel": "For Cash assets:",
+      "cashAssetsText": "Actions show \"SAVE\" (increase) or \"INVEST\" (move to other assets) instead of buy/sell",
+      "collapsibleTablesLabel": "Collapsible Tables:",
+      "collapsibleTablesText": "Click on an asset class header to expand/collapse and see individual assets",
+      "decreasePosition": "Decrease position",
+      "deleteAssetLabel": "Delete Asset:",
+      "deleteAssetText": "When editing an asset, click the trash icon to delete it",
+      "deltaLabel": "Variazione:",
+      "deltaText": "Positive values indicate how much to buy, negative values indicate how much to sell",
+      "editAssetLabel": "Edit Asset:",
+      "editAssetText": "Click the edit (pencil) button in any row to edit the current value and target %",
+      "increasePosition": "Increase position",
+      "notInAllocation": "Not in allocation",
+      "percentageTargetsLabel": "Percentage targets",
+      "percentageTargetsPageText": "for active assets within a class should sum to 100%",
+      "percentageTargetsText": "for active assets should sum to 100%",
+      "targetModeLabel": "Target Mode:",
+      "targetModePageText": "Choose \"%\" for percentage-based allocation, \"SET\" for fixed amounts (only for cash types), or \"OFF\" to exclude",
+      "targetModeText": "Choose \"%\" for percentage-based allocation, \"SET\" for fixed amounts (e.g., emergency cash), or \"OFF\" to exclude from calculations",
+      "title": "Come usare",
+      "withinTargetRange": "Within target range"
+    },
+    "importCsv": "Importa CSV",
+    "massEditAssetClasses": "Mass Edit Asset Classes",
+    "massEditAssets": "Mass Edit {{assetClass}} Assets",
+    "messages": {
+      "importCsvError": "Error importing CSV: {{message}}"
+    },
+    "openDcaHelperAria": "Open Dca Helper Aria",
+    "portfolioDetailsByAssetClass": "Portfolio Details By Asset Class",
+    "portfolioValueExcludingCash": "Portfolio Value (excl. Cash):",
+    "rates": "Rates: {{date}}",
+    "refreshPrices": "Aggiorna prezzi",
+    "refreshPricesAria": "Refresh asset prices from Yahoo Finance",
+    "refreshPricesTitle": "Fetch live prices from Yahoo Finance",
+    "refreshingPrices": "Refreshing…",
+    "selectAssetClass": "Select Asset Class",
+    "syncingWithNetWorth": "Syncing with Net Worth Tracker (current month)",
+    "title": "Asset Allocation Manager",
+    "totalHoldingsIncludingCash": "Total holdings (incl. cash):",
+    "updatedAssets": "Aggiornato {{count}} asset",
+    "validationErrors": "Validation Errors",
+    "viewAssetClassDetails": "Visualizza i dettagli della classe di attivi:",
+    "viewDetailedPortfolioBreakdown": "View Detailed Portfolio Breakdown"
+  },
+  "expenseTracker": {
+    "actions": "Azioni",
+    "addExpense": "Aggiungi spesa",
+    "addIncome": "Aggiungi entrate",
+    "all": "Tutti",
+    "allCategories": "All Categories",
+    "allTransactions": "All Transactions",
+    "amount": "Importo",
+    "amountRange": "Amount Range",
+    "amountWithCurrency": "Amount ({{currency}})",
+    "analytics": "Analisi",
+    "backToCurrentPeriod": "Back to Current Period",
+    "budget": "Budget",
+    "budgetRule": {
+      "needs": "Necessità",
+      "ruleLabel": "La regola 50/30/20:",
+      "ruleText": "Destinate il 50% del reddito ai bisogni, il 30% ai desideri e il 20% al risparmio.",
+      "savings": "Risparmi",
+      "title": "Titolo",
+      "wants": "Desideri"
+    },
+    "budgets": "Budget",
+    "category": "Categoria",
+    "categoryBreakdown": "Category Breakdown - {{period}}",
+    "categorySource": "Category Source",
+    "categorySpendingTrends": "Category Spending Trends",
+    "clickToSort": "Click to Sort",
+    "confirm": {
+      "deleteTransaction": "Are you sure you want to delete this transaction?",
+      "loadDemo": "Load demo expense data for {{year}}? This will replace existing data for {{year}}.",
+      "reset": "Are you sure you want to reset all expense tracker data? This cannot be undone."
+    },
+    "date": "Data",
+    "deleteTransaction": "Delete Transaction",
+    "description": "Descrizione",
+    "descriptionPlaceholder": "Inserisci una descrizione...",
+    "editTransaction": "Edit Transaction",
+    "emptyTransactions": "Empty Transactions",
+    "expense": "Spesa",
+    "expenseBreakdown": "Expense Breakdown - {{period}}",
+    "expenseCategory": "Expense Category",
+    "filterByCategory": "Filter By Category",
+    "howItWorks": {
+      "addTransactionsLabel": "Aggiungi transazioni:",
+      "addTransactionsText": "Fate clic su «Aggiungi entrata» o «Aggiungi spesa» per registrare nuove transazioni",
+      "editDeleteLabel": "Modifica/Elimina:",
+      "editDeleteText": "Fate clic su qualsiasi riga di transazione per modificarla o eliminarla",
+      "navigateMonthsLabel": "Naviga tra i mesi:",
+      "navigateMonthsText": "Usate i selettori mese/anno per visualizzare periodi diversi",
+      "needsWantsLabel": "Bisogni vs Desideri:",
+      "needsWantsText": "Categorizzate le spese per monitorare il rispetto della regola del budget 50/30/20",
+      "setBudgetsLabel": "Imposta budget:",
+      "setBudgetsText": "Andate alla scheda Budget per impostare limiti di spesa mensili per categoria",
+      "title": "Titolo",
+      "viewAnalyticsLabel": "Visualizza analisi:",
+      "viewAnalyticsText": "Consultate la scheda Analisi per grafici e tendenze di spesa"
+    },
+    "importPdf": "Importa PDF",
+    "importPdfAria": "Import Pdf Aria",
+    "income": "Entrate",
+    "incomeSource": "Income Source",
+    "manageCategories": "Gestisci categorie",
+    "max": "Max",
+    "messages": {
+      "importCsvError": "Error importing CSV: {{message}}"
+    },
+    "min": "Min",
+    "month": "Mese",
+    "monthly": "Mensile",
+    "monthlyAverage": "Monthly Average",
+    "monthlyBudgets": "Monthly Budgets",
+    "monthlyBudgetsDescription": "Impostate limiti di spesa mensili per ogni categoria. Questi budget si applicano a tutti i mesi e aiutano a monitorare le spese sull'intero budget.",
+    "monthlySpendingComparison": "Monthly Spending Comparison",
+    "need": "Necessità",
+    "needEssential": "Need Essential",
+    "needs": "Necessità",
+    "netBalance": "Net Balance",
+    "noExpensesForPeriod": "No Expenses for Period",
+    "oneTimeOnly": "One Time Only",
+    "onlyExpenses": "Only Expenses",
+    "onlyIncome": "Only Income",
+    "percentOfTotal": "Percent of Total",
+    "period": {
+      "fullYear": "Full Year {{year}}",
+      "monthYear": "{{month}} {{year}}",
+      "quarterYear": "Q{{quarter}} {{year}}",
+      "ytdAverage": "YTD Average {{year}}"
+    },
+    "quarter": "Trimestre",
+    "quarterly": "Trimestrale",
+    "quarters": {
+      "q1": "Q1",
+      "q2": "Q2",
+      "q3": "Q3",
+      "q4": "Q4"
+    },
+    "recurring": "Ricorrente",
+    "recurringHint": "Le transazioni ricorrenti verranno copiate automaticamente nei nuovi mesi",
+    "recurringOnly": "Recurring Only",
+    "recurringTransaction": "Recurring Transaction",
+    "remaining": "Rimanente",
+    "savingsRate": "Savings Rate",
+    "search": "Cerca",
+    "searchPlaceholder": "Cerca descrizione o importo...",
+    "selectCategory": "Select Category",
+    "selectPeriod": "Select Period",
+    "selectSource": "Select Source",
+    "show": "Mostra",
+    "sortAscending": "Sort Ascending",
+    "sortBy": "Ordina per",
+    "sortDescending": "Sort Descending",
+    "source": "Fonte",
+    "spendingAnalyticsFor": "Spending Analytics for {{year}}",
+    "spentThisMonth": "Spent This Month",
+    "subcategoryOptional": "Subcategory Optional",
+    "subcategoryPlaceholder": "es., Elettricità, Gas...",
+    "subtitle": "Track your income and expenses, set budgets, and gain insights into your spending patterns.",
+    "sumOfFilteredTransactions": "Sum of Filtered Transactions",
+    "summaryFor": "Summary for {{month}} {{year}}",
+    "tabsAria": "Tabs Aria",
+    "title": "Cashflow Tracker",
+    "total": "Totale",
+    "totalExpenses": "Total Expenses",
+    "totalIncome": "Total Income",
+    "transactions": "Transactions",
+    "type": "Tipo",
+    "validation": {
+      "amountGreaterThanZero": "Please enter a valid amount greater than 0"
+    },
+    "view": "Visualizza",
+    "want": "Desiderio",
+    "wantNonEssential": "Want Non Essential",
+    "wants": "Desideri",
+    "year": "Anno",
+    "yearToDateAverage": "Year to Date Average",
+    "yearlyTotal": "Yearly Total"
+  },
+  "netWorth": {
+    "account": "Conto",
+    "accountName": "Nome account",
+    "accountType": "Account Type",
+    "acquisitionPrice": "Acquisition Price",
+    "actions": "Azioni",
+    "amount": "Importo",
+    "assetAllocationSync": "Asset Allocation Sync",
+    "assets": "Asset",
+    "avgMonthlyNetWorth": "Avg Monthly Net Worth",
+    "backToCurrentPeriod": "Back to Current Period",
+    "balance": "Saldo",
+    "bankInstitution": "Bank Institution",
+    "bankOrInstitution": "Bank or Institution",
+    "cashAndLiquidity": "Cash and Liquidity",
+    "cashEntry": "Voce liquidità",
+    "class": "Classe",
+    "confirm": {
+      "deleteAsset": "Are you sure you want to delete this asset?",
+      "deleteCash": "Are you sure you want to delete this cash entry?",
+      "deleteOperation": "Are you sure you want to delete this operation?",
+      "deletePension": "Are you sure you want to delete this pension entry?",
+      "loadDemo": "This will add demo data for {{year}} to your net worth tracker. Any existing data for {{year}} will be replaced. Continue?",
+      "reset": "Are you sure you want to reset all net worth tracker data? This cannot be undone."
+    },
+    "currency": "Valuta",
+    "currentValue": "Current Value",
+    "date": "Data",
+    "deleteAsset": "Elimina asset",
+    "deleteCashEntry": "Elimina voce di liquidità",
+    "deleteOperation": "Delete Operation",
+    "deletePension": "Elimina pensione",
+    "description": "Descrizione",
+    "editAsset": "Modifica asset",
+    "editCashEntry": "Modifica voce di liquidità",
+    "editPension": "Modifica pensione",
+    "emptyAssets": "Empty Assets",
+    "emptyCash": "Liquidità vuota",
+    "emptyOperations": "Empty Operations",
+    "emptyPensions": "Empty Pensions",
+    "financialOperations": "Financial Operations",
+    "historicalNetWorth": "Historical Net Worth",
+    "howItWorks": {
+      "assetAllocationSyncLabel": "Sincronizzazione allocazione attivi:",
+      "assetAllocationSyncText": "Abilitate la sincronizzazione per mantenere automaticamente i dati del mese corrente sincronizzati con il Gestore allocazione attivi",
+      "forecastConfidenceLabel": "Affidabilità previsione:",
+      "forecastConfidenceText": "BASSA (1-5 mesi), MEDIA (6-23 mesi), ALTA (24+ mesi di dati con crescita stabile)",
+      "logAssetsLabel": "Registra attivi:",
+      "logAssetsText": "Tracciate azioni, ETF, obbligazioni con numero di quote e prezzo",
+      "logCashLabel": "Registra liquidità:",
+      "logCashText": "Registrate conti bancari, liquidità di intermediazione, carte di credito",
+      "logOperationsLabel": "Registra operazioni:",
+      "logOperationsText": "Registrate dividendi, acquisti, vendite, tasse, ecc.",
+      "logPensionsLabel": "Registra pensioni:",
+      "logPensionsText": "Tracciate pensioni statali, private e aziendali",
+      "monthlySnapshotLabel": "Istantanea mensile:",
+      "monthlySnapshotText": "Aggiornate i valori a fine mese per il monitoraggio storico",
+      "title": "Titolo",
+      "viewHistoryLabel": "Visualizza cronologia:",
+      "viewHistoryText": "Navigate tra i mesi per visualizzare i dati storici"
+    },
+    "institutionName": "Institution Name",
+    "log": "Registra",
+    "logAsset": "Registra asset",
+    "logCash": "Registra liquidità",
+    "logFinancialOperation": "Log Financial Operation",
+    "logOperation": "Log Operation",
+    "logPension": "Log Pension",
+    "marketPrice": "Market Price",
+    "messages": {
+      "importDataError": "Error importing data: {{message}}"
+    },
+    "month": "Mese",
+    "monthlyDataEntry": "Monthly Data Entry",
+    "name": "Nome",
+    "netWorth": "Patrimonio netto",
+    "netWorthChange": "Net Worth Change",
+    "noteOptional": "Note Optional",
+    "operationType": "Operation Type",
+    "otherSpecifyBelow": "Other Specify Below",
+    "pension": "Pensione",
+    "pensionName": "Pension Name",
+    "pensionType": "Pension Type",
+    "pensions": "Pensioni",
+    "placeholders": {
+      "addNote": "Aggiungi una nota...",
+      "dividend": "Dividendo",
+      "localCreditUnion": "Local Credit Union",
+      "mainSavings": "Main Savings",
+      "statePension": "State Pension"
+    },
+    "selectBankBroker": "Select Bank Broker",
+    "selectPeriod": "Select Period",
+    "selectType": "Select Type",
+    "setCountryInSettings": " (Set country in Settings)",
+    "shares": "Quote",
+    "startMonthLog": "Start Month Log",
+    "subtitle": "Track your financial operations and net worth on a monthly basis. Monitor assets, cash, pensions, and progress toward FIRE.",
+    "summaryFor": "Net Worth Summary for {{month}} {{year}}",
+    "syncCurrentMonth": "Sincronizza mese corrente",
+    "syncInfo": "Se abilitato, le modifiche agli attivi e alla liquidità di questo mese si sincronizzeranno automaticamente con il Gestore allocazione attivi, e viceversa.",
+    "syncWithAssetAllocationAria": "Sync with Asset Allocation Aria",
+    "ticker": "Ticker",
+    "title": "Net Worth Tracker",
+    "totalAssets": "Total Assets",
+    "totalCash": "Liquidità totale",
+    "totalPension": "Total Pension",
+    "type": "Tipo",
+    "validation": {
+      "accountExists": "An account with this name already exists",
+      "amountGreaterThanZero": "Please enter a valid amount greater than 0",
+      "pensionExists": "A pension with this name already exists",
+      "validBalance": "Please enter a valid balance",
+      "validPensionValue": "Please enter a valid pension value"
+    },
+    "value": "Valore",
+    "year": "Anno",
+    "yearToDateProgress": "Year to Date Progress",
+    "ytdChange": "Variazione YTD"
+  },
+  "notFound": {
+    "backHome": "Back to Home",
+    "message": "Oops! The page you're looking for doesn't exist. It might have been moved or deleted.",
+    "popularPages": "Popular Pages",
+    "popularPagesNavigation": "Popular pages navigation",
+    "title": "404 - Pagina non trovata"
+  },
+  "portfolioBreakdown": {
+    "backToAssetAllocation": "Back to Asset Allocation",
+    "breakdownsAria": "Portfolio breakdowns",
+    "dimensions": {
+      "continent": {
+        "description": "For stocks, derived from the ISIN country prefix. For ETFs, derived from the fund name (e.g. an \"MSCI World\" ETF maps to Global).",
+        "title": "By Continent"
+      },
+      "currency": {
+        "description": "Distribution of holdings by the currency they were originally entered in.",
+        "title": "By Currency"
+      },
+      "etfProvider": {
+        "description": "The fund family / issuer inferred from the fund name (e.g., Vanguard, iShares). Direct stock holdings are grouped under \"Direct holding\".",
+        "title": "By ETF Provider"
+      },
+      "holding": {
+        "description": "Each individual asset as a share of the portfolio.",
+        "title": "Per titolo"
+      },
+      "market": {
+        "description": "The listing exchange for each holding (e.g., NASDAQ, LSE, Xetra).",
+        "title": "Per mercato"
+      },
+      "region": {
+        "description": "Finer-grained region (e.g., Western Europe, East Asia, Emerging Markets) derived from ISIN country (stocks) or fund name (ETFs).",
+        "title": "Per regione"
+      },
+      "sector": {
+        "description": "Individual stocks use their listed sector from Yahoo Finance. ETFs use a sector label inferred from their fund name (e.g. \"Technology\", \"Government Bonds\"), as Yahoo no longer exposes per-ETF holdings without authentication.",
+        "title": "Per settore"
+      }
+    },
+    "emptyPrefix": "Your portfolio is empty. Add assets in the",
+    "emptySuffix": "to see breakdowns here.",
+    "failedTickers": "· Failed: {{tickers}}",
+    "metadataFetched": "Metadata for {{count}} ticker",
+    "noTickers": "None of your assets have a ticker symbol, so only the Currency and Holding breakdowns are available. Add tickers in the Asset Allocation Manager to unlock sector, region, market, and provider breakdowns.",
+    "portfolioValue": "Portfolio Value:",
+    "refreshMetadata": "Aggiorna metadati",
+    "refreshMetadataAria": "Refresh asset metadata from Yahoo Finance",
+    "refreshMetadataTitle": "Re-fetch sector, country, and fund family from Yahoo Finance",
+    "refreshingMetadata": "Refreshing…",
+    "subtitle": "Slice your current portfolio across multiple dimensions to understand concentration risk, diversification, and exposure. Data is read from your saved Asset Allocation; for ETFs and individual stocks, additional metadata is fetched from Yahoo Finance.",
+    "title": "Portfolio Breakdown"
+  },
+  "questionnaire": {
+    "assetClasses": {
+      "bonds": "Obbligazioni",
+      "cash": "Liquidità",
+      "crypto": "Cripto",
+      "realEstate": "Immobiliare",
+      "stocks": "Azioni"
+    },
+    "back": "Indietro",
+    "disclaimer": "This is not financial advice. Do your own research and consult a qualified financial advisor.",
+    "exportResults": "Export Results",
+    "goToFireCalculator": "Go to FIRE Calculator",
+    "metrics": {
+      "annualWithdrawal": "Annual withdrawal from portfolio",
+      "incomeToSave": "Percentage of income to save",
+      "investmentRiskProfile": "Investment risk profile",
+      "riskTolerance": "Risk Tolerance",
+      "safeWithdrawalRate": "Safe Withdrawal Rate",
+      "targetSavingsRate": "Target Savings Rate"
+    },
+    "progress": "Question {{current}} of {{total}}",
+    "recommendedAssetAllocation": "Recommended Asset Allocation",
+    "resultsSubtitle": "Based on your responses, here's your personalized FIRE strategy",
+    "resultsTitle": "Your FIRE Persona",
+    "retakeQuestionnaire": "Rifai il questionario",
+    "subtitle": "Answer 12 questions to discover your ideal FIRE strategy and get personalized recommendations",
+    "suitableAssetTypes": "Suitable Asset Types",
+    "title": "FIRE Persona Questionnaire"
+  },
+  "fireCalculator": {
+    "title": "Parametri del Calcolatore FIRE",
+    "fromAssetAllocation": "Da Allocazione Patrimoniale",
+    "autoCalculated": "Calcolato automaticamente",
+    "sections": {
+      "initialValues": "Valori iniziali",
+      "assetAllocation": "Allocazione patrimoniale",
+      "income": "Reddito",
+      "pension": "Pensione",
+      "expenses": "Spese e risparmi",
+      "fireParams": "Parametri FIRE",
+      "expectedReturns": "Rendimenti attesi",
+      "options": "Opzioni"
+    },
+    "labels": {
+      "initialSavings": "Risparmi iniziali / Valore del portafoglio ({{currency}})",
+      "stocksPercent": "Azioni (%)",
+      "bondsPercent": "Obbligazioni (%)",
+      "cashPercent": "Liquidità (%)",
+      "laborIncome": "Reddito annuale da lavoro netto ({{currency}})",
+      "laborIncomeGrowthRate": "Tasso di crescita del reddito da lavoro (%)",
+      "otherIncome": "Reddito secondario / Lavoro dopo il FIRE (annuale) ({{currency}})",
+      "retirementAge": "Età pensionistica per pensione statale",
+      "statePension": "Reddito pensione statale (annuale) ({{currency}})",
+      "privatePension": "Reddito pensione privata (annuale) ({{currency}})",
+      "currentExpenses": "Spese annuali correnti ({{currency}})",
+      "fireExpenses": "Spese annuali FIRE ({{currency}})",
+      "savingsRate": "Tasso di risparmio (%)",
+      "currentAge": "Età attuale",
+      "withdrawalRate": "Tasso di prelievo desiderato (%)",
+      "yearsOfExpenses": "Anni di spese necessari per il FIRE",
+      "stockReturn": "Rendimento atteso delle azioni (%)",
+      "bondReturn": "Rendimento atteso delle obbligazioni (%)",
+      "cashReturn": "Liquidità / Tasso di inflazione (%)"
+    },
+    "allocationTotal": "Totale: {{value}}%",
+    "allocationWarning": "Dovrebbe essere pari al 100%",
+    "deflationWarning": "Un valore positivo indica deflazione. Periodi prolungati di deflazione sono storicamente rari – considerare attentamente nelle proprie proiezioni.",
+    "options": {
+      "stopWorking": "Smettere di lavorare al raggiungimento del numero FIRE",
+      "useAssetAllocation": "Utilizzare il valore e l'allocazione del portafoglio dall'Allocazione Patrimoniale",
+      "useExpenseTrackerExpenses": "Calcolare le spese correnti dagli ultimi 12 mesi del Tracker Spese",
+      "useExpenseTrackerIncome": "Calcolare il reddito da lavoro dagli ultimi 12 mesi del Tracker Spese"
+    }
+  },
+  "fireMetrics": {
+    "heading": "Metriche FIRE",
+    "share": "Condividi",
+    "copied": "Copiato!",
+    "failed": "Fallito",
+    "ariaLinkCopied": "Link copiato negli appunti",
+    "ariaCopyLink": "Copia il link per condividere questo calcolo",
+    "fireTarget": "Obiettivo FIRE",
+    "fireTargetSubtitle": "per FIRE standard",
+    "yearsToFIRE": "Anni al FIRE",
+    "atAge": "All'età di {{age}}",
+    "portfolioValue": "Valore del portafoglio",
+    "currentAge": "Età attuale",
+    "years": "anni",
+    "notAvailable": "N/D"
+  },
+  "monteCarlo": {
+    "pageTitle": "Simulazioni Monte Carlo",
+    "pageDescription": "Esegui simulazioni multiple con rendimenti di mercato casuali per valutare la probabilità di raggiungere il FIRE. Questo aiuta a comprendere la gamma di risultati potenziali e la probabilità di successo in diverse condizioni di mercato.",
+    "sectionDescription": "Esegui simulazioni multiple con rendimenti di mercato casuali per valutare la probabilità di raggiungere il FIRE.",
+    "validationError": "Errore di validazione",
+    "fixValidationReturn": "Tornare al Calcolatore FIRE per correggere questi problemi.",
+    "baseData": {
+      "title": "Dati base della simulazione",
+      "subtitle": "Dati dal Calcolatore FIRE utilizzati nelle simulazioni",
+      "financialPosition": "Posizione finanziaria",
+      "initialPortfolio": "Portafoglio iniziale",
+      "fireTarget": "Obiettivo FIRE",
+      "annualIncome": "Reddito annuale",
+      "savingsRate": "Tasso di risparmio",
+      "assetAllocation": "Allocazione patrimoniale",
+      "stocks": "Azioni",
+      "bonds": "Obbligazioni",
+      "cash": "Liquidità",
+      "expectedReturns": "Rendimenti attesi",
+      "stockReturn": "Rendimento azionario",
+      "bondReturn": "Rendimento obbligazionario",
+      "cashReturn": "Rendimento liquidità",
+      "personalExpenses": "Personale e spese",
+      "currentAge": "Età attuale",
+      "currentAgeValue": "~{{age}} anni",
+      "currentExpenses": "Spese correnti",
+      "fireExpenses": "Spese FIRE",
+      "withdrawalRate": "Tasso di prelievo",
+      "stopWorkingAtFIRE": "Smettere di lavorare al FIRE",
+      "note": "Questi valori sono caricati dal Calcolatore FIRE. Per modificarli, andare alla pagina <1>Calcolatore FIRE</1>."
+    },
+    "params": {
+      "numSimulations": "Numero di simulazioni",
+      "stockVolatility": "Volatilità azionaria (% deviazione standard)",
+      "bondVolatility": "Volatilità obbligazionaria (% deviazione standard)",
+      "blackSwanProb": "Probabilità cigno nero (% per anno)",
+      "blackSwanImpact": "Impatto cigno nero (%)"
+    },
+    "validation": {
+      "fixErrors": "Correggere gli errori di validazione prima di eseguire le simulazioni",
+      "numSimulationsMin": "Minimo 1.000 simulazioni richieste per significatività statistica",
+      "numSimulationsMax": "Massimo 100.000 simulazioni consentite per le prestazioni",
+      "stockVolatilityMin": "La volatilità azionaria deve essere maggiore dello 0%",
+      "bondVolatilityMin": "La volatilità obbligazionaria deve essere maggiore dello 0%",
+      "bondVolatilityMax": "La volatilità obbligazionaria deve essere inferiore alla volatilità azionaria ({{value}}%)",
+      "blackSwanProbMin": "La probabilità minima è dello 0,1% per anno",
+      "blackSwanImpactPositive": "L'impatto deve essere negativo o zero (rappresenta una perdita)",
+      "blackSwanImpactMin": "L'impatto non può essere inferiore al -50% (rappresenta una perdita massima del 50%)"
+    },
+    "runSimulation": "Esegui simulazioni",
+    "runningSimulation": "Esecuzione simulazioni in corso...",
+    "runSimulationAria": "Esegui simulazioni Monte Carlo",
+    "runningSimulationAria": "Simulazioni in esecuzione, attendere prego",
+    "fixErrorsAria": "Correggere gli errori di validazione per eseguire le simulazioni",
+    "results": {
+      "heading": "Risultati della simulazione",
+      "successRate": "Tasso di successo",
+      "successRateAria": "Tasso di successo: {{value}}",
+      "successfulSimulations": "Simulazioni riuscite",
+      "failedSimulations": "Simulazioni fallite",
+      "medianYears": "Anni mediani al FIRE",
+      "medianYearsValue": "{{value}} anni"
+    },
+    "logs": {
+      "title": "Log delle simulazioni",
+      "recordedCount": "{{count}} simulazioni registrate",
+      "description": "Questi log sono temporanei e verranno eliminati quando si lascia questa pagina o si aggiorna. Scaricarli per conservare un registro delle simulazioni.",
+      "downloadCSVAria": "Scarica i log come file CSV",
+      "downloadJSONAria": "Scarica i log come file JSON",
+      "filterLabel": "Filtro:",
+      "filterAll": "Tutte le simulazioni ({{count}})",
+      "filterSuccess": "Riuscite ({{count}})",
+      "filterFailed": "Fallite ({{count}})",
+      "showLabel": "Mostra:",
+      "perPage": "{{count}} per pagina",
+      "colId": "ID",
+      "colStatus": "Stato",
+      "colYearsToFIRE": "Anni al FIRE",
+      "colFinalPortfolio": "Portafoglio finale",
+      "colDetails": "Dettagli",
+      "statusSuccess": "Riuscita",
+      "statusFailed": "Fallita",
+      "yearsValue": "{{count}} anni",
+      "viewDetailsAria": "Visualizza i dettagli della simulazione {{id}}",
+      "initialParams": "Parametri iniziali",
+      "paramInitialSavings": "Risparmi iniziali:",
+      "paramStocks": "Azioni:",
+      "paramBonds": "Obbligazioni:",
+      "paramCash": "Liquidità:",
+      "paramStockReturn": "Rendimento atteso azionario:",
+      "paramBondReturn": "Rendimento atteso obbligazionario:",
+      "paramInflation": "Inflazione base:",
+      "paramWithdrawalRate": "Tasso di prelievo:",
+      "paramStockVolatility": "Volatilità azionaria:",
+      "paramBondVolatility": "Volatilità obbligazionaria:",
+      "tableYear": "Anno",
+      "tableAge": "Età",
+      "tableStockReturn": "Rendimento azionario",
+      "tableBondReturn": "Rendimento obbligazionario",
+      "tableInflation": "Inflazione",
+      "tablePortfolioReturn": "Rendimento portafoglio",
+      "tableBlackSwan": "Cigno nero",
+      "tableExpenses": "Spese",
+      "tableLaborIncome": "Reddito da lavoro",
+      "tablePortfolioValue": "Valore portafoglio",
+      "tableWithdrawalPct": "Prelievo %",
+      "tableFIRE": "FIRE",
+      "blackSwanEvent": "Evento cigno nero",
+      "fireAchieved": "FIRE raggiunto",
+      "paginationFirst": "Vai alla prima pagina",
+      "paginationPrev": "Vai alla pagina precedente",
+      "paginationNext": "Vai alla pagina successiva",
+      "paginationLast": "Vai all'ultima pagina",
+      "paginationInfo": "Pagina {{current}} di {{total}} ({{count}} simulazioni)",
+      "failureReasons": {
+        "portfolioDepleted": "Portafoglio esaurito",
+        "sequenceOfReturnsRisk": "Rischio di sequenza dei rendimenti",
+        "unsustainableEnding": "Termine insostenibile",
+        "fireTooLate": "FIRE troppo tardi",
+        "withdrawalRateBreach": "Superamento del tasso di prelievo",
+        "fireLost": "FIRE perso",
+        "forcedReturnToWork": "Ritorno forzato al lavoro",
+        "healthcareExpenseShock": "Shock spese sanitarie"
+      }
+    },
+    "chart": {
+      "noData": "Nessuna simulazione riuscita da visualizzare.",
+      "yearsDistribution": "Distribuzione degli anni al FIRE",
+      "yearsDistributionAria": "Distribuzione degli anni al FIRE",
+      "yearsAxisLabel": "Anni al FIRE",
+      "simulationsAxisLabel": "Simulazioni",
+      "tooltipCount": "Conteggio",
+      "tooltipYears": "Anni: {{label}}",
+      "tooltipSimulations": "{{value}} simulazioni",
+      "median": "Mediana",
+      "statsAria": "Statistiche degli anni al FIRE",
+      "bestCase10": "Caso migliore (10° percentile):",
+      "percentile25": "25° percentile:",
+      "medianPercentile": "Mediana (50° percentile):",
+      "percentile75": "75° percentile:",
+      "worstCase90": "Caso peggiore (90° percentile):",
+      "mean": "Media:",
+      "yearsValue": "{{value}} anni",
+      "meanValue": "{{value}} anni",
+      "portfolioStats": "Statistiche del valore finale del portafoglio",
+      "portfolioStatsAria": "Statistiche del valore finale del portafoglio",
+      "worstCase10": "Caso peggiore (10° percentile):",
+      "medianPortfolio": "Patrimonio netto mediano:",
+      "bestCase90": "Caso migliore (90° percentile):"
+    }
+  },
+  "cookieConsent": {
+    "acknowledgeAria": "Conferma avviso sui cookie",
+    "descriptionEnd": ". Your data never leaves your device.",
+    "descriptionMiddle": " to store your financial data locally and securely on your device. ",
+    "descriptionStart": "Fire Tools uses ",
+    "gotIt": "Ho capito",
+    "learnMore": "Scopra di più",
+    "noTracking": "Non usiamo cookie di analisi, tracciamento o marketing",
+    "strictlyNecessary": "cookie strettamente necessari",
+    "title": "Avviso sui cookie"
+  },
+  "questionnairePrompt": {
+    "closeDontAskAgain": "Chiudi e non chiedere più",
+    "title": "Scopra il Suo profilo FIRE",
+    "description": "Compili il breve questionario per scoprire quale strategia FIRE Le si addice meglio. Riceverà raccomandazioni personalizzate per allocazione, tasso di risparmio e approccio di investimento.",
+    "features": {
+      "twoMinutes": "Richiede solo 2 minuti",
+      "personalizedInsights": "Approfondimenti personalizzati",
+      "tailoredRecommendations": "Raccomandazioni su misura"
+    },
+    "start": "Inizia questionario",
+    "remindLater": "Ricordamelo più tardi",
+    "dontShowAgain": "Non mostrarlo più"
+  },
+  "scrollToTop": {
+    "ariaLabel": "Torna all’inizio",
+    "title": "Vai all’inizio"
+  },
+  "profileMenu": {
+    "ariaLabel": "Menu profilo",
+    "settings": "Impostazioni"
+  },
+  "legal": {
+    "privacyPolicy": "Informativa sulla privacy",
+    "cookiePolicy": "Informativa sui cookie",
+    "lastUpdated": "Ultimo aggiornamento",
+    "closePolicyModal": "Chiudi finestra policy",
+    "switchToCookiePolicy": "Informativa sui cookie",
+    "switchToPrivacyPolicy": "Informativa sulla privacy",
+    "contentEnglishOnly": "Una versione inglese di questa policy è anche disponibile come riferimento legalmente vincolante."
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "bellAria": "Notifiche",
+    "markAllAsRead": "Segna tutto come letto",
+    "markAllRead": "Segna tutto letto",
+    "empty": "Nessuna notifica",
+    "markAsUnread": "Segna come non letto",
+    "markAsRead": "Segna come letto",
+    "deleteNotification": "Elimina notifica",
+    "settings": "Impostazioni notifiche",
+    "justNow": "Ora",
+    "bellAriaUnread_one": "Notifications ({{count}} unread)",
+    "bellAriaUnread_other": "Notifications ({{count}} unread)",
+    "minutesAgo_one": "{{count}} min fa",
+    "minutesAgo_other": "{{count}} min fa",
+    "hoursAgo_one": "{{count}} h fa",
+    "hoursAgo_other": "{{count}} h fa",
+    "daysAgo_one": "{{count}} g fa",
+    "daysAgo_other": "{{count}} g fa"
+  },
+  "dialogs": {
+    "massEdit": {
+      "instructions": "Modifichi tutte le percentuali insieme. Il totale deve essere pari al 100% per salvare.",
+      "total": "Totale",
+      "saveAll": "Salva tutto",
+      "errors": {
+        "totalMustEqual": "Total must equal 100%. Current total: {{total}}"
+      }
+    },
+    "shared": {
+      "asset": "Asset",
+      "addAsset": "Aggiungi asset",
+      "editAsset": "Modifica asset",
+      "assetClassRequired": "Classe di asset *",
+      "typeRequired": "Tipo *",
+      "assetNameRequired": "Nome asset *",
+      "addNewAssetOption": "+ Aggiungi nuovo asset...",
+      "selectExistingAssetAria": "Seleziona asset esistente o aggiungine uno",
+      "selectExistingAssetsTitle": "Seleziona tra gli asset esistenti",
+      "chooseExisting": "Scegli esistente",
+      "bankInstitution": "Banca/Istituto",
+      "selectBankBroker": "Selezioni banca/broker...",
+      "otherCustomName": "Altro (nome personalizzato)",
+      "bankOrInstitutionAria": "Banca o istituzione",
+      "supportsOpenBanking": "Supporta OpenBanking PSD2",
+      "institutionNameRequired": "Nome istituzione *",
+      "nationCodeRequired": "Codice Paese *",
+      "referenceOptional": "Riferimento (opzionale)",
+      "tickerSymbolRequired": "Ticker/Simbolo *",
+      "enterNewTickerOption": "+ Inserisci nuovo ticker...",
+      "selectExistingTickerAria": "Seleziona ticker esistente o inseriscine uno",
+      "optional": "Opzionale",
+      "fetchPriceTitle": "Recupera prezzo e info da Yahoo Finance",
+      "selectExistingTickersTitle": "Seleziona tra i ticker esistenti",
+      "isinRequired": "ISIN *",
+      "numberOfSharesRequired": "Numero di azioni *",
+      "pricePerShareMarket": "Prezzo per azione (mercato)",
+      "fetchedAutomaticallyTitle": "Recuperato automaticamente da Yahoo Finance",
+      "clickFetchButtonHint": "Clicca il pulsante recupera accanto al ticker per ottenere il prezzo",
+      "acquisitionPricePerShare": "Prezzo di acquisto per azione",
+      "acquisitionPriceTitle": "Il prezzo a cui hai inizialmente comprato questo asset",
+      "leaveBlankMarketPrice": "Lascia vuoto per usare il prezzo di mercato come prezzo di acquisto",
+      "currentValue": "Valore attuale",
+      "calculatedSuffix": "(Calcolato)",
+      "currencyRequired": "Valuta *",
+      "currencyAria": "Valuta",
+      "trackDepreciation": "Traccia ammortamento",
+      "methodRequired": "Metodo *",
+      "purchasePriceRequired": "Prezzo di acquisto *",
+      "purchaseDateRequired": "Data di acquisto *",
+      "usefulLifeYearsRequired": "Vita utile (anni) *",
+      "salvageValue": "Valore residuo",
+      "annualRatePercent": "Tasso annuale (%)",
+      "accumulatedDepreciation": "Ammortamento accumulato",
+      "hasMortgage": "Ha mutuo",
+      "originalLoanAmountRequired": "Importo originale del prestito *",
+      "currentBalanceRequired": "Saldo attuale *",
+      "interestRatePercentRequired": "Tasso di interesse (%) *",
+      "termYearsRequired": "Durata (anni) *",
+      "startDate": "Data inizio",
+      "lenderOptional": "Ente erogatore (opzionale)",
+      "monthlyPayment": "Rata mensile",
+      "remaining": "Residuo",
+      "yearsAbbr": "yrs",
+      "primaryResidenceExcluded": "Residenza principale (esclusa dal calcolo FIRE)",
+      "targetModeRequired": "Modalità target *",
+      "targetPercentWithinClass": "% target (entro la classe di asset) *",
+      "notesOptional": "Note (opzionali)",
+      "placeholders": {
+        "assetName": "e.g., S&P 500 Index Fund",
+        "institutionName": "e.g., Local Credit Union",
+        "ticker": "es., SPY",
+        "isin": "es., US78462F1030",
+        "shares": "es., 100",
+        "defaultsToPrice": "Predefinito: {{price}}",
+        "pricePaid": "Prezzo pagato",
+        "estimatedValue": "Inserisci il valore stimato",
+        "cashAmount": "Inserisci l'importo in contanti",
+        "purchasePrice": "e.g., 25000",
+        "usefulLife": "es., 10",
+        "salvageValue": "es., 3000",
+        "annualRate": "es., 20",
+        "accumulatedDepreciation": "es., 5000",
+        "originalLoanAmount": "e.g., 200000",
+        "currentBalance": "e.g., 180000",
+        "interestRate": "es., 3.5",
+        "termYears": "es., 30",
+        "lender": "es., Banca ABC",
+        "targetPercent": "es., 50",
+        "notes": "Note su questo asset..."
+      },
+      "validation": {
+        "assetNameRequired": "Inserisci un nome per l'asset",
+        "duplicateAssetName": "Esiste già un asset con questo nome",
+        "nationCodeRequired": "Inserisci un codice nazione",
+        "tickerSymbolRequired": "Inserisci un ticker/simbolo",
+        "isinRequired": "Inserisci un codice ISIN",
+        "validSharesRequired": "Inserisci un numero valido di azioni",
+        "fetchPriceFirst": "Please fetch the price first by entering a ticker and clicking the fetch button"
+      },
+      "lookup": {
+        "enterTickerFirst": "Inserisci prima un ticker"
+      },
+      "assetClassNames": {
+        "STOCKS": "Azioni",
+        "BONDS": "Obbligazioni",
+        "CASH": "Liquidità",
+        "CRYPTO": "Cripto",
+        "REAL_ESTATE": "Immobiliare",
+        "COMMODITIES": "Materie prime",
+        "VEHICLE": "Veicolo",
+        "COLLECTIBLE": "Da collezione",
+        "ART": "Arte"
+      },
+      "subAssetTypeNames": {
+        "ETF": "ETF",
+        "SINGLE_STOCK": "Singola azione",
+        "PRIVATE_EQUITY": "Private equity",
+        "SINGLE_BOND": "Singola obbligazione",
+        "SAVINGS_ACCOUNT": "Conto di risparmio",
+        "CHECKING_ACCOUNT": "Conto corrente",
+        "BROKERAGE_ACCOUNT": "Conto di investimento",
+        "MONEY_ETF": "ETF mercato monetario",
+        "COIN": "Moneta",
+        "PROPERTY": "Immobile",
+        "REIT": "REIT",
+        "PHYSICAL_GOLD": "Oro fisico",
+        "GOLD_ETC": "Gold ETC",
+        "SILVER_ETC": "Silver ETC",
+        "OIL_ETC": "Oil ETC",
+        "NATURAL_GAS_ETC": "ETC gas naturale",
+        "COPPER_ETC": "Copper ETC",
+        "PLATINUM_ETC": "ETC platino",
+        "PALLADIUM_ETC": "ETC palladio",
+        "AGRICULTURAL_ETC": "ETC agricolo",
+        "COMMODITY_ETF": "ETF su materie prime",
+        "CAR": "Auto",
+        "MOTORCYCLE": "Motocicletta",
+        "BOAT": "Barca",
+        "OTHER_VEHICLE": "Altro veicolo",
+        "WATCH": "Orologio",
+        "WINE": "Vino",
+        "JEWELRY": "Gioielli",
+        "SPORTS_MEMORABILIA": "Memorabilia sportiva",
+        "OTHER_COLLECTIBLE": "Altro oggetto da collezione",
+        "PAINTING": "Quadro",
+        "SCULPTURE": "Scultura",
+        "DIGITAL_ART": "Arte digitale",
+        "OTHER_ART": "Altra arte"
+      },
+      "depreciationMethods": {
+        "straightLine": "Lineare",
+        "decliningBalance": "Saldo decrescente",
+        "manual": "Manuale"
+      },
+      "targetModes": {
+        "percentage": "Percentuale (%)",
+        "fixedAmount": "Importo fisso",
+        "offExcluded": "Off (escluso)"
+      }
+    },
+    "dca": {
+      "title": "Calcolatore Piano di accumulo (PAC)",
+      "description": "Calculate how to invest a lump sum according to your asset allocation targets. Enter an amount below to see the exact dollar and share breakdown for each asset.",
+      "investmentAmount": "Investment Amount ({{currency}})",
+      "enterAmountPlaceholder": "Inserisci l'importo da investire",
+      "calculating": "Calcolo in corso...",
+      "calculate": "Calcola",
+      "error": "Errore",
+      "investmentSummary": "Riepilogo investimenti",
+      "confirmYourInvestments": "Confermi i Suoi investimenti",
+      "investmentBreakdown": "Dettaglio investimento",
+      "totalAmount": "Importo totale",
+      "enterActualSharesNote": "Enter the actual shares you purchased to track how closely you followed the suggestion.",
+      "pricesFetchedNote": "Prezzi recuperati dall'API Yahoo Finance.",
+      "somePricesFailed": "Alcuni prezzi non sono stati recuperati.",
+      "asset": "Asset",
+      "allocation": "Allocazione",
+      "suggested": "Suggerito",
+      "actual": "Effettivo",
+      "deviation": "Scostamento",
+      "actualSharesForAsset": "Actual shares for {{assetName}}",
+      "actualAmountForAsset": "Actual amount for {{assetName}}",
+      "confirmAsset": "Confirm {{assetName}}",
+      "suggestedTotal": "Totale suggerito",
+      "actualTotal": "Totale effettivo",
+      "overallDeviation": "Deviazione complessiva",
+      "restart": "Ricomincia",
+      "investAgain": "Investi di nuovo",
+      "backToSuggestions": "Torna ai suggerimenti",
+      "confirmAll": "Conferma tutto",
+      "feedback": {
+        "greatJob": "Great job! Your investments closely match the suggested allocation.",
+        "reasonablyClose": "Your investments are reasonably close to the suggested allocation.",
+        "significantDeviation": "Your investments deviate significantly from the suggestion. Consider adjusting future investments."
+      },
+      "howItWorks": {
+        "title": "Come funziona",
+        "enterAmount": "Inserisci l'importo che vuoi investire",
+        "distribute": "The calculator will distribute it according to your asset allocation targets",
+        "fetchPrices": "I prezzi correnti sono recuperati dall'API Yahoo Finance",
+        "exactShares": "You'll see the exact number of shares (fractional) to buy for each asset",
+        "new": "NUOVO",
+        "confirmAfterInvesting": "After investing, click \"Confirm\" to record actual shares purchased and track deviations"
+      },
+      "errors": {
+        "required": "Obbligatorio",
+        "invalidNumber": "Numero non valido",
+        "mustBePositive": "Deve essere positivo",
+        "invalidInvestmentAmount": "Inserisci un importo di investimento valido maggiore di 0",
+        "priceFetchFailed": "Unable to fetch current prices from Yahoo Finance API. Price data may be unavailable due to network issues or API limitations. You can still see the investment amounts for each asset.",
+        "calculateFailed": "Calcolo della ripartizione DCA non riuscito",
+        "validSharesForAsset": "Please enter a valid number of shares for {{assetName}}",
+        "validAmountForAsset": "Please enter a valid amount for {{assetName}}",
+        "invalid": "Non valido",
+        "validAmountsBeforeConfirming": "Inserisci importi validi per tutti gli asset prima di confermare"
+      }
+    },
+    "categories": {
+      "manageCategories": "Gestisci categorie",
+      "addCustomCategory": "Aggiungi categoria personalizzata",
+      "editCategory": "Modifica categoria",
+      "closeDialog": "Chiudi finestra",
+      "defaultCategories": "Categorie predefinite",
+      "defaultCategoriesInfo": "Personalizza nome, icona e colore. Non possono essere eliminati.",
+      "customCategories": "Categorie personalizzate",
+      "addCategory": "Aggiungi categoria",
+      "noCustomCategories": "No custom categories yet. Click \"Add Category\" to create one.",
+      "editCategoryAria": "Edit {{name}}",
+      "deleteCategoryAria": "Delete {{name}}",
+      "categoryName": "Nome categoria",
+      "categoryNamePlaceholder": "Inserisci il nome della categoria...",
+      "icon": "Icona",
+      "selectIcon": "Seleziona un'icona...",
+      "noIconsAvailable": "Nessuna icona disponibile. Tutte le icone sono in uso.",
+      "color": "Colore",
+      "colorOptional": "Colore (opzionale)",
+      "selectColorAria": "Select color {{color}}",
+      "customColorHex": "Colore personalizzato (hex)",
+      "defaultExpenseType": "Tipo di spesa predefinito",
+      "saveChanges": "Salva modifiche",
+      "deleteCategory": "Elimina categoria",
+      "warning": "Avviso",
+      "deleteNamedQuestion": "Are you sure you want to delete “{{name}}”?",
+      "deleteCategoryQuestion": "Are you sure you want to delete the category “{{name}}”?",
+      "yesDelete": "Sì, elimina",
+      "deleteWarning_one": "There is {{count}} expense tied to this category. If you proceed with deletion, all expenses will be assigned to “No Category”.",
+      "deleteWarning_other": "There are {{count}} expenses tied to this category. If you proceed with deletion, all expenses will be assigned to “No Category”.",
+      "errors": {
+        "categoryNameRequired": "Inserisci il nome della categoria",
+        "iconRequired": "Seleziona un'icona",
+        "colorRequired": "Seleziona o inserisci un colore",
+        "invalidHexColor": "Inserisci un codice colore hex valido (es. #FF5733)"
+      }
+    },
+    "pdfImport": {
+      "title": "Importa da PDF (sperimentale)",
+      "closeDialog": "Chiudi finestra",
+      "documentType": "Tipo di documento",
+      "pdfFiles": "File PDF",
+      "useAiCategorization": "Usa categorizzazione IA",
+      "configureAiHint": "Configure an OpenAI-compatible endpoint in Settings → Experimental Features to enable.",
+      "summaryRows": "{{included}} of {{total}} rows will be imported.",
+      "detectedTransactions": "Transazioni rilevate",
+      "includeRow": "Includi riga",
+      "kind": "Tipo",
+      "categorySource": "Categoria / Fonte",
+      "includeDescription": "Include {{description}}",
+      "aiSuffix": " · AI",
+      "emptyState": "Choose one or more PDF files to start. Nothing is uploaded anywhere — parsing happens in your browser.",
+      "defaultDescription": "Importazione PDF",
+      "documentTypes": {
+        "auto": "Rilevamento automatico",
+        "receipt": "Ricevuta",
+        "invoice": "Fattura",
+        "bankStatement": "Estratto conto bancario/carta",
+        "payslip": "Busta paga"
+      },
+      "status": {
+        "readingFiles_one": "Reading {{count}} file…",
+        "readingFiles_other": "Reading {{count}} files…",
+        "blankRowsDetected_one": "Detected {{count}} row but every amount is 0 — looks like a blank template. Fill the amounts in and re-upload, or edit each row below before importing.",
+        "blankRowsDetected_other": "Detected {{count}} rows but every amount is 0 — looks like a blank template. Fill the amounts in and re-upload, or edit each row below before importing.",
+        "transactionsDetected_one": "Detected {{count}} transaction. Review and confirm below.",
+        "transactionsDetected_other": "Detected {{count}} transactions. Review and confirm below.",
+        "runningLlm": "Categorizzazione LLM in corso…",
+        "noTransactionsDetected": "Nessuna transazione rilevata. Prova un tipo di documento diverso.",
+        "importedEntries": "Imported {{incomeCount}} income + {{expenseCount}} expense entries."
+      },
+      "errors": {
+        "noExtractableText": "\"{{fileName}}\" has no extractable text (it may be a scanned image — run it through OCR first).",
+        "noTransactionsInFile": "No transactions found in \"{{fileName}}\". Try a different document type.",
+        "failedToRead": "Failed to read \"{{fileName}}\": {{reason}}",
+        "llmFailed": "Categorizzazione LLM non riuscita — uso risultati euristici.",
+        "invalidIncludedRows": "Each included row needs a date and an amount greater than zero."
+      }
+    }
+  },
+  "guidedTour": {
+    "validation": {
+      "enterValueForField": "Please enter a value for {{field}} to continue",
+      "thisField": "questo campo",
+      "completeActionBeforeContinuing": "Please complete the action (click the button) before continuing"
+    },
+    "dragToMove": "Drag to move",
+    "skipThisPage": "Skip this page",
+    "skipPage": "Salta pagina",
+    "skipEntireTour": "Skip entire tour",
+    "skipTour": "Salta tour",
+    "hints": {
+      "enterValue": "Enter a value in the highlighted field to continue",
+      "clickHighlighted": "Click the highlighted button to continue",
+      "runActionThenNext": "Click the button to run the action, then click Next"
+    },
+    "back": "Indietro",
+    "done": "Fatto",
+    "nextArrow": "Avanti →",
+    "pageCompleteTitle": "Page Tour Complete!",
+    "pageCompleteContinueStart": "You've explored this page. Would you like to continue with the",
+    "pageCompleteContinueEnd": "tour?",
+    "finishTour": "Termina tour",
+    "continueTo": "Continua a {{pageName}}",
+    "allPagesComplete": "You've completed the interactive tour of all pages!",
+    "overviewCompleteTitle": "Panoramica completata!",
+    "restartNote": "You can restart this tour anytime from Settings → Restart Tour",
+    "stepIndicatorAria": "Passo {{current}} di {{total}}",
+    "previousStep": "Passo precedente",
+    "nextStep": "Passo successivo",
+    "finish": "Fine",
+    "pageNames": {
+      "assetAllocation": "Asset Allocation",
+      "cashflowTracker": "Cashflow Tracker",
+      "netWorthTracker": "Net Worth Tracker",
+      "monteCarlo": "Monte Carlo"
+    },
+    "dataChoice": {
+      "greatOverview": "Great! You've seen an overview of Fire Tools.",
+      "existingData": "You have existing data in the app.",
+      "demoDataLoaded": "We've loaded demo data so you can explore.",
+      "question": "What would you like to do?",
+      "startFresh": "Start Fresh",
+      "clearAllData": "Clear all data",
+      "keepMyData": "Keep My Data",
+      "keepCurrentData": "Keep your current data",
+      "keepDemoData": "Keep Demo Data",
+      "exploreSampleData": "Explore with sample data"
+    },
+    "interactivePrompt": {
+      "title": "Percorso interattivo",
+      "description": "Would you like a hands-on walkthrough of each page? We'll guide you through the key features and show you how everything works.",
+      "learnByDoing": "Learn by doing!",
+      "stepByStep": "We'll walk you through each tool step by step.",
+      "exploreOwn": "Esplora autonomamente",
+      "skipWalkthrough": "Skip walkthrough",
+      "yesGuideMe": "Sì, mi guidi",
+      "walkthroughHint": "Interactive walkthrough"
+    },
+    "overview": {
+      "welcome": {
+        "title": "Welcome to Fire Tools!",
+        "paragraph1Start": "Welcome! Fire Tools is a comprehensive suite of financial planning tools designed to help you achieve",
+        "fireStrong": "Financial Independence and Retire Early (FIRE)",
+        "paragraph2": "This quick tour will show you the main features and how to get the most out of the application. We'll also load some demo data so you can see everything in action.",
+        "privacyNote": "All your data stays on your device - we never send it anywhere."
+      },
+      "assetAllocation": {
+        "title": "Asset Allocation Manager",
+        "strong": "Track and manage your investment portfolio",
+        "text": "with intelligent asset allocation tools.",
+        "features": {
+          "addAssets": "Add stocks, bonds, ETFs, and other assets",
+          "targets": "Set target allocations and see rebalancing recommendations",
+          "dca": "Use the DCA (Dollar Cost Averaging) helper for regular investments"
+        }
+      },
+      "cashflow": {
+        "title": "Cashflow Tracker",
+        "strong": "Monitor your income and expenses",
+        "text": "to understand your spending patterns and savings rate.",
+        "features": {
+          "log": "Log income and expenses by category",
+          "budgets": "Set budgets using the 50/30/20 rule",
+          "analytics": "View charts and analytics of your spending"
+        }
+      },
+      "netWorth": {
+        "title": "Net Worth Tracker",
+        "strong": "Track your financial progress over time",
+        "text": "with monthly snapshots of your net worth.",
+        "features": {
+          "monitor": "Monitor assets, cash, and pension accounts",
+          "charts": "See historical charts of your wealth growth",
+          "sync": "Sync with Asset Allocation for consistency"
+        }
+      },
+      "fireCalculator": {
+        "title": "FIRE Calculator",
+        "strong": "Calculate your path to Financial Independence",
+        "text": "with detailed projections and timeline analysis.",
+        "features": {
+          "projections": "Visual projections of your net worth over time",
+          "reachFire": "See exactly when you can reach FIRE",
+          "scenarios": "Adjust parameters to see different scenarios"
+        }
+      },
+      "monteCarlo": {
+        "title": "Monte Carlo Simulations",
+        "strong": "Assess the probability of reaching your FIRE goals",
+        "text": "by running thousands of simulations with randomized market returns.",
+        "features": {
+          "success": "See your success probability percentage",
+          "volatility": "Account for market volatility and black swan events",
+          "outcomes": "Understand the range of possible outcomes"
+        }
+      },
+      "together": {
+        "title": "Tools Work Together",
+        "strong": "The real power comes from using FIRE tools together, but each tool can also work independently!",
+        "assetValues": "Asset values flow into FIRE Calculator",
+        "cashflowUpdates": "Income/expenses update savings calculations",
+        "netWorthSync": "Net Worth syncs with Asset Allocation"
+      }
+    },
+    "interactive": {
+      "fireCalculator": {
+        "initialSavings": {
+          "title": "Initial Savings",
+          "description": "Enter your current savings or portfolio value. This is your starting point for FIRE calculations."
+        },
+        "annualIncome": {
+          "title": "Annual Income",
+          "description": "Enter your annual net labor income. This determines how much you can save each year toward FIRE."
+        },
+        "annualExpenses": {
+          "title": "Annual Expenses",
+          "description": "Set your current annual expenses. Lower expenses mean a faster path to FIRE!"
+        },
+        "withdrawalRate": {
+          "title": "Withdrawal Rate",
+          "description": "The withdrawal rate (typically 3-4%) determines your FIRE target. A 4% rate means you need 25x your annual expenses."
+        },
+        "integrationOptions": {
+          "title": "Integration Options",
+          "description": "These options connect tools together: sync portfolio values from Asset Allocation, or use actual income/expenses from Cashflow Tracker for more accurate calculations."
+        },
+        "fireMetrics": {
+          "title": "FIRE Metrics",
+          "description": "See your FIRE target, years to FIRE, and projected portfolio value. These are your key milestones!"
+        },
+        "growthCharts": {
+          "title": "Growth Charts",
+          "description": "Visualize your journey! The Net Worth Growth chart shows your portfolio over time, and Income vs Expenses shows your cash flow."
+        }
+      },
+      "assetAllocation": {
+        "yourAssets": {
+          "title": "Your Assets",
+          "description": "This table shows your portfolio holdings. You can see each asset's current value, target allocation, and recommended action (BUY/SELL/HOLD)."
+        },
+        "addNewAssets": {
+          "title": "Add New Assets",
+          "description": "Click the \"Add Asset\" button to add a new holding to your portfolio. Go ahead, click it now!"
+        },
+        "assetClassSelection": {
+          "title": "Asset Class Selection",
+          "description": "First, choose the asset class (Stocks, Bonds, Cash, Crypto, or Real Estate). This determines how the asset is categorized in your portfolio."
+        },
+        "assetDetails": {
+          "title": "🏷️ Dettagli asset",
+          "description": "Enter the asset name, ticker symbol (e.g., AAPL, VTI), number of shares you own, and the price per share. The total value is calculated automatically."
+        },
+        "targetAllocation": {
+          "title": "Target Allocation",
+          "description": "Set your target allocation mode: \"%\" for percentage of the asset class, \"SET\" for a fixed amount, or \"OFF\" to exclude from rebalancing."
+        },
+        "targetAllocations": {
+          "title": "Target Allocations",
+          "description": "Set your target percentages for each asset class. The tool calculates what to buy or sell to reach your targets."
+        },
+        "dcaHelper": {
+          "title": "💹 Helper DCA",
+          "description": "The DCA (Dollar Cost Averaging) Helper calculates how to split a lump sum investment. Click the \"DCA Helper\" button to see how it works!"
+        },
+        "enterInvestmentAmount": {
+          "title": "Enter Investment Amount",
+          "description": "Enter the amount you want to invest. The DCA Helper will calculate how to split it across your assets according to your target allocations."
+        },
+        "investmentBreakdown": {
+          "title": "Investment Breakdown",
+          "description": "After calculating, you'll see exactly how much to invest in each asset and how many shares to buy. Current prices are fetched from Yahoo Finance."
+        },
+        "confirm": {
+          "title": "✅ Conferma",
+          "description": "After making your investments, you can confirm the actual shares purchased to track deviations from the suggested amounts."
+        }
+      },
+      "expenseTracker": {
+        "addIncome": {
+          "title": "Aggiungi entrate",
+          "description": "Track your income and expenses here. Click \"Add Income\" to see how to add income!"
+        },
+        "dateAmount": {
+          "title": "📅 Data e importo",
+          "description": "Select the date when you received the income and enter the amount. This helps track your income over time."
+        },
+        "incomeSource": {
+          "title": "Income Source",
+          "description": "Choose the income source: Salary, Bonus, Dividend, Freelance, Investment, Rental, or Other. This categorizes your income for better analytics."
+        },
+        "addExpense": {
+          "title": "💸 Aggiungi spesa",
+          "description": "Now click \"Add Expense\" to see how to record your spending."
+        },
+        "expenseDetails": {
+          "title": "📅 Dettagli spesa",
+          "description": "Enter the date, amount, and a description of the expense. Be specific to help you track spending patterns."
+        },
+        "categoryType": {
+          "title": "🏷️ Categoria e tipo",
+          "description": "Select a category (Housing, Food, Transport, etc.) and classify as Need or Want. This powers the 50/30/20 budget analysis."
+        },
+        "budgetRule": {
+          "title": "50/30/20 Budget Rule",
+          "description": "See how your spending compares to the 50/30/20 rule: 50% for needs (housing, food), 30% for wants (entertainment), and 20% for savings."
+        },
+        "setBudgets": {
+          "title": "Set Budgets",
+          "description": "Click the Budgets tab to set monthly spending limits for each category. Track your progress with visual indicators."
+        },
+        "budgetCategories": {
+          "title": "Budget Categories",
+          "description": "Here you can set monthly budget limits for each expense category. The progress bars show how much you've spent vs. your budget. Edit the amounts to customize your spending goals."
+        },
+        "analytics": {
+          "title": "Analisi",
+          "description": "Click the Analytics tab to see spending trends, category breakdowns, and monthly comparisons to help you understand your financial habits."
+        },
+        "spendingInsights": {
+          "title": "Spending Insights",
+          "description": "View detailed charts and analytics: spending trends over time, category breakdowns, and monthly comparisons. Use the view selector to switch between monthly, quarterly, and yearly perspectives."
+        }
+      },
+      "netWorth": {
+        "logAssets": {
+          "title": "Registra asset",
+          "description": "Just like in Asset Allocation, you can add assets here to track your historical net worth. Click \"Log Asset\" to add stocks, bonds, crypto, real estate, and other holdings with their current values."
+        },
+        "logOperations": {
+          "title": "Log Operations",
+          "description": "Click \"Log Operation\" to track financial operations like dividends, purchases, and sales."
+        },
+        "operationDetails": {
+          "title": "📅 Operation Details",
+          "description": "Select the date and operation type: Dividend, Purchase, Sale, Deposit, Withdrawal, Interest, or Tax."
+        },
+        "amountDescription": {
+          "title": "Amount & Description",
+          "description": "Enter the amount and a description. Income operations (dividends, interest) increase your net worth; expenses (taxes) decrease it."
+        },
+        "historicalChart": {
+          "title": "Historical Chart",
+          "description": "Watch your wealth grow over time! The chart shows your net worth progression with monthly variations and forecasted growth."
+        },
+        "assetAllocationSync": {
+          "title": "Asset Allocation Sync",
+          "description": "Enable sync to automatically keep your asset data consistent between Net Worth Tracker and Asset Allocation Manager."
+        }
+      },
+      "monteCarlo": {
+        "baseData": {
+          "title": "Simulation Base Data",
+          "description": "This section shows the FIRE Calculator data used for simulations: your portfolio value, FIRE target, income, savings rate, and expected returns. These values come from your FIRE Calculator inputs."
+        },
+        "parameters": {
+          "title": "Simulation Parameters",
+          "description": "Adjust the simulation settings: number of simulations (1000-100000), stock/bond volatility (higher = more uncertain), and black swan event probability. These affect how conservative or optimistic your projections are."
+        },
+        "runSimulation": {
+          "title": "▶️ Esegui simulazione",
+          "description": "Click the \"Run Simulations\" button to run the Monte Carlo analysis. This will generate thousands of scenarios based on your parameters."
+        },
+        "results": {
+          "title": "Results & Success Rate",
+          "description": "See your success probability, median outcome, and the range of possible results. Green means high probability of success!"
+        },
+        "logs": {
+          "title": "Simulation Logs",
+          "description": "After running simulations, you can view detailed logs showing the yearly breakdown of each simulation, including returns, expenses (adjusted for inflation), and portfolio values. Export the logs as CSV or JSON for further analysis."
+        }
+      }
+    }
+  },
+  "tables": {
+    "assetIndex": "Asset / Indice",
+    "ticker": "Ticker",
+    "assetClass": "Classe di Asset",
+    "targetMode": "Modalità Target",
+    "percentTarget": "% Obiettivo",
+    "percentCurrentTotal": "% Corrente (Totale)",
+    "percentCurrentClass": "% Corrente (Classe)",
+    "percentCurrent": "% Corrente",
+    "absoluteCurrent": "Valore Corrente Assoluto",
+    "absoluteTarget": "Valore Target Assoluto",
+    "delta": "Variazione",
+    "action": "Azione",
+    "totalPortfolio": "Portafoglio Totale",
+    "percentTargetClass": "% Target (classe)",
+    "assetName": "Nome Asset",
+    "type": "Tipo",
+    "shares": "Quote",
+    "pricePerShare": "Prezzo/Quota",
+    "acquisitionPrice": "Prezzo Acq.",
+    "currentValue": "Valore Corrente",
+    "targetValue": "Valore Target",
+    "editColumn": "Modifica",
+    "assetCount": "({{count}} asset)",
+    "editAll": "Modifica Tutti",
+    "editAllTitle": "Modifica Tutte le Percentuali",
+    "copyIsinTooltip": "Clicca per copiare ISIN: {{isin}}",
+    "copied": "Copiato!",
+    "calculatedLabel": "(Calcolato)",
+    "calculatedValueTitle": "Il valore corrente è calcolato da quote × prezzo per quota",
+    "bankBrokerTitle": "Banca/Broker: {{name}}",
+    "deleteAssetConfirm": "Eliminare {{name}}?",
+    "value": "Importo",
+    "bucket": "Categoria"
+  },
+  "charts": {
+    "noDataToDisplay": "Nessun dato da visualizzare",
+    "noHistoricalData": "Nessun Dato Storico",
+    "startTrackingNetWorth": "Inizia a monitorare il tuo patrimonio netto per visualizzare il grafico storico.",
+    "netWorthGrowth": "Crescita del Patrimonio Netto",
+    "incomeVsExpenses": "Entrate vs Uscite",
+    "zoomControls": "Controlli zoom del grafico",
+    "zoom20Years": "20 Anni",
+    "zoom30Years": "30 Anni",
+    "zoom40Years": "40 Anni",
+    "zoomAllYears": "Tutti gli Anni",
+    "zoomTo20AriaLabel": "Zoom a 20 anni",
+    "zoomTo30AriaLabel": "Zoom a 30 anni",
+    "zoomTo40AriaLabel": "Zoom a 40 anni",
+    "showAllYearsAriaLabel": "Mostra tutti gli anni",
+    "customZoomPlaceholder": "Personalizzato",
+    "customZoomAriaLabel": "Zoom personalizzato in anni",
+    "netWorthChartAriaLabel": "Grafico della crescita del patrimonio netto nel tempo",
+    "incomeExpensesChartAriaLabel": "Grafico comparativo di entrate e uscite nel tempo",
+    "netWorth": "Patrimonio Netto",
+    "fireTarget": "Obiettivo FIRE",
+    "ageLabel": "Età",
+    "ageTooltipLabel": "Età {{age}}",
+    "viewLabel": "Visualizza:",
+    "yearToDate": "Da inizio anno",
+    "allHistoricalData": "Tutti i Dati Storici",
+    "showForecast": "Mostra Previsione",
+    "compareIn": "Confronta in:",
+    "netWorthCurrency": "Patrimonio Netto ({{currency}})",
+    "forecastCurrency": "Previsione ({{currency}})",
+    "prevYear": "Anno Prec.: {{value}}",
+    "noMonthlyData": "Nessun dato mensile da visualizzare. Aggiungi transazioni per vedere il confronto.",
+    "avgExpenses": "Spese medie:",
+    "avg": "Media",
+    "income": "Entrate",
+    "expenses": "Uscite",
+    "noExpenseData": "Nessun dato di spesa da visualizzare. Aggiungi delle spese per vedere la ripartizione.",
+    "noTrendData": "Nessun dato di tendenza da visualizzare. Aggiungi transazioni su più mesi per vedere le tendenze.",
+    "noCategoryData": "Nessun dato per categoria da visualizzare.",
+    "laborIncome": "Reddito da Lavoro",
+    "investmentYield": "Rendimento degli Investimenti",
+    "statePension": "Pensione Statale",
+    "privatePension": "Pensione Privata",
+    "otherIncome": "Altri Redditi",
+    "transactionCount_one": "{{count}} transazione",
+    "transactionCount_other": "{{count}} transazioni"
+  },
+  "dataManagement": {
+    "title": "Gestione Dati",
+    "loadDemoData": "Carica Dati Demo",
+    "loadDemoAriaLabel": "Carica dati di spesa demo per l'anno corrente",
+    "exportButton": "Esporta {{format}}",
+    "exportAriaLabel": "Esporta i dati del calcolatore in un file {{format}}",
+    "importButton": "Importa {{format}}",
+    "importAriaLabel": "Importa i dati del calcolatore da un file {{format}}",
+    "resetButton": "Azzera Tutti i Dati",
+    "resetAriaLabel": "Azzera tutti i dati del calcolatore ai valori predefiniti"
+  },
+  "searchableSelect": {
+    "searchPlaceholder": "Cerca...",
+    "searchAriaLabel": "Cerca opzioni",
+    "noResults": "Nessun risultato trovato",
+    "defaultPlaceholder": "Seleziona..."
+  },
+  "privacyBlur": {
+    "ariaLabel": "Valore nascosto per privacy",
+    "title": "Modalità privacy attiva - valore nascosto"
+  },
+  "inputs": {
+    "sliderAriaLabel": "Input valore per {{id}}"
+  },
+  "demo": {
+    "message": "Demo in sola lettura con dati di esempio — importazioni e ripristini sono disabilitati. Scarica l'app per salvare i tuoi dati.",
+    "cta": "Scarica app desktop",
+    "disabledAction": "Disabilitato nella demo. Scarica l'app per importare i tuoi dati."
+  },
+  "policyContent": {
+    "privacy": {
+      "lastUpdated": "31 dicembre 2025",
+      "sections": [
+        {
+          "title": "1. Introduzione",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Benvenuto in <strong>Fire Tools</strong> (l'\"Applicazione\"). La presente Informativa sulla Privacy spiega come trattiamo i tuoi dati personali quando utilizzi i nostri strumenti di pianificazione finanziaria. La tua privacy è fondamentale per noi e questa informativa illustra il nostro impegno a proteggere le tue informazioni personali."
+            },
+            {
+              "type": "p",
+              "html": "Fire Tools è un'applicazione di pianificazione finanziaria progettata con la privacy come principio fondamentale. <strong>Tutti i tuoi dati sono memorizzati localmente sul tuo dispositivo</strong> e non vengono mai trasmessi a server esterni senza il tuo consenso esplicito."
+            }
+          ]
+        },
+        {
+          "title": "2. Titolare del trattamento",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Il titolare del trattamento responsabile dei tuoi dati personali è:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Nome dell'applicazione:</strong> Fire Tools",
+                "<strong>Repository:</strong> <a href=\"https://github.com/mbianchidev/fire-tools\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/mbianchidev/fire-tools</a>",
+                "<strong>Contatti:</strong> security@mb-consulting.dev"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "3. Quali dati raccogliamo",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Fire Tools raccoglie solo i dati che fornisci volontariamente utilizzando le funzionalità del calcolatore e dell'allocazione del patrimonio. Questi includono:"
+            },
+            {
+              "type": "h3",
+              "text": "Dati di pianificazione finanziaria"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Importo dei risparmi iniziali",
+                "Reddito annuale e spese",
+                "Aspettative di investimento e tolleranza al rischio",
+                "Età di pensionamento e obiettivi FIRE",
+                "Preferenze di allocazione del patrimonio",
+                "Posizioni del portafoglio e dati di performance"
+              ]
+            },
+            {
+              "type": "h3",
+              "text": "Preferenze dell'applicazione"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Impostazioni della valuta",
+                "Preferenze di visualizzazione",
+                "Scelte di consenso per privacy e cookie"
+              ]
+            },
+            {
+              "type": "h3",
+              "text": "Cosa NON raccogliamo"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Informazioni di identificazione personale (nome, email, indirizzo)",
+                "Credenziali di autenticazione",
+                "Cronologia di navigazione al di fuori dell'applicazione",
+                "Impronte digitali del dispositivo o identificatori di tracciamento",
+                "Dati di geolocalizzazione",
+                "Informazioni di contatto"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "4. Base giuridica del trattamento (GDPR)",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Ai sensi del Regolamento Generale sulla Protezione dei Dati (GDPR), la nostra base giuridica per il trattamento dei tuoi dati è:"
+            },
+            {
+              "type": "table",
+              "headers": [
+                "Attività di trattamento",
+                "Base giuridica"
+              ],
+              "rows": [
+                [
+                  "Memorizzazione degli input del calcolatore",
+                  "Consenso (Articolo 6(1)(a))"
+                ],
+                [
+                  "Salvataggio dei dati di allocazione del patrimonio",
+                  "Consenso (Articolo 6(1)(a))"
+                ],
+                [
+                  "Mantenimento delle preferenze dell'applicazione",
+                  "Interesse legittimo (Articolo 6(1)(f))"
+                ],
+                [
+                  "Cookie essenziali per il funzionamento",
+                  "Interesse legittimo (Articolo 6(1)(f))"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "title": "5. Come utilizziamo i tuoi dati",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Tutti i dati che inserisci vengono utilizzati esclusivamente per:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Calcoli finanziari:</strong> Esecuzione di proiezioni FIRE, simulazioni Monte Carlo e analisi di allocazione del patrimonio",
+                "<strong>Memorizzazione locale:</strong> Conservazione dei tuoi dati tra le sessioni sul tuo dispositivo",
+                "<strong>Funzionalità dell'applicazione:</strong> Fornitura delle funzionalità e degli strumenti che hai richiesto"
+              ]
+            },
+            {
+              "type": "p",
+              "html": "<strong>Non:</strong>"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Condividiamo i tuoi dati con terze parti",
+                "Vendiamo i tuoi dati a nessuno",
+                "Utilizziamo i tuoi dati per pubblicità o marketing",
+                "Ti profiliamo per nessun motivo",
+                "Trasferiamo i tuoi dati a livello internazionale"
+              ]
+            },
+            {
+              "type": "link",
+              "prefix": "Per maggiori dettagli sull'utilizzo dei cookie, consulta la nostra ",
+              "target": "cookie",
+              "suffix": "."
+            }
+          ]
+        },
+        {
+          "title": "6. Condivisione dei dati e terze parti",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "<strong>Non condividiamo i tuoi dati con nessuno.</strong> Poiché i tuoi dati non lasciano mai il tuo dispositivo, non ci sono dati da condividere. Non:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Vendiamo i tuoi dati personali",
+                "Condividiamo dati con fornitori di servizi (non ne abbiamo)",
+                "Inviamo dati a società di analisi",
+                "Trasmettiamo dati a reti pubblicitarie",
+                "Condividiamo dati con partner commerciali",
+                "Divulghiamo dati alle autorità legali (non vi abbiamo accesso)"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "7. Trasferimenti internazionali di dati",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "<strong>Non applicabile.</strong> I tuoi dati rimangono sul tuo dispositivo e non vengono mai trasferiti da nessuna parte, né a livello nazionale né internazionale."
+            }
+          ]
+        },
+        {
+          "title": "8. Conservazione dei dati",
+          "blocks": [
+            {
+              "type": "table",
+              "headers": [
+                "Tipo di dato",
+                "Periodo di conservazione"
+              ],
+              "rows": [
+                [
+                  "Input e impostazioni del calcolatore",
+                  "Conservati nei cookie per 365 giorni, o fino a quando non cancelli i dati del browser"
+                ],
+                [
+                  "Dati di allocazione del patrimonio",
+                  "Conservati nei cookie per 365 giorni, o fino a quando non cancelli i dati del browser"
+                ],
+                [
+                  "Preferenze dell'utente",
+                  "Conservate nei cookie per 365 giorni, o fino a quando non cancelli i dati del browser"
+                ]
+              ]
+            },
+            {
+              "type": "p",
+              "html": "Hai il controllo completo sui tuoi dati. Puoi eliminare tutti i dati memorizzati in qualsiasi momento utilizzando l'opzione \"Reimposta tutti i dati\" nella pagina Impostazioni o cancellando i cookie del browser."
+            }
+          ]
+        },
+        {
+          "title": "9. I tuoi diritti (GDPR e leggi sulla privacy)",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Ai sensi del GDPR e di altre leggi sulla privacy, hai i seguenti diritti:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Diritto di accesso:</strong> Tutti i tuoi dati sono accessibili tramite l'interfaccia di Fire Tools",
+                "<strong>Diritto di rettifica:</strong> Puoi modificare i tuoi dati in qualsiasi momento tramite gli input del calcolatore",
+                "<strong>Diritto alla cancellazione:</strong> Utilizza il pulsante \"Reimposta tutti i dati\" o cancella i cookie del browser",
+                "<strong>Diritto di limitazione del trattamento:</strong> Interrompi l'utilizzo dell'applicazione o elimina i tuoi dati",
+                "<strong>Diritto alla portabilità dei dati:</strong> Esporta i tuoi dati in file CSV in qualsiasi momento",
+                "<strong>Diritto di opposizione:</strong> Puoi smettere di utilizzare l'applicazione in qualsiasi momento",
+                "<strong>Diritto di revocare il consenso:</strong> Elimina i tuoi dati o smetti di utilizzare l'applicazione"
+              ]
+            },
+            {
+              "type": "p",
+              "html": "Poiché tutti i dati sono memorizzati localmente sul tuo dispositivo, hai il controllo diretto sui tuoi dati senza dover contattarci."
+            }
+          ]
+        },
+        {
+          "title": "10. Sicurezza",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Implementiamo solide misure di sicurezza per proteggere i tuoi dati:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Crittografia AES-256:</strong> Tutti i dati finanziari sensibili sono crittografati prima della memorizzazione",
+                "<strong>HTTPS/TLS:</strong> L'applicazione è servita tramite connessioni HTTPS sicure",
+                "<strong>Cookie sicuri:</strong> I cookie utilizzano i flag <code>SameSite=Strict</code> e <code>Secure</code>",
+                "<strong>Nessuna memorizzazione su server:</strong> I tuoi dati non raggiungono mai i nostri server (non ne abbiamo)",
+                "<strong>Nessuna trasmissione di rete:</strong> I dati non vengono mai inviati sulla rete",
+                "<strong>Open Source:</strong> Trasparenza totale - verifica il nostro codice su GitHub"
+              ]
+            },
+            {
+              "type": "p",
+              "html": "<strong>La tua responsabilità:</strong> Mantieni il tuo dispositivo sicuro. Chiunque abbia accesso al tuo dispositivo e al tuo browser può visualizzare i tuoi dati di Fire Tools."
+            }
+          ]
+        },
+        {
+          "title": "11. Privacy dei minori",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Fire Tools è destinato ad adulti che pianificano il proprio futuro finanziario. Non raccogliamo consapevolmente dati da minori di 16 anni. Poiché non raccogliamo alcun dato, questo è intrinsecamente protetto."
+            }
+          ]
+        },
+        {
+          "title": "12. Modifiche alla presente informativa",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Possiamo aggiornare la presente Informativa sulla Privacy di tanto in tanto per riflettere cambiamenti nelle nostre pratiche o nei requisiti legali. Quando apportiamo modifiche, aggiorniamo la data \"Ultimo aggiornamento\" in cima a questa informativa."
+            },
+            {
+              "type": "p",
+              "html": "Le modifiche sostanziali saranno annunciate tramite il nostro repository GitHub. L'uso continuato di Fire Tools dopo le modifiche costituisce accettazione dell'informativa aggiornata."
+            }
+          ]
+        },
+        {
+          "title": "13. Contattaci",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Per domande, dubbi o richieste relative alla presente Informativa sulla Privacy:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Email:</strong> security@mb-consulting.dev",
+                "<strong>GitHub:</strong> <a href=\"https://github.com/mbianchidev/fire-tools\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/mbianchidev/fire-tools</a>"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "14. Giurisdizione e legge applicabile",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "La presente Informativa sulla Privacy è disciplinata dalle leggi applicabili sulla protezione dei dati, incluso il GDPR (UE), il CCPA (California) e altre normative pertinenti sulla privacy. Poiché non raccogliamo né memorizziamo dati, la conformità è intrinsecamente mantenuta."
+            }
+          ]
+        }
+      ],
+      "lastUpdatedDate": "31 dicembre 2025"
+    },
+    "cookie": {
+      "lastUpdated": "31 dicembre 2025",
+      "sections": [
+        {
+          "title": "1. Introduzione",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "La presente Cookie Policy spiega come <strong>Fire Tools</strong> utilizza i cookie e tecnologie di tracciamento simili. Ci impegniamo a essere trasparenti riguardo alle nostre pratiche sui dati e alla tua privacy."
+            },
+            {
+              "type": "p",
+              "html": "<strong>Il nostro approccio è semplice:</strong> Utilizziamo solo cookie essenziali per il funzionamento dell'applicazione. Non utilizziamo cookie di tracciamento, analitici, pubblicitari o di terze parti."
+            }
+          ]
+        },
+        {
+          "title": "2. Cosa sono i cookie?",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "I cookie sono piccoli file di testo memorizzati sul tuo dispositivo dal browser quando visiti un sito web. Permettono al sito di ricordare le tue preferenze e offrire una migliore esperienza utente."
+            },
+            {
+              "type": "p",
+              "html": "I cookie possono essere classificati per:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Durata:</strong> Cookie di sessione (eliminati alla chiusura del browser) o persistenti (rimangono per un periodo prestabilito)",
+                "<strong>Origine:</strong> Cookie di prima parte (impostati dal sito che visiti) o di terze parti (impostati da servizi esterni)",
+                "<strong>Scopo:</strong> Essenziali, funzionali, analitici o pubblicitari"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "3. Cookie che utilizziamo",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Fire Tools utilizza SOLO cookie essenziali di prima parte. Questi cookie sono necessari per il funzionamento dell'applicazione e non possono essere disabilitati senza compromettere le funzionalità principali."
+            },
+            {
+              "type": "table",
+              "headers": [
+                "Nome cookie",
+                "Scopo",
+                "Durata",
+                "Tipo"
+              ],
+              "rows": [
+                [
+                  "<code>fire-calculator-inputs</code>",
+                  "Memorizza gli input del calcolatore (risparmi, spese, rendimenti, ecc.) per la persistenza tra le sessioni",
+                  "365 giorni",
+                  "Essenziale"
+                ],
+                [
+                  "<code>fire-calculator-asset-allocation</code>",
+                  "Memorizza i dati di allocazione del patrimonio per il monitoraggio del portafoglio",
+                  "365 giorni",
+                  "Essenziale"
+                ],
+                [
+                  "<code>fire-calculator-asset-class-targets</code>",
+                  "Memorizza le percentuali target di allocazione per il ribilanciamento",
+                  "365 giorni",
+                  "Essenziale"
+                ],
+                [
+                  "<code>fire-calculator-settings</code>",
+                  "Memorizza le preferenze dell'applicazione (valuta, impostazioni di visualizzazione, ecc.)",
+                  "365 giorni",
+                  "Essenziale"
+                ],
+                [
+                  "<code>fire-tools-cookie-consent</code>",
+                  "Memorizza la tua scelta sul consenso ai cookie",
+                  "365 giorni",
+                  "Essenziale"
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          "title": "4. Cookie che NON utilizziamo",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Fire Tools non utilizza nessuno dei seguenti tipi di cookie:"
+            },
+            {
+              "type": "infoBox",
+              "title": "✅ Nessun tracciamento, nessuna analitica, nessuna pubblicità",
+              "html": "La tua privacy è fondamentale. Abbiamo preso la decisione consapevole di non implementare alcun cookie non essenziale."
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Cookie analitici:</strong> Niente Google Analytics, Mixpanel o altri servizi di analisi",
+                "<strong>Cookie pubblicitari:</strong> Nessuna rete pubblicitaria o pixel di tracciamento",
+                "<strong>Cookie dei social media:</strong> Nessun tracciamento da Facebook, Twitter o altri social",
+                "<strong>Cookie di terze parti:</strong> Nessun cookie da servizi esterni o partner",
+                "<strong>Cookie di performance:</strong> Nessun monitoraggio delle prestazioni o heatmap",
+                "<strong>Cookie di marketing:</strong> Nessun retargeting o targeting comportamentale"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "5. Misure di sicurezza",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Tutti i cookie utilizzati da Fire Tools sono protetti da misure di sicurezza standard del settore:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Crittografia AES-256:</strong> I dati finanziari sensibili vengono crittografati prima di essere memorizzati nei cookie",
+                "<strong>SameSite=Strict:</strong> I cookie sono limitati al contesto di prima parte, prevenendo attacchi CSRF",
+                "<strong>Flag Secure:</strong> I cookie vengono trasmessi solo su connessioni HTTPS in produzione",
+                "<strong>HttpOnly:</strong> Non applicabile poiché serve l'accesso JavaScript per il funzionamento del calcolatore"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "6. Le tue scelte sui cookie",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Hai diverse opzioni per gestire i cookie:"
+            },
+            {
+              "type": "h3",
+              "text": "Impostazioni del browser"
+            },
+            {
+              "type": "p",
+              "html": "Puoi controllare i cookie tramite le impostazioni del tuo browser. La maggior parte dei browser consente di:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Visualizzare quali cookie sono memorizzati",
+                "Eliminare i cookie esistenti",
+                "Bloccare tutti i cookie o tipi specifici",
+                "Essere avvisati prima dell'impostazione dei cookie"
+              ]
+            },
+            {
+              "type": "p",
+              "html": "Per maggiori informazioni sulla gestione dei cookie nel tuo browser:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<a href=\"https://support.google.com/chrome/answer/95647\" target=\"_blank\" rel=\"noopener noreferrer\">Google Chrome</a>",
+                "<a href=\"https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer\" target=\"_blank\" rel=\"noopener noreferrer\">Mozilla Firefox</a>",
+                "<a href=\"https://support.apple.com/guide/safari/manage-cookies-sfri11471/mac\" target=\"_blank\" rel=\"noopener noreferrer\">Apple Safari</a>",
+                "<a href=\"https://support.microsoft.com/en-us/windows/manage-cookies-in-microsoft-edge\" target=\"_blank\" rel=\"noopener noreferrer\">Microsoft Edge</a>"
+              ]
+            },
+            {
+              "type": "h3",
+              "text": "Impostazioni dell'applicazione"
+            },
+            {
+              "type": "p",
+              "html": "All'interno di Fire Tools puoi:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Reimposta tutti i dati:</strong> Usa il pulsante \"Reimposta tutti i dati\" nelle Impostazioni per cancellare tutti i dati memorizzati",
+                "<strong>Modalità privacy:</strong> Attiva la modalità privacy per nascondere le informazioni finanziarie sensibili",
+                "<strong>Esporta dati:</strong> Scarica i tuoi dati in file CSV prima di cancellare i cookie"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "7. Impatto della disabilitazione dei cookie",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Poiché tutti i nostri cookie sono essenziali, disabilitarli influirà sull'applicazione:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Gli input del calcolatore non saranno salvati tra le sessioni",
+                "I dati di allocazione del patrimonio andranno persi alla chiusura del browser",
+                "Le preferenze dovranno essere impostate ogni volta",
+                "Alcune funzionalità potrebbero non funzionare correttamente"
+              ]
+            },
+            {
+              "type": "p",
+              "html": "Se preferisci non utilizzare i cookie, puoi comunque usare Fire Tools ma dovrai reinserire i dati a ogni sessione."
+            }
+          ]
+        },
+        {
+          "title": "8. Memorizzazione locale",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Oltre ai cookie, Fire Tools potrebbe utilizzare l'API localStorage del browser per alcune funzionalità. localStorage è simile ai cookie ma offre più spazio di memorizzazione e non viene inviato con le richieste HTTP."
+            },
+            {
+              "type": "p",
+              "html": "Come i nostri cookie, localStorage è utilizzato solo per funzionalità essenziali:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Memorizzazione di dataset più grandi localmente",
+                "Caching dello stato dell'applicazione",
+                "Mantenimento delle preferenze utente"
+              ]
+            },
+            {
+              "type": "p",
+              "html": "Puoi cancellare localStorage tramite gli strumenti di sviluppo del browser o utilizzando la funzionalità di reset dell'applicazione."
+            }
+          ]
+        },
+        {
+          "title": "9. Conformità internazionale",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "L'uso dei nostri cookie è conforme alle principali normative sulla privacy:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>GDPR (UE):</strong> Conforme - solo cookie essenziali, nessun consenso richiesto per cookie strettamente necessari",
+                "<strong>CCPA (California):</strong> Conforme - nessuna vendita di informazioni personali",
+                "<strong>Direttiva ePrivacy (UE):</strong> Conforme - i cookie essenziali sono esenti dai requisiti di consenso",
+                "<strong>LGPD (Brasile):</strong> Conforme - trattamento dati minimale",
+                "<strong>PIPEDA (Canada):</strong> Conforme - consenso ottenuto per l'uso dei cookie"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "10. Modifiche alla presente Cookie Policy",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Possiamo aggiornare la presente Cookie Policy di tanto in tanto per riflettere cambiamenti nelle nostre pratiche o nei requisiti legali. Quando apportiamo modifiche:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "Aggiorniamo la data \"Ultimo aggiornamento\" in cima a questa policy",
+                "Avvisiamo gli utenti tramite il banner di consenso ai cookie dell'applicazione",
+                "Documentiamo le modifiche significative nel nostro repository GitHub"
+              ]
+            },
+            {
+              "type": "p",
+              "html": "Ti incoraggiamo a rivedere periodicamente questa Cookie Policy."
+            }
+          ]
+        },
+        {
+          "title": "11. Contattaci",
+          "blocks": [
+            {
+              "type": "p",
+              "html": "Se hai domande sull'uso dei cookie o sulla presente Cookie Policy:"
+            },
+            {
+              "type": "ul",
+              "items": [
+                "<strong>Email:</strong> security@mb-consulting.dev",
+                "<strong>GitHub:</strong> <a href=\"https://github.com/mbianchidev/fire-tools\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/mbianchidev/fire-tools</a>",
+                "<strong>Issue:</strong> Segnala qualsiasi problema nel nostro tracker delle issue su GitHub"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "12. Policy correlate",
+          "blocks": [
+            {
+              "type": "link",
+              "prefix": "Per maggiori informazioni su come gestiamo i tuoi dati, consulta la nostra ",
+              "target": "privacy",
+              "suffix": ". Insieme, queste policy forniscono un quadro completo delle nostre pratiche sulla privacy."
+            }
+          ]
+        }
+      ],
+      "lastUpdatedDate": "31 dicembre 2025"
+    }
+  }
+}

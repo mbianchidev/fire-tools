@@ -3,7 +3,8 @@
  * Handles saving/loading notification state to/from encrypted cookies
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { encryptData, decryptData } from './cookieEncryption';
 import {
   type Notification,
@@ -12,37 +13,55 @@ import {
   DEFAULT_NOTIFICATION_STATE,
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from '../types/notification';
+import { showNativeNotification } from './nativeNotifications';
 
 const NOTIFICATIONS_KEY = 'fire-tools-notifications';
 const MAX_NOTIFICATIONS = 50; // Limit to prevent cookie overflow
 
-// Cookie options
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+/**
+ * Event dispatched on `window` whenever the notification state changes
+ * (add / mark read / delete / clear / preferences). UI surfaces such as
+ * the bell badge listen for this so they refresh immediately instead of
+ * waiting for the user to open the panel.
+ */
+export const NOTIFICATIONS_CHANGED_EVENT = 'fire-tools:notifications-changed';
+
+const emitNotificationsChanged = (): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    window.dispatchEvent(new CustomEvent(NOTIFICATIONS_CHANGED_EVENT));
+  } catch (error) {
+    console.error('Failed to dispatch notifications-changed event:', error);
+  }
+};
+
+// Cookie options (only used when SafeCookies routes to real cookies)
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365, // 1 year
   sameSite: 'strict',
-  secure: window.location.protocol === 'https:',
+  secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
   path: '/',
 };
 
 /**
- * Save notification state to encrypted cookies
+ * Save notification state to encrypted storage
  */
 export function saveNotificationState(state: NotificationState): void {
   try {
     const stateJson = JSON.stringify(state);
     const encryptedState = encryptData(stateJson);
-    Cookies.set(NOTIFICATIONS_KEY, encryptedState, COOKIE_OPTIONS);
+    SafeCookies.set(NOTIFICATIONS_KEY, encryptedState, COOKIE_OPTIONS);
   } catch (error) {
-    console.error('Failed to save notification state to cookies:', error);
+    console.error('Failed to save notification state:', error);
   }
 }
 
 /**
- * Load notification state from encrypted cookies
+ * Load notification state from encrypted storage
  */
 export function loadNotificationState(): NotificationState {
   try {
-    const encryptedState = Cookies.get(NOTIFICATIONS_KEY);
+    const encryptedState = SafeCookies.get(NOTIFICATIONS_KEY);
     if (encryptedState) {
       const decryptedState = decryptData(encryptedState);
       if (decryptedState) {
@@ -60,7 +79,7 @@ export function loadNotificationState(): NotificationState {
     }
     return DEFAULT_NOTIFICATION_STATE;
   } catch (error) {
-    console.error('Failed to load notification state from cookies:', error);
+    console.error('Failed to load notification state:', error);
     return DEFAULT_NOTIFICATION_STATE;
   }
 }
@@ -77,6 +96,7 @@ export function clearNotifications(): void {
       lastChecked: null,
     };
     saveNotificationState(clearedState);
+    emitNotificationsChanged();
   } catch (error) {
     console.error('Failed to clear notifications:', error);
   }
@@ -102,6 +122,17 @@ export function addNotification(notification: Notification): void {
     };
     
     saveNotificationState(updatedState);
+    emitNotificationsChanged();
+
+    // Best-effort: also fire a native OS notification when the user has
+    // opted in. Errors are swallowed by the helper.
+    if (state.preferences.enableNativeNotifications) {
+      void showNativeNotification({
+        title: notification.title,
+        message: notification.message,
+        priority: notification.priority,
+      });
+    }
   } catch (error) {
     console.error('Failed to add notification:', error);
   }
@@ -124,6 +155,7 @@ export function markNotificationAsRead(notificationId: string): void {
     };
     
     saveNotificationState(updatedState);
+    emitNotificationsChanged();
   } catch (error) {
     console.error('Failed to mark notification as read:', error);
   }
@@ -146,6 +178,7 @@ export function markNotificationAsUnread(notificationId: string): void {
     };
     
     saveNotificationState(updatedState);
+    emitNotificationsChanged();
   } catch (error) {
     console.error('Failed to mark notification as unread:', error);
   }
@@ -170,6 +203,7 @@ export function markAllNotificationsAsRead(): void {
     };
     
     saveNotificationState(updatedState);
+    emitNotificationsChanged();
   } catch (error) {
     console.error('Failed to mark all notifications as read:', error);
   }
@@ -190,6 +224,7 @@ export function deleteNotification(notificationId: string): void {
     };
     
     saveNotificationState(updatedState);
+    emitNotificationsChanged();
   } catch (error) {
     console.error('Failed to delete notification:', error);
   }
@@ -250,6 +285,7 @@ export function updateNotificationPreferences(
     };
     
     saveNotificationState(updatedState);
+    emitNotificationsChanged();
   } catch (error) {
     console.error('Failed to update notification preferences:', error);
   }

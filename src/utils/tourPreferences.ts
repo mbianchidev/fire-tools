@@ -3,39 +3,38 @@
  * Handles saving/loading tour completion state to/from encrypted cookies
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { encryptData, decryptData } from './cookieEncryption';
+import {
+  PREF_KEY_TOUR_COMPLETED,
+  pushPreferenceToBackend,
+  deletePreferenceFromBackend,
+} from './uiPreferencesSync';
 
 const TOUR_COMPLETED_KEY = 'fire-tools-tour-completed';
 
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365,
   sameSite: 'strict',
   secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
   path: '/',
 };
 
-/**
- * Save tour completion state to encrypted cookies
- * @param completed - Whether the tour has been completed
- */
 export function saveTourCompleted(completed: boolean): void {
   try {
     const payload = JSON.stringify({ completed });
     const encrypted = encryptData(payload);
-    Cookies.set(TOUR_COMPLETED_KEY, encrypted, COOKIE_OPTIONS);
+    SafeCookies.set(TOUR_COMPLETED_KEY, encrypted, COOKIE_OPTIONS);
+    pushPreferenceToBackend(PREF_KEY_TOUR_COMPLETED, payload);
   } catch (error) {
     console.error('Failed to save tour preference:', error);
   }
 }
 
-/**
- * Load tour completion state from encrypted cookies
- * @returns Whether the tour has been completed (defaults to false)
- */
 export function loadTourCompleted(): boolean {
   try {
-    const encrypted = Cookies.get(TOUR_COMPLETED_KEY);
+    const encrypted = SafeCookies.get(TOUR_COMPLETED_KEY);
     if (!encrypted) {
       return false;
     }
@@ -53,12 +52,10 @@ export function loadTourCompleted(): boolean {
   }
 }
 
-/**
- * Clear tour preference from cookies (allows restarting the tour)
- */
 export function clearTourPreference(): void {
   try {
-    Cookies.remove(TOUR_COMPLETED_KEY, { path: '/' });
+    SafeCookies.remove(TOUR_COMPLETED_KEY, { path: '/' });
+    deletePreferenceFromBackend(PREF_KEY_TOUR_COMPLETED);
   } catch (error) {
     console.error('Failed to clear tour preference:', error);
   }

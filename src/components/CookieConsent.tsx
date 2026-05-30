@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
+import SafeCookies from '../utils/safeCookies';
+import { useTranslation } from 'react-i18next';
 import { usePolicyModal } from '../App';
+import { IS_DEMO_MODE } from '../utils/demoMode';
 import './CookieConsent.css';
 
 const CONSENT_COOKIE = 'fire-tools-cookie-consent';
@@ -14,11 +16,17 @@ interface ConsentData {
 
 export function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const { t } = useTranslation();
   const { openPolicy } = usePolicyModal();
 
   useEffect(() => {
+    if (IS_DEMO_MODE) {
+      // Demo mode never writes cookies, so the consent banner has nothing
+      // to consent to — keep it hidden.
+      return;
+    }
     // Check if user has already acknowledged the cookie notice
-    const stored = Cookies.get(CONSENT_COOKIE);
+    const stored = SafeCookies.get(CONSENT_COOKIE);
     if (!stored) {
       setVisible(true);
     } else {
@@ -41,14 +49,14 @@ export function CookieConsent() {
       acknowledged: true,
       timestamp: new Date().toISOString(),
     };
-    
-    Cookies.set(CONSENT_COOKIE, JSON.stringify(consentData), {
+
+    SafeCookies.set(CONSENT_COOKIE, JSON.stringify(consentData), {
       expires: 365,
       sameSite: 'strict',
       secure: window.location.protocol === 'https:',
       path: '/',
     });
-    
+
     setVisible(false);
   };
 
@@ -65,20 +73,20 @@ export function CookieConsent() {
       <div className="cookie-banner-content">
         <div className="cookie-banner-text">
           <h2 id="cookie-title" className="cookie-banner-title">
-            🍪 Cookie Notice
+            🍪 {t('cookieConsent.title')}
           </h2>
           <p id="cookie-description" className="cookie-banner-description">
-            Fire Tools uses <strong>strictly necessary cookies</strong> to store your financial data locally and securely on your device. 
-            We <strong>do not use analytics, tracking, or marketing cookies</strong>. Your data never leaves your device.
+            {t('cookieConsent.descriptionStart')}<strong>{t('cookieConsent.strictlyNecessary')}</strong>{t('cookieConsent.descriptionMiddle')}
+            <strong>{t('cookieConsent.noTracking')}</strong>{t('cookieConsent.descriptionEnd')}
           </p>
           <p className="cookie-banner-links">
-            Learn more:{' '}
+            {t('cookieConsent.learnMore')}:{' '}
             <button type="button" className="cookie-policy-link" onClick={() => openPolicy('privacy')}>
-              Privacy Policy
+              {t('legal.privacyPolicy')}
             </button>
             {' · '}
             <button type="button" className="cookie-policy-link" onClick={() => openPolicy('cookie')}>
-              Cookie Policy
+              {t('legal.cookiePolicy')}
             </button>
           </p>
         </div>
@@ -86,9 +94,9 @@ export function CookieConsent() {
           <button
             onClick={handleAcknowledge}
             className="cookie-btn-acknowledge"
-            aria-label="Acknowledge cookie notice"
+            aria-label={t('cookieConsent.acknowledgeAria')}
           >
-            Got it
+            {t('cookieConsent.gotIt')}
           </button>
         </div>
       </div>

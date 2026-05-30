@@ -62,6 +62,8 @@ tags:
     description: Experimental — cached ticker metadata and breakdown computations
   - name: Banks
     description: Read-mostly lookup of supported banks/brokers with OpenBanking support flag
+  - name: UiPreferences
+    description: Generic per-user UI preferences (tour, banners, dismissable prompts)
 
 security: []   # default: no auth (single-user). Per-operation may require bearer.
 
@@ -1453,6 +1455,64 @@ paths:
               schema: { $ref: '#/components/schemas/BankInfo' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  # ---------------------------------------------------------------------------
+  # UI Preferences (generic per-user KV)
+  # ---------------------------------------------------------------------------
+  /ui-preferences:
+    get:
+      tags: [UiPreferences]
+      summary: Get all UI preferences for the current user
+      operationId: listUiPreferences
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UiPreferenceMap' }
+
+  /ui-preferences/{key}:
+    parameters:
+      - in: path
+        name: key
+        required: true
+        schema:
+          type: string
+          pattern: '^[A-Za-z][A-Za-z0-9_.-]{0,63}$'
+    get:
+      tags: [UiPreferences]
+      summary: Get a single UI preference
+      operationId: getUiPreference
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UiPreference' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [UiPreferences]
+      summary: Upsert a single UI preference
+      operationId: putUiPreference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UiPreferenceInput' }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UiPreference' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+    delete:
+      tags: [UiPreferences]
+      summary: Delete a single UI preference
+      operationId: deleteUiPreference
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '#/components/responses/NotFound' }
+
 # =============================================================================
 # Components
 # =============================================================================
@@ -2552,3 +2612,27 @@ components:
         bic:                 { type: string, nullable: true }
         institutionType:     { $ref: '#/components/schemas/InstitutionType' }
         logoUrl:             { type: string, nullable: true }
+
+    # -- UI Preferences ------------------------------------------------------
+    UiPreference:
+      type: object
+      required: [key, value, updatedAt]
+      properties:
+        key:       { type: string, pattern: '^[A-Za-z][A-Za-z0-9_.-]{0,63}$' }
+        value:     { type: string, maxLength: 8192, description: 'Opaque string (typically JSON-encoded)' }
+        updatedAt: { type: string, format: date-time }
+
+    UiPreferenceInput:
+      type: object
+      required: [value]
+      properties:
+        value: { type: string, maxLength: 8192 }
+
+    UiPreferenceMap:
+      type: object
+      required: [preferences]
+      properties:
+        preferences:
+          type: object
+          additionalProperties: { type: string }
+          description: 'Map of preference key → opaque string value'

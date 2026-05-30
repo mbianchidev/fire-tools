@@ -45,7 +45,7 @@ If a heuristic category is wrong (e.g. an obscure merchant), an **optional** LLM
 
 - **No PDF bytes ever leave your device.** Parsing happens fully in the browser.
 - **No network calls at all** unless you (a) configure the LLM endpoint **and** (b) tick *Use AI categorization* for an import.
-- The API key is stored encrypted with the rest of your settings (AES-256 in a cookie scoped to your browser).
+- The API key is stored encrypted with the rest of your settings (local SQLite database on desktop, AES-256-encrypted cookie in browser).
 - You can clear everything via *Settings → Data Management → Reset All Data*.
 
 ## Limitations

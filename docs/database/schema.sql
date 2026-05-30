@@ -623,6 +623,22 @@ CREATE TABLE IF NOT EXISTS banks (
 );
 CREATE INDEX IF NOT EXISTS idx_banks_country ON banks (country_code);
 
+-- -----------------------------------------------------------------------------
+-- 11. UI Preferences (generic per-user KV store)
+-- -----------------------------------------------------------------------------
+-- Replaces the encrypted-cookie store used by the pure-web build for things
+-- like tour completion, banner dismissals, and prompt suppressions.
+-- Values are opaque strings (typically JSON-encoded by the client).
+
+CREATE TABLE IF NOT EXISTS ui_preferences (
+    user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    key        TEXT    NOT NULL,
+    value      TEXT    NOT NULL,
+    updated_at TEXT    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, key)
+);
+CREATE INDEX IF NOT EXISTS idx_ui_preferences_user ON ui_preferences (user_id);
+
 -- =============================================================================
 -- End of schema
 -- =============================================================================

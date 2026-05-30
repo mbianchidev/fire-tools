@@ -1,0 +1,75 @@
+appId: dev.mb-consulting.firetools
+productName: Fire Tools
+copyright: Copyright © 2026 Fire Tools Contributors
+directories:
+  output: release/${version}
+  buildResources: electron/build
+
+files:
+  - electron/**/*
+  - dist-electron/**/*
+  - server/dist/**/*
+  - server/migrations/**/*
+  - package.json
+  - "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}"
+  - "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+  - "!**/node_modules/*.d.ts"
+  - "!**/node_modules/.bin"
+
+asarUnpack:
+  - "**/*.{node,dll,dylib,so}"
+  - "node_modules/better-sqlite3/**/*"
+
+extraMetadata:
+  main: electron/main.cjs
+
+asar: true
+
+# After macOS signing (including ad-hoc), re-sign with the correct bundle
+# identifier so NotificationCenter attributes notifications to "Fire Tools"
+# instead of the default "Electron". See scripts/electron-after-sign.cjs.
+afterSign: scripts/electron-after-sign.cjs
+
+mac:
+  category: public.app-category.finance
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: electron/build/entitlements.mac.plist
+  entitlementsInherit: electron/build/entitlements.mac.plist
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  # Code-signing & notarization driven via env:
+  #   CSC_LINK, CSC_KEY_PASSWORD (signing cert)
+  #   APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID (notarization)
+  notarize: false
+
+win:
+  publisherName: Fire Tools Contributors
+  legalTrademarks: ""
+  target:
+    - target: nsis
+      arch:
+        - x64
+  # Sign via WINDOWS_CERTIFICATE_LINK / WINDOWS_CERTIFICATE_PASSWORD env when available.
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: "${productName}-Setup-${version}-${arch}.${ext}"
+  shortcutName: Fire Tools
+  uninstallDisplayName: Fire Tools ${version}
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+linux:
+  category: Finance
+  target:
+    - target: AppImage
+      arch:
+        - x64
+
+publish: null

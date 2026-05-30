@@ -3,7 +3,8 @@
  * Handles saving/loading user preferences to/from encrypted cookies
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import {
   CurrencySettings,
   DEFAULT_CURRENCY_SETTINGS,
@@ -11,8 +12,16 @@ import {
 import { AssetClass } from '../types/assetAllocation';
 import { LlmCategorizationConfig } from '../types/pdfImport';
 import { encryptData, decryptData } from './cookieEncryption';
+import { IS_DEMO_MODE } from './demoMode';
 
 export type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+
+/**
+ * UI language code. Kept here (instead of imported from `src/i18n`) so
+ * cookieSettings has no dependency on the i18n module — avoids a cycle
+ * because the i18n init reads settings to discover the saved language.
+ */
+export type LanguageCode = 'en' | 'it' | 'fr' | 'de' | 'es';
 
 /**
  * Opt-in experimental / preview features. All default to false so they don't
@@ -32,6 +41,22 @@ export const DEFAULT_EXPERIMENTAL_FEATURES: ExperimentalFeatures = {
   pdfImport: false,
 };
 
+export type BackendMode = 'embedded' | 'custom';
+
+/** Local-deployment backend connection settings.
+ * - `embedded`: app uses the in-process backend bundled with Electron
+ *   (no-op for non-Electron browser builds).
+ * - `custom`: app talks to a separately-running backend at `customUrl`.
+ *   Useful when running a shared backend on the LAN, in Docker, etc. */
+export interface BackendSettings {
+  mode: BackendMode;
+  customUrl?: string;
+}
+
+export const DEFAULT_BACKEND_SETTINGS: BackendSettings = {
+  mode: 'embedded',
+};
+
 export interface UserSettings {
   accountName: string;
   decimalSeparator: '.' | ',';
@@ -44,9 +69,13 @@ export interface UserSettings {
   includePrimaryResidenceInFIRE: boolean;
   searchThreshold: number;
   experimentalFeatures: ExperimentalFeatures;
+  /** UI language. Always defaults to English. Independent from currency. */
+  language: LanguageCode;
   /** Optional OpenAI-compatible LLM config for PDF import categorization.
    *  Stored encrypted with the rest of the settings. */
   llmCategorization?: LlmCategorizationConfig;
+  /** Where the app finds its backend API (embedded vs. custom URL). */
+  backend: BackendSettings;
 }
 
 export const DEFAULT_FIRE_ASSET_CLASS_INCLUSION: Record<AssetClass, boolean> = {
@@ -73,40 +102,43 @@ export const DEFAULT_SETTINGS: UserSettings = {
   includePrimaryResidenceInFIRE: true, // Default to including primary residence
   searchThreshold: 8,
   experimentalFeatures: DEFAULT_EXPERIMENTAL_FEATURES,
+  language: 'en',
+  backend: DEFAULT_BACKEND_SETTINGS,
 };
 
 const SETTINGS_KEY = 'fire-calculator-settings';
 
 // Cookie options
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365, // 1 year
   sameSite: 'strict',
-  secure: window.location.protocol === 'https:',
+  secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
   path: '/',
 };
 
 /**
- * Save user settings to encrypted cookies
+ * Save user settings to encrypted storage
  * @param settings - The settings to save
  */
 export function saveSettings(settings: UserSettings): void {
+  if (IS_DEMO_MODE) return;
   try {
     const settingsJson = JSON.stringify(settings);
     const encryptedSettings = encryptData(settingsJson);
-    Cookies.set(SETTINGS_KEY, encryptedSettings, COOKIE_OPTIONS);
+    SafeCookies.set(SETTINGS_KEY, encryptedSettings, COOKIE_OPTIONS);
   } catch (error) {
-    console.error('Failed to save settings to cookies:', error);
-    throw new Error('Failed to save settings to cookies. Cookies may be disabled.');
+    console.error('Failed to save settings:', error);
+    throw new Error('Failed to save settings.');
   }
 }
 
 /**
- * Load user settings from encrypted cookies
+ * Load user settings from encrypted storage
  * @returns The saved settings, or DEFAULT_SETTINGS if none saved
  */
 export function loadSettings(): UserSettings {
   try {
-    const encryptedSettings = Cookies.get(SETTINGS_KEY);
+    const encryptedSettings = SafeCookies.get(SETTINGS_KEY);
     if (encryptedSettings) {
       const decryptedSettings = decryptData(encryptedSettings);
       if (decryptedSettings) {
@@ -131,6 +163,10 @@ export function loadSettings(): UserSettings {
             ...DEFAULT_EXPERIMENTAL_FEATURES,
             ...(parsed.experimentalFeatures || {}),
           },
+          backend: {
+            ...DEFAULT_BACKEND_SETTINGS,
+            ...(parsed.backend || {}),
+          },
         };
       }
     }
@@ -142,13 +178,13 @@ export function loadSettings(): UserSettings {
 }
 
 /**
- * Clear user settings from cookies
+ * Clear user settings from storage
  */
 export function clearSettings(): void {
   try {
-    Cookies.remove(SETTINGS_KEY, { path: '/' });
+    SafeCookies.remove(SETTINGS_KEY, { path: '/' });
   } catch (error) {
-    console.error('Failed to clear settings from cookies:', error);
+    console.error('Failed to clear settings:', error);
   }
 }
 
@@ -218,6 +254,32 @@ export function validateSettings(settings: Partial<UserSettings>): { isValid: bo
     const validFormats = ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD'];
     if (!validFormats.includes(settings.dateFormat)) {
       errors.push('Date format must be "DD/MM/YYYY", "MM/DD/YYYY", or "YYYY-MM-DD"');
+    }
+  }
+
+  if (settings.language !== undefined) {
+    const validLanguages: LanguageCode[] = ['en', 'it', 'fr', 'de', 'es'];
+    if (!validLanguages.includes(settings.language as LanguageCode)) {
+      errors.push('Language must be one of: en, it, fr, de, es');
+    }
+  }
+
+  if (settings.backend !== undefined) {
+    if (settings.backend.mode !== 'embedded' && settings.backend.mode !== 'custom') {
+      errors.push('Backend mode must be "embedded" or "custom"');
+    }
+    if (settings.backend.mode === 'custom') {
+      const url = settings.backend.customUrl;
+      if (!url || typeof url !== 'string') {
+        errors.push('Custom backend URL is required when mode is "custom"');
+      } else {
+        try {
+          // eslint-disable-next-line no-new
+          new URL(url);
+        } catch {
+          errors.push('Custom backend URL must be a valid absolute URL');
+        }
+      }
     }
   }
 

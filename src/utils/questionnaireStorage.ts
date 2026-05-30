@@ -3,15 +3,16 @@
  * Handles saving/loading questionnaire results using encrypted cookies
  */
 
-import Cookies from 'js-cookie';
+import SafeCookies from './safeCookies';
+import type { CookieAttributes } from './safeCookies';
 import { QuestionnaireResults } from '../types/questionnaire';
 import { encryptData, decryptData } from './cookieEncryption';
 
-// Cookie key
+// Storage key
 const QUESTIONNAIRE_RESULTS_KEY = 'fire-tools-questionnaire-results';
 
 // Cookie options - secure settings for production
-const COOKIE_OPTIONS: Cookies.CookieAttributes = {
+const COOKIE_OPTIONS: CookieAttributes = {
   expires: 365, // 1 year
   sameSite: 'strict',
   secure: typeof window !== 'undefined' && window.location.protocol === 'https:',
@@ -37,26 +38,26 @@ function isValidQuestionnaireResults(obj: any): obj is QuestionnaireResults {
 }
 
 /**
- * Save questionnaire results to encrypted cookies
+ * Save questionnaire results to encrypted storage
  */
 export function saveQuestionnaireResults(results: QuestionnaireResults): void {
   try {
     const resultsJson = JSON.stringify(results);
     const encryptedResults = encryptData(resultsJson);
-    
-    Cookies.set(QUESTIONNAIRE_RESULTS_KEY, encryptedResults, COOKIE_OPTIONS);
+
+    SafeCookies.set(QUESTIONNAIRE_RESULTS_KEY, encryptedResults, COOKIE_OPTIONS);
   } catch (error) {
-    console.error('Failed to save questionnaire results to cookies:', error);
-    throw new Error('Failed to save questionnaire results. Cookies may be disabled.');
+    console.error('Failed to save questionnaire results:', error);
+    throw new Error('Failed to save questionnaire results.');
   }
 }
 
 /**
- * Load questionnaire results from encrypted cookies
+ * Load questionnaire results from encrypted storage
  */
 export function loadQuestionnaireResults(): QuestionnaireResults | null {
   try {
-    const encryptedResults = Cookies.get(QUESTIONNAIRE_RESULTS_KEY);
+    const encryptedResults = SafeCookies.get(QUESTIONNAIRE_RESULTS_KEY);
     if (!encryptedResults) {
       return null;
     }
@@ -73,19 +74,19 @@ export function loadQuestionnaireResults(): QuestionnaireResults | null {
 
     return null;
   } catch (error) {
-    console.error('Failed to load questionnaire results from cookies:', error);
+    console.error('Failed to load questionnaire results:', error);
     return null;
   }
 }
 
 /**
- * Clear questionnaire results from cookies
+ * Clear questionnaire results from storage
  */
 export function clearQuestionnaireResults(): void {
   try {
-    Cookies.remove(QUESTIONNAIRE_RESULTS_KEY, { path: '/' });
+    SafeCookies.remove(QUESTIONNAIRE_RESULTS_KEY, { path: '/' });
   } catch (error) {
-    console.error('Failed to clear questionnaire results from cookies:', error);
+    console.error('Failed to clear questionnaire results:', error);
   }
 }
 

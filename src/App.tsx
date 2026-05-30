@@ -1,5 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route, Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+// Use HashRouter under file:// (Electron) so deep links work without a server.
+const Router = typeof window !== 'undefined' && window.location.protocol === 'file:' ? HashRouter : BrowserRouter;
 import { useState, useEffect, useMemo, createContext, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';
 import { calculateFIRE } from './utils/fireCalculator';
@@ -19,6 +22,7 @@ import { ProfileMenu } from './components/ProfileMenu';
 import { NotificationBell } from './components/NotificationBell';
 import { SettingsPage } from './components/SettingsPage';
 import { CookieConsent } from './components/CookieConsent';
+import { DemoBanner } from './components/DemoBanner';
 import { GuidedTour } from './components/GuidedTour';
 import { NotFoundPage } from './components/NotFoundPage';
 import { QuestionnairePage } from './components/QuestionnairePage';
@@ -28,6 +32,7 @@ import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
 import { loadSettings, saveSettings, type UserSettings } from './utils/cookieSettings';
+import { syncPreferencesFromBackend } from './utils/uiPreferencesSync';
 import './App.css';
 import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
@@ -52,17 +57,18 @@ export const usePolicyModal = () => useContext(PolicyModalContext);
 
 function Navigation({ accountName, showPortfolioBreakdown }: { accountName: string; showPortfolioBreakdown: boolean }) {
   const location = useLocation();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
   
   return (
-    <nav className="app-nav" aria-label="Main navigation">
+    <nav className="app-nav" aria-label={t('nav.label')}>
       <button 
         className="nav-toggle" 
         onClick={toggleMenu} 
-        aria-label="Toggle navigation menu"
+        aria-label={t('nav.toggle')}
         aria-expanded={isOpen}
       >
         {isOpen ? <MaterialIcon name="close" /> : <MaterialIcon name="menu" />}
@@ -74,7 +80,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/' ? 'page' : undefined}
         >
-          <MaterialIcon name="home" className="nav-icon" /> Home
+          <MaterialIcon name="home" className="nav-icon" /> {t('nav.home')}
         </Link>
         <Link 
           to="/asset-allocation" 
@@ -82,7 +88,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/asset-allocation' ? 'page' : undefined}
         >
-          <MaterialIcon name="pie_chart" className="nav-icon" /> Asset Allocation
+          <MaterialIcon name="pie_chart" className="nav-icon" /> {t('nav.assetAllocation')}
         </Link>
         {showPortfolioBreakdown && (
           <Link 
@@ -91,7 +97,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
             onClick={closeMenu}
             aria-current={location.pathname === '/portfolio-breakdown' ? 'page' : undefined}
           >
-            <MaterialIcon name="donut_large" className="nav-icon" /> Portfolio Breakdown
+            <MaterialIcon name="donut_large" className="nav-icon" /> {t('nav.portfolioBreakdown')}
           </Link>
         )}
         <Link 
@@ -100,7 +106,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/expense-tracker' ? 'page' : undefined}
         >
-          <MaterialIcon name="account_balance_wallet" className="nav-icon" /> Cashflow
+          <MaterialIcon name="account_balance_wallet" className="nav-icon" /> {t('nav.cashflow')}
         </Link>
         <Link 
           to="/net-worth-tracker" 
@@ -108,7 +114,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/net-worth-tracker' ? 'page' : undefined}
         >
-          <MaterialIcon name="trending_up" className="nav-icon" /> Net Worth
+          <MaterialIcon name="trending_up" className="nav-icon" /> {t('nav.netWorth')}
         </Link>
         <Link 
           to="/fire-calculator" 
@@ -116,7 +122,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/fire-calculator' ? 'page' : undefined}
         >
-          <MaterialIcon name="local_fire_department" className="nav-icon" /> FIRE Calculator
+          <MaterialIcon name="local_fire_department" className="nav-icon" /> {t('nav.fireCalculator')}
         </Link>
         <Link 
           to="/monte-carlo" 
@@ -124,7 +130,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
         >
-          <MaterialIcon name="casino" className="nav-icon" /> Monte Carlo
+          <MaterialIcon name="casino" className="nav-icon" /> {t('nav.monteCarlo')}
         </Link>
       </div>
       <div className="nav-actions">
@@ -438,15 +444,67 @@ function FIRECalculatorPage() {
   );
 }
 
+// Bridges Electron menu IPC events into React Router navigation.
+// Lives inside <Router> so it can use useNavigate().
+function NavigateBridge() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const bridge = typeof window !== 'undefined' ? window.fireTools : undefined;
+    if (!bridge?.onNavigate) return;
+    const unsubscribe = bridge.onNavigate((path: string) => {
+      if (typeof path === 'string' && path.startsWith('/')) {
+        navigate(path);
+      }
+    });
+    return () => {
+      try { unsubscribe?.(); } catch { /* ignore */ }
+    };
+  }, [navigate]);
+  return null;
+}
+
 function App() {
-  // Use base path only in production (for GitHub Pages), not in local development
-  const basename = import.meta.env.MODE === 'production' ? '/fire-tools' : '/';
+  // SPA lives under /demo on the web so the landing page can sit at the root.
+  // Production = GitHub Pages under /fire-tools. Electron detection covers
+  // both packaged (file://) and unpackaged dev (http://) launches via the
+  // preload bridge that only exists inside Electron.
+  const isElectron =
+    typeof window !== 'undefined' &&
+    (window.location.protocol === 'file:' || Boolean(window.fireTools));
+  const basename = isElectron
+    ? '/'
+    : import.meta.env.MODE === 'production'
+    ? '/fire-tools/demo'
+    : '/demo';
+  const { t } = useTranslation();
   
   // Load settings from localStorage
   const [settings, setSettings] = useState<UserSettings>(() => loadSettings());
   
   // Policy modal state
   const [policyModalType, setPolicyModalType] = useState<PolicyType | null>(null);
+
+  // Mirror persisted UI prefs (tour, banner, questionnaire prompt) from the
+  // backend into local cookies before children mount, so synchronous
+  // load*() helpers see DB-backed values on first render.
+  // In pure-web mode getApiBaseUrl() resolves null and this is a no-op.
+  const [prefsReady, setPrefsReady] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const TIMEOUT_MS = 800;
+    const timer = setTimeout(() => {
+      if (!cancelled) setPrefsReady(true);
+    }, TIMEOUT_MS);
+    syncPreferencesFromBackend().finally(() => {
+      if (cancelled) return;
+      clearTimeout(timer);
+      setPrefsReady(true);
+    });
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, []);
   
   const handleSettingsChange = (newSettings: UserSettings) => {
     setSettings(newSettings);
@@ -459,17 +517,23 @@ function App() {
   const closePolicy = () => {
     setPolicyModalType(null);
   };
-  
+
+  if (!prefsReady) {
+    return null;
+  }
+
   return (
     <Router basename={basename}>
       <PolicyModalContext.Provider value={{ openPolicy, closePolicy }}>
-        <div className="app">
-          <a href="#main-content" className="skip-link">Skip to main content</a>
+        <div className={isElectron ? 'app app--electron' : 'app'}>
+          <NavigateBridge />
+          <DemoBanner />
+          <a href="#main-content" className="skip-link">{t('app.skipToContent')}</a>
           
           <header className="app-header">
             <FireIcon size={96} className="header-fire-icon" />
-            <h1>Fire Tools</h1>
-            <p>Rocket fuel for your financial planning</p>
+            <h1>{t('app.title')}</h1>
+            <p>{t('app.tagline')}</p>
           </header>
 
           <Navigation accountName={settings.accountName} showPortfolioBreakdown={settings.experimentalFeatures?.portfolioBreakdown ?? false} />
@@ -489,32 +553,32 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
 
-          <footer className="app-footer">
-            <p>
-              Fire Tools - Disclaimer: This is for educational purposes only. 
-              Market data is provided as an indication only and may be delayed or inaccurate.
-              Consult with a financial advisor for professional advice.
-            </p>
-            <div className="footer-links">
-              <button 
-                type="button" 
-                className="footer-link-btn" 
-                onClick={() => openPolicy('privacy')}
-              >
-                Privacy Policy
-              </button>
-              <span className="footer-separator">•</span>
-              <button 
-                type="button" 
-                className="footer-link-btn" 
-                onClick={() => openPolicy('cookie')}
-              >
-                Cookie Policy
-              </button>
-              <span className="footer-separator">•</span>
-              <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </div>
-          </footer>
+          {!isElectron && (
+            <footer className="app-footer">
+              <p>
+                {t('app.disclaimer')}
+              </p>
+              <div className="footer-links">
+                <button 
+                  type="button" 
+                  className="footer-link-btn" 
+                  onClick={() => openPolicy('privacy')}
+                >
+                  {t('app.privacyPolicy')}
+                </button>
+                <span className="footer-separator">•</span>
+                <button 
+                  type="button" 
+                  className="footer-link-btn" 
+                  onClick={() => openPolicy('cookie')}
+                >
+                  {t('app.cookiePolicy')}
+                </button>
+                <span className="footer-separator">•</span>
+                <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">{t('app.github')}</a>
+              </div>
+            </footer>
+          )}
 
           <PolicyModal 
             isOpen={policyModalType !== null} 
@@ -522,7 +586,7 @@ function App() {
             policyType={policyModalType || 'privacy'}
             onSwitchPolicy={openPolicy}
           />
-          <CookieConsent />
+          {!isElectron && <CookieConsent />}
           <GuidedTour />
           <QuestionnairePrompt />
         </div>

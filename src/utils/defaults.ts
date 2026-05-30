@@ -285,19 +285,28 @@ export function generateDemoNetWorthDataForYear(targetYear: number, previousYear
   return months;
 }
 
-// Demo data for Net Worth Tracker - generates 12 months of data for current year with randomized variations
+// Demo data for Net Worth Tracker - generates 12 months of data for current year + 12 months of previous year (archived)
 export function getDemoNetWorthData(): NetWorthTrackerData {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1; // 1-12
-  
-  const months = generateDemoNetWorthDataForYear(currentYear);
-  
+  const prevYear = currentYear - 1;
+
+  // Build last year first, then chain into current year via December snapshot for continuity
+  const prevYearMonths = generateDemoNetWorthDataForYear(prevYear);
+  const prevDec = prevYearMonths[prevYearMonths.length - 1];
+  const months = generateDemoNetWorthDataForYear(currentYear, prevDec);
+
   return {
     years: [
       {
         year: currentYear,
         months,
         isArchived: false,
+      },
+      {
+        year: prevYear,
+        months: prevYearMonths,
+        isArchived: true,
       },
     ],
     currentYear,
@@ -311,56 +320,56 @@ export function getDemoNetWorthData(): NetWorthTrackerData {
   };
 }
 
-// Demo data for Cashflow Tracker
+// Demo data for Cashflow Tracker - 12 months for prior year and 12 months for current year
+// with varied incomes (salary, occasional freelance/bonus) and varied expense categories.
+// Designed so first month of current year retains salary >= €5,000 to satisfy demo invariants.
 export function getDemoCashflowData(): ExpenseTrackerData {
   const currentYear = new Date().getFullYear();
   const prevYear = currentYear - 1;
-  
+
+  const buildYear = (year: number, isArchived: boolean) => {
+    const baseSalary = year === currentYear ? 5200 : 4900;
+    const months = [] as ExpenseTrackerData['years'][number]['months'];
+    for (let m = 1; m <= 12; m++) {
+      const mm = String(m).padStart(2, '0');
+      const salary = baseSalary + (m - 1) * 8; // tiny monthly drift to look realistic
+      const incomes: ExpenseTrackerData['years'][number]['months'][number]['incomes'] = [
+        { id: `demo-${year}-inc-sal-${m}`, date: `${year}-${mm}-01`, amount: salary, description: 'Monthly Salary', type: 'income', source: 'SALARY', currency: 'EUR' },
+      ];
+      // Occasional freelance income (alternating months)
+      if (m % 2 === 0) {
+        incomes.push({ id: `demo-${year}-inc-frl-${m}`, date: `${year}-${mm}-15`, amount: 250 + (m * 10), description: 'Freelance Work', type: 'income', source: 'FREELANCE', currency: 'EUR' });
+      }
+      // Annual bonus in December
+      if (m === 12) {
+        incomes.push({ id: `demo-${year}-inc-bonus`, date: `${year}-12-20`, amount: 2500, description: 'Year-end Bonus', type: 'income', source: 'BONUS', currency: 'EUR' });
+      }
+
+      const expenses: ExpenseTrackerData['years'][number]['months'][number]['expenses'] = [
+        { id: `demo-${year}-exp-rent-${m}`, date: `${year}-${mm}-01`, amount: 1200, description: 'Rent', type: 'expense', category: 'HOUSING', expenseType: 'NEED', currency: 'EUR' },
+        { id: `demo-${year}-exp-gro-${m}`, date: `${year}-${mm}-05`, amount: 320 + ((m * 17) % 90), description: 'Groceries', type: 'expense', category: 'GROCERIES', expenseType: 'NEED', currency: 'EUR' },
+        { id: `demo-${year}-exp-util-${m}`, date: `${year}-${mm}-10`, amount: 130 + ((m * 11) % 60), description: 'Utilities', type: 'expense', category: 'UTILITIES', expenseType: 'NEED', currency: 'EUR' },
+        { id: `demo-${year}-exp-trn-${m}`, date: `${year}-${mm}-12`, amount: 90 + ((m * 7) % 40), description: 'Transport', type: 'expense', category: 'TRANSPORT', expenseType: 'NEED', currency: 'EUR' },
+        { id: `demo-${year}-exp-din-${m}`, date: `${year}-${mm}-18`, amount: 140 + ((m * 13) % 80), description: 'Dining Out', type: 'expense', category: 'DINING_OUT', expenseType: 'WANT', currency: 'EUR' },
+        { id: `demo-${year}-exp-ent-${m}`, date: `${year}-${mm}-22`, amount: 60 + ((m * 9) % 50), description: 'Entertainment', type: 'expense', category: 'ENTERTAINMENT', expenseType: 'WANT', currency: 'EUR' },
+        { id: `demo-${year}-exp-sub-${m}`, date: `${year}-${mm}-25`, amount: 45, description: 'Streaming Services', type: 'expense', category: 'SUBSCRIPTIONS', expenseType: 'WANT', currency: 'EUR' },
+      ];
+
+      months.push({
+        year,
+        month: m,
+        incomes,
+        expenses,
+        budgets: [],
+      });
+    }
+    return { year, months, isArchived };
+  };
+
   return {
     years: [
-      {
-        year: prevYear,
-        months: [
-          {
-            year: prevYear,
-            month: 12,
-            incomes: [
-              { id: 'demo-inc-1', date: `${prevYear}-12-01`, amount: 5000, description: 'Monthly Salary', type: 'income', source: 'SALARY', currency: 'EUR' },
-            ],
-            expenses: [
-              { id: 'demo-exp-1', date: `${prevYear}-12-01`, amount: 1200, description: 'Rent', type: 'expense', category: 'HOUSING', expenseType: 'NEED', currency: 'EUR' },
-              { id: 'demo-exp-2', date: `${prevYear}-12-05`, amount: 350, description: 'Groceries', type: 'expense', category: 'GROCERIES', expenseType: 'NEED', currency: 'EUR' },
-              { id: 'demo-exp-3', date: `${prevYear}-12-10`, amount: 150, description: 'Utilities', type: 'expense', category: 'UTILITIES', expenseType: 'NEED', currency: 'EUR' },
-              { id: 'demo-exp-4', date: `${prevYear}-12-15`, amount: 200, description: 'Dining Out', type: 'expense', category: 'DINING_OUT', expenseType: 'WANT', currency: 'EUR' },
-              { id: 'demo-exp-5', date: `${prevYear}-12-20`, amount: 100, description: 'Entertainment', type: 'expense', category: 'ENTERTAINMENT', expenseType: 'WANT', currency: 'EUR' },
-            ],
-            budgets: [],
-          },
-        ],
-        isArchived: false,
-      },
-      {
-        year: currentYear,
-        months: [
-          {
-            year: currentYear,
-            month: 1,
-            incomes: [
-              { id: 'demo-inc-2', date: `${currentYear}-01-01`, amount: 5000, description: 'Monthly Salary', type: 'income', source: 'SALARY', currency: 'EUR' },
-              { id: 'demo-inc-3', date: `${currentYear}-01-15`, amount: 200, description: 'Freelance Work', type: 'income', source: 'FREELANCE', currency: 'EUR' },
-            ],
-            expenses: [
-              { id: 'demo-exp-6', date: `${currentYear}-01-01`, amount: 1200, description: 'Rent', type: 'expense', category: 'HOUSING', expenseType: 'NEED', currency: 'EUR' },
-              { id: 'demo-exp-7', date: `${currentYear}-01-05`, amount: 380, description: 'Groceries', type: 'expense', category: 'GROCERIES', expenseType: 'NEED', currency: 'EUR' },
-              { id: 'demo-exp-8', date: `${currentYear}-01-10`, amount: 160, description: 'Utilities', type: 'expense', category: 'UTILITIES', expenseType: 'NEED', currency: 'EUR' },
-              { id: 'demo-exp-9', date: `${currentYear}-01-12`, amount: 50, description: 'Streaming Services', type: 'expense', category: 'SUBSCRIPTIONS', expenseType: 'WANT', currency: 'EUR' },
-              { id: 'demo-exp-10', date: `${currentYear}-01-18`, amount: 180, description: 'Dining Out', type: 'expense', category: 'DINING_OUT', expenseType: 'WANT', currency: 'EUR' },
-            ],
-            budgets: [],
-          },
-        ],
-        isArchived: false,
-      },
+      buildYear(prevYear, true),
+      buildYear(currentYear, false),
     ],
     currentYear,
     currentMonth: 1,

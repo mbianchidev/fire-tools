@@ -8,11 +8,26 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "predev": "node scripts/stop-dev.mjs",
+    "dev:all": "node scripts/dev-all.mjs",
+    "stop": "node scripts/stop-dev.mjs",
+    "build": "rm -rf dist && tsc && vite build",
+    "postbuild": "node scripts/build-landing.mjs && node scripts/build-docs.mjs",
+    "build:electron": "tsc && vite build --mode electron && npm --prefix server run build",
+    "build:landing": "node scripts/build-landing.mjs",
+    "build:docs": "node scripts/build-docs.mjs",
+    "docs:screenshots": "node scripts/take-screenshots.mjs",
     "preview": "vite preview",
+    "pretest": "node scripts/ensure-sqlite-for-node.cjs",
     "test": "vitest run --coverage --reporter=default --reporter=json --outputFile=test-results.json",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "postinstall": "node scripts/ensure-electron.mjs && node scripts/ensure-native-modules.mjs",
+    "electron:rebuild": "node scripts/ensure-native-modules.mjs",
+    "preelectron:dev": "node scripts/stop-dev.mjs && node scripts/ensure-electron.mjs && node scripts/ensure-native-modules.mjs",
+    "electron:dev": "node scripts/electron-dev.mjs",
+    "electron:build": "npm run build:electron",
+    "electron:dist": "npm run build:electron && electron-builder --config electron-builder.yml"
   },
   "keywords": [
     "fire",
@@ -20,9 +35,22 @@
     "financial-independence",
     "monte-carlo"
   ],
-  "author": "",
+  "author": {
+    "name": "Fire Tools Contributors",
+    "email": "noreply@mb-consulting.dev",
+    "url": "https://github.com/mbianchidev/fire-tools"
+  },
+  "homepage": "https://github.com/mbianchidev/fire-tools",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbianchidev/fire-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mbianchidev/fire-tools/issues"
+  },
   "license": "ISC",
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@testing-library/react": "^16.3.2",
     "@types/crypto-js": "^4.2.2",
     "@types/js-cookie": "^3.0.6",
@@ -30,20 +58,30 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.7",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
     "jsdom": "^29.1.1",
+    "marked": "^18.0.4",
     "typescript": "^6.0.3",
     "vite": "^8.0.14",
     "vitest": "^4.0.18"
   },
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
+    "express": "^4.21.0",
+    "express-rate-limit": "^8.5.2",
+    "i18next": "^26.3.0",
     "js-cookie": "^3.0.7",
     "pdfjs-dist": "^5.7.284",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-i18next": "^17.0.8",
     "react-is": "^19.2.6",
     "react-router-dom": "^7.15.1",
-    "recharts": "^3.8.1"
+    "recharts": "^3.8.1",
+    "zod": "^4.4.3"
   }
 }

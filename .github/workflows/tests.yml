@@ -1,0 +1,203 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      asset_allocation: ${{ steps.filter.outputs.asset_allocation }}
+      expense_tracker: ${{ steps.filter.outputs.expense_tracker }}
+      fire_calculator: ${{ steps.filter.outputs.fire_calculator }}
+      homepage: ${{ steps.filter.outputs.homepage }}
+      net_worth_tracker: ${{ steps.filter.outputs.net_worth_tracker }}
+      questionnaire: ${{ steps.filter.outputs.questionnaire }}
+      settings: ${{ steps.filter.outputs.settings }}
+      server: ${{ steps.filter.outputs.server }}
+      full: ${{ steps.filter.outputs.full }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: filter
+        with:
+          filters: |
+            # Page-scoped filters. A page test job runs when EITHER
+            # its test directory or a source file matching the page changes.
+            asset_allocation:
+              - 'tests/pages/asset-allocation/**'
+              - 'src/components/{Asset,Allocation,Portfolio,Breakdown,DCA,Editable,Collapsible,MassEdit}*'
+              - 'src/utils/{allocation,portfolio,price,yahoo,ticker,etf,exchange,currency,defaultAssets,dca}*'
+            expense_tracker:
+              - 'tests/pages/expense-tracker/**'
+              - 'src/components/{Expense,Income,Monthly,CategoryManager,PDFImport,MassEdit}*'
+              - 'src/utils/{expense,pdf,demoExpense,llm,categories,customCategories}*'
+            fire_calculator:
+              - 'tests/pages/fire-calculator/**'
+              - 'src/components/{Calculator,FIRE,MonteCarlo,Projection}*'
+              - 'src/utils/{fire,monteCarlo,chartHelper,projection}*'
+            homepage:
+              - 'tests/pages/homepage/**'
+              - 'src/components/HomePage*'
+            net_worth_tracker:
+              - 'tests/pages/net-worth-tracker/**'
+              - 'src/components/{NetWorth,Historical}*'
+              - 'src/utils/{netWorth,depreciation,mortgage,dataSync}*'
+            questionnaire:
+              - 'tests/pages/questionnaire/**'
+              - 'src/components/{Questionnaire,GuidedTour}*'
+              - 'src/utils/{questionnaire,tourPreferences,notification}*'
+            settings:
+              - 'tests/pages/settings/**'
+              - 'src/components/{Settings,Cookie,DataManagement,Policy,Language}*'
+              - 'src/utils/{cookie,settings,banner,dataExport,countryToRegion,urlParams}*'
+              - 'src/i18n/**'
+              - 'tests/shared/i18n*'
+            server:
+              - 'server/**'
+              - 'scripts/**'
+            # Full suite when shared utilities/components/types change, or when
+            # build config / package files change.
+            full:
+              - 'tests/shared/**'
+              - 'tests/types/**'
+              - 'tests/README.md'
+              - 'src/App.tsx'
+              - 'src/main.tsx'
+              - 'src/types/**'
+              - 'src/hooks/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'vite.config.ts'
+              - 'tsconfig*.json'
+              - '.github/workflows/tests.yml'
+
+  full:
+    name: Full FE test suite
+    needs: changes
+    if: ${{ needs.changes.outputs.full == 'true' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --run
+
+  page:
+    name: Page tests
+    needs: changes
+    if: ${{ needs.changes.outputs.full != 'true' && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - page: asset-allocation
+            changed: ${{ needs.changes.outputs.asset_allocation }}
+          - page: expense-tracker
+            changed: ${{ needs.changes.outputs.expense_tracker }}
+          - page: fire-calculator
+            changed: ${{ needs.changes.outputs.fire_calculator }}
+          - page: homepage
+            changed: ${{ needs.changes.outputs.homepage }}
+          - page: net-worth-tracker
+            changed: ${{ needs.changes.outputs.net_worth_tracker }}
+          - page: questionnaire
+            changed: ${{ needs.changes.outputs.questionnaire }}
+          - page: settings
+            changed: ${{ needs.changes.outputs.settings }}
+    steps:
+      - name: Skip if page not changed
+        if: ${{ matrix.changed != 'true' }}
+        run: echo "No changes for ${{ matrix.page }}, skipping." && exit 0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: ${{ matrix.changed == 'true' }}
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        if: ${{ matrix.changed == 'true' }}
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: ${{ matrix.changed == 'true' }}
+      - name: Run tests for ${{ matrix.page }}
+        if: ${{ matrix.changed == 'true' }}
+        run: |
+          if [ -z "$(ls -A tests/pages/${{ matrix.page }} 2>/dev/null)" ]; then
+            echo "tests/pages/${{ matrix.page }} is empty, nothing to run."
+            exit 0
+          fi
+          npm test -- --run tests/pages/${{ matrix.page }}/
+          
+# 3) Append this job at the bottom of the file:
+  server-tests:
+    name: Server test suite
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+          cache: npm
+      # Skip root postinstall (electron-rebuild) so better-sqlite3 keeps the
+      # Node-ABI prebuild — server tests run under plain Node, not Electron.
+      - run: npm ci --ignore-scripts
+      - run: npm --prefix server ci
+      - run: npm --prefix server test
+
+  docker-stack:
+    name: Docker stack health
+    needs: changes
+    if: ${{ needs.changes.outputs.server == 'true' || needs.changes.outputs.full == 'true' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Build images (no cache)
+        run: docker compose build --no-cache
+      - name: Start stack
+        run: docker compose up -d
+      - name: Wait for backend to become healthy
+        run: |
+          for i in $(seq 1 30); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' $(docker compose ps -q backend) 2>/dev/null || echo "starting")
+            echo "attempt $i: backend health = $status"
+            if [ "$status" = "healthy" ]; then exit 0; fi
+            sleep 2
+          done
+          echo "backend never became healthy"
+          docker compose logs backend
+          exit 1
+      - name: Probe backend /health from host
+        run: |
+          backend_id=$(docker compose ps -q backend)
+          ip=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$backend_id")
+          curl --fail --silent --show-error "http://$ip:8787/api/v1/health" | tee /tmp/health.json
+          grep -q '"status":"ok"' /tmp/health.json
+      - name: Probe frontend on host port
+        run: |
+          for i in $(seq 1 20); do
+            if curl --fail --silent --show-error http://localhost:8080/ -o /dev/null; then
+              echo "frontend reachable"; exit 0
+            fi
+            sleep 2
+          done
+          echo "frontend never responded on :8080"
+          docker compose logs frontend
+          exit 1
+      - name: Dump logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Tear down
+        if: always()
+        run: docker compose down --volumes --remove-orphans
