@@ -1,0 +1,133 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      asset_allocation: ${{ steps.filter.outputs.asset_allocation }}
+      expense_tracker: ${{ steps.filter.outputs.expense_tracker }}
+      fire_calculator: ${{ steps.filter.outputs.fire_calculator }}
+      homepage: ${{ steps.filter.outputs.homepage }}
+      net_worth_tracker: ${{ steps.filter.outputs.net_worth_tracker }}
+      questionnaire: ${{ steps.filter.outputs.questionnaire }}
+      settings: ${{ steps.filter.outputs.settings }}
+      full: ${{ steps.filter.outputs.full }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            # Page-scoped filters. A page test job runs when EITHER
+            # its test directory or a source file matching the page changes.
+            asset_allocation:
+              - 'tests/pages/asset-allocation/**'
+              - 'src/components/{Asset,Allocation,Portfolio,Breakdown,DCA,Editable,Collapsible,MassEdit}*'
+              - 'src/utils/{allocation,portfolio,price,yahoo,ticker,etf,exchange,currency,defaultAssets,dca}*'
+            expense_tracker:
+              - 'tests/pages/expense-tracker/**'
+              - 'src/components/{Expense,Income,Monthly,CategoryManager,PDFImport,MassEdit}*'
+              - 'src/utils/{expense,pdf,demoExpense,llm,categories,customCategories}*'
+            fire_calculator:
+              - 'tests/pages/fire-calculator/**'
+              - 'src/components/{Calculator,FIRE,MonteCarlo,Projection}*'
+              - 'src/utils/{fire,monteCarlo,chartHelper,projection}*'
+            homepage:
+              - 'tests/pages/homepage/**'
+              - 'src/components/HomePage*'
+            net_worth_tracker:
+              - 'tests/pages/net-worth-tracker/**'
+              - 'src/components/{NetWorth,Historical}*'
+              - 'src/utils/{netWorth,depreciation,mortgage,dataSync}*'
+            questionnaire:
+              - 'tests/pages/questionnaire/**'
+              - 'src/components/{Questionnaire,GuidedTour}*'
+              - 'src/utils/{questionnaire,tourPreferences,notification}*'
+            settings:
+              - 'tests/pages/settings/**'
+              - 'src/components/{Settings,Cookie,DataManagement,Policy}*'
+              - 'src/utils/{cookie,settings,banner,dataExport,countryToRegion,urlParams}*'
+            # Full suite when shared utilities/components/types change, or when
+            # build config / package files change.
+            full:
+              - 'tests/shared/**'
+              - 'tests/types/**'
+              - 'tests/README.md'
+              - 'src/App.tsx'
+              - 'src/main.tsx'
+              - 'src/types/**'
+              - 'src/hooks/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'vite.config.ts'
+              - 'tsconfig*.json'
+              - '.github/workflows/tests.yml'
+
+  full:
+    name: Full test suite
+    needs: changes
+    if: ${{ needs.changes.outputs.full == 'true' || github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test -- --run
+
+  page:
+    name: Page tests (${{ matrix.page }})
+    needs: changes
+    if: ${{ needs.changes.outputs.full != 'true' && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - page: asset-allocation
+            changed: ${{ needs.changes.outputs.asset_allocation }}
+          - page: expense-tracker
+            changed: ${{ needs.changes.outputs.expense_tracker }}
+          - page: fire-calculator
+            changed: ${{ needs.changes.outputs.fire_calculator }}
+          - page: homepage
+            changed: ${{ needs.changes.outputs.homepage }}
+          - page: net-worth-tracker
+            changed: ${{ needs.changes.outputs.net_worth_tracker }}
+          - page: questionnaire
+            changed: ${{ needs.changes.outputs.questionnaire }}
+          - page: settings
+            changed: ${{ needs.changes.outputs.settings }}
+    steps:
+      - name: Skip if page not changed
+        if: ${{ matrix.changed != 'true' }}
+        run: echo "No changes for ${{ matrix.page }}, skipping." && exit 0
+      - uses: actions/checkout@v5
+        if: ${{ matrix.changed == 'true' }}
+      - uses: actions/setup-node@v6
+        if: ${{ matrix.changed == 'true' }}
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: ${{ matrix.changed == 'true' }}
+      - name: Run tests for ${{ matrix.page }}
+        if: ${{ matrix.changed == 'true' }}
+        run: |
+          if [ -z "$(ls -A tests/pages/${{ matrix.page }} 2>/dev/null)" ]; then
+            echo "tests/pages/${{ matrix.page }} is empty, nothing to run."
+            exit 0
+          fi
+          npm test -- --run tests/pages/${{ matrix.page }}/
