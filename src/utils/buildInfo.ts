@@ -12,6 +12,7 @@ export interface BuildInfo {
   commit: string;
   buildTime: string;
   dependencies: Record<string, string>;
+  repoUrl: string;
 }
 
 const readGlobal = <T>(name: string, fallback: T): T => {
@@ -39,9 +40,29 @@ export const buildInfo: BuildInfo = {
     typeof __APP_DEPENDENCIES__ !== 'undefined'
       ? __APP_DEPENDENCIES__
       : readGlobal<Record<string, string>>('__APP_DEPENDENCIES__', {}),
+  repoUrl:
+    typeof __APP_REPO_URL__ !== 'undefined'
+      ? __APP_REPO_URL__
+      : readGlobal('__APP_REPO_URL__', ''),
 };
 
 export const formatCommit = (commit: string): string => {
   if (!commit || commit === 'unknown') return commit || 'unknown';
   return commit.length > 7 ? commit.slice(0, 7) : commit;
+};
+
+/**
+ * Build a URL to a commit on the host where the repo lives.
+ * Supports GitHub, GitLab and Bitbucket URL shapes; returns `null` if we
+ * don't know enough to construct a stable link.
+ */
+export const buildCommitUrl = (
+  repoUrl: string,
+  commit: string,
+): string | null => {
+  if (!repoUrl || !commit || commit === 'unknown') return null;
+  const base = repoUrl.replace(/\/+$/, '');
+  if (/bitbucket\.org/i.test(base)) return `${base}/commits/${commit}`;
+  // Default to the GitHub / GitLab shape (both use /commit/<sha>).
+  return `${base}/commit/${commit}`;
 };

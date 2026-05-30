@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { buildInfo, formatCommit } from '../utils/buildInfo';
+import { buildInfo, formatCommit, buildCommitUrl } from '../utils/buildInfo';
 import { getApiBaseUrl } from '../utils/apiBase';
 import { MaterialIcon } from './MaterialIcon';
+import { CopyableValue } from './CopyableValue';
 import './AboutSection.css';
 
 interface BackendInfo {
@@ -17,8 +18,6 @@ type BackendStatus =
   | { state: 'loading' }
   | { state: 'ok'; info: BackendInfo }
   | { state: 'unreachable'; error: string };
-
-const COMMIT_URL_BASE = 'https://github.com/mbianchidev/fire-tools/commit/';
 
 export const AboutSection: React.FC = () => {
   const { t } = useTranslation();
@@ -50,7 +49,8 @@ export const AboutSection: React.FC = () => {
   }, []);
 
   const commitShort = formatCommit(buildInfo.commit);
-  const commitIsKnown = buildInfo.commit && buildInfo.commit !== 'unknown';
+  const commitIsKnown = Boolean(buildInfo.commit) && buildInfo.commit !== 'unknown';
+  const frontendCommitUrl = buildCommitUrl(buildInfo.repoUrl, buildInfo.commit);
   const deps = Object.entries(buildInfo.dependencies);
 
   return (
@@ -62,19 +62,25 @@ export const AboutSection: React.FC = () => {
 
       <dl className="about-grid">
         <dt>{t('about.appVersion')}</dt>
-        <dd data-testid="about-app-version">{buildInfo.version}</dd>
+        <dd data-testid="about-app-version">
+          <CopyableValue value={buildInfo.version} />
+        </dd>
 
         <dt>{t('about.commit')}</dt>
         <dd data-testid="about-commit">
           {commitIsKnown ? (
-            <a
-              href={`${COMMIT_URL_BASE}${buildInfo.commit}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={buildInfo.commit}
-            >
-              <code>{commitShort}</code>
-            </a>
+            frontendCommitUrl ? (
+              <a
+                href={frontendCommitUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={buildInfo.commit}
+              >
+                <code>{commitShort}</code>
+              </a>
+            ) : (
+              <code title={buildInfo.commit}>{commitShort}</code>
+            )
           ) : (
             <code>{t('common.notAvailable')}</code>
           )}
@@ -114,21 +120,39 @@ export const AboutSection: React.FC = () => {
       {backend.state === 'ok' && (
         <dl className="about-grid">
           <dt>{t('about.backendVersion')}</dt>
-          <dd data-testid="about-backend-version">{backend.info.version ?? t('common.notAvailable')}</dd>
+          <dd data-testid="about-backend-version">
+            {backend.info.version ? (
+              <CopyableValue value={backend.info.version} />
+            ) : (
+              t('common.notAvailable')
+            )}
+          </dd>
 
           {backend.info.commit && (
             <>
               <dt>{t('about.commit')}</dt>
               <dd>
                 {backend.info.commit !== 'unknown' ? (
-                  <a
-                    href={`${COMMIT_URL_BASE}${backend.info.commit}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={backend.info.commit}
-                  >
-                    <code>{formatCommit(backend.info.commit)}</code>
-                  </a>
+                  (() => {
+                    const backendCommitUrl = buildCommitUrl(
+                      buildInfo.repoUrl,
+                      backend.info.commit,
+                    );
+                    return backendCommitUrl ? (
+                      <a
+                        href={backendCommitUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={backend.info.commit}
+                      >
+                        <code>{formatCommit(backend.info.commit)}</code>
+                      </a>
+                    ) : (
+                      <code title={backend.info.commit}>
+                        {formatCommit(backend.info.commit)}
+                      </code>
+                    );
+                  })()
                 ) : (
                   <code>{t('common.notAvailable')}</code>
                 )}
@@ -165,7 +189,7 @@ export const AboutSection: React.FC = () => {
             {deps.map(([name, version]) => (
               <tr key={name}>
                 <td><code>{name}</code></td>
-                <td><code>{version}</code></td>
+                <td><CopyableValue value={version} /></td>
               </tr>
             ))}
             {backend.state === 'ok' && backend.info.dependencies
@@ -177,7 +201,7 @@ export const AboutSection: React.FC = () => {
                         <code>{name}</code>{' '}
                         <span className="about-dep-tag">{t('about.backendDepTag')}</span>
                       </td>
-                      <td><code>{version}</code></td>
+                      <td><CopyableValue value={version} /></td>
                     </tr>
                   ))
               : null}

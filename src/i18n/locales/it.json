@@ -42,6 +42,8 @@
     "spanish": "Spagnolo",
     "hideValues": "Nascondi valori",
     "notAvailable": "N/D",
+    "copyToClipboard": "Clicca per copiare",
+    "copied": "Copiato!",
     "months": {
       "april": "Aprile",
       "august": "Agosto",

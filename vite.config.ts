@@ -10,6 +10,8 @@ const pkg = JSON.parse(
   version?: string
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
+  repository?: string | { url?: string }
+  homepage?: string
 }
 
 const resolveCommitHash = (): string => {
@@ -21,6 +23,43 @@ const resolveCommitHash = (): string => {
       .trim() || 'unknown'
   } catch {
     return 'unknown'
+  }
+}
+
+// Normalize any git remote / package.json repository URL into a clean
+// "https://host/owner/repo" form (no trailing .git, no git+ prefix, no SSH).
+const normalizeRepoUrl = (raw: string | undefined | null): string => {
+  if (!raw) return ''
+  let url = raw.trim()
+  if (!url) return ''
+  url = url.replace(/^git\+/, '')
+  // git@github.com:owner/repo(.git) -> https://github.com/owner/repo
+  const sshMatch = url.match(/^git@([^:]+):(.+?)(?:\.git)?$/)
+  if (sshMatch) url = `https://${sshMatch[1]}/${sshMatch[2]}`
+  // ssh://git@host/owner/repo(.git) -> https://host/owner/repo
+  url = url.replace(/^ssh:\/\/git@/, 'https://')
+  url = url.replace(/\.git$/, '')
+  url = url.replace(/\/+$/, '')
+  return url
+}
+
+const resolveRepoUrl = (): string => {
+  if (process.env.APP_REPO_URL) return normalizeRepoUrl(process.env.APP_REPO_URL)
+  const fromPkg =
+    typeof pkg.repository === 'string'
+      ? pkg.repository
+      : pkg.repository?.url ?? pkg.homepage
+  const normalized = normalizeRepoUrl(fromPkg)
+  if (normalized) return normalized
+  try {
+    const remote = execSync('git config --get remote.origin.url', {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .toString()
+      .trim()
+    return normalizeRepoUrl(remote)
+  } catch {
+    return ''
   }
 }
 
@@ -49,6 +88,7 @@ for (const name of FEATURED_DEPS) {
 const APP_VERSION = pkg.version ?? '0.0.0'
 const APP_COMMIT_HASH = resolveCommitHash()
 const APP_BUILD_TIME = process.env.BUILD_TIME ?? new Date().toISOString()
+const APP_REPO_URL = resolveRepoUrl()
 
 // Lightweight static handler used in `npm run dev:all` to serve the pre-built
 // landing page (at /), OpenAPI viewer (at /api) and docs (at /docs) from a
@@ -186,6 +226,7 @@ export default defineConfig(({ mode, command }) => ({
     __APP_COMMIT_HASH__: JSON.stringify(APP_COMMIT_HASH),
     __APP_BUILD_TIME__: JSON.stringify(APP_BUILD_TIME),
     __APP_DEPENDENCIES__: JSON.stringify(featuredDependencies),
+    __APP_REPO_URL__: JSON.stringify(APP_REPO_URL),
   },
   server: {
     proxy: {
