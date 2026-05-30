@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { useTranslation } from 'react-i18next';
 import { usePolicyModal } from '../App';
+import { IS_DEMO_MODE } from '../utils/demoMode';
 import './CookieConsent.css';
 
 const CONSENT_COOKIE = 'fire-tools-cookie-consent';
@@ -19,6 +20,11 @@ export function CookieConsent() {
   const { openPolicy } = usePolicyModal();
 
   useEffect(() => {
+    if (IS_DEMO_MODE) {
+      // Demo mode never writes cookies, so the consent banner has nothing
+      // to consent to — keep it hidden.
+      return;
+    }
     // Check if user has already acknowledged the cookie notice
     const stored = Cookies.get(CONSENT_COOKIE);
     if (!stored) {

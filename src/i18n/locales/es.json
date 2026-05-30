@@ -1749,5 +1749,10 @@
   },
   "inputs": {
     "sliderAriaLabel": "Entrada de valor para {{id}}"
+  },
+  "demo": {
+    "message": "Estás explorando una demo en vivo con datos de muestra: nada de lo que cambies aquí se guarda.",
+    "cta": "Descargar app de escritorio",
+    "dismiss": "Cerrar aviso de demo"
   }
 }

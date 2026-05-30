@@ -11,6 +11,7 @@ import {
 import { AssetClass } from '../types/assetAllocation';
 import { LlmCategorizationConfig } from '../types/pdfImport';
 import { encryptData, decryptData } from './cookieEncryption';
+import { IS_DEMO_MODE } from './demoMode';
 
 export type DateFormat = 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
 
@@ -100,6 +101,7 @@ const COOKIE_OPTIONS: Cookies.CookieAttributes = {
  * @param settings - The settings to save
  */
 export function saveSettings(settings: UserSettings): void {
+  if (IS_DEMO_MODE) return;
   try {
     const settingsJson = JSON.stringify(settings);
     const encryptedSettings = encryptData(settingsJson);

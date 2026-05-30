@@ -1749,5 +1749,10 @@
   },
   "inputs": {
     "sliderAriaLabel": "Value input for {{id}}"
+  },
+  "demo": {
+    "message": "You're exploring a live demo with sample data — nothing you change here is saved.",
+    "cta": "Download desktop app",
+    "dismiss": "Dismiss demo banner"
   }
 }

@@ -10,6 +10,13 @@ import { ExpenseTrackerData, YearData, MonthData, IncomeEntry, ExpenseEntry } fr
 import { NetWorthTrackerData, NetWorthYearData, MonthlySnapshot, AssetHolding, CashEntry, PensionEntry, FinancialOperation } from '../types/netWorthTracker';
 import { DEFAULT_INPUTS } from './defaults';
 import { encryptData, decryptData } from './cookieEncryption';
+import {
+  IS_DEMO_MODE,
+  getDemoAssetAllocation,
+  getDemoCalculatorInputs,
+  getDemoExpenseTracker,
+  getDemoNetWorthTracker,
+} from './demoMode';
 
 // Cookie keys
 const ASSET_ALLOCATION_KEY = 'fire-calculator-asset-allocation';
@@ -72,6 +79,7 @@ export function saveAssetAllocation(
   assets: Asset[],
   assetClassTargets: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }>
 ): void {
+  if (IS_DEMO_MODE) return;
   try {
     const assetsJson = JSON.stringify(assets);
     const targetsJson = JSON.stringify(assetClassTargets);
@@ -94,6 +102,9 @@ export function loadAssetAllocation(): {
   assets: Asset[] | null;
   assetClassTargets: Record<AssetClass, { targetMode: AllocationMode; targetPercent?: number }> | null;
 } {
+  if (IS_DEMO_MODE) {
+    return getDemoAssetAllocation();
+  }
   try {
     const encryptedAssets = Cookies.get(ASSET_ALLOCATION_KEY);
     const encryptedTargets = Cookies.get(ASSET_CLASS_TARGETS_KEY);
@@ -150,6 +161,7 @@ export function clearAssetAllocation(): void {
  * Save FIRE Calculator inputs to encrypted cookies
  */
 export function saveFireCalculatorInputs(inputs: CalculatorInputs): void {
+  if (IS_DEMO_MODE) return;
   try {
     const inputsJson = JSON.stringify(inputs);
     const encryptedInputs = encryptData(inputsJson);
@@ -165,6 +177,9 @@ export function saveFireCalculatorInputs(inputs: CalculatorInputs): void {
  * Load FIRE Calculator inputs from encrypted cookies
  */
 export function loadFireCalculatorInputs(): CalculatorInputs | null {
+  if (IS_DEMO_MODE) {
+    return getDemoCalculatorInputs();
+  }
   try {
     const encryptedInputs = Cookies.get(FIRE_CALCULATOR_INPUTS_KEY);
     if (encryptedInputs) {
@@ -260,6 +275,7 @@ function isValidExpenseTrackerData(obj: any): obj is ExpenseTrackerData {
  * Expense tracker data can easily exceed this limit with realistic transaction history.
  */
 export function saveExpenseTrackerData(data: ExpenseTrackerData): void {
+  if (IS_DEMO_MODE) return;
   try {
     const dataJson = JSON.stringify(data);
     const encryptedData = encryptData(dataJson);
@@ -275,6 +291,9 @@ export function saveExpenseTrackerData(data: ExpenseTrackerData): void {
  * Load Expense Tracker data from encrypted localStorage
  */
 export function loadExpenseTrackerData(): ExpenseTrackerData | null {
+  if (IS_DEMO_MODE) {
+    return getDemoExpenseTracker();
+  }
   try {
     // Try localStorage first
     let encryptedData = localStorage.getItem(EXPENSE_TRACKER_KEY);
@@ -417,6 +436,7 @@ function isValidNetWorthTrackerData(obj: unknown): obj is NetWorthTrackerData {
  * Net worth tracker data can easily exceed this limit with realistic asset history.
  */
 export function saveNetWorthTrackerData(data: NetWorthTrackerData): void {
+  if (IS_DEMO_MODE) return;
   try {
     const dataJson = JSON.stringify(data);
     const encryptedData = encryptData(dataJson);
@@ -448,6 +468,9 @@ function migrateAcquisitionPrice(data: NetWorthTrackerData): void {
  * Load Net Worth Tracker data from encrypted localStorage
  */
 export function loadNetWorthTrackerData(): NetWorthTrackerData | null {
+  if (IS_DEMO_MODE) {
+    return getDemoNetWorthTracker();
+  }
   try {
     // Try localStorage first
     let encryptedData = localStorage.getItem(NET_WORTH_TRACKER_KEY);

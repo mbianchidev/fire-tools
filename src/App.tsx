@@ -22,6 +22,7 @@ import { ProfileMenu } from './components/ProfileMenu';
 import { NotificationBell } from './components/NotificationBell';
 import { SettingsPage } from './components/SettingsPage';
 import { CookieConsent } from './components/CookieConsent';
+import { DemoBanner } from './components/DemoBanner';
 import { GuidedTour } from './components/GuidedTour';
 import { NotFoundPage } from './components/NotFoundPage';
 import { QuestionnairePage } from './components/QuestionnairePage';
@@ -469,6 +470,7 @@ function App() {
     <Router basename={basename}>
       <PolicyModalContext.Provider value={{ openPolicy, closePolicy }}>
         <div className="app">
+          <DemoBanner />
           <a href="#main-content" className="skip-link">{t('app.skipToContent')}</a>
           
           <header className="app-header">

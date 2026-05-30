@@ -1749,5 +1749,10 @@
   },
   "inputs": {
     "sliderAriaLabel": "Saisie de valeur pour {{id}}"
+  },
+  "demo": {
+    "message": "Vous explorez une démo en direct avec des données fictives — rien de ce que vous modifiez ici n'est enregistré.",
+    "cta": "Télécharger l'application",
+    "dismiss": "Fermer le bandeau démo"
   }
 }

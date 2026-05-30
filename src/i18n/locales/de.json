@@ -1749,5 +1749,10 @@
   },
   "inputs": {
     "sliderAriaLabel": "Werteingabe für {{id}}"
+  },
+  "demo": {
+    "message": "Sie testen eine Live-Demo mit Beispieldaten — Änderungen werden hier nicht gespeichert.",
+    "cta": "Desktop-App herunterladen",
+    "dismiss": "Demo-Hinweis schließen"
   }
 }
