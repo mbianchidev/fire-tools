@@ -212,6 +212,53 @@ describe('portfolio breakdown', () => {
   });
 });
 
+describe('ui preferences', () => {
+  it('PUT/GET/DELETE round-trips a preference', async () => {
+    const { app } = makeApp();
+
+    const empty = await request(app).get('/api/v1/ui-preferences');
+    expect(empty.status).toBe(200);
+    expect(empty.body.preferences).toEqual({});
+
+    const put = await request(app)
+      .put('/api/v1/ui-preferences/tour_completed')
+      .send({ value: '{"completed":true}' });
+    expect(put.status).toBe(200);
+    expect(put.body.key).toBe('tour_completed');
+    expect(put.body.value).toBe('{"completed":true}');
+
+    const get = await request(app).get('/api/v1/ui-preferences/tour_completed');
+    expect(get.status).toBe(200);
+    expect(get.body.value).toBe('{"completed":true}');
+
+    const list = await request(app).get('/api/v1/ui-preferences');
+    expect(list.status).toBe(200);
+    expect(list.body.preferences.tour_completed).toBe('{"completed":true}');
+
+    const del = await request(app).delete('/api/v1/ui-preferences/tour_completed');
+    expect(del.status).toBe(204);
+
+    const after = await request(app).get('/api/v1/ui-preferences/tour_completed');
+    expect(after.status).toBe(404);
+  });
+
+  it('rejects invalid keys and oversized values', async () => {
+    const { app } = makeApp();
+    const bad = await request(app)
+      .put('/api/v1/ui-preferences/1bad')
+      .send({ value: 'x' });
+    expect(bad.status).toBe(400);
+    expect(bad.body.error.code).toBe('invalid_param');
+
+    const huge = 'a'.repeat(9000);
+    const tooBig = await request(app)
+      .put('/api/v1/ui-preferences/some_key')
+      .send({ value: huge });
+    expect(tooBig.status).toBe(400);
+    expect(tooBig.body.error.code).toBe('invalid_body');
+  });
+});
+
 describe('unimplemented endpoints', () => {
   it('returns 501 for paths not yet wired', async () => {
     const { app } = makeApp();

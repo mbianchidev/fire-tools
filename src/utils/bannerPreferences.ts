@@ -1,5 +1,10 @@
 import Cookies from 'js-cookie';
 import { encryptData, decryptData } from './cookieEncryption';
+import {
+  PREF_KEY_SECURITY_BANNER_DISMISSED,
+  pushPreferenceToBackend,
+  deletePreferenceFromBackend,
+} from './uiPreferencesSync';
 
 const SECURITY_BANNER_KEY = 'fire-tools-security-banner-dismissed';
 
@@ -15,6 +20,7 @@ export function saveSecurityBannerDismissed(dismissed: boolean): void {
     const payload = JSON.stringify({ dismissed });
     const encrypted = encryptData(payload);
     Cookies.set(SECURITY_BANNER_KEY, encrypted, COOKIE_OPTIONS);
+    pushPreferenceToBackend(PREF_KEY_SECURITY_BANNER_DISMISSED, payload);
   } catch (error) {
     console.error('Failed to save security banner preference:', error);
   }
@@ -43,6 +49,7 @@ export function loadSecurityBannerDismissed(): boolean {
 export function clearSecurityBannerPreference(): void {
   try {
     Cookies.remove(SECURITY_BANNER_KEY, { path: '/' });
+    deletePreferenceFromBackend(PREF_KEY_SECURITY_BANNER_DISMISSED);
   } catch (error) {
     console.error('Failed to clear security banner preference:', error);
   }

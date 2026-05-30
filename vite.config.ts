@@ -85,7 +85,7 @@ function devPagesPlugin() {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, command }) => ({
   plugins: [
     react(),
     devPagesPlugin(),
@@ -93,6 +93,12 @@ export default defineConfig(({ mode }) => ({
       name: 'handle-trailing-slash',
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
+          // Electron dev runs vite in `--mode electron` and loads routes
+          // directly (no `/demo` basename). Skip web-only path rewrites.
+          if (mode === 'electron') {
+            next();
+            return;
+          }
           // SPA lives under /demo in web builds. Normalise the calculator route
           // so URLs like /demo/fire-calculator?params resolve to /demo/fire-calculator/?params.
           if (req.url === '/demo/fire-calculator') {
@@ -113,10 +119,18 @@ export default defineConfig(({ mode }) => ({
       },
     },
   ],
-  // Electron loads index.html via file://, so it needs a relative base.
-  // Web builds: landing sits at the site root; SPA lives under /demo so the
-  // landing page can market the project. Production = GitHub Pages.
-  base: mode === 'electron' ? './' : mode === 'production' ? '/fire-tools/demo/' : '/demo/',
+  // Electron build loads index.html via file:// → needs a relative base.
+  // Electron dev uses the vite dev server at http://localhost:5173 → base '/'
+  // so HMR + asset URLs work. Web builds: landing sits at the site root; SPA
+  // lives under /demo so the landing page can market the project.
+  base:
+    mode === 'electron'
+      ? command === 'serve'
+        ? '/'
+        : './'
+      : mode === 'production'
+      ? '/fire-tools/demo/'
+      : '/demo/',
   build: {
     outDir: mode === 'electron' ? 'dist-electron' : 'dist/demo',
   },

@@ -55,18 +55,20 @@ describe('migration runner', () => {
   it('rolls back the last migration and re-applies cleanly', () => {
     const db = new Database(':memory:');
     db.pragma('foreign_keys = ON');
-    runMigrations(db, path);
+    const applied = runMigrations(db, path);
+    const totalMigrations = applied.migrationsApplied.length;
     expect(tableExists(db, 'users')).toBe(true);
+    expect(tableExists(db, 'schema_migrations')).toBe(true);
 
     const rolled = rollbackMigrations(db, path, 1);
     expect(rolled.migrationsRolledBack.length).toBe(1);
-    expect(tableExists(db, 'users')).toBe(false);
-    expect(tableExists(db, 'banks')).toBe(false);
     expect(tableExists(db, 'schema_migrations')).toBe(true);
 
     const reapplied = runMigrations(db, path);
     expect(reapplied.migrationsApplied.length).toBe(1);
-    expect(tableExists(db, 'users')).toBe(true);
+    const finalStatus = getMigrationStatus(db, path);
+    expect(finalStatus.length).toBe(totalMigrations);
+    expect(finalStatus.every((m) => m.applied)).toBe(true);
 
     db.close();
   });

@@ -23,7 +23,14 @@ function detectDemoMode(): boolean {
   if (typeof window === 'undefined' || !window.location) {
     return false;
   }
-  // Electron loads via file:// — never demo there.
+  // Electron exposes the `fireTools` preload bridge in both dev (http://localhost)
+  // and packaged builds (file://). Detect it explicitly so dev-mode Electron
+  // doesn't fall through to the web demo guards below.
+  const w = window as unknown as { fireTools?: unknown };
+  if (w.fireTools) {
+    return false;
+  }
+  // Packaged Electron loads via file:// — never demo there.
   if (window.location.protocol === 'file:') {
     return false;
   }

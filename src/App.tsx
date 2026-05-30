@@ -32,6 +32,7 @@ import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
 import { loadSettings, saveSettings, type UserSettings } from './utils/cookieSettings';
+import { syncPreferencesFromBackend } from './utils/uiPreferencesSync';
 import './App.css';
 import './components/AssetAllocationManager.css';
 import './components/ExpenseTrackerPage.css';
@@ -464,9 +465,17 @@ function NavigateBridge() {
 
 function App() {
   // SPA lives under /demo on the web so the landing page can sit at the root.
-  // Production = GitHub Pages under /fire-tools.
-  const isElectron = typeof window !== 'undefined' && window.location.protocol === 'file:';
-  const basename = isElectron ? '/' : import.meta.env.MODE === 'production' ? '/fire-tools/demo' : '/demo';
+  // Production = GitHub Pages under /fire-tools. Electron detection covers
+  // both packaged (file://) and unpackaged dev (http://) launches via the
+  // preload bridge that only exists inside Electron.
+  const isElectron =
+    typeof window !== 'undefined' &&
+    (window.location.protocol === 'file:' || Boolean(window.fireTools));
+  const basename = isElectron
+    ? '/'
+    : import.meta.env.MODE === 'production'
+    ? '/fire-tools/demo'
+    : '/demo';
   const { t } = useTranslation();
   
   // Load settings from localStorage
@@ -474,6 +483,28 @@ function App() {
   
   // Policy modal state
   const [policyModalType, setPolicyModalType] = useState<PolicyType | null>(null);
+
+  // Mirror persisted UI prefs (tour, banner, questionnaire prompt) from the
+  // backend into local cookies before children mount, so synchronous
+  // load*() helpers see DB-backed values on first render.
+  // In pure-web mode getApiBaseUrl() resolves null and this is a no-op.
+  const [prefsReady, setPrefsReady] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const TIMEOUT_MS = 800;
+    const timer = setTimeout(() => {
+      if (!cancelled) setPrefsReady(true);
+    }, TIMEOUT_MS);
+    syncPreferencesFromBackend().finally(() => {
+      if (cancelled) return;
+      clearTimeout(timer);
+      setPrefsReady(true);
+    });
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, []);
   
   const handleSettingsChange = (newSettings: UserSettings) => {
     setSettings(newSettings);
@@ -486,7 +517,11 @@ function App() {
   const closePolicy = () => {
     setPolicyModalType(null);
   };
-  
+
+  if (!prefsReady) {
+    return null;
+  }
+
   return (
     <Router basename={basename}>
       <PolicyModalContext.Provider value={{ openPolicy, closePolicy }}>
@@ -518,30 +553,32 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
 
-          <footer className="app-footer">
-            <p>
-              {t('app.disclaimer')}
-            </p>
-            <div className="footer-links">
-              <button 
-                type="button" 
-                className="footer-link-btn" 
-                onClick={() => openPolicy('privacy')}
-              >
-                {t('app.privacyPolicy')}
-              </button>
-              <span className="footer-separator">•</span>
-              <button 
-                type="button" 
-                className="footer-link-btn" 
-                onClick={() => openPolicy('cookie')}
-              >
-                {t('app.cookiePolicy')}
-              </button>
-              <span className="footer-separator">•</span>
-              <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">{t('app.github')}</a>
-            </div>
-          </footer>
+          {!isElectron && (
+            <footer className="app-footer">
+              <p>
+                {t('app.disclaimer')}
+              </p>
+              <div className="footer-links">
+                <button 
+                  type="button" 
+                  className="footer-link-btn" 
+                  onClick={() => openPolicy('privacy')}
+                >
+                  {t('app.privacyPolicy')}
+                </button>
+                <span className="footer-separator">•</span>
+                <button 
+                  type="button" 
+                  className="footer-link-btn" 
+                  onClick={() => openPolicy('cookie')}
+                >
+                  {t('app.cookiePolicy')}
+                </button>
+                <span className="footer-separator">•</span>
+                <a href="https://github.com/mbianchidev/fire-tools" target="_blank" rel="noopener noreferrer">{t('app.github')}</a>
+              </div>
+            </footer>
+          )}
 
           <PolicyModal 
             isOpen={policyModalType !== null} 
@@ -549,7 +586,7 @@ function App() {
             policyType={policyModalType || 'privacy'}
             onSwitchPolicy={openPolicy}
           />
-          <CookieConsent />
+          {!isElectron && <CookieConsent />}
           <GuidedTour />
           <QuestionnairePrompt />
         </div>

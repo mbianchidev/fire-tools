@@ -182,7 +182,8 @@ body {
   backdrop-filter: blur(20px);
   box-shadow: 0 4px 30px var(--accent-glow);
   border-bottom: 1px solid var(--border-accent);
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 1000;
 }
 
@@ -1883,7 +1884,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: stretch;
     padding: 1rem;
     gap: 0;
-    position: relative;
+    position: sticky;
+    top: 0;
   }
 
   .nav-toggle {

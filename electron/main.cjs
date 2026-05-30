@@ -25,16 +25,25 @@ let embeddedServerError = null;
 async function startEmbedded() {
   try {
     const dbPath = path.join(app.getPath('userData'), 'firetools.db');
-    const migrationsPath = path.join(app.getAppPath(), 'server', 'migrations');
+    // Use __dirname-relative paths so resolution works whether we're launched
+    // unpackaged (electron electron/main.cjs → __dirname = <repo>/electron)
+    // or packaged inside an asar (__dirname = .../app.asar/electron). In both
+    // cases server/ is the sibling directory next to electron/.
+    const projectRoot = path.resolve(__dirname, '..');
+    const migrationsPath = path.join(projectRoot, 'server', 'migrations');
+    const embedEntry = path.join(projectRoot, 'server', 'dist', 'embed.js');
 
     if (!fs.existsSync(migrationsPath)) {
       throw new Error(`Migrations directory not found at ${migrationsPath}`);
     }
+    if (!fs.existsSync(embedEntry)) {
+      throw new Error(
+        `Embedded server entry not found at ${embedEntry}. Did you run \`npm run --workspace server build\`?`
+      );
+    }
 
     const embedModule = await import(
-      require('node:url').pathToFileURL(
-        path.join(app.getAppPath(), 'server', 'dist', 'embed.js')
-      ).href
+      require('node:url').pathToFileURL(embedEntry).href
     );
     embeddedServer = await embedModule.startEmbeddedServer({
       dbPath,
@@ -56,9 +65,9 @@ function loadInitialRoute(win) {
   // without the user having to click through the homepage tiles.
   const initialRoute = '/fire-calculator';
   if (isDev) {
-    // Vite dev server uses basename '/demo' (see vite.config.ts); production
-    // electron build uses HashRouter under file://, so no basename prefix.
-    win.loadURL(`${process.env.ELECTRON_RENDERER_URL}/demo${initialRoute}`);
+    // Dev server runs in `--mode electron` (base '/'), so we hit the route
+    // directly without the web build's `/demo` basename.
+    win.loadURL(`${process.env.ELECTRON_RENDERER_URL}${initialRoute}`);
     win.webContents.openDevTools({ mode: 'detach' });
   } else {
     win.loadFile(path.join(__dirname, '..', 'dist-electron', 'index.html'), {

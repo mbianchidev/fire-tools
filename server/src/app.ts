@@ -17,6 +17,7 @@ import { buildPdfImportsRouter } from './routes/pdfImports.js';
 import { buildPortfolioBreakdownRouter } from './routes/portfolioBreakdown.js';
 import { buildBanksRouter } from './routes/banks.js';
 import { buildNotImplementedRouter } from './routes/notImplemented.js';
+import { buildUiPreferencesRouter } from './routes/uiPreferences.js';
 
 export interface BuildAppOptions {
   db: DB;
@@ -75,6 +76,7 @@ export const buildApp = ({ db, env, dbPath, disableRateLimit }: BuildAppOptions)
   v1.use(buildPdfImportsRouter(db));
   v1.use(buildPortfolioBreakdownRouter(db));
   v1.use(buildBanksRouter(db));
+  v1.use(buildUiPreferencesRouter(db));
   v1.use(buildNotImplementedRouter());
   app.use('/api/v1', v1);
 
