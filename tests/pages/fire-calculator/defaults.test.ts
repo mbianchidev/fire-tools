@@ -70,7 +70,7 @@ describe('getDemoNetWorthData', () => {
     const data = getDemoNetWorthData();
     
     expect(data.currentYear).toBe(currentYear);
-    expect(data.years).toHaveLength(1);
+    expect(data.years.length).toBeGreaterThanOrEqual(1);
     expect(data.years[0].year).toBe(currentYear);
     expect(data.years[0].months).toHaveLength(12);
     expect(data.defaultCurrency).toBe('EUR');

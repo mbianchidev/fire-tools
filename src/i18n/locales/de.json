@@ -1751,8 +1751,8 @@
     "sliderAriaLabel": "Werteingabe für {{id}}"
   },
   "demo": {
-    "message": "Sie testen eine Live-Demo mit Beispieldaten — Änderungen werden hier nicht gespeichert.",
+    "message": "Schreibgeschützte Demo mit Beispieldaten — Imports und Zurücksetzen sind deaktiviert. Lade die App herunter, um eigene Daten zu speichern.",
     "cta": "Desktop-App herunterladen",
-    "dismiss": "Demo-Hinweis schließen"
+    "disabledAction": "In der Demo deaktiviert. Lade die App herunter, um deine Daten zu importieren."
   }
 }

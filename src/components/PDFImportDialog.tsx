@@ -28,6 +28,7 @@ import {
   PdfDocType,
 } from '../types/pdfImport';
 import { extractPdfText } from '../utils/pdfTextExtractor';
+import { IS_DEMO_MODE } from '../utils/demoMode';
 import { parsePdf } from '../utils/pdfHeuristics';
 import { categorizeWithLlm } from '../utils/llmCategorizer';
 import { MaterialIcon } from './MaterialIcon';
@@ -219,9 +220,13 @@ export function PDFImportDialog({
                 type="file"
                 accept="application/pdf,.pdf"
                 multiple
-                disabled={busy}
+                disabled={busy || IS_DEMO_MODE}
+                title={IS_DEMO_MODE ? t('demo.disabledAction') : undefined}
                 onChange={e => handleFiles(e.target.files)}
               />
+              {IS_DEMO_MODE && (
+                <p className="form-help" style={{ color: '#92400e' }}>{t('demo.disabledAction')}</p>
+              )}
             </div>
 
             <div className={`form-group pdf-import-llm-toggle${llmConfigured ? '' : ' is-disabled'}`}>

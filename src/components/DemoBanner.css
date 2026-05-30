@@ -40,22 +40,6 @@
   outline: none;
 }
 
-.demo-banner__close {
-  background: transparent;
-  border: none;
-  color: #78350f;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 0.25rem;
-}
-
-.demo-banner__close:hover,
-.demo-banner__close:focus {
-  color: #451a03;
-  outline: none;
-}
-
 @media (prefers-color-scheme: dark) {
   .demo-banner {
     background: linear-gradient(90deg, #78350f 0%, #92400e 100%);
@@ -69,12 +53,5 @@
   .demo-banner__cta:hover,
   .demo-banner__cta:focus {
     background: #f59e0b;
-  }
-  .demo-banner__close {
-    color: #fef3c7;
-  }
-  .demo-banner__close:hover,
-  .demo-banner__close:focus {
-    color: #fff7ed;
   }
 }

@@ -7,6 +7,7 @@ import { AllocationTable } from './AllocationTable';
 import { AssetClassTable } from './AssetClassTable';
 import { AllocationChart } from './AllocationChart';
 import { MaterialIcon } from './MaterialIcon';
+import { IS_DEMO_MODE } from '../utils/demoMode';
 
 export const AssetAllocationManager: React.FC = () => {
   const { t } = useTranslation();
@@ -103,21 +104,34 @@ export const AssetAllocationManager: React.FC = () => {
       )}
 
       <div className="manager-actions">
-        <button onClick={handleAddAsset} className="action-btn add-btn">
+        <button onClick={handleAddAsset} className="action-btn add-btn" disabled={IS_DEMO_MODE} title={IS_DEMO_MODE ? t('demo.disabledAction') : undefined}>
           <MaterialIcon name="add" /> {t('assetAllocation.addAsset')}
         </button>
         <button onClick={handleExport} className="action-btn export-btn">
           <MaterialIcon name="download" /> {t('assetAllocation.exportCsv')}
         </button>
-        <label className="action-btn import-btn">
-          <MaterialIcon name="upload" /> {t('assetAllocation.importCsv')}
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleImport}
-            style={{ display: 'none' }}
-          />
-        </label>
+        {IS_DEMO_MODE ? (
+          <button
+            type="button"
+            disabled
+            className="action-btn import-btn"
+            title={t('demo.disabledAction')}
+            aria-label={t('demo.disabledAction')}
+            style={{ opacity: 0.55, cursor: 'not-allowed' }}
+          >
+            <MaterialIcon name="upload" /> {t('assetAllocation.importCsv')}
+          </button>
+        ) : (
+          <label className="action-btn import-btn">
+            <MaterialIcon name="upload" /> {t('assetAllocation.importCsv')}
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleImport}
+              style={{ display: 'none' }}
+            />
+          </label>
+        )}
       </div>
 
       <div className="allocation-section">

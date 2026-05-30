@@ -1751,8 +1751,8 @@
     "sliderAriaLabel": "Saisie de valeur pour {{id}}"
   },
   "demo": {
-    "message": "Vous explorez une démo en direct avec des données fictives — rien de ce que vous modifiez ici n'est enregistré.",
+    "message": "Démo en lecture seule avec des données d'exemple — les imports et réinitialisations sont désactivés. Téléchargez l'application pour sauvegarder vos données.",
     "cta": "Télécharger l'application",
-    "dismiss": "Fermer le bandeau démo"
+    "disabledAction": "Désactivé en démo. Téléchargez l'application pour importer vos données."
   }
 }

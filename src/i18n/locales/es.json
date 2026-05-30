@@ -1751,8 +1751,8 @@
     "sliderAriaLabel": "Entrada de valor para {{id}}"
   },
   "demo": {
-    "message": "Estás explorando una demo en vivo con datos de muestra: nada de lo que cambies aquí se guarda.",
+    "message": "Demo de solo lectura con datos de muestra — las importaciones y los restablecimientos están deshabilitados. Descarga la app para guardar tus propios datos.",
     "cta": "Descargar app de escritorio",
-    "dismiss": "Cerrar aviso de demo"
+    "disabledAction": "Deshabilitado en la demo. Descarga la app para importar tus datos."
   }
 }

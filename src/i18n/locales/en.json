@@ -1751,8 +1751,8 @@
     "sliderAriaLabel": "Value input for {{id}}"
   },
   "demo": {
-    "message": "You're exploring a live demo with sample data — nothing you change here is saved.",
+    "message": "Read-only demo with sample data — imports and resets are disabled. Download the app to save your own data.",
     "cta": "Download desktop app",
-    "dismiss": "Dismiss demo banner"
+    "disabledAction": "Disabled in demo. Download the app to import your data."
   }
 }

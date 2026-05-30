@@ -30,6 +30,7 @@ import { fetchExchangeRatesAsMap } from '../utils/exchangeRateApi';
 import { CategoryManagerDialog } from './CategoryManagerDialog';
 import { SearchableSelect } from './SearchableSelect';
 import { LanguageSelector } from './LanguageSelector';
+import { IS_DEMO_MODE } from '../utils/demoMode';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -1549,6 +1550,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 </div>
               </div>
 
+              {!IS_DEMO_MODE && (
               <div className="data-management-group">
                 <div className="subsection-header-with-tooltip">
                   <h3>{t('settings.importAllData')}</h3>
@@ -1562,7 +1564,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   <input type="file" accept=".json" onChange={handleImportAllJSON} hidden />
                 </label>
               </div>
+              )}
 
+              {!IS_DEMO_MODE && (
               <div className="data-management-group">
                 <div className="subsection-header-with-tooltip">
                   <h3>{t('settings.importIndividualFiles')}</h3>
@@ -1590,6 +1594,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   </label>
                 </div>
               </div>
+              )}
 
               <div className="data-management-group">
                 <div className="subsection-header-with-tooltip">
@@ -1621,6 +1626,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                 </button>
               </div>
 
+              {!IS_DEMO_MODE && (
               <div className="data-management-group">
                 <div className="subsection-header-with-tooltip">
                   <h3><MaterialIcon name="inventory_2" /> {t('settings.demoData')}</h3>
@@ -1633,7 +1639,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   <MaterialIcon name="sports_esports" /> {t('settings.loadDemoData')}
                 </button>
               </div>
+              )}
 
+              {!IS_DEMO_MODE && (
               <div className="data-management-group danger-zone">
                 <h3><MaterialIcon name="warning" /> {t('settings.dangerZone')}</h3>
                 <p className="setting-help">{t('settings.actionCannotBeUndone')}</p>
@@ -1641,6 +1649,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   <MaterialIcon name="delete" /> {t('settings.resetAllData')}
                 </button>
               </div>
+              )}
             </div>
           )}
         </section>

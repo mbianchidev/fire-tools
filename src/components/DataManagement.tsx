@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MaterialIcon } from './MaterialIcon';
+import { IS_DEMO_MODE } from '../utils/demoMode';
 
 interface DataManagementProps {
   onExport: () => void;
@@ -40,7 +41,7 @@ export const DataManagement: React.FC<DataManagementProps> = ({
       </button>
       {isOpen && (
         <div id="data-management-content" className="data-management-content">
-          {onLoadDemo && (
+          {onLoadDemo && !IS_DEMO_MODE && (
             <button 
               onClick={onLoadDemo} 
               className="action-btn" 
@@ -64,34 +65,49 @@ export const DataManagement: React.FC<DataManagementProps> = ({
           >
             <MaterialIcon name="download" /> {t('dataManagement.exportButton', { format: formatLabel })}
           </button>
-          <label 
-            className="action-btn import-btn" 
-            style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', marginBottom: '8px' }}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                (e.currentTarget.querySelector('input') as HTMLInputElement)?.click();
-              }
-            }}
-          >
-            <MaterialIcon name="upload" /> {t('dataManagement.importButton', { format: formatLabel })}
-            <input
-              type="file"
-              accept={acceptType}
-              onChange={onImport}
-              style={{ display: 'none' }}
-              aria-label={t('dataManagement.importAriaLabel', { format: formatLabel })}
-            />
-          </label>
-          <button 
-            onClick={onReset} 
-            className="action-btn reset-btn" 
-            style={{ width: '100%', backgroundColor: '#ef4444', color: 'white', justifyContent: 'center' }}
-            aria-label={t('dataManagement.resetAriaLabel')}
-          >
-            <MaterialIcon name="refresh" /> {t('dataManagement.resetButton')}
-          </button>
+          {IS_DEMO_MODE ? (
+            <button
+              type="button"
+              disabled
+              className="action-btn import-btn"
+              style={{ width: '100%', justifyContent: 'center', marginBottom: '8px', opacity: 0.55, cursor: 'not-allowed' }}
+              title={t('demo.disabledAction')}
+              aria-label={t('demo.disabledAction')}
+            >
+              <MaterialIcon name="upload" /> {t('dataManagement.importButton', { format: formatLabel })}
+            </button>
+          ) : (
+            <label
+              className="action-btn import-btn"
+              style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', marginBottom: '8px' }}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  (e.currentTarget.querySelector('input') as HTMLInputElement)?.click();
+                }
+              }}
+            >
+              <MaterialIcon name="upload" /> {t('dataManagement.importButton', { format: formatLabel })}
+              <input
+                type="file"
+                accept={acceptType}
+                onChange={onImport}
+                style={{ display: 'none' }}
+                aria-label={t('dataManagement.importAriaLabel', { format: formatLabel })}
+              />
+            </label>
+          )}
+          {!IS_DEMO_MODE && (
+            <button 
+              onClick={onReset} 
+              className="action-btn reset-btn" 
+              style={{ width: '100%', backgroundColor: '#ef4444', color: 'white', justifyContent: 'center' }}
+              aria-label={t('dataManagement.resetAriaLabel')}
+            >
+              <MaterialIcon name="refresh" /> {t('dataManagement.resetButton')}
+            </button>
+          )}
         </div>
       )}
     </div>

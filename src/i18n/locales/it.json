@@ -1751,8 +1751,8 @@
     "sliderAriaLabel": "Input valore per {{id}}"
   },
   "demo": {
-    "message": "Stai esplorando una demo dal vivo con dati di esempio — nulla di ciò che modifichi qui viene salvato.",
+    "message": "Demo in sola lettura con dati di esempio — importazioni e ripristini sono disabilitati. Scarica l'app per salvare i tuoi dati.",
     "cta": "Scarica app desktop",
-    "dismiss": "Chiudi avviso demo"
+    "disabledAction": "Disabilitato nella demo. Scarica l'app per importare i tuoi dati."
   }
 }
