@@ -90,7 +90,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      # Skip root postinstall (electron/native rebuild) in FE-only CI jobs.
+      - run: npm ci --ignore-scripts
       - run: npm test -- --run
 
   page:
