@@ -76,6 +76,9 @@ Back up your data anytime with CSV export. Import previously saved data to resto
 **🌍 Multi-language UI**  
 The interface ships in English (default), Italian, French, German, and Spanish. Change the language from **Settings → Language**; the choice is stored alongside your other (encrypted) preferences and is independent of the display currency. See [Internationalization (i18n)](#-internationalization-i18n) for coverage details.
 
+**ℹ️ About / Build Info**
+A built-in **Settings → About** section shows the running app version, the git commit hash the build was produced from (with a link to GitHub), the build timestamp, and the versions of major dependencies (React, Vite, Recharts, etc.). When the local backend is reachable, it also surfaces the backend's version and its own dependency set (Express, better-sqlite3, …) — useful for filing bug reports and confirming the frontend and backend are running the same release.
+
 ---
 
 ## 🚀 Quick Start
@@ -245,7 +248,7 @@ boot:
 - **Database schema**: [`docs/database/schema.sql`](docs/database/schema.sql) — **SQLite is the first-class target**, **PostgreSQL is fully compatible**. See [`docs/database/README.md`](docs/database/README.md).
 - **Backend**: [`server/`](server/) — Node + Express + better-sqlite3, full OpenAPI implementation.
 - **Docker stack**: [`docker-compose.yml`](docker-compose.yml) + [`docs/deployment/README.md`](docs/deployment/README.md).
-- **Desktop wrapper**: [`electron/`](electron/) — hardened Electron, code-sign-ready. **Bundles the backend in-process** so the desktop app needs no separate server; SQLite lives at the OS userData path (`~/Library/Application Support/fire-tools/firetools.db` on macOS, `%APPDATA%\fire-tools\firetools.db` on Windows, `~/.config/fire-tools/firetools.db` on Linux). You can also point the app at a separately-running backend via **Settings → Backend → Custom URL**.
+- **Desktop wrapper**: [`electron/`](electron/) — hardened Electron, code-sign-ready. **Bundles the backend in-process** so the desktop app needs no separate server; SQLite lives at the OS userData path (`~/Library/Application Support/fire-tools/firetools.db` on macOS, `%APPDATA%\fire-tools\firetools.db` on Windows, `~/.config/fire-tools/firetools.db` on Linux). User settings are also mirrored to a sibling `settings.json` in the same folder (atomic writes, mirrors the DB on every change) so they are easy to back up, inspect, or carry between installs. You can also point the app at a separately-running backend via **Settings → Backend → Custom URL**.
 
 Both contract files cover every feature currently shipped (FIRE calculator,
 asset allocation, expense / income tracker, net worth tracker, notifications,
@@ -284,6 +287,11 @@ Tracking issues: [#133](https://github.com/mbianchidev/fire-tools/issues/133) (t
 ### Desktop ([`electron/`](electron/))
 - **Electron 33** with hardened defaults (contextIsolation, sandbox, no nodeIntegration)
 - **electron-builder** producing `dmg` / `nsis` / `AppImage`
+- **Auto-updater** ([`electron-updater`](https://www.electron.build/auto-update))
+  pulls releases from GitHub and takes a **pre-install backup** of your DB
+  every time, keeping at least one snapshot alive (configurable retention,
+  minimum 1). Restore any snapshot from **Settings → Updates & backups**.
+  Design notes in [`docs/engineering/auto-updater.md`](docs/engineering/auto-updater.md).
 
 ### Mobile (separate repo — see [`docs/mobile/README.md`](docs/mobile/README.md))
 - **Flutter** consuming the same OpenAPI contract — lives in `fire-tools-mobile`.
@@ -302,6 +310,12 @@ Fire Tools takes your privacy seriously:
 - ✅ **Secure cookies (browser)** - `SameSite=Strict` and `Secure` flags
   protect against attacks
 - ✅ **Open source** - Full transparency, audit the code yourself
+- ✅ **Structured logs, PII-gated** - Diagnostic logs are kept in an
+  in-memory ring buffer and never include financial data (tickers,
+  amounts, allocations) unless you explicitly enable the "Include PII in
+  logs" toggle in Settings. Export logs from Settings → "Export logs" to
+  attach a sanitized log to a bug report. See
+  [`docs/engineering/logging.md`](docs/engineering/logging.md).
 
 Learn more in our [Security Policy](SECURITY.md).
 
