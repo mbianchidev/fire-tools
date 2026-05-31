@@ -133,11 +133,13 @@ function groupItemsIntoLines(
 export async function extractPdfText(file: File): Promise<ExtractedPdf> {
   const pdfjsLib = await loadPdfJs();
   const buffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+  const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) });
+  const pdf = await loadingTask.promise;
 
   const allLines: PdfTextLine[] = [];
+  const pageCount = pdf.numPages;
   try {
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    for (let pageNum = 1; pageNum <= pageCount; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
       allLines.push(...groupItemsIntoLines(textContent.items, pageNum));
@@ -145,7 +147,7 @@ export async function extractPdfText(file: File): Promise<ExtractedPdf> {
     }
   } finally {
     await pdf.cleanup().catch(() => undefined);
-    await pdf.destroy().catch(() => undefined);
+    await loadingTask.destroy().catch(() => undefined);
   }
 
   const fullText = allLines.map(l => l.text).join('\n');
@@ -154,7 +156,7 @@ export async function extractPdfText(file: File): Promise<ExtractedPdf> {
     fileName: file.name,
     fullText,
     lines: allLines,
-    pageCount: pdf.numPages,
+    pageCount: pageCount,
   };
 }
 
