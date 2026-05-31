@@ -185,3 +185,32 @@ publish:
 `.github/workflows/release.yml` uploads the `*.yml` and `*.blockmap`
 files alongside the installer so `electron-updater` can resolve the
 latest version.
+
+## Local testing
+
+The updater is disabled by default in `npm run electron:dev` because
+unpacked apps cannot meaningfully self-replace. Two env flags opt in:
+
+- `FIRETOOLS_UPDATER_FORCE_DEV=1` — runs a real check against the
+  configured GitHub repo. Requires `electron/dev-app-update.yml` (already
+  committed). Only useful once a release published via the
+  `release.yml` workflow exists; older releases (e.g. `v1.1.0`) lack the
+  `latest-mac.yml` / `latest.yml` metadata and will 404.
+- `FIRETOOLS_UPDATER_MOCK=1` — simulates the full lifecycle
+  (`checking → available → downloading → downloaded`) without contacting
+  GitHub. `quitAndInstall` is a no-op so the dev app keeps running, but
+  the pre-install backup **does** execute — inspect it under
+  `<userData>/backups/`. Use this to verify the UI banner, settings
+  toggles, and backup rotation end-to-end on a developer machine.
+
+Example:
+
+```sh
+FIRETOOLS_UPDATER_MOCK=1 npm run electron:dev
+```
+
+Then open Settings → Updates & Backups, click **Check for updates**, and
+walk through the simulated download/install. After clicking
+**Install & restart**, a new backup directory will appear under
+`~/Library/Application Support/Electron/backups/` (macOS) or the
+equivalent `userData` path on your OS.
