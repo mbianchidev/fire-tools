@@ -1,7 +1,4 @@
 import Database from 'better-sqlite3';
-import { mkdtempSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -38,8 +35,8 @@ export const makeApp = () => {
  * not support encryption on `:memory:` databases.
  */
 export const makeFileApp = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'fire-tools-api-'));
-  const dbPath = join(dir, 'fire.db');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fire-tools-api-'));
+  const dbPath = path.join(dir, 'fire.db');
   const db = new Database(dbPath);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
