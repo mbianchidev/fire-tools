@@ -44,6 +44,7 @@ import {
 } from '../utils/updater';
 import { API_ENDPOINTS, type ApiEndpoint } from '../utils/apiCatalog';
 import { IS_DEMO_MODE } from '../utils/demoMode';
+import { AboutSection } from './AboutSection';
 import './SettingsPage.css';
 
 interface SettingsPageProps {
@@ -51,7 +52,7 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'backend', 'updater', 'advanced', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support'] as const;
+const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'backend', 'updater', 'advanced', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support', 'about'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
@@ -154,18 +155,38 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   useEffect(() => {
     if (!isElectron) return;
     let cancelled = false;
-    (async () => {
-      const info = await getEmbeddedBackendInfo();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    // Poll until the embedded backend reports a URL or error. The main
+    // process answers immediately even while `startEmbedded()` is still
+    // running, so a single fetch on mount races the server boot.
+    const poll = async () => {
       if (cancelled) return;
-      if (info?.error) {
-        setEmbeddedBackendError(info.error);
+      try {
+        const info = await getEmbeddedBackendInfo();
+        if (cancelled) return;
+        if (info?.error) {
+          setEmbeddedBackendError(info.error);
+          setEmbeddedBackendUrl(null);
+          return;
+        }
+        if (info?.url) {
+          setEmbeddedBackendUrl(info.url);
+          setEmbeddedBackendError(null);
+          return;
+        }
+      } catch (err) {
+        if (cancelled) return;
+        setEmbeddedBackendError(err instanceof Error ? err.message : String(err));
         setEmbeddedBackendUrl(null);
-      } else if (info?.url) {
-        setEmbeddedBackendUrl(info.url);
-        setEmbeddedBackendError(null);
+        return;
       }
-    })();
-    return () => { cancelled = true; };
+      timer = setTimeout(poll, 500);
+    };
+    poll();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   }, [isElectron]);
 
   // Show temporary message
@@ -463,11 +484,28 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
       }
       origin = trimmed;
     } else {
-      if (!embeddedBackendUrl) {
+      let url = embeddedBackendUrl;
+      if (!url) {
+        // Backend might still be starting; ask main one more time before
+        // declaring it unavailable to avoid a stale-state false negative.
+        try {
+          const info = await getEmbeddedBackendInfo();
+          if (info?.url) {
+            url = info.url;
+            setEmbeddedBackendUrl(info.url);
+            setEmbeddedBackendError(null);
+          } else if (info?.error) {
+            setEmbeddedBackendError(info.error);
+          }
+        } catch {
+          // Fall through to the error branch below.
+        }
+      }
+      if (!url) {
         setBackendTestState({ status: 'error', message: embeddedBackendError || t('settings.backend.embeddedUnavailable') });
         return;
       }
-      origin = embeddedBackendUrl;
+      origin = url;
     }
     try {
       await probeBackend(origin);
@@ -2534,6 +2572,23 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   </a>
                 </div>
               </div>
+            </div>
+          )}
+        </section>
+
+        {/* About */}
+        <section className="settings-section collapsible-section">
+          <button
+            className="collapsible-header"
+            onClick={() => toggleSection('about')}
+            aria-expanded={!collapsedSections.has('about')}
+            aria-controls="about-content"
+          >
+            <h2><MaterialIcon name="info" /> {t('settings.sections.about')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('about') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('about') && (
+            <div id="about-content" className="collapsible-content">
+              <AboutSection />
             </div>
           )}
         </section>

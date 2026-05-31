@@ -31,6 +31,8 @@
     "spanish": "Spanisch",
     "hideValues": "Werte ausblenden",
     "notAvailable": "k.A.",
+    "copyToClipboard": "Klicken zum Kopieren",
+    "copied": "Kopiert!",
     "months": {
       "april": "April",
       "august": "August",
@@ -138,7 +140,8 @@
       "disclaimer": "Haftungsausschluss",
       "backend": "Backend",
       "advanced": "Erweitert",
-      "updater": "Updates & Sicherungen"
+      "updater": "Updates & Sicherungen",
+      "about": "Info"
     },
     "accountName": "Kontoname",
     "accountNameHelp": "Dieser Name wird in der gesamten App angezeigt",
@@ -2469,5 +2472,19 @@
       "later": "Später",
       "dismiss": "Verwerfen"
     }
+  },
+  "about": {
+    "appInfo": "App-Informationen",
+    "appVersion": "Version",
+    "commit": "Commit",
+    "buildTime": "Erstellt am",
+    "backendInfo": "Backend",
+    "backendVersion": "Backend-Version",
+    "dependencies": "Wichtige Abhängigkeiten",
+    "dependencyName": "Paket",
+    "dependencyVersion": "Version",
+    "backendUnreachable": "Backend nicht erreichbar. App läuft im Nur-Client-Modus.",
+    "backendDepTag": "backend",
+    "refresh": "Aktualisieren"
   }
 }

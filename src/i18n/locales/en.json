@@ -31,6 +31,8 @@
     "spanish": "Spanish",
     "hideValues": "Hide values",
     "notAvailable": "N/A",
+    "copyToClipboard": "Click to copy",
+    "copied": "Copied!",
     "months": {
       "april": "April",
       "august": "August",
@@ -138,7 +140,8 @@
       "disclaimer": "Disclaimer",
       "backend": "Backend",
       "advanced": "Advanced",
-      "updater": "Updater & Backups"
+      "updater": "Updater & Backups",
+      "about": "About"
     },
     "accountName": "Account Name",
     "accountNameHelp": "This name will be displayed throughout the app",
@@ -2469,5 +2472,19 @@
       "later": "Later",
       "dismiss": "Dismiss"
     }
+  },
+  "about": {
+    "appInfo": "App information",
+    "appVersion": "Version",
+    "commit": "Commit",
+    "buildTime": "Built at",
+    "backendInfo": "Backend",
+    "backendVersion": "Backend version",
+    "dependencies": "Major dependencies",
+    "dependencyName": "Package",
+    "dependencyVersion": "Version",
+    "backendUnreachable": "Backend is not reachable. The app runs in client-only mode.",
+    "backendDepTag": "backend",
+    "refresh": "Refresh"
   }
 }

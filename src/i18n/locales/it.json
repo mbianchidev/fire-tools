@@ -31,6 +31,8 @@
     "spanish": "Spagnolo",
     "hideValues": "Nascondi valori",
     "notAvailable": "N/D",
+    "copyToClipboard": "Clicca per copiare",
+    "copied": "Copiato!",
     "months": {
       "april": "Aprile",
       "august": "Agosto",
@@ -138,7 +140,8 @@
       "disclaimer": "Disclaimer",
       "backend": "Backend",
       "advanced": "Avanzate",
-      "updater": "Aggiornamenti e Backup"
+      "updater": "Aggiornamenti e Backup",
+      "about": "Informazioni"
     },
     "accountName": "Nome account",
     "accountNameHelp": "Questo nome verrà visualizzato in tutta l'applicazione",
@@ -2469,5 +2472,19 @@
       "later": "Più tardi",
       "dismiss": "Ignora"
     }
+  },
+  "about": {
+    "appInfo": "Informazioni sull'app",
+    "appVersion": "Versione",
+    "commit": "Commit",
+    "buildTime": "Compilato il",
+    "backendInfo": "Backend",
+    "backendVersion": "Versione backend",
+    "dependencies": "Dipendenze principali",
+    "dependencyName": "Pacchetto",
+    "dependencyVersion": "Versione",
+    "backendUnreachable": "Backend non raggiungibile. L'app è in modalità solo client.",
+    "backendDepTag": "backend",
+    "refresh": "Aggiorna"
   }
 }
