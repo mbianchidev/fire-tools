@@ -31,6 +31,8 @@
     "spanish": "Espagnol",
     "hideValues": "Masquer les valeurs",
     "notAvailable": "N/D",
+    "copyToClipboard": "Cliquer pour copier",
+    "copied": "Copié !",
     "months": {
       "april": "Avril",
       "august": "Août",
@@ -137,7 +139,8 @@
       "language": "Langue",
       "disclaimer": "Avertissement",
       "backend": "Backend",
-      "advanced": "Avancé"
+      "advanced": "Avancé",
+      "about": "À propos"
     },
     "accountName": "Nom de compte",
     "accountNameHelp": "Ce nom sera affiché dans toute l'application",
@@ -2403,5 +2406,19 @@
       ],
       "lastUpdatedDate": "31 décembre 2025"
     }
+  },
+  "about": {
+    "appInfo": "Informations sur l'application",
+    "appVersion": "Version",
+    "commit": "Commit",
+    "buildTime": "Compilé le",
+    "backendInfo": "Backend",
+    "backendVersion": "Version backend",
+    "dependencies": "Dépendances principales",
+    "dependencyName": "Paquet",
+    "dependencyVersion": "Version",
+    "backendUnreachable": "Backend injoignable. L'application fonctionne en mode client uniquement.",
+    "backendDepTag": "backend",
+    "refresh": "Actualiser"
   }
 }
