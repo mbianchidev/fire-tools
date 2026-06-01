@@ -41,6 +41,10 @@ mac:
       arch:
         - x64
         - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
   # Code-signing & notarization driven via env:
   #   CSC_LINK, CSC_KEY_PASSWORD (signing cert)
   #   APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, APPLE_TEAM_ID (notarization)

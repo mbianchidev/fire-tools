@@ -66,7 +66,7 @@ jobs:
           esac
 
       - name: Build Fire Tools and create DMG
-        run: npm run electron:dist -- --publish never --mac dmg --${{ matrix.arch }}
+        run: npm run electron:dist -- --publish never --mac dmg zip --${{ matrix.arch }}
         env:
           APP_VERSION: ${{ github.ref_name }}
           NODE_NO_WARNINGS: '1'
@@ -167,19 +167,63 @@ jobs:
           name: windows-artifacts
           path: artifacts/windows
 
+      - name: Stage release assets
+        run: |
+          set -euo pipefail
+          rm -rf dist-assets
+          mkdir -p dist-assets
+          # Real download/update payloads (unique per-arch / per-OS names).
+          find artifacts -type f \( -name '*.dmg' -o -name '*.zip' -o -name '*.exe' -o -name '*.blockmap' \) -exec cp -f {} dist-assets/ \;
+          # Windows auto-update manifest (single source).
+          find artifacts/windows -type f -name 'latest.yml' -exec cp -f {} dist-assets/ \;
+          # Merge the per-arch macOS manifests into one latest-mac.yml so a single,
+          # non-colliding asset references both x64 and arm64 builds.
+          python3 -c "import yaml" 2>/dev/null || pip install --quiet --break-system-packages pyyaml
+          mapfile -t MAC_YML < <(find artifacts/macos -type f -name 'latest-mac.yml' | sort)
+          python3 - "${MAC_YML[@]}" <<'PY'
+          import sys, yaml
+          paths = sys.argv[1:]
+          merged, seen, files = None, set(), []
+          for p in paths:
+              with open(p) as fh:
+                  data = yaml.safe_load(fh) or {}
+              if merged is None:
+                  merged = dict(data)
+              for entry in data.get('files', []):
+                  url = entry.get('url')
+                  if url and url not in seen:
+                      seen.add(url)
+                      files.append(entry)
+          if merged is not None:
+              merged['files'] = files
+              with open('dist-assets/latest-mac.yml', 'w') as fh:
+                  yaml.safe_dump(merged, fh, sort_keys=False)
+              print('Merged latest-mac.yml with %d file entry/entries' % len(files))
+          PY
+          # Guards: no non-asset manifests, no duplicate basenames.
+          for bad in app-update.yml builder-debug.yml; do
+            if [ -e "dist-assets/$bad" ]; then
+              echo "::error::Unexpected non-asset file staged: $bad"
+              exit 1
+            fi
+          done
+          dupes=$(find dist-assets -type f -exec basename {} \; | sort | uniq -d)
+          if [ -n "$dupes" ]; then
+            echo "::error::Duplicate asset basenames would collide on the release:"
+            echo "$dupes"
+            exit 1
+          fi
+          echo "Staged release assets:"
+          ls -la dist-assets
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
         with:
           generate_release_notes: true
+          draft: false
+          make_latest: 'true'
           files: |
-            artifacts/macos/**/*.dmg
-            artifacts/macos/**/*.zip
-            artifacts/macos/**/*.yml
-            artifacts/macos/**/*.blockmap
-            artifacts/windows/**/*.exe
-            artifacts/windows/**/*.nupkg
-            artifacts/windows/**/*.yml
-            artifacts/windows/**/*.blockmap
+            dist-assets/*
           body: |
             ## Installation
 
