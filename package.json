@@ -7,13 +7,14 @@
     "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
   },
   "scripts": {
+    "bump-version": "node scripts/bump-version.mjs",
     "dev": "vite",
     "predev": "node scripts/stop-dev.mjs",
     "dev:all": "node scripts/dev-all.mjs",
     "stop": "node scripts/stop-dev.mjs",
     "build": "rm -rf dist && tsc && vite build",
     "postbuild": "node scripts/build-landing.mjs && node scripts/build-docs.mjs",
-    "build:electron": "tsc && vite build --mode electron && npm --prefix server run build",
+    "build:electron": "tsc && vite build --mode electron && npm install --prefix server && npm --prefix server run build",
     "build:landing": "node scripts/build-landing.mjs",
     "build:docs": "node scripts/build-docs.mjs",
     "docs:screenshots": "node scripts/take-screenshots.mjs",
