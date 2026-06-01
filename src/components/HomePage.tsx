@@ -148,6 +148,20 @@ export function HomePage() {
           <span className="cta-link" aria-hidden="true">{t('home.cards.monteCarlo.cta')}</span>
         </Link>
 
+        <Link to="/investment-growth" className="feature-card" aria-labelledby="investment-growth-title">
+          <div className="feature-icon" aria-hidden="true"><MaterialIcon name="trending_up" size="large" /></div>
+          <h3 id="investment-growth-title" className="feature-card-title">{t('home.cards.investmentGrowth.title')}</h3>
+          <p>
+            {t('home.cards.investmentGrowth.body')}
+          </p>
+          <div className="feature-highlights">
+            <span className="highlight-item"><MaterialIcon name="show_chart" size="small" /> {t('home.cards.investmentGrowth.h1')}</span>
+            <span className="highlight-item"><MaterialIcon name="autorenew" size="small" /> {t('home.cards.investmentGrowth.h2')}</span>
+            <span className="highlight-item"><MaterialIcon name="savings" size="small" /> {t('home.cards.investmentGrowth.h3')}</span>
+          </div>
+          <span className="cta-link" aria-hidden="true">{t('home.cards.investmentGrowth.cta')}</span>
+        </Link>
+
         <Link to="/questionnaire" className="feature-card" aria-labelledby="fire-quiz-title">
           <div className="feature-icon" aria-hidden="true"><MaterialIcon name="quiz" size="large" /></div>
           <h3 id="fire-quiz-title" className="feature-card-title">{t('home.cards.quiz.title')}</h3>

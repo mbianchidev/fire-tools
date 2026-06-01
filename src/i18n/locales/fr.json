@@ -109,6 +109,14 @@
         "h3": "Événements cygne noir",
         "cta": "Lancer les simulations →"
       },
+      "investmentGrowth": {
+        "title": "Calculateur de croissance des investissements",
+        "body": "Projetez la valeur finale de votre portefeuille dans le temps avec contributions, rendements attendus et inflation. Obtenez un retour sur la croissance réelle et le taux d'épargne.",
+        "h1": "Rendements ajustés à l'inflation",
+        "h2": "Contributions récurrentes",
+        "h3": "Feedback sur le taux d'épargne",
+        "cta": "Projeter la croissance →"
+      },
       "quiz": {
         "title": "Quiz Persona FIRE",
         "body": "Découvrez votre persona FIRE et obtenez des recommandations personnalisées selon votre situation, vos objectifs et votre tolérance au risque.",
