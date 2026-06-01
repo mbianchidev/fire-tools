@@ -53,6 +53,8 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix server
 
+      - run: npm ci --prefix server
+
       - name: Verify macOS arch is concrete
         run: |
           case "${{ matrix.arch }}" in
@@ -108,6 +110,8 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm ci --prefix server
+
       - run: npm ci --prefix server
 
       - name: Build Fire Tools and create Windows installer
