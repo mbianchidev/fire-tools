@@ -88,6 +88,17 @@ interface BenchRow {
 }
 const bench: BenchRow[] = [];
 
+/** Record (or update) the extraction timing for a fixture/engine pair. */
+function recordBenchmark(file: string, engine: 'pdfjs' | 'liteparse', ms: number): void {
+  let row = bench.find(b => b.file === file);
+  if (!row) {
+    row = { file, pdfjsMs: 0, liteMs: null };
+    bench.push(row);
+  }
+  if (engine === 'pdfjs') row.pdfjsMs = ms;
+  else row.liteMs = ms;
+}
+
 describe('PDF parsing benchmark: pdfjs vs LiteParse', () => {
   for (const tc of CASES) {
     describe(tc.file, () => {
@@ -104,9 +115,7 @@ describe('PDF parsing benchmark: pdfjs vs LiteParse', () => {
         expect(drafts[0].amount).toBeCloseTo(tc.amount, 2);
         expect(drafts[0].currency).toBe(tc.currency);
 
-        const row = bench.find(b => b.file === tc.file) ?? { file: tc.file, pdfjsMs: 0, liteMs: null };
-        row.pdfjsMs = pdfjsMs;
-        if (!bench.includes(row)) bench.push(row);
+        recordBenchmark(tc.file, 'pdfjs', pdfjsMs);
       });
 
       it.skipIf(!liteParseAvailable)(
@@ -124,9 +133,7 @@ describe('PDF parsing benchmark: pdfjs vs LiteParse', () => {
           expect(drafts[0].amount).toBeCloseTo(tc.amount, 2);
           expect(drafts[0].currency).toBe(tc.currency);
 
-          const row = bench.find(b => b.file === tc.file) ?? { file: tc.file, pdfjsMs: 0, liteMs: null };
-          row.liteMs = liteMs;
-          if (!bench.includes(row)) bench.push(row);
+          recordBenchmark(tc.file, 'liteparse', liteMs);
         },
       );
     });
