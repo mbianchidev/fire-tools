@@ -52,22 +52,34 @@ export function DebtRepaymentChart({ timeline, debts }: Props) {
     <div style={{ width: '100%', height: 360 }}>
       <ResponsiveContainer>
         <LineChart data={data} margin={{ top: 16, right: 24, bottom: 16, left: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" />
           <XAxis
             dataKey="month"
-            label={{ value: 'Month', position: 'insideBottom', offset: -4 }}
+            stroke="var(--text-secondary)"
+            label={{ value: 'Month', position: 'insideBottom', offset: -4, fill: 'var(--text-secondary)' }}
           />
-          <YAxis tickFormatter={(v) => formatDisplayCurrency(Number(v))} />
+          <YAxis
+            stroke="var(--text-secondary)"
+            tickFormatter={(v) => formatDisplayCurrency(Number(v))}
+          />
           <Tooltip
             formatter={(value) => formatDisplayCurrency(Number(value))}
             labelFormatter={(label) => `Month ${label}`}
+            contentStyle={{
+              background: 'var(--bg-elevated, #1A1D26)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 8,
+              color: 'var(--text-primary)',
+            }}
+            labelStyle={{ color: 'var(--text-primary)' }}
+            itemStyle={{ color: 'var(--text-primary)' }}
           />
-          <Legend />
+          <Legend wrapperStyle={{ color: 'var(--text-secondary)' }} />
           <Line
             type="monotone"
             dataKey="total"
             name="Total balance"
-            stroke="#000"
+            stroke="var(--text-primary)"
             strokeWidth={2}
             dot={false}
           />

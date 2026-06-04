@@ -125,14 +125,6 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           <MaterialIcon name="paid" className="nav-icon" /> {NAVBAR_LABELS.netWorth}
         </Link>
         <Link
-          to="/debt-payoff"
-          className={`nav-link ${location.pathname === '/debt-payoff' ? 'active' : ''}`}
-          onClick={closeMenu}
-          aria-current={location.pathname === '/debt-payoff' ? 'page' : undefined}
-        >
-          <MaterialIcon name="credit_score" className="nav-icon" /> {NAVBAR_LABELS.debtPayoff}
-        </Link>
-        <Link
           to="/fire-calculator"
           className={`nav-link ${location.pathname === '/fire-calculator' ? 'active' : ''}`}
           onClick={closeMenu}

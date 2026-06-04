@@ -1,24 +1,45 @@
 .debt-payoff-page {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 3rem;
+  padding: 2rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .debt-payoff-page h2 {
-  margin-top: 0;
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.debt-payoff-page .page-intro {
+  color: var(--text-secondary);
+  max-width: 760px;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .debt-payoff-section {
-  background: var(--card-bg, #fff);
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 8px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem 1.25rem 1.5rem;
+  box-shadow: var(--shadow-md);
 }
 
 .debt-payoff-section h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
+  margin: 0 0 1rem;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .debt-payoff-grid {
@@ -30,20 +51,31 @@
 .debt-payoff-field {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
 .debt-payoff-field label {
+  font-size: 0.85rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  color: var(--text-primary);
 }
 
 .debt-payoff-field input,
 .debt-payoff-field select {
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--border-color, #ccc);
-  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-body);
   font-size: 0.95rem;
+  transition: border-color var(--transition-fast);
+}
+
+.debt-payoff-field input:focus,
+.debt-payoff-field select:focus {
+  border-color: var(--accent-primary);
+  outline: none;
 }
 
 .debt-table {
@@ -54,19 +86,43 @@
 .debt-table th,
 .debt-table td {
   text-align: left;
-  padding: 0.5rem 0.6rem;
-  border-bottom: 1px solid var(--border-color, #eee);
+  padding: 0.6rem 0.6rem;
+  border-bottom: 1px solid var(--border-subtle);
   font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.debt-table th {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .debt-table input,
 .debt-table select {
   width: 100%;
-  padding: 0.3rem 0.4rem;
-  border: 1px solid var(--border-color, #ccc);
-  border-radius: 4px;
+  padding: 0.4rem 0.55rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-body);
   font-size: 0.9rem;
   box-sizing: border-box;
+  transition: border-color var(--transition-fast);
+}
+
+.debt-table input:focus,
+.debt-table select:focus {
+  border-color: var(--accent-primary);
+  outline: none;
+}
+
+.debt-table input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--accent-primary);
 }
 
 .debt-table .debt-actions {
@@ -74,83 +130,105 @@
   text-align: center;
 }
 
+.debt-payoff-hint {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 .debt-payoff-btn {
-  background: #ff7e00;
-  color: #fff;
+  background: var(--accent-primary);
+  color: #0B0D12;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-md);
   cursor: pointer;
+  font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 600;
+  transition: background var(--transition-fast);
 }
 
 .debt-payoff-btn:hover {
-  background: #e56f00;
+  background: var(--accent-primary-light);
 }
 
 .debt-payoff-btn.secondary {
   background: transparent;
-  color: var(--text-color, #333);
-  border: 1px solid var(--border-color, #ccc);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.debt-payoff-btn.secondary:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-tertiary);
 }
 
 .debt-payoff-btn.danger {
-  background: #c0392b;
-  padding: 0.25rem 0.6rem;
+  background: #B91C1C;
+  color: #fff;
+  padding: 0.3rem 0.65rem;
   font-size: 0.85rem;
+}
+
+.debt-payoff-btn.danger:hover {
+  background: #DC2626;
 }
 
 .debt-payoff-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .debt-payoff-summary-card {
-  background: var(--surface-bg, #f7f7f9);
-  border: 1px solid var(--border-color, #e5e5e5);
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .debt-payoff-summary-card .label {
-  font-size: 0.8rem;
-  color: var(--muted-text, #666);
+  font-size: 0.75rem;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 .debt-payoff-summary-card .value {
+  font-family: var(--font-heading);
   font-size: 1.25rem;
-  font-weight: 700;
-  margin-top: 0.25rem;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .debt-payoff-warning {
-  background: #fff3cd;
-  border: 1px solid #ffe69c;
-  color: #664d03;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  color: #FDE68A;
   padding: 0.75rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   margin: 1rem 0;
 }
 
 .debt-payoff-error {
-  background: #f8d7da;
-  border: 1px solid #f5c2c7;
-  color: #842029;
+  background: rgba(185, 28, 28, 0.15);
+  border: 1px solid rgba(185, 28, 28, 0.45);
+  color: #FCA5A5;
   padding: 0.75rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   margin: 1rem 0;
 }
 
 .debt-payoff-recommend {
-  background: #d1ecf1;
-  border: 1px solid #bee5eb;
-  color: #0c5460;
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  color: var(--accent-primary-light);
   padding: 0.75rem 1rem;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   margin: 1rem 0;
 }
 
