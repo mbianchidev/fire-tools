@@ -27,6 +27,9 @@ export const NAVBAR_LABELS = {
   fireCalculator: 'FIRE Calculator',
   monteCarlo: 'Monte Carlo',
   debtPayoff: 'Debt Payoff',
+  investmentGrowth: 'Investment Growth',
+  withdrawalRate: 'Withdrawal Rate',
+  tools: 'Tools',
 } as const;
 
 export type NavbarLabelKey = keyof typeof NAVBAR_LABELS;

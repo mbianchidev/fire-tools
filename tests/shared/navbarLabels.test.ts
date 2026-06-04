@@ -49,6 +49,9 @@ describe('navbar is English-only (#233)', () => {
       fireCalculator: 'FIRE Calculator',
       monteCarlo: 'Monte Carlo',
       debtPayoff: 'Debt Payoff',
+      investmentGrowth: 'Investment Growth',
+      withdrawalRate: 'Withdrawal Rate',
+      tools: 'Tools',
     });
   });
 
