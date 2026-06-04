@@ -87,7 +87,12 @@ async function main() {
 
   spawnChild('electron-dev', 'node', ['scripts/electron-dev.mjs'], {
     cwd: repoRoot,
-    env: { ...process.env, ELECTRON_RENDERER_URL: RENDERER_URL, VITE_API_BASE_URL: BACKEND_URL },
+    env: {
+      ...process.env,
+      ELECTRON_RENDERER_URL: RENDERER_URL,
+      VITE_API_BASE_URL: BACKEND_URL,
+      FIRETOOLS_BACKEND_URL: BACKEND_URL,
+    },
   });
 }
 
