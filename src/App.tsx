@@ -121,6 +121,14 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
         >
           <MaterialIcon name="trending_up" className="nav-icon" /> {NAVBAR_LABELS.netWorth}
         </Link>
+        <Link
+          to="/fire-calculator"
+          className={`nav-link ${location.pathname === '/fire-calculator' ? 'active' : ''}`}
+          onClick={closeMenu}
+          aria-current={location.pathname === '/fire-calculator' ? 'page' : undefined}
+        >
+          <MaterialIcon name="local_fire_department" className="nav-icon" /> {NAVBAR_LABELS.fireCalculator}
+        </Link>
         <ToolsMenu onNavigate={closeMenu} />
       </div>
       <div className="nav-actions">

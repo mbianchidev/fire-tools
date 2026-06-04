@@ -11,7 +11,6 @@ interface ToolItem {
 }
 
 const TOOLS: ToolItem[] = [
-  { to: '/fire-calculator', icon: 'local_fire_department', label: NAVBAR_LABELS.fireCalculator },
   { to: '/monte-carlo', icon: 'casino', label: NAVBAR_LABELS.monteCarlo },
   { to: '/withdrawal-rate', icon: 'trending_down', label: NAVBAR_LABELS.withdrawalRate },
 ];
