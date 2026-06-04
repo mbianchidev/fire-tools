@@ -109,6 +109,14 @@
         "h3": "Eventi cigno nero",
         "cta": "Avvia le simulazioni →"
       },
+      "withdrawalRate": {
+        "title": "Simulatore del tasso di prelievo",
+        "body": "Metti alla prova il tuo portafoglio pensionistico con diversi tassi di prelievo tramite uno slider in tempo reale, basato sulla regola del 4% del Trinity Study.",
+        "h1": "Trinity Study",
+        "h2": "Slider in tempo reale",
+        "h3": "Probabilità di successo",
+        "cta": "Prova il simulatore →"
+      },
       "quiz": {
         "title": "Quiz Persona FIRE",
         "body": "Scopri la tua persona FIRE e ricevi consigli personalizzati in base alla tua situazione finanziaria, agli obiettivi e alla tolleranza al rischio.",
