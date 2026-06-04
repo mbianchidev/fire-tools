@@ -109,6 +109,14 @@
         "h3": "Schwarzer-Schwan-Ereignisse",
         "cta": "Simulationen starten →"
       },
+      "withdrawalRate": {
+        "title": "Entnahmeraten-Simulator",
+        "body": "Belastungstest deines Ruhestandsportfolios bei verschiedenen Entnahmeraten mit einem Live-Schieberegler, basierend auf der 4-%-Regel der Trinity-Studie.",
+        "h1": "Trinity-Studie",
+        "h2": "Live-Schieberegler",
+        "h3": "Erfolgswahrscheinlichkeit",
+        "cta": "Simulator ausprobieren →"
+      },
       "quiz": {
         "title": "FIRE-Persona-Quiz",
         "body": "Entdecke deine FIRE-Persona und erhalte personalisierte Empfehlungen basierend auf deiner finanziellen Situation, deinen Zielen und deiner Risikotoleranz.",

@@ -109,6 +109,14 @@
         "h3": "Événements cygne noir",
         "cta": "Lancer les simulations →"
       },
+      "withdrawalRate": {
+        "title": "Simulateur de taux de retrait",
+        "body": "Testez la résistance de votre portefeuille de retraite à différents taux de retrait avec un curseur en temps réel, basé sur la règle des 4 % du Trinity Study.",
+        "h1": "Trinity Study",
+        "h2": "Curseur en direct",
+        "h3": "Probabilité de succès",
+        "cta": "Essayer le simulateur →"
+      },
       "quiz": {
         "title": "Quiz Persona FIRE",
         "body": "Découvrez votre persona FIRE et obtenez des recommandations personnalisées selon votre situation, vos objectifs et votre tolérance au risque.",

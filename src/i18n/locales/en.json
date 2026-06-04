@@ -109,6 +109,14 @@
         "h3": "Black Swan Events",
         "cta": "Run Simulations →"
       },
+      "withdrawalRate": {
+        "title": "Withdrawal Rate Simulator",
+        "body": "Stress-test your retirement portfolio at different withdrawal rates with a live slider, grounded in the Trinity Study's 4% rule.",
+        "h1": "Trinity Study",
+        "h2": "Live Slider",
+        "h3": "Success Probability",
+        "cta": "Try the Simulator →"
+      },
       "quiz": {
         "title": "FIRE Persona Quiz",
         "body": "Discover your FIRE persona and get personalized recommendations based on your financial situation, goals, and risk tolerance.",
