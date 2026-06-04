@@ -12,6 +12,7 @@ import { IncomeExpensesChart } from './components/IncomeExpensesChart';
 import { NetWorthChart } from './components/NetWorthChart';
 import { FIREMetrics } from './components/FIREMetrics';
 import { MonteCarloPage } from './components/MonteCarloPage';
+import { ReverseFIRECalculatorPage } from './components/ReverseFIRECalculatorPage';
 import { InvestmentGrowthPage } from './components/InvestmentGrowthPage';
 import { WithdrawalRatePage } from './components/WithdrawalRatePage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
@@ -541,6 +542,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
+            <Route path="/reverse-fire-calculator" element={<ReverseFIRECalculatorPage />} />
             <Route path="/monte-carlo" element={<MonteCarloPage />} />
             <Route path="/investment-growth" element={<InvestmentGrowthPage />} />
             <Route path="/withdrawal-rate" element={<WithdrawalRatePage />} />

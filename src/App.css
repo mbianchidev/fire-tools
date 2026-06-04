@@ -716,6 +716,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-items: center;
   gap: 0.3rem;
   box-shadow: var(--glow-primary);
+  text-decoration: none;
 }
 
 .share-button:hover {
