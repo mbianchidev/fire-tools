@@ -301,11 +301,15 @@ export function ReverseFIRECalculatorPage() {
                   <PrivacyBlur isPrivacyMode={isPrivacyMode}>
                     <AbbreviatedValue
                       value={result.futureValueOfCurrentSavings}
+                      currency={currencySymbol}
                     />
                   </PrivacyBlur>{' '}
                   vs target{' '}
                   <PrivacyBlur isPrivacyMode={isPrivacyMode}>
-                    <AbbreviatedValue value={result.fireTarget} />
+                    <AbbreviatedValue
+                      value={result.fireTarget}
+                      currency={currencySymbol}
+                    />
                   </PrivacyBlur>
                   .
                 </div>
@@ -320,9 +324,9 @@ export function ReverseFIRECalculatorPage() {
                   </div>
                   <div className="metric-value">
                     <PrivacyBlur isPrivacyMode={isPrivacyMode}>
-                      {currencySymbol}
                       <AbbreviatedValue
                         value={result.requiredMonthlySavings}
+                        currency={currencySymbol}
                       />
                     </PrivacyBlur>
                   </div>
@@ -340,9 +344,9 @@ export function ReverseFIRECalculatorPage() {
                   </div>
                   <div className="metric-value">
                     <PrivacyBlur isPrivacyMode={isPrivacyMode}>
-                      {currencySymbol}
                       <AbbreviatedValue
                         value={result.requiredAnnualSavings}
+                        currency={currencySymbol}
                       />
                     </PrivacyBlur>
                   </div>
@@ -355,8 +359,10 @@ export function ReverseFIRECalculatorPage() {
                   </div>
                   <div className="metric-value">
                     <PrivacyBlur isPrivacyMode={isPrivacyMode}>
-                      {currencySymbol}
-                      <AbbreviatedValue value={result.fireTarget} />
+                      <AbbreviatedValue
+                        value={result.fireTarget}
+                        currency={currencySymbol}
+                      />
                     </PrivacyBlur>
                   </div>
                   <div className="metric-subtitle">
@@ -374,9 +380,9 @@ export function ReverseFIRECalculatorPage() {
                   </div>
                   <div className="metric-value">
                     <PrivacyBlur isPrivacyMode={isPrivacyMode}>
-                      {currencySymbol}
                       <AbbreviatedValue
                         value={result.futureValueOfCurrentSavings}
+                        currency={currencySymbol}
                       />
                     </PrivacyBlur>
                   </div>
