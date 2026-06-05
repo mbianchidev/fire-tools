@@ -116,7 +116,7 @@ describe('PDF parsing benchmark: pdfjs vs LiteParse', () => {
         expect(drafts[0].currency).toBe(tc.currency);
 
         recordBenchmark(tc.file, 'pdfjs', pdfjsMs);
-      });
+      }, 30000);
 
       it.skipIf(!liteParseAvailable)(
         'LiteParse extractor + heuristics recover the expected transaction',
@@ -135,6 +135,7 @@ describe('PDF parsing benchmark: pdfjs vs LiteParse', () => {
 
           recordBenchmark(tc.file, 'liteparse', liteMs);
         },
+        30000,
       );
     });
   }

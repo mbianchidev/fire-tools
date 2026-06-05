@@ -17,7 +17,7 @@ This feature is **experimental** and **off by default**. Enable it under **Setti
    - Toggle each row on/off.
    - Change the kind (income ↔ expense).
    - Edit the date, description, amount, category, expense type (need/want) or income source.
-5. Confirm to push the included rows into the current Expense Tracker.
+5. Confirm to push the included rows into the Expense Tracker. The view jumps to the month of the earliest imported transaction so you immediately see the added rows (a payslip dated in May lands in May, not whichever month you were viewing).
 
 The doc-type dropdown lets you override the auto-detected parser if it picks the wrong one.
 
@@ -82,5 +82,6 @@ Scanned PDFs (image-only, no text layer) are **not supported**. Run them through
 | --- | --- | --- |
 | "No transactions detected" | Wrong doc-type or unusual layout | Pick the correct doc type from the dropdown. |
 | All rows have wrong dates | Locale mismatch (DD/MM vs MM/DD) | Edit each row's date manually before confirming. |
+| Imported rows seem to vanish after confirming | They belong to a different month than the one you were viewing | The view now auto-jumps to the imported month; use the month/year selector to revisit other periods. |
 | LLM categorization does nothing | Endpoint/key not set, or model name wrong | Re-check the three fields in Settings. |
 | Build error about `?url` import | Vite version too old | This feature needs Vite 5+ (already pinned in the project). |
