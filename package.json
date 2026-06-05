@@ -1,6 +1,6 @@
 {
   "name": "fire-tools",
-  "version": "2.0.1",
+  "version": "2.1.1",
   "description": "FIRE tools including calculator with Monte Carlo simulations and asset allocation manager",
   "type": "module",
   "engines": {
@@ -14,7 +14,7 @@
     "stop": "node scripts/stop-dev.mjs",
     "build": "rm -rf dist && tsc && vite build",
     "postbuild": "node scripts/build-landing.mjs && node scripts/build-docs.mjs",
-    "build:electron": "tsc && vite build --mode electron && npm install --prefix server && npm --prefix server run build",
+    "build:electron": "tsc && vite build --mode electron && npm install --prefix server && npm --prefix server run build && node scripts/gen-build-meta.mjs",
     "build:landing": "node scripts/build-landing.mjs",
     "build:docs": "node scripts/build-docs.mjs",
     "docs:screenshots": "node scripts/take-screenshots.mjs",
