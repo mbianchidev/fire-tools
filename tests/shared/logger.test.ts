@@ -79,16 +79,24 @@ describe('logger', () => {
     });
 
     it('never leaks PII tokens into the exported text when flag is off', () => {
-      log('asset-allocation', 'user', 'rebalance', 'recomputed portfolio', {
-        pii: { ticker: 'TSLA', quantity: 42, account: 'My IRA' },
-      });
-      log('net-worth', 'system', 'snapshot', 'recorded snapshot', {
-        pii: { totalEUR: 123456.78, holdings: [{ ticker: 'VWCE', qty: 200 }] },
-      });
-      const text = exportLogsAsText();
-      const forbidden = ['TSLA', 'VWCE', '42', 'My IRA', '123456.78', '200'];
-      for (const token of forbidden) {
-        expect(text.includes(token), `expected exported text to NOT contain "${token}"`).toBe(false);
+      // Pin the clock so the timestamp can't incidentally contain forbidden
+      // tokens (e.g. seconds == "42" or "00").
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(2024, 0, 1, 9, 15, 30));
+      try {
+        log('asset-allocation', 'user', 'rebalance', 'recomputed portfolio', {
+          pii: { ticker: 'TSLA', quantity: 42, account: 'My IRA' },
+        });
+        log('net-worth', 'system', 'snapshot', 'recorded snapshot', {
+          pii: { totalEUR: 123456.78, holdings: [{ ticker: 'VWCE', qty: 200 }] },
+        });
+        const text = exportLogsAsText();
+        const forbidden = ['TSLA', 'VWCE', '42', 'My IRA', '123456.78', '200'];
+        for (const token of forbidden) {
+          expect(text.includes(token), `expected exported text to NOT contain "${token}"`).toBe(false);
+        }
+      } finally {
+        vi.useRealTimers();
       }
     });
 

@@ -20,6 +20,37 @@ current savings rate, with adjustable expected return and inflation.
 
 Every change recalculates immediately and updates the projection chart.
 
+## FIRE variants
+
+The calculator supports five FIRE flavours. Pick one from the **FIRE Type** selector
+to change how the target number and post-FIRE behaviour are computed.
+
+- **Standard FIRE** — the classic: `target = annual_expenses × years_of_expenses`.
+  After FIRE, optionally stop working (`stopWorkingAtFIRE`) and let the portfolio
+  fund expenses.
+- **Lean FIRE** — minimalist lifestyle. The target is scaled down by
+  `leanExpenseMultiplier` (default `0.7`). Lower target ⇒ reach FIRE sooner.
+  Formula: `target = annual_expenses × leanExpenseMultiplier × years_of_expenses`.
+- **Fat FIRE** — more comfortable lifestyle. The target is scaled up by
+  `fatExpenseMultiplier` (default `2.0`). Higher target ⇒ takes longer.
+  Formula: `target = annual_expenses × fatExpenseMultiplier × years_of_expenses`.
+- **Barista FIRE** — partial retirement where a part-time job covers part of
+  expenses. Only the *gap* needs to be funded by the portfolio.
+  Formula: `target = max(0, annual_expenses − baristaAnnualIncome) × years_of_expenses`.
+  After FIRE, labor income is capped at `baristaAnnualIncome` and no longer grows.
+- **Coast FIRE** — save aggressively early, then stop contributing and let
+  compounding do the rest until a chosen retirement age.
+  Formula: `target = standard_target / (1 + expected_return)^(coastTargetAge − currentAge)`.
+  After Coast FIRE is reached the model keeps labor income but stops new
+  contributions; only investment yield grows the portfolio.
+
+Notes:
+- Post-FIRE *expenses* always use `fireAnnualExpenses` — the lean/fat multipliers
+  only affect the target, not what you actually spend in retirement.
+- All variants honour the existing inputs (returns, withdrawal rate, pensions,
+  other income). Switching variants never invalidates saved data — missing
+  fields fall back to defaults.
+
 ## Reading the chart
 
 - The line shows projected net worth year by year.
@@ -43,3 +74,33 @@ Use **Import CSV** to load a previously exported file.
   affects success rate.
 - The expected return is a *real* return (after inflation). If you input a
   nominal return, set inflation to zero so you don't double-count it.
+
+## Reverse FIRE Calculator
+
+The companion **Reverse FIRE** page (linked from the FIRE Calculator header,
+or navigate to `/reverse-fire-calculator`) flips the question around: instead
+of asking *when* you'll reach FIRE, you pick a **target retirement age** and
+the tool tells you **how much you must save each month** to get there.
+
+Inputs:
+
+- Target retirement age
+- Current savings
+- Annual FIRE expenses + withdrawal rate (defines the FIRE target)
+- Expected stock, bond and cash returns (weighted by your asset allocation)
+- Inflation proxy (absolute value of the cash return)
+- "Inflate FIRE target to retirement year" toggle — when on, the target is
+  expressed in future euros; when off, both target and returns are treated
+  as real values.
+
+Output:
+
+- Required monthly and annual savings (annuity-due — contributions assumed
+  at the start of each year)
+- Projected future value of your current savings alone
+- The FIRE target you're aiming at
+- An "already on track" badge when no further contributions are needed
+
+The page shares its inputs with the forward FIRE calculator via the same
+encrypted cookie storage, so toggling between the two views never loses
+your numbers.

@@ -12,13 +12,18 @@ import { IncomeExpensesChart } from './components/IncomeExpensesChart';
 import { NetWorthChart } from './components/NetWorthChart';
 import { FIREMetrics } from './components/FIREMetrics';
 import { MonteCarloPage } from './components/MonteCarloPage';
+import { ReverseFIRECalculatorPage } from './components/ReverseFIRECalculatorPage';
+import { InvestmentGrowthPage } from './components/InvestmentGrowthPage';
+import { WithdrawalRatePage } from './components/WithdrawalRatePage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
 import { PortfolioBreakdownPage } from './components/PortfolioBreakdownPage';
 import { ExpenseTrackerPage } from './components/ExpenseTrackerPage';
 import { NetWorthTrackerPage } from './components/NetWorthTrackerPage';
+import { DebtPayoffPage } from './components/DebtPayoffPage';
 import { HomePage } from './components/HomePage';
 import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
+import { ToolsMenu } from './components/ToolsMenu';
 import { NotificationBell } from './components/NotificationBell';
 import { SettingsPage } from './components/SettingsPage';
 import { CookieConsent } from './components/CookieConsent';
@@ -117,7 +122,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
           onClick={closeMenu}
           aria-current={location.pathname === '/net-worth-tracker' ? 'page' : undefined}
         >
-          <MaterialIcon name="trending_up" className="nav-icon" /> {NAVBAR_LABELS.netWorth}
+          <MaterialIcon name="paid" className="nav-icon" /> {NAVBAR_LABELS.netWorth}
         </Link>
         <Link
           to="/fire-calculator"
@@ -127,14 +132,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
         >
           <MaterialIcon name="local_fire_department" className="nav-icon" /> {NAVBAR_LABELS.fireCalculator}
         </Link>
-        <Link
-          to="/monte-carlo"
-          className={`nav-link ${location.pathname === '/monte-carlo' ? 'active' : ''}`}
-          onClick={closeMenu}
-          aria-current={location.pathname === '/monte-carlo' ? 'page' : undefined}
-        >
-          <MaterialIcon name="casino" className="nav-icon" /> {NAVBAR_LABELS.monteCarlo}
-        </Link>
+        <ToolsMenu onNavigate={closeMenu} />
       </div>
       <div className="nav-actions">
         <NotificationBell />
@@ -545,11 +543,15 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/fire-calculator" element={<FIRECalculatorPage />} />
+            <Route path="/reverse-fire-calculator" element={<ReverseFIRECalculatorPage />} />
             <Route path="/monte-carlo" element={<MonteCarloPage />} />
+            <Route path="/investment-growth" element={<InvestmentGrowthPage />} />
+            <Route path="/withdrawal-rate" element={<WithdrawalRatePage />} />
             <Route path="/asset-allocation" element={<AssetAllocationPage />} />
             <Route path="/portfolio-breakdown" element={settings.experimentalFeatures?.portfolioBreakdown ? <PortfolioBreakdownPage /> : <NotFoundPage />} />
             <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
             <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
+            <Route path="/debt-payoff" element={<DebtPayoffPage />} />
             <Route path="/questionnaire" element={<QuestionnairePage />} />
             <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
             <Route path="/privacy-policy" element={<PolicyRouteRedirect policyType="privacy" />} />
