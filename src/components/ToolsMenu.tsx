@@ -14,6 +14,7 @@ const TOOLS: ToolItem[] = [
   { to: '/monte-carlo', icon: 'casino', label: NAVBAR_LABELS.monteCarlo },
   { to: '/investment-growth', icon: 'trending_up', label: NAVBAR_LABELS.investmentGrowth },
   { to: '/withdrawal-rate', icon: 'trending_down', label: NAVBAR_LABELS.withdrawalRate },
+  { to: '/debt-payoff', icon: 'credit_score', label: NAVBAR_LABELS.debtPayoff },
 ];
 
 interface ToolsMenuProps {

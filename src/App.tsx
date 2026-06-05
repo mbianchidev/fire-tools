@@ -19,6 +19,7 @@ import { AssetAllocationPage } from './components/AssetAllocationPage';
 import { PortfolioBreakdownPage } from './components/PortfolioBreakdownPage';
 import { ExpenseTrackerPage } from './components/ExpenseTrackerPage';
 import { NetWorthTrackerPage } from './components/NetWorthTrackerPage';
+import { DebtPayoffPage } from './components/DebtPayoffPage';
 import { HomePage } from './components/HomePage';
 import { DataManagement } from './components/DataManagement';
 import { ProfileMenu } from './components/ProfileMenu';
@@ -550,6 +551,7 @@ function App() {
             <Route path="/portfolio-breakdown" element={settings.experimentalFeatures?.portfolioBreakdown ? <PortfolioBreakdownPage /> : <NotFoundPage />} />
             <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
             <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />
+            <Route path="/debt-payoff" element={<DebtPayoffPage />} />
             <Route path="/questionnaire" element={<QuestionnairePage />} />
             <Route path="/settings" element={<SettingsPage onSettingsChange={handleSettingsChange} />} />
             <Route path="/privacy-policy" element={<PolicyRouteRedirect policyType="privacy" />} />
