@@ -2738,3 +2738,39 @@ components:
           type: object
           additionalProperties: { type: string }
           description: 'Map of preference key → opaque string value'
+
+    # -- Audit log -----------------------------------------------------------
+    AuditActionType:
+      type: string
+      description: 'Discrete, user-meaningful action recorded in the audit log.'
+      enum:
+        - CREATE_ASSET
+        - UPDATE_ASSET
+        - DELETE_ASSET
+        - RUN_CALCULATION
+        - UPDATE_SETTINGS
+        - IMPORT_DATA
+        - EXPORT_DATA
+        - CLEAR_DATA
+
+    AuditLogEntry:
+      type: object
+      description: >-
+        A single audit log entry. Privacy-first: payloads carry only
+        non-sensitive context (ids, counts, field names) and are never
+        transmitted off device in the pure-web build.
+      required: [id, timestamp, actionType, payload]
+      properties:
+        id:         { type: string, description: 'Client-minted unique id (UUID when available)' }
+        timestamp:  { type: string, format: date-time, description: 'ISO-8601 UTC time of the action' }
+        userId:     { type: integer, format: int64, nullable: true, description: 'Owning user (reserved for multi-tenant backend)' }
+        sessionId:  { type: string, nullable: true, description: 'Per-app-load session id grouping related actions' }
+        actionType: { $ref: '#/components/schemas/AuditActionType' }
+        payload:
+          type: object
+          additionalProperties:
+            oneOf:
+              - { type: string }
+              - { type: number }
+              - { type: boolean }
+          description: 'Non-sensitive primitive key/value context for the action'

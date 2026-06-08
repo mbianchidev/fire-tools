@@ -165,7 +165,8 @@
       "backend": "Backend",
       "advanced": "Avanzado",
       "updater": "Actualizaciones y Copias",
-      "about": "Acerca de"
+      "about": "Acerca de",
+      "auditLog": "Registro de actividad"
     },
     "accountName": "Nombre de cuenta",
     "accountNameHelp": "Este nombre se mostrará en toda la aplicación",
@@ -2552,5 +2553,38 @@
     "backendUnreachable": "Backend no accesible. La app funciona en modo solo cliente.",
     "backendDepTag": "backend",
     "refresh": "Actualizar"
+  },
+  "auditLog": {
+    "title": "Registro de actividad",
+    "privacyNote": "Tu actividad se registra solo en este dispositivo y nunca se envía a ningún sitio. Usa este registro para revisar tus acciones recientes.",
+    "empty": "Aún no hay actividad registrada.",
+    "clear": "Borrar registro",
+    "clearConfirm": "¿Borrar todo el registro de actividad? Esta acción no se puede deshacer.",
+    "cleared": "Registro de actividad borrado.",
+    "showDetails": "Mostrar detalles",
+    "hideDetails": "Ocultar detalles",
+    "count": "{{count}} entradas",
+    "columns": {
+      "timestamp": "Hora",
+      "action": "Acción",
+      "details": "Detalles"
+    },
+    "filters": {
+      "action": "Tipo de acción",
+      "all": "Todas las acciones",
+      "from": "Desde",
+      "to": "Hasta",
+      "reset": "Restablecer filtros"
+    },
+    "actions": {
+      "CREATE_ASSET": "Activo creado",
+      "UPDATE_ASSET": "Activo actualizado",
+      "DELETE_ASSET": "Activo eliminado",
+      "RUN_CALCULATION": "Cálculo ejecutado",
+      "UPDATE_SETTINGS": "Ajustes actualizados",
+      "IMPORT_DATA": "Datos importados",
+      "EXPORT_DATA": "Datos exportados",
+      "CLEAR_DATA": "Datos borrados"
+    }
   }
 }

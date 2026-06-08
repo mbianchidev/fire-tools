@@ -165,7 +165,8 @@
       "backend": "Backend",
       "advanced": "Erweitert",
       "updater": "Updates & Sicherungen",
-      "about": "Info"
+      "about": "Info",
+      "auditLog": "Aktivitätsprotokoll"
     },
     "accountName": "Kontoname",
     "accountNameHelp": "Dieser Name wird in der gesamten App angezeigt",
@@ -2552,5 +2553,38 @@
     "backendUnreachable": "Backend nicht erreichbar. App läuft im Nur-Client-Modus.",
     "backendDepTag": "backend",
     "refresh": "Aktualisieren"
+  },
+  "auditLog": {
+    "title": "Aktivitätsprotokoll",
+    "privacyNote": "Deine Aktivität wird nur auf diesem Gerät aufgezeichnet und niemals übertragen. Nutze dieses Protokoll, um deine letzten Aktionen zu überprüfen.",
+    "empty": "Noch keine Aktivität aufgezeichnet.",
+    "clear": "Protokoll löschen",
+    "clearConfirm": "Das gesamte Aktivitätsprotokoll löschen? Dies kann nicht rückgängig gemacht werden.",
+    "cleared": "Aktivitätsprotokoll gelöscht.",
+    "showDetails": "Details anzeigen",
+    "hideDetails": "Details ausblenden",
+    "count": "{{count}} Einträge",
+    "columns": {
+      "timestamp": "Zeit",
+      "action": "Aktion",
+      "details": "Details"
+    },
+    "filters": {
+      "action": "Aktionstyp",
+      "all": "Alle Aktionen",
+      "from": "Von",
+      "to": "Bis",
+      "reset": "Filter zurücksetzen"
+    },
+    "actions": {
+      "CREATE_ASSET": "Anlage erstellt",
+      "UPDATE_ASSET": "Anlage aktualisiert",
+      "DELETE_ASSET": "Anlage gelöscht",
+      "RUN_CALCULATION": "Berechnung ausgeführt",
+      "UPDATE_SETTINGS": "Einstellungen aktualisiert",
+      "IMPORT_DATA": "Daten importiert",
+      "EXPORT_DATA": "Daten exportiert",
+      "CLEAR_DATA": "Daten gelöscht"
+    }
   }
 }

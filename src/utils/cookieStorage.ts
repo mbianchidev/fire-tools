@@ -10,6 +10,7 @@ import { CalculatorInputs } from '../types/calculator';
 import { ExpenseTrackerData, YearData, MonthData, IncomeEntry, ExpenseEntry } from '../types/expenseTracker';
 import { NetWorthTrackerData, NetWorthYearData, MonthlySnapshot, AssetHolding, CashEntry, PensionEntry, FinancialOperation } from '../types/netWorthTracker';
 import { Debt, DebtRepaymentMethod, DebtRepaymentMode } from '../types/debt';
+import { AuditLogEntry, isAuditActionType } from '../types/auditLog';
 import { DEFAULT_INPUTS } from './defaults';
 import { encryptData, decryptData } from './cookieEncryption';
 import {
@@ -28,6 +29,13 @@ const FIRE_CALCULATOR_INPUTS_KEY = 'fire-calculator-inputs';
 const EXPENSE_TRACKER_KEY = 'fire-tools-expense-tracker';
 const NET_WORTH_TRACKER_KEY = 'fire-tools-net-worth-tracker';
 const DEBT_PAYOFF_KEY = 'fire-tools-debt-payoff';
+const AUDIT_LOG_KEY = 'fire-tools-audit-log';
+
+// Audit log is intentionally bounded so it never grows the encrypted cookie
+// beyond what browsers accept (~4KB). We keep the newest entries and trim by
+// both count and encrypted byte size.
+const AUDIT_LOG_MAX_ENTRIES = 50;
+const AUDIT_LOG_MAX_BYTES = 3500;
 
 // Cookie options - secure settings for production
 const COOKIE_OPTIONS: CookieAttributes = {
@@ -533,6 +541,7 @@ export function clearAllData(): void {
   clearExpenseTrackerData();
   clearNetWorthTrackerData();
   clearDebtPayoffData();
+  clearAuditLog();
 }
 
 // --- Debt payoff calculator persistence ---
@@ -602,6 +611,82 @@ export function clearDebtPayoffData(): void {
     SafeCookies.remove(DEBT_PAYOFF_KEY, { path: '/' });
   } catch (error) {
     logger.error('cookie-storage', 'clear-failed', 'failed to clear debt payoff data from cookies', { pii: { error: (error as Error)?.message } });
+  }
+}
+
+// --- Audit log persistence ---
+
+function isValidAuditLogEntry(obj: any): obj is AuditLogEntry {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof obj.id === 'string' &&
+    typeof obj.timestamp === 'string' &&
+    isAuditActionType(obj.actionType) &&
+    typeof obj.payload === 'object' &&
+    obj.payload !== null &&
+    !Array.isArray(obj.payload)
+  );
+}
+
+/**
+ * Trim audit entries (assumed newest-last) so the encrypted payload stays
+ * within both the entry-count and byte-size budgets. Oldest entries are
+ * dropped first.
+ */
+function trimAuditEntries(entries: AuditLogEntry[]): AuditLogEntry[] {
+  let trimmed = entries.slice(-AUDIT_LOG_MAX_ENTRIES);
+  // Drop oldest until the encrypted size fits the cookie budget.
+  while (trimmed.length > 1) {
+    const encrypted = encryptData(JSON.stringify(trimmed));
+    if (encrypted.length <= AUDIT_LOG_MAX_BYTES) break;
+    trimmed = trimmed.slice(1);
+  }
+  return trimmed;
+}
+
+/**
+ * Save the audit log to encrypted storage. Entries are expected in
+ * chronological order (oldest first); the list is bounded before persisting.
+ * No-op in demo mode to keep the demo environment clean.
+ */
+export function saveAuditLog(entries: AuditLogEntry[]): void {
+  if (IS_DEMO_MODE) return;
+  try {
+    const bounded = trimAuditEntries(entries);
+    const encrypted = encryptData(JSON.stringify(bounded));
+    SafeCookies.set(AUDIT_LOG_KEY, encrypted, COOKIE_OPTIONS);
+  } catch (error) {
+    logger.error('cookie-storage', 'save-failed', 'failed to save audit log to storage', { pii: { error: (error as Error)?.message } });
+  }
+}
+
+/**
+ * Load the audit log from encrypted storage. Returns an empty array when no
+ * (valid) data is present.
+ */
+export function loadAuditLog(): AuditLogEntry[] {
+  if (IS_DEMO_MODE) return [];
+  try {
+    const encrypted = SafeCookies.get(AUDIT_LOG_KEY);
+    if (!encrypted) return [];
+    const decrypted = decryptData(encrypted);
+    if (!decrypted) return [];
+    const parsed = JSON.parse(decrypted);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidAuditLogEntry);
+  } catch (error) {
+    logger.error('cookie-storage', 'load-failed', 'failed to load audit log from storage', { pii: { error: (error as Error)?.message } });
+    return [];
+  }
+}
+
+/** Clear the audit log from storage. */
+export function clearAuditLog(): void {
+  try {
+    SafeCookies.remove(AUDIT_LOG_KEY, { path: '/' });
+  } catch (error) {
+    logger.error('cookie-storage', 'clear-failed', 'failed to clear audit log from storage', { pii: { error: (error as Error)?.message } });
   }
 }
 

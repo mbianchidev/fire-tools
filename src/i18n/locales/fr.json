@@ -165,7 +165,8 @@
       "backend": "Backend",
       "advanced": "Avancé",
       "updater": "Mises à jour & Sauvegardes",
-      "about": "À propos"
+      "about": "À propos",
+      "auditLog": "Journal d'activité"
     },
     "accountName": "Nom de compte",
     "accountNameHelp": "Ce nom sera affiché dans toute l'application",
@@ -2552,5 +2553,38 @@
     "backendUnreachable": "Backend injoignable. L'application fonctionne en mode client uniquement.",
     "backendDepTag": "backend",
     "refresh": "Actualiser"
+  },
+  "auditLog": {
+    "title": "Journal d'activité",
+    "privacyNote": "Votre activité est enregistrée uniquement sur cet appareil et n'est jamais transmise. Utilisez ce journal pour consulter vos actions récentes.",
+    "empty": "Aucune activité enregistrée pour le moment.",
+    "clear": "Effacer le journal",
+    "clearConfirm": "Effacer tout le journal d'activité ? Cette action est irréversible.",
+    "cleared": "Journal d'activité effacé.",
+    "showDetails": "Afficher les détails",
+    "hideDetails": "Masquer les détails",
+    "count": "{{count}} entrées",
+    "columns": {
+      "timestamp": "Heure",
+      "action": "Action",
+      "details": "Détails"
+    },
+    "filters": {
+      "action": "Type d'action",
+      "all": "Toutes les actions",
+      "from": "Du",
+      "to": "Au",
+      "reset": "Réinitialiser les filtres"
+    },
+    "actions": {
+      "CREATE_ASSET": "Actif créé",
+      "UPDATE_ASSET": "Actif mis à jour",
+      "DELETE_ASSET": "Actif supprimé",
+      "RUN_CALCULATION": "Calcul exécuté",
+      "UPDATE_SETTINGS": "Paramètres mis à jour",
+      "IMPORT_DATA": "Données importées",
+      "EXPORT_DATA": "Données exportées",
+      "CLEAR_DATA": "Données effacées"
+    }
   }
 }
