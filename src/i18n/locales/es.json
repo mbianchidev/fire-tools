@@ -2539,6 +2539,59 @@
       "dismiss": "Descartar"
     }
   },
+  "backtest": {
+    "title": "Backtest de cartera",
+    "description": "Ejecuta una simulación histórica determinista de tu asignación actual y revisa crecimiento, drawdowns y rendimientos anuales.",
+    "model": {
+      "buyAndHold": "Modelo: buy-and-hold (sin rebalanceo periódico). Si falta historial de un activo, se usan supuestos deterministas por clase."
+    },
+    "controls": {
+      "initialInvestment": "Inversión inicial",
+      "lookbackYears": "Ventana histórica",
+      "lookbackOption": "{{years}} años",
+      "run": "Ejecutar backtest",
+      "running": "Ejecutando backtest..."
+    },
+    "errors": {
+      "title": "Error de backtest",
+      "noAssets": "Añade al menos un activo activo con valor positivo para ejecutar el backtest.",
+      "invalidInvestment": "La inversión inicial debe ser mayor que 0.",
+      "calculationFailed": "Falló el backtest: {{message}}"
+    },
+    "assumptions": {
+      "marketCoverage": "Cobertura de datos de mercado: {{requested}} ticker(s) solicitados, {{failed}} ticker(s) sin historial utilizable.",
+      "failedTickers": "Se aplicaron supuestos para: {{tickers}}.",
+      "usedNotice": "{{count}} activo(s) requirieron supuestos de respaldo.",
+      "source": "Fuente de supuestos: {{source}}"
+    },
+    "metrics": {
+      "title": "Resumen del backtest",
+      "cagr": "CAGR",
+      "totalReturn": "Rentabilidad total",
+      "annualizedVolatility": "Volatilidad anualizada",
+      "maxDrawdown": "Drawdown máximo",
+      "bestYear": "Mejor año",
+      "worstYear": "Peor año",
+      "finalValue": "Valor final"
+    },
+    "charts": {
+      "growthTitle": "Crecimiento en el tiempo",
+      "growthLegend": "Valor de la cartera",
+      "drawdownTitle": "Perfil de drawdown",
+      "drawdownLegend": "Drawdown"
+    },
+    "table": {
+      "title": "Serie año por año",
+      "year": "Año",
+      "annualReturn": "Rentabilidad anual",
+      "endValue": "Valor al cierre",
+      "drawdown": "Drawdown",
+      "dataSource": "Fuente de datos",
+      "marketData": "Datos de mercado",
+      "assumptionData": "Supuestos",
+      "mixedData": "Mixto"
+    }
+  },
   "about": {
     "appInfo": "Información de la app",
     "appVersion": "Versión",

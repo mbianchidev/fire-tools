@@ -29,6 +29,27 @@ Prices are fetched directly from your browser to Yahoo Finance. No backend
 proxy, no third-party analytics — the request is opt-in and only fires when
 you press **Refresh prices**.
 
+## Portfolio backtesting
+
+Use **Portfolio backtest** to run a historical simulation of your current
+allocation and inspect:
+
+- CAGR
+- Total return
+- Annualized volatility
+- Max drawdown
+- Best/worst year
+- Final value of your starting investment
+- Year-by-year growth + drawdown series
+
+The model is **buy-and-hold** (no periodic rebalancing). If an asset has a
+ticker with enough Yahoo Finance history, the app uses real market data.
+When history is missing (or the asset has no ticker), Fire Tools applies
+deterministic per-asset-class assumptions so the run remains reproducible.
+
+Assumptions are documented in `src/utils/backtestCalculator.ts` and can be
+updated there in one place.
+
 ## Export / Import
 
 Use **Export CSV** to grab a snapshot. Use **Import CSV** to load it back, or

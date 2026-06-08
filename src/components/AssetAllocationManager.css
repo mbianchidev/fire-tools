@@ -428,6 +428,85 @@
   background: var(--color-action-excluded);
 }
 
+.backtest-section {
+  margin-top: 1rem;
+}
+
+.backtest-header {
+  margin-bottom: 0.5rem;
+}
+
+.backtest-model-note {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 1rem;
+}
+
+.backtest-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.backtest-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 200px;
+}
+
+.backtest-control span {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.backtest-fetch-status,
+.backtest-assumptions-note {
+  margin-top: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.backtest-summary {
+  margin-top: 1.5rem;
+}
+
+.backtest-summary h4,
+.chart-card h4,
+.backtest-series-table h4 {
+  margin: 0 0 0.75rem;
+  color: var(--text-primary);
+}
+
+.backtest-summary-table th {
+  width: 25%;
+}
+
+.backtest-summary-table td {
+  font-weight: 600;
+}
+
+.backtest-charts-row {
+  margin-top: 1.5rem;
+}
+
+.chart-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.backtest-series-table {
+  margin-top: 1.5rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .charts-row {
@@ -453,6 +532,10 @@
   .action-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .backtest-control {
+    min-width: 100%;
   }
 }
 

@@ -27,6 +27,7 @@ import { DCAHelperDialog } from './DCAHelperDialog';
 import { DataManagement } from './DataManagement';
 import { ScrollToTopButton } from './ScrollToTopButton';
 import { PrivacyBlur } from './PrivacyBlur';
+import { BacktestSection } from './BacktestSection';
 
 /**
  * Calculate cash delta from assets and targets.
@@ -804,6 +805,8 @@ export const AssetAllocationPage: React.FC = () => {
             </div>
           )}
         </section>
+
+        <BacktestSection assets={assets} currency={currency} isPrivacyMode={isPrivacyMode} />
 
         <section className="allocation-section" aria-labelledby="portfolio-details-heading" data-tour="asset-list">
           <div className="section-header-with-actions">

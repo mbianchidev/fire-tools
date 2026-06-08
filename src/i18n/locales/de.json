@@ -2539,6 +2539,59 @@
       "dismiss": "Verwerfen"
     }
   },
+  "backtest": {
+    "title": "Portfolio-Backtest",
+    "description": "Führe eine deterministische historische Simulation deiner aktuellen Allokation aus und analysiere Wachstum, Drawdowns und Jahresrenditen.",
+    "model": {
+      "buyAndHold": "Modell: Buy-and-hold (kein periodisches Rebalancing). Fehlende Historie wird durch deterministische Asset-Klassen-Annahmen ersetzt."
+    },
+    "controls": {
+      "initialInvestment": "Startinvestment",
+      "lookbackYears": "Rückblickzeitraum",
+      "lookbackOption": "{{years}} Jahre",
+      "run": "Backtest starten",
+      "running": "Backtest läuft..."
+    },
+    "errors": {
+      "title": "Backtest-Fehler",
+      "noAssets": "Füge mindestens ein aktives Asset mit positivem Wert hinzu, um den Backtest auszuführen.",
+      "invalidInvestment": "Das Startinvestment muss größer als 0 sein.",
+      "calculationFailed": "Backtest fehlgeschlagen: {{message}}"
+    },
+    "assumptions": {
+      "marketCoverage": "Marktdatenabdeckung: {{requested}} Ticker angefragt, {{failed}} Ticker ohne nutzbare Historie.",
+      "failedTickers": "Für folgende Ticker wurden Annahmen verwendet: {{tickers}}.",
+      "usedNotice": "Für {{count}} Asset(s) waren Fallback-Annahmen erforderlich.",
+      "source": "Quelle der Annahmen: {{source}}"
+    },
+    "metrics": {
+      "title": "Backtest-Zusammenfassung",
+      "cagr": "CAGR",
+      "totalReturn": "Gesamtrendite",
+      "annualizedVolatility": "Annualisierte Volatilität",
+      "maxDrawdown": "Maximaler Drawdown",
+      "bestYear": "Bestes Jahr",
+      "worstYear": "Schlechtestes Jahr",
+      "finalValue": "Endwert"
+    },
+    "charts": {
+      "growthTitle": "Wachstum im Zeitverlauf",
+      "growthLegend": "Portfoliowert",
+      "drawdownTitle": "Drawdown-Verlauf",
+      "drawdownLegend": "Drawdown"
+    },
+    "table": {
+      "title": "Jahresreihe",
+      "year": "Jahr",
+      "annualReturn": "Jahresrendite",
+      "endValue": "Endwert",
+      "drawdown": "Drawdown",
+      "dataSource": "Datenquelle",
+      "marketData": "Marktdaten",
+      "assumptionData": "Annahmen",
+      "mixedData": "Gemischt"
+    }
+  },
   "about": {
     "appInfo": "App-Informationen",
     "appVersion": "Version",

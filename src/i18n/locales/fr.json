@@ -2539,6 +2539,59 @@
       "dismiss": "Ignorer"
     }
   },
+  "backtest": {
+    "title": "Backtest du portefeuille",
+    "description": "Lance une simulation historique déterministe de ton allocation actuelle et analyse la croissance, les drawdowns et les rendements annuels.",
+    "model": {
+      "buyAndHold": "Modèle : buy-and-hold (sans rééquilibrage périodique). Si l'historique d'un actif manque, des hypothèses déterministes par classe sont utilisées."
+    },
+    "controls": {
+      "initialInvestment": "Investissement initial",
+      "lookbackYears": "Fenêtre historique",
+      "lookbackOption": "{{years}} ans",
+      "run": "Lancer le backtest",
+      "running": "Backtest en cours..."
+    },
+    "errors": {
+      "title": "Erreur de backtest",
+      "noAssets": "Ajoute au moins un actif actif avec une valeur positive pour lancer le backtest.",
+      "invalidInvestment": "L'investissement initial doit être supérieur à 0.",
+      "calculationFailed": "Échec du backtest : {{message}}"
+    },
+    "assumptions": {
+      "marketCoverage": "Couverture des données de marché : {{requested}} ticker(s) demandés, {{failed}} ticker(s) sans historique exploitable.",
+      "failedTickers": "Des hypothèses de remplacement ont été appliquées pour : {{tickers}}.",
+      "usedNotice": "{{count}} actif(s) ont nécessité des hypothèses de remplacement.",
+      "source": "Source des hypothèses : {{source}}"
+    },
+    "metrics": {
+      "title": "Résumé du backtest",
+      "cagr": "CAGR",
+      "totalReturn": "Rendement total",
+      "annualizedVolatility": "Volatilité annualisée",
+      "maxDrawdown": "Drawdown maximal",
+      "bestYear": "Meilleure année",
+      "worstYear": "Pire année",
+      "finalValue": "Valeur finale"
+    },
+    "charts": {
+      "growthTitle": "Croissance dans le temps",
+      "growthLegend": "Valeur du portefeuille",
+      "drawdownTitle": "Profil de drawdown",
+      "drawdownLegend": "Drawdown"
+    },
+    "table": {
+      "title": "Série année par année",
+      "year": "Année",
+      "annualReturn": "Rendement annuel",
+      "endValue": "Valeur de fin d'année",
+      "drawdown": "Drawdown",
+      "dataSource": "Source de données",
+      "marketData": "Données de marché",
+      "assumptionData": "Hypothèses",
+      "mixedData": "Mixte"
+    }
+  },
   "about": {
     "appInfo": "Informations sur l'application",
     "appVersion": "Version",
