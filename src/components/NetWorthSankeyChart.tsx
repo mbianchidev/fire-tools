@@ -31,24 +31,71 @@ interface NodeRendererProps {
   width: number;
   height: number;
   index: number;
-  payload: { name: string; fill: string; value: number };
+  payload: { name: string; fill: string; value: number; level?: number };
   currency: SupportedCurrency;
   isPrivacyMode: boolean;
 }
 
+/** Label background halo so "above" category labels stay readable over flows. */
+const LABEL_HALO = '#0B0E14';
+
 function CustomNode({ x, y, width, height, payload, currency, isPrivacyMode }: NodeRendererProps) {
   const fill = payload.fill ?? '#2DD4BF';
-  const isLeft = x < 200;
-  const labelX = isLeft ? x + width + 8 : x - 8;
-  const textAnchor = isLeft ? 'start' : 'end';
+  // Role comes from the graph (level), not a brittle x-threshold.
+  const level = payload.level ?? (x < 200 ? 0 : 2);
   const valueLabel = formatAmount(payload.value, currency, isPrivacyMode);
+  const cy = y + height / 2;
+
+  // Category nodes (middle column) carry many flows on both sides, so their
+  // labels go ABOVE the node — centered, with a dark halo for legibility.
+  if (level === 1) {
+    const labelX = x + width / 2;
+    const nameY = Math.max(12, y - 18);
+    return (
+      <g>
+        <rect x={x} y={y} width={width} height={height} fill={fill} rx={2} />
+        <text
+          x={labelX}
+          y={nameY}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#F8FAFC"
+          fontSize={11}
+          fontWeight={600}
+          stroke={LABEL_HALO}
+          strokeWidth={3}
+          style={{ paintOrder: 'stroke' }}
+        >
+          {payload.name}
+        </text>
+        <text
+          x={labelX}
+          y={nameY + 13}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill="#CBD5E1"
+          fontSize={10}
+          stroke={LABEL_HALO}
+          strokeWidth={3}
+          style={{ paintOrder: 'stroke' }}
+        >
+          {valueLabel}
+        </text>
+      </g>
+    );
+  }
+
+  // Root (level 0) → label in the left margin; leaves (level 2) → right margin.
+  const isRoot = level === 0;
+  const labelX = isRoot ? x - 8 : x + width + 8;
+  const textAnchor = isRoot ? 'end' : 'start';
 
   return (
     <g>
       <rect x={x} y={y} width={width} height={height} fill={fill} rx={2} />
       <text
         x={labelX}
-        y={y + height / 2 - 6}
+        y={cy - 6}
         textAnchor={textAnchor}
         dominantBaseline="middle"
         fill="#F8FAFC"
@@ -59,7 +106,7 @@ function CustomNode({ x, y, width, height, payload, currency, isPrivacyMode }: N
       </text>
       <text
         x={labelX}
-        y={y + height / 2 + 8}
+        y={cy + 8}
         textAnchor={textAnchor}
         dominantBaseline="middle"
         fill="#94A3B8"
@@ -104,8 +151,8 @@ function CustomLink({
     <g>
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={sourceFill} stopOpacity={0.55} />
-          <stop offset="100%" stopColor={targetFill} stopOpacity={0.3} />
+          <stop offset="0%" stopColor={sourceFill} stopOpacity={0.45} />
+          <stop offset="100%" stopColor={targetFill} stopOpacity={0.2} />
         </linearGradient>
       </defs>
       <path
@@ -148,12 +195,12 @@ export function NetWorthSankeyChart({
   return (
     <div className="sankey-chart-wrapper" aria-label={t('netWorth.sankey.title')}>
       <Sankey
-        width={900}
-        height={380}
+        width={920}
+        height={420}
         data={sankeyData}
         nodeWidth={18}
-        nodePadding={14}
-        margin={{ top: 10, right: 160, bottom: 10, left: 160 }}
+        nodePadding={26}
+        margin={{ top: 36, right: 150, bottom: 18, left: 150 }}
         sort={false}
         node={(nodeProps) => (
           <CustomNode

@@ -8,6 +8,8 @@ import { MonthlySnapshot, ASSET_CLASSES, ACCOUNT_TYPES, PENSION_TYPES } from '..
 export interface SankeyNodeEntry {
   name: string;
   fill: string;
+  /** Graph depth: 0 = total portfolio (root), 1 = category, 2 = sub-category (leaf). */
+  level: 0 | 1 | 2;
 }
 
 export interface SankeyLinkEntry {
@@ -99,8 +101,8 @@ export function buildSankeyData(
   const nodes: SankeyNodeEntry[] = [];
   const links: SankeyLinkEntry[] = [];
 
-  function addNode(name: string, fill: string): number {
-    nodes.push({ name, fill });
+  function addNode(name: string, fill: string, level: 0 | 1 | 2): number {
+    nodes.push({ name, fill, level });
     return nodes.length - 1;
   }
 
@@ -138,10 +140,10 @@ export function buildSankeyData(
 
   if (totalPortfolio < MIN_CHART_VALUE) return { nodes: [], links: [] };
 
-  const portfolioIdx = addNode(t('netWorth.sankey.totalPortfolio'), '#2DD4BF');
+  const portfolioIdx = addNode(t('netWorth.sankey.totalPortfolio'), '#2DD4BF', 0);
 
   if (totalInvestments > 0) {
-    const investmentsIdx = addNode(t('netWorth.sankey.investments'), '#3B82F6');
+    const investmentsIdx = addNode(t('netWorth.sankey.investments'), '#3B82F6', 1);
     links.push({ source: portfolioIdx, target: investmentsIdx, value: totalInvestments });
 
     for (const [assetClass, value] of investmentsByClass.entries()) {
@@ -150,14 +152,15 @@ export function buildSankeyData(
       const fallbackName = ASSET_CLASSES.find(c => c.id === assetClass)?.name ?? assetClass;
       const classIdx = addNode(
         i18nKey ? t(i18nKey) : fallbackName,
-        ASSET_CLASS_COLORS[assetClass] ?? '#94A3B8'
+        ASSET_CLASS_COLORS[assetClass] ?? '#94A3B8',
+        2
       );
       links.push({ source: investmentsIdx, target: classIdx, value });
     }
   }
 
   if (totalCash > 0) {
-    const cashIdx = addNode(t('netWorth.sankey.cashLiquidity'), '#06B6D4');
+    const cashIdx = addNode(t('netWorth.sankey.cashLiquidity'), '#06B6D4', 1);
     links.push({ source: portfolioIdx, target: cashIdx, value: totalCash });
 
     for (const [accountType, balance] of cashByType.entries()) {
@@ -166,14 +169,15 @@ export function buildSankeyData(
       const fallbackName = ACCOUNT_TYPES.find(c => c.id === accountType)?.name ?? accountType;
       const typeIdx = addNode(
         i18nKey ? t(i18nKey) : fallbackName,
-        CASH_TYPE_COLORS[accountType] ?? '#94A3B8'
+        CASH_TYPE_COLORS[accountType] ?? '#94A3B8',
+        2
       );
       links.push({ source: cashIdx, target: typeIdx, value: balance });
     }
   }
 
   if (totalPension > 0 && showPension) {
-    const pensionIdx = addNode(t('netWorth.sankey.pension'), '#A855F7');
+    const pensionIdx = addNode(t('netWorth.sankey.pension'), '#A855F7', 1);
     links.push({ source: portfolioIdx, target: pensionIdx, value: totalPension });
 
     for (const [pensionType, value] of pensionByType.entries()) {
@@ -182,7 +186,8 @@ export function buildSankeyData(
       const fallbackName = PENSION_TYPES.find(c => c.id === pensionType)?.name ?? pensionType;
       const typeIdx = addNode(
         i18nKey ? t(i18nKey) : fallbackName,
-        PENSION_TYPE_COLORS[pensionType] ?? '#94A3B8'
+        PENSION_TYPE_COLORS[pensionType] ?? '#94A3B8',
+        2
       );
       links.push({ source: pensionIdx, target: typeIdx, value });
     }

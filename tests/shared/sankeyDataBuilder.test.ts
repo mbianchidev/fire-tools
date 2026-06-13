@@ -85,6 +85,39 @@ describe('buildSankeyData', () => {
     expect(result.links.length).toBe(6);
   });
 
+  it('assigns graph levels: 0 root, 1 category, 2 leaf', () => {
+    const snapshot = {
+      ...makeSnapshot(),
+      assets: [
+        { id: '1', ticker: 'AAPL', name: 'Apple', shares: 1, pricePerShare: 100, currency: 'EUR' as const, assetClass: 'STOCKS' as const },
+      ],
+      cashEntries: [
+        { id: '2', accountName: 'Savings', accountType: 'SAVINGS' as const, balance: 500, currency: 'EUR' as const },
+      ],
+      pensions: [
+        { id: '3', name: 'Employer', currentValue: 200, currency: 'EUR' as const, pensionType: 'EMPLOYER' as const },
+      ],
+    };
+    const result = buildSankeyData(snapshot, true, t);
+    // Root portfolio node
+    expect(result.nodes[0].level).toBe(0);
+    // Category nodes (Investments, Cash, Pension)
+    const categoryNames = [
+      'netWorth.sankey.investments',
+      'netWorth.sankey.cashLiquidity',
+      'netWorth.sankey.pension',
+    ];
+    for (const node of result.nodes) {
+      if (categoryNames.includes(node.name)) {
+        expect(node.level).toBe(1);
+      }
+    }
+    // Exactly one root, three categories, rest leaves
+    expect(result.nodes.filter(n => n.level === 0)).toHaveLength(1);
+    expect(result.nodes.filter(n => n.level === 1)).toHaveLength(3);
+    expect(result.nodes.filter(n => n.level === 2)).toHaveLength(3);
+  });
+
   it('excludes pension nodes when showPension is false', () => {
     const snapshot = {
       ...makeSnapshot(),
