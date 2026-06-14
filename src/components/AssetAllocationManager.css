@@ -2662,6 +2662,18 @@ select:disabled {
 .breakdown-page-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.5rem;
   text-decoration: none;
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  color: white;
+}
+
+.breakdown-page-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.45);
+  color: white;
+}
+
+.breakdown-page-link .material-symbols-outlined {
+  font-size: 1.15rem;
 }
