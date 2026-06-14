@@ -14,18 +14,27 @@ const TOOLS: ToolItem[] = [
   { to: '/monte-carlo', icon: 'casino', label: NAVBAR_LABELS.monteCarlo },
   { to: '/investment-growth', icon: 'trending_up', label: NAVBAR_LABELS.investmentGrowth },
   { to: '/withdrawal-rate', icon: 'trending_down', label: NAVBAR_LABELS.withdrawalRate },
+  { to: '/portfolio-backtest', icon: 'analytics', label: NAVBAR_LABELS.portfolioBacktest },
   { to: '/debt-payoff', icon: 'credit_score', label: NAVBAR_LABELS.debtPayoff },
 ];
 
+const PORTFOLIO_BREAKDOWN_TOOL: ToolItem = {
+  to: '/portfolio-breakdown',
+  icon: 'donut_large',
+  label: NAVBAR_LABELS.portfolioBreakdown,
+};
+
 interface ToolsMenuProps {
   onNavigate?: () => void;
+  showPortfolioBreakdown?: boolean;
 }
 
-export const ToolsMenu: React.FC<ToolsMenuProps> = ({ onNavigate }) => {
+export const ToolsMenu: React.FC<ToolsMenuProps> = ({ onNavigate, showPortfolioBreakdown = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const isActive = TOOLS.some((t) => location.pathname === t.to);
+  const tools = showPortfolioBreakdown ? [...TOOLS, PORTFOLIO_BREAKDOWN_TOOL] : TOOLS;
+  const isActive = tools.some((t) => location.pathname === t.to);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,7 +79,7 @@ export const ToolsMenu: React.FC<ToolsMenuProps> = ({ onNavigate }) => {
 
       {isOpen && (
         <div className="tools-menu-dropdown" role="menu">
-          {TOOLS.map((tool) => (
+          {tools.map((tool) => (
             <Link
               key={tool.to}
               to={tool.to}

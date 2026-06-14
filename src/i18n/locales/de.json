@@ -117,6 +117,14 @@
         "h3": "Sparquoten-Feedback",
         "cta": "Wachstum projizieren →"
       },
+      "portfolioBacktest": {
+        "title": "Portfolio-Backtest",
+        "body": "Simuliere dein Asset-Allocation-Portfolio mit historischen Renditen und analysiere CAGR, Volatilität, Drawdowns und Jahreswerte.",
+        "h1": "Historisches Wachstum",
+        "h2": "Drawdown-Analyse",
+        "h3": "Jahrestabelle",
+        "cta": "Backtest starten →"
+      },
       "withdrawalRate": {
         "title": "Entnahmeraten-Simulator",
         "body": "Belastungstest deines Ruhestandsportfolios bei verschiedenen Entnahmeraten mit einem Live-Schieberegler, basierend auf der 4-%-Regel der Trinity-Studie.",
@@ -545,7 +553,8 @@
     "updatedAssets": "{{count}} Vermögenswert aktualisiert",
     "validationErrors": "Validation Errors",
     "viewAssetClassDetails": "Anlageklassendetails anzeigen:",
-    "viewDetailedPortfolioBreakdown": "View Detailed Portfolio Breakdown"
+    "viewDetailedPortfolioBreakdown": "View Detailed Portfolio Breakdown",
+    "viewPortfolioBacktest": "Portfolio-Backtest öffnen"
   },
   "expenseTracker": {
     "actions": "Aktionen",
@@ -802,7 +811,42 @@
     "value": "Wert",
     "year": "Jahr",
     "yearToDateProgress": "Year to Date Progress",
-    "ytdChange": "YTD-Änderung"
+    "ytdChange": "YTD-Änderung",
+    "sankey": {
+      "title": "Vermögensfluss",
+      "subtitle": "Zusammensetzung Ihres Nettovermögens für diesen Monat",
+      "totalPortfolio": "Gesamtportfolio",
+      "investments": "Investitionen",
+      "cashLiquidity": "Barmittel & Liquidität",
+      "pension": "Rente",
+      "noData": "Keine Daten für diesen Monat. Fügen Sie Vermögenswerte, Kasseneinträge oder Renten hinzu.",
+      "assetClasses": {
+        "stocks": "Aktien",
+        "etf": "ETF",
+        "bonds": "Anleihen",
+        "crypto": "Krypto",
+        "realEstate": "Immobilien",
+        "privateEquity": "Private Equity",
+        "vehicle": "Fahrzeug",
+        "collectible": "Sammlerstück",
+        "art": "Kunst",
+        "commodities": "Rohstoffe",
+        "other": "Sonstige"
+      },
+      "accountTypes": {
+        "savings": "Sparkonto",
+        "checking": "Girokonto",
+        "brokerage": "Brokerkonto",
+        "creditCard": "Kreditkarte",
+        "other": "Sonstiges"
+      },
+      "pensionTypes": {
+        "state": "Staatliche Rente",
+        "private": "Private Rente",
+        "employer": "Betriebliche Rente",
+        "other": "Sonstige Rente"
+      }
+    }
   },
   "notFound": {
     "backHome": "Back to Home",
@@ -840,7 +884,7 @@
         "title": "Nach Region"
       },
       "sector": {
-        "description": "Individual stocks use their listed sector from Yahoo Finance. ETFs use a sector label inferred from their fund name (e.g. \"Technology\", \"Government Bonds\"), as Yahoo no longer exposes per-ETF holdings without authentication.",
+        "description": "Industry-sector mix (e.g. Technology, Financial Services, Consumer goods). Individual stocks use their listed sector from Yahoo Finance. Broad-market ETFs are expanded into industry sectors using approximate weightings for well-known indices (e.g. S&P 500, MSCI World, FTSE All-World), since Yahoo no longer exposes per-ETF holdings without authentication. Bond, commodity, and single-sector funds keep their own label.",
         "title": "Nach Sektor"
       }
     },
@@ -2540,6 +2584,68 @@
       "dismiss": "Verwerfen"
     }
   },
+  "backtest": {
+    "pageTitle": "Portfolio-Backtest",
+    "pageDescription": "Teste die in der Asset Allocation gespeicherten Bestände historisch. Das Tool nutzt aktuelle Asset-Werte als Gewichtung und setzt das Startinvestment standardmäßig auf den aktuellen aktiven Allokationswert.",
+    "title": "Portfolio-Backtest",
+    "description": "Führe eine deterministische historische Simulation deiner aktuellen Allokation aus und analysiere Wachstum, Drawdowns und Jahresrenditen.",
+    "model": {
+      "buyAndHold": "Modell: Buy-and-hold (kein periodisches Rebalancing). Fehlende Historie wird durch deterministische Asset-Klassen-Annahmen ersetzt."
+    },
+    "controls": {
+      "initialInvestment": "Startinvestment",
+      "defaultInitialInvestmentNote": "Standard ist die aktuelle Asset-Allocation-Summe: {{amount}}.",
+      "finalValueExplanation": "Der Endwert ist der simulierte Endwert des hier eingetragenen Startinvestments, kein separater Live-Portfoliostand.",
+      "lookbackYears": "Rückblickzeitraum",
+      "lookbackOption": "{{years}} Jahre",
+      "run": "Backtest starten",
+      "running": "Backtest läuft..."
+    },
+    "errors": {
+      "title": "Backtest-Fehler",
+      "noAssets": "Füge mindestens ein aktives Asset mit positivem Wert hinzu, um den Backtest auszuführen.",
+      "invalidInvestment": "Das Startinvestment muss größer als 0 sein.",
+      "calculationFailed": "Backtest fehlgeschlagen: {{message}}"
+    },
+    "assumptions": {
+      "marketCoverage": "Marktdatenabdeckung: {{requested}} Ticker angefragt, {{failed}} Ticker ohne nutzbare Historie.",
+      "failedTickers": "Für folgende Ticker wurden Annahmen verwendet: {{tickers}}.",
+      "usedNotice": "Für {{count}} Asset(s) waren Fallback-Annahmen erforderlich.",
+      "source": "Quelle der Annahmen: {{source}}"
+    },
+    "source": {
+      "currentAllocationValue": "Aktueller Asset-Allocation-Wert:",
+      "usesAssetAllocation": "Gewichtungen und Ticker kommen aus der Asset Allocation. Bearbeite diese Seite, um den Backtest zu ändern.",
+      "editAllocation": "Asset Allocation bearbeiten"
+    },
+    "metrics": {
+      "title": "Backtest-Zusammenfassung",
+      "cagr": "CAGR",
+      "totalReturn": "Gesamtrendite",
+      "annualizedVolatility": "Annualisierte Volatilität",
+      "maxDrawdown": "Maximaler Drawdown",
+      "bestYear": "Bestes Jahr",
+      "worstYear": "Schlechtestes Jahr",
+      "finalValue": "Endwert"
+    },
+    "charts": {
+      "growthTitle": "Wachstum im Zeitverlauf",
+      "growthLegend": "Portfoliowert",
+      "drawdownTitle": "Drawdown-Verlauf",
+      "drawdownLegend": "Drawdown"
+    },
+    "table": {
+      "title": "Jahresreihe",
+      "year": "Jahr",
+      "annualReturn": "Jahresrendite",
+      "endValue": "Endwert",
+      "drawdown": "Drawdown",
+      "dataSource": "Datenquelle",
+      "marketData": "Marktdaten",
+      "assumptionData": "Annahmen",
+      "mixedData": "Gemischt"
+    }
+  },
   "about": {
     "appInfo": "App-Informationen",
     "appVersion": "Version",
@@ -2586,5 +2692,35 @@
       "EXPORT_DATA": "Daten exportiert",
       "CLEAR_DATA": "Daten gelöscht"
     }
+  },
+  "withdrawalRate": {
+    "inputType": {
+      "label": "Ich gebe diese Rate ein als",
+      "help": "Wählen Sie aus, welches Entnahmeraten-Konzept Ihre Eingabe darstellt. Die anderen beiden werden daraus abgeleitet."
+    },
+    "types": {
+      "swr": "Sichere Entnahmerate (SWR)",
+      "ltwr": "Langfristige Entnahmerate (LTWR)",
+      "pwr": "Ewige Entnahmerate (PWR)"
+    },
+    "short": {
+      "swr": "SWR",
+      "ltwr": "LTWR",
+      "pwr": "PWR"
+    },
+    "explanations": {
+      "swr": "Maximale inflationsbereinigte Rate, die das Portfolio über Ihren Zeitraum von {{years}} Jahren nicht erschöpft.",
+      "ltwr": "Nachhaltiger Mittelweg über einen langen Zeitraum von {{years}} Jahren, in dem SWR und PWR konvergieren.",
+      "pwr": "Rate, die Ihr Kapital unbegrenzt erhält — typischerweise die konservativste."
+    },
+    "results": {
+      "heading": "Entnahmeraten-Optionen",
+      "description": "Sie geben eine Rate ein; die anderen beiden werden über die implizite Realrendite mit einem deterministischen Amortisationsmodell abgeleitet.",
+      "impliedRealReturn": "Implizite Realrendite",
+      "youEntered": "Eingegeben",
+      "derived": "Abgeleitet"
+    },
+    "principalWarning": "Ihre Eingabe impliziert eine nicht-positive Realrendite ({{rate}}), daher kann keine positive Rate das Kapital dauerhaft erhalten. Die ewige Rate wird als 0% angezeigt.",
+    "ltwrHorizonNote": "LTWR verwendet einen festen langfristigen Zeitraum von {{years}} Jahren."
   }
 }

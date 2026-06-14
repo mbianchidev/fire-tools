@@ -16,6 +16,7 @@ import { ReverseFIRECalculatorPage } from './components/ReverseFIRECalculatorPag
 import { InvestmentGrowthPage } from './components/InvestmentGrowthPage';
 import { WithdrawalRatePage } from './components/WithdrawalRatePage';
 import { AssetAllocationPage } from './components/AssetAllocationPage';
+import { PortfolioBacktestPage } from './components/PortfolioBacktestPage';
 import { PortfolioBreakdownPage } from './components/PortfolioBreakdownPage';
 import { ExpenseTrackerPage } from './components/ExpenseTrackerPage';
 import { NetWorthTrackerPage } from './components/NetWorthTrackerPage';
@@ -100,16 +101,6 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
         >
           <MaterialIcon name="pie_chart" className="nav-icon" /> {NAVBAR_LABELS.assetAllocation}
         </Link>
-        {showPortfolioBreakdown && (
-          <Link
-            to="/portfolio-breakdown"
-            className={`nav-link ${location.pathname === '/portfolio-breakdown' ? 'active' : ''}`}
-            onClick={closeMenu}
-            aria-current={location.pathname === '/portfolio-breakdown' ? 'page' : undefined}
-          >
-            <MaterialIcon name="donut_large" className="nav-icon" /> {NAVBAR_LABELS.portfolioBreakdown}
-          </Link>
-        )}
         <Link
           to="/expense-tracker"
           className={`nav-link ${location.pathname === '/expense-tracker' ? 'active' : ''}`}
@@ -134,7 +125,7 @@ function Navigation({ accountName, showPortfolioBreakdown }: { accountName: stri
         >
           <MaterialIcon name="local_fire_department" className="nav-icon" /> {NAVBAR_LABELS.fireCalculator}
         </Link>
-        <ToolsMenu onNavigate={closeMenu} />
+        <ToolsMenu onNavigate={closeMenu} showPortfolioBreakdown={showPortfolioBreakdown} />
       </div>
       <div className="nav-actions">
         <NotificationBell />
@@ -574,6 +565,7 @@ function App() {
             <Route path="/investment-growth" element={<InvestmentGrowthPage />} />
             <Route path="/withdrawal-rate" element={<WithdrawalRatePage />} />
             <Route path="/asset-allocation" element={<AssetAllocationPage />} />
+            <Route path="/portfolio-backtest" element={<PortfolioBacktestPage />} />
             <Route path="/portfolio-breakdown" element={settings.experimentalFeatures?.portfolioBreakdown ? <PortfolioBreakdownPage /> : <NotFoundPage />} />
             <Route path="/expense-tracker" element={<ExpenseTrackerPage />} />
             <Route path="/net-worth-tracker" element={<NetWorthTrackerPage />} />

@@ -73,8 +73,17 @@ four** places to keep the contract in sync:
 - **Run calculation / export / import** — `src/App.tsx` (`FIRECalculatorPage`).
   `RUN_CALCULATION` is debounced (~1.5 s) and skips the first render, because
   the calculator recomputes automatically on every input change.
+- **Withdrawal-rate run** — `src/components/WithdrawalRatePage.tsx` logs
+  `RUN_CALCULATION` (`tool: 'withdrawal-rate'`), debounced + skip-first like the
+  FIRE calculator since the sweep recomputes reactively.
+- **Portfolio backtest** — `src/components/BacktestSection.tsx` logs
+  `RUN_CALCULATION` (`tool: 'portfolio-backtest'`) on a successful run; this is
+  an explicit button press, so it's logged directly (no debounce).
 - **Settings change** — `src/components/SettingsPage.tsx` (`UPDATE_SETTINGS`,
   logging only the changed key name).
+
+> The Net-worth **Sankey** view is a passive visualization, not a user action,
+> so it is intentionally not audited.
 
 > **Why not instrument everything?** The log is a UX affordance, not telemetry.
 > We cover the main flows cleanly rather than emitting noise.

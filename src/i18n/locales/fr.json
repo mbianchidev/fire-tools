@@ -117,6 +117,14 @@
         "h3": "Feedback sur le taux d'épargne",
         "cta": "Projeter la croissance →"
       },
+      "portfolioBacktest": {
+        "title": "Backtest du portefeuille",
+        "body": "Simulez votre portefeuille d'allocation d'actifs avec des rendements historiques et analysez CAGR, volatilité, drawdowns et résultats annuels.",
+        "h1": "Croissance historique",
+        "h2": "Analyse des drawdowns",
+        "h3": "Table annuelle",
+        "cta": "Lancer le backtest →"
+      },
       "withdrawalRate": {
         "title": "Simulateur de taux de retrait",
         "body": "Testez la résistance de votre portefeuille de retraite à différents taux de retrait avec un curseur en temps réel, basé sur la règle des 4 % du Trinity Study.",
@@ -545,7 +553,8 @@
     "updatedAssets": "{{count}} actif mis à jour",
     "validationErrors": "Validation Errors",
     "viewAssetClassDetails": "Voir les détails de la classe d'actifs :",
-    "viewDetailedPortfolioBreakdown": "View Detailed Portfolio Breakdown"
+    "viewDetailedPortfolioBreakdown": "View Detailed Portfolio Breakdown",
+    "viewPortfolioBacktest": "Ouvrir le backtest du portefeuille"
   },
   "expenseTracker": {
     "actions": "Actions",
@@ -802,7 +811,42 @@
     "value": "Valeur",
     "year": "Année",
     "yearToDateProgress": "Year to Date Progress",
-    "ytdChange": "Variation YTD"
+    "ytdChange": "Variation YTD",
+    "sankey": {
+      "title": "Flux de Patrimoine",
+      "subtitle": "Composition de votre patrimoine net pour ce mois",
+      "totalPortfolio": "Portefeuille Total",
+      "investments": "Investissements",
+      "cashLiquidity": "Trésorerie & Liquidités",
+      "pension": "Retraite",
+      "noData": "Aucune donnée pour ce mois. Ajoutez des actifs, des entrées de trésorerie ou des retraites pour voir le graphique.",
+      "assetClasses": {
+        "stocks": "Actions",
+        "etf": "ETF",
+        "bonds": "Obligations",
+        "crypto": "Crypto",
+        "realEstate": "Immobilier",
+        "privateEquity": "Capital Investissement",
+        "vehicle": "Véhicule",
+        "collectible": "Objet de Collection",
+        "art": "Art",
+        "commodities": "Matières Premières",
+        "other": "Autre"
+      },
+      "accountTypes": {
+        "savings": "Épargne",
+        "checking": "Compte Courant",
+        "brokerage": "Courtage",
+        "creditCard": "Carte de Crédit",
+        "other": "Autre Trésorerie"
+      },
+      "pensionTypes": {
+        "state": "Retraite de l'État",
+        "private": "Retraite Privée",
+        "employer": "Retraite Employeur",
+        "other": "Autre Retraite"
+      }
+    }
   },
   "notFound": {
     "backHome": "Back to Home",
@@ -840,7 +884,7 @@
         "title": "Par région"
       },
       "sector": {
-        "description": "Individual stocks use their listed sector from Yahoo Finance. ETFs use a sector label inferred from their fund name (e.g. \"Technology\", \"Government Bonds\"), as Yahoo no longer exposes per-ETF holdings without authentication.",
+        "description": "Industry-sector mix (e.g. Technology, Financial Services, Consumer goods). Individual stocks use their listed sector from Yahoo Finance. Broad-market ETFs are expanded into industry sectors using approximate weightings for well-known indices (e.g. S&P 500, MSCI World, FTSE All-World), since Yahoo no longer exposes per-ETF holdings without authentication. Bond, commodity, and single-sector funds keep their own label.",
         "title": "Par secteur"
       }
     },
@@ -2540,6 +2584,68 @@
       "dismiss": "Ignorer"
     }
   },
+  "backtest": {
+    "pageTitle": "Backtest du portefeuille",
+    "pageDescription": "Backtestez les positions enregistrées dans l'allocation d'actifs. L'outil utilise les valeurs actuelles comme pondérations et prend par défaut la valeur actuelle active comme investissement initial.",
+    "title": "Backtest du portefeuille",
+    "description": "Lance une simulation historique déterministe de ton allocation actuelle et analyse la croissance, les drawdowns et les rendements annuels.",
+    "model": {
+      "buyAndHold": "Modèle : buy-and-hold (sans rééquilibrage périodique). Si l'historique d'un actif manque, des hypothèses déterministes par classe sont utilisées."
+    },
+    "controls": {
+      "initialInvestment": "Investissement initial",
+      "defaultInitialInvestmentNote": "Par défaut, total actuel de l'allocation d'actifs : {{amount}}.",
+      "finalValueExplanation": "La valeur finale est la valeur simulée en fin de période de l'investissement initial saisi ici, pas un solde de portefeuille en direct séparé.",
+      "lookbackYears": "Fenêtre historique",
+      "lookbackOption": "{{years}} ans",
+      "run": "Lancer le backtest",
+      "running": "Backtest en cours..."
+    },
+    "errors": {
+      "title": "Erreur de backtest",
+      "noAssets": "Ajoute au moins un actif actif avec une valeur positive pour lancer le backtest.",
+      "invalidInvestment": "L'investissement initial doit être supérieur à 0.",
+      "calculationFailed": "Échec du backtest : {{message}}"
+    },
+    "assumptions": {
+      "marketCoverage": "Couverture des données de marché : {{requested}} ticker(s) demandés, {{failed}} ticker(s) sans historique exploitable.",
+      "failedTickers": "Des hypothèses de remplacement ont été appliquées pour : {{tickers}}.",
+      "usedNotice": "{{count}} actif(s) ont nécessité des hypothèses de remplacement.",
+      "source": "Source des hypothèses : {{source}}"
+    },
+    "source": {
+      "currentAllocationValue": "Valeur actuelle de l'allocation d'actifs :",
+      "usesAssetAllocation": "Les pondérations et tickers viennent de l'allocation d'actifs. Modifiez cette page pour changer le backtest.",
+      "editAllocation": "Modifier l'allocation d'actifs"
+    },
+    "metrics": {
+      "title": "Résumé du backtest",
+      "cagr": "CAGR",
+      "totalReturn": "Rendement total",
+      "annualizedVolatility": "Volatilité annualisée",
+      "maxDrawdown": "Drawdown maximal",
+      "bestYear": "Meilleure année",
+      "worstYear": "Pire année",
+      "finalValue": "Valeur finale"
+    },
+    "charts": {
+      "growthTitle": "Croissance dans le temps",
+      "growthLegend": "Valeur du portefeuille",
+      "drawdownTitle": "Profil de drawdown",
+      "drawdownLegend": "Drawdown"
+    },
+    "table": {
+      "title": "Série année par année",
+      "year": "Année",
+      "annualReturn": "Rendement annuel",
+      "endValue": "Valeur de fin d'année",
+      "drawdown": "Drawdown",
+      "dataSource": "Source de données",
+      "marketData": "Données de marché",
+      "assumptionData": "Hypothèses",
+      "mixedData": "Mixte"
+    }
+  },
   "about": {
     "appInfo": "Informations sur l'application",
     "appVersion": "Version",
@@ -2586,5 +2692,35 @@
       "EXPORT_DATA": "Données exportées",
       "CLEAR_DATA": "Données effacées"
     }
+  },
+  "withdrawalRate": {
+    "inputType": {
+      "label": "Je saisis ce taux comme",
+      "help": "Choisissez le concept de taux de retrait que représente votre saisie. Les deux autres en sont déduits."
+    },
+    "types": {
+      "swr": "Taux de Retrait Sûr (SWR)",
+      "ltwr": "Taux de Retrait à Long Terme (LTWR)",
+      "pwr": "Taux de Retrait Perpétuel (PWR)"
+    },
+    "short": {
+      "swr": "SWR",
+      "ltwr": "LTWR",
+      "pwr": "PWR"
+    },
+    "explanations": {
+      "swr": "Taux maximal ajusté de l'inflation qui évite d'épuiser le portefeuille sur votre horizon de {{years}} ans.",
+      "ltwr": "Juste milieu durable sur un long horizon de {{years}} ans, où le SWR et le PWR convergent.",
+      "pwr": "Taux qui préserve votre capital indéfiniment — généralement le plus prudent."
+    },
+    "results": {
+      "heading": "Options de taux de retrait",
+      "description": "Vous saisissez un taux ; les deux autres sont déduits du rendement réel implicite à l'aide d'un modèle d'amortissement déterministe.",
+      "impliedRealReturn": "Rendement réel implicite",
+      "youEntered": "Saisi",
+      "derived": "Déduit"
+    },
+    "principalWarning": "Votre saisie implique un rendement réel non positif ({{rate}}), donc aucun taux positif ne peut préserver le capital indéfiniment. Le taux perpétuel est affiché à 0%.",
+    "ltwrHorizonNote": "Le LTWR utilise un horizon à long terme fixe de {{years}} ans."
   }
 }
