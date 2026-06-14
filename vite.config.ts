@@ -111,6 +111,7 @@ const PAGES_BASE = GITHUB_SLUG ? `/${GITHUB_SLUG.repo}/demo/` : '/demo/'
 const APP_PAGES_URL = GITHUB_SLUG
   ? `https://${GITHUB_SLUG.owner}.github.io${PAGES_BASE}`
   : ''
+const isPagesBuild = (mode: string): boolean => mode === 'production'
 
 if (!GITHUB_SLUG) {
   console.warn(
@@ -250,7 +251,27 @@ export default defineConfig(({ mode, command }) => ({
       : '/demo/',
   build: {
     outDir: mode === 'electron' ? 'dist-electron' : 'dist/demo',
+    rollupOptions: isPagesBuild(mode)
+      ? {
+          output: {
+            entryFileNames: 'assets/[name].js',
+            chunkFileNames: 'assets/[name].js',
+            assetFileNames: 'assets/[name][extname]',
+          },
+        }
+      : undefined,
   },
+  worker: isPagesBuild(mode)
+    ? {
+        rollupOptions: {
+          output: {
+            entryFileNames: 'assets/worker-[name].js',
+            chunkFileNames: 'assets/worker-[name].js',
+            assetFileNames: 'assets/worker-[name][extname]',
+          },
+        },
+      }
+    : undefined,
   define: {
     __APP_VERSION__: JSON.stringify(APP_VERSION),
     __APP_COMMIT_HASH__: JSON.stringify(APP_COMMIT_HASH),

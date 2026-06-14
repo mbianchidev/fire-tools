@@ -13,6 +13,7 @@ instead.
 - [Migrations & rollbacks](./migrations.md)
 - [Audit log](./audit-log.md)
 - [Logging & PII handling](./logging.md)
+- [GitHub Pages deploy](./github-pages.md)
 - [Cutting a release](./releasing.md)
 
 ## Architecture at a glance
