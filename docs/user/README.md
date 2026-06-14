@@ -13,6 +13,7 @@ walkthrough and a screenshot so you can see exactly what to expect.
 - [FIRE calculator](./fire-calculator.md)
 - [Monte Carlo simulation](./monte-carlo.md)
 - [Asset allocation manager](./asset-allocation.md)
+- [Portfolio backtest](./backtesting.md)
 - [Expense tracker](./expense-tracker.md)
 - [Net-worth tracker](./net-worth-tracker.md)
 - [Questionnaire (guided setup)](./questionnaire.md)

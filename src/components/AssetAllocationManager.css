@@ -464,6 +464,23 @@
   font-weight: 600;
 }
 
+.backtest-control-note,
+.backtest-final-value-note {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.backtest-final-value-note {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: -0.25rem 0 1rem;
+}
+
+.backtest-source-actions {
+  margin-top: 1rem;
+}
+
 .backtest-fetch-status,
 .backtest-assumptions-note {
   margin-top: 0.75rem;

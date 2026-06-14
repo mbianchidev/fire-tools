@@ -117,6 +117,14 @@
         "h3": "Feedback sur le taux d'épargne",
         "cta": "Projeter la croissance →"
       },
+      "portfolioBacktest": {
+        "title": "Backtest du portefeuille",
+        "body": "Simulez votre portefeuille d'allocation d'actifs avec des rendements historiques et analysez CAGR, volatilité, drawdowns et résultats annuels.",
+        "h1": "Croissance historique",
+        "h2": "Analyse des drawdowns",
+        "h3": "Table annuelle",
+        "cta": "Lancer le backtest →"
+      },
       "withdrawalRate": {
         "title": "Simulateur de taux de retrait",
         "body": "Testez la résistance de votre portefeuille de retraite à différents taux de retrait avec un curseur en temps réel, basé sur la règle des 4 % du Trinity Study.",
@@ -544,7 +552,8 @@
     "updatedAssets": "{{count}} actif mis à jour",
     "validationErrors": "Validation Errors",
     "viewAssetClassDetails": "Voir les détails de la classe d'actifs :",
-    "viewDetailedPortfolioBreakdown": "View Detailed Portfolio Breakdown"
+    "viewDetailedPortfolioBreakdown": "View Detailed Portfolio Breakdown",
+    "viewPortfolioBacktest": "Ouvrir le backtest du portefeuille"
   },
   "expenseTracker": {
     "actions": "Actions",
@@ -2540,6 +2549,8 @@
     }
   },
   "backtest": {
+    "pageTitle": "Backtest du portefeuille",
+    "pageDescription": "Backtestez les positions enregistrées dans l'allocation d'actifs. L'outil utilise les valeurs actuelles comme pondérations et prend par défaut la valeur actuelle active comme investissement initial.",
     "title": "Backtest du portefeuille",
     "description": "Lance une simulation historique déterministe de ton allocation actuelle et analyse la croissance, les drawdowns et les rendements annuels.",
     "model": {
@@ -2547,6 +2558,8 @@
     },
     "controls": {
       "initialInvestment": "Investissement initial",
+      "defaultInitialInvestmentNote": "Par défaut, total actuel de l'allocation d'actifs : {{amount}}.",
+      "finalValueExplanation": "La valeur finale est la valeur simulée en fin de période de l'investissement initial saisi ici, pas un solde de portefeuille en direct séparé.",
       "lookbackYears": "Fenêtre historique",
       "lookbackOption": "{{years}} ans",
       "run": "Lancer le backtest",
@@ -2563,6 +2576,11 @@
       "failedTickers": "Des hypothèses de remplacement ont été appliquées pour : {{tickers}}.",
       "usedNotice": "{{count}} actif(s) ont nécessité des hypothèses de remplacement.",
       "source": "Source des hypothèses : {{source}}"
+    },
+    "source": {
+      "currentAllocationValue": "Valeur actuelle de l'allocation d'actifs :",
+      "usesAssetAllocation": "Les pondérations et tickers viennent de l'allocation d'actifs. Modifiez cette page pour changer le backtest.",
+      "editAllocation": "Modifier l'allocation d'actifs"
     },
     "metrics": {
       "title": "Résumé du backtest",

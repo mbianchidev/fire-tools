@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ResponsiveContainer,
@@ -28,6 +28,7 @@ interface BacktestSectionProps {
   assets: Asset[];
   currency: string;
   isPrivacyMode: boolean;
+  defaultInitialInvestment?: number;
 }
 
 interface BacktestFetchStatus {
@@ -43,14 +44,20 @@ export const BacktestSection: React.FC<BacktestSectionProps> = ({
   assets,
   currency,
   isPrivacyMode,
+  defaultInitialInvestment,
 }) => {
   const { t } = useTranslation();
-  const [initialInvestment, setInitialInvestment] = useState<number>(DEFAULT_INITIAL_INVESTMENT);
+  const initialDefault =
+    defaultInitialInvestment && defaultInitialInvestment > 0
+      ? Math.round(defaultInitialInvestment)
+      : DEFAULT_INITIAL_INVESTMENT;
+  const [initialInvestment, setInitialInvestment] = useState<number>(initialDefault);
   const [lookbackYears, setLookbackYears] = useState<number>(DEFAULT_LOOKBACK_YEARS);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fetchStatus, setFetchStatus] = useState<BacktestFetchStatus | null>(null);
   const [backtestResult, setBacktestResult] = useState<PortfolioBacktestSuccess | null>(null);
+  const hasEditedInitialInvestmentRef = useRef(false);
 
   const eligibleAssets = useMemo(
     () => assets.filter(asset => asset.targetMode !== 'OFF' && asset.currentValue > 0),
@@ -65,6 +72,12 @@ export const BacktestSection: React.FC<BacktestSectionProps> = ({
       })) ?? [],
     [backtestResult],
   );
+
+  useEffect(() => {
+    if (!hasEditedInitialInvestmentRef.current && initialDefault > 0) {
+      setInitialInvestment(initialDefault);
+    }
+  }, [initialDefault]);
 
   const formatAxisCurrency = (value: number | string): string =>
     formatDisplayCurrency(Number(value), currency);
@@ -207,9 +220,17 @@ export const BacktestSection: React.FC<BacktestSectionProps> = ({
             min={1}
             step={100}
             value={initialInvestment}
-            onChange={event => setInitialInvestment(Number(event.target.value))}
+            onChange={event => {
+              hasEditedInitialInvestmentRef.current = true;
+              setInitialInvestment(Number(event.target.value));
+            }}
             className="target-input"
           />
+          <small className="backtest-control-note">
+            {t('backtest.controls.defaultInitialInvestmentNote', {
+              amount: formatDisplayCurrency(initialDefault, currency),
+            })}
+          </small>
         </label>
 
         <label htmlFor="backtest-lookback-years" className="backtest-control">
@@ -233,6 +254,10 @@ export const BacktestSection: React.FC<BacktestSectionProps> = ({
           {isRunning ? t('backtest.controls.running') : t('backtest.controls.run')}
         </button>
       </div>
+
+      <p className="backtest-final-value-note">
+        <MaterialIcon name="help" size="small" /> {t('backtest.controls.finalValueExplanation')}
+      </p>
 
       {error && (
         <div className="validation-errors" role="alert" aria-live="polite">
