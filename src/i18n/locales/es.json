@@ -874,7 +874,7 @@
         "title": "Por región"
       },
       "sector": {
-        "description": "Individual stocks use their listed sector from Yahoo Finance. ETFs use a sector label inferred from their fund name (e.g. \"Technology\", \"Government Bonds\"), as Yahoo no longer exposes per-ETF holdings without authentication.",
+        "description": "Industry-sector mix (e.g. Technology, Financial Services, Consumer goods). Individual stocks use their listed sector from Yahoo Finance. Broad-market ETFs are expanded into industry sectors using approximate weightings for well-known indices (e.g. S&P 500, MSCI World, FTSE All-World), since Yahoo no longer exposes per-ETF holdings without authentication. Bond, commodity, and single-sector funds keep their own label.",
         "title": "Por sector"
       }
     },
