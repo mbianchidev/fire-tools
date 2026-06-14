@@ -32,6 +32,7 @@ import {
   DEFAULT_LTWR_HORIZON_YEARS,
 } from '../utils/withdrawalRateConversion';
 import { logger } from '../utils/logger';
+import { useAuditLog } from '../contexts/AuditLogContext';
 import { formatDisplayCurrency, formatDisplayPercent } from '../utils/numberFormatter';
 import { MaterialIcon } from './MaterialIcon';
 import { SliderInput } from './SliderInput';
@@ -80,6 +81,7 @@ function successRateColor(rate: number): string {
 export const WithdrawalRatePage: React.FC = () => {
   const location = useLocation();
   const { t } = useTranslation();
+  const { logAuditEvent } = useAuditLog();
 
   // Load inputs once per navigation, same pattern as MonteCarloPage.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,6 +131,7 @@ export const WithdrawalRatePage: React.FC = () => {
 
   const sweepDebounce = useRef<number | null>(null);
   const currentDebounce = useRef<number | null>(null);
+  const calcAuditInitialised = useRef(false);
 
   const portfolioValid = inputs.initialSavings > 0;
   const allocationSum = inputs.stocksPercent + inputs.bondsPercent + inputs.cashPercent;
@@ -160,6 +163,25 @@ export const WithdrawalRatePage: React.FC = () => {
       if (sweepDebounce.current) window.clearTimeout(sweepDebounce.current);
     };
   }, [inputs, retirementYears, numSimulations, canSimulate, portfolioValid, allocationSum]);
+
+  // Audit a withdrawal-rate run once results settle. Debounced and skipping the
+  // initial render so dragging sliders / page load don't flood the log.
+  useEffect(() => {
+    if (!canSimulate || sweep.length === 0) return;
+    if (!calcAuditInitialised.current) {
+      calcAuditInitialised.current = true;
+      return;
+    }
+    const handle = window.setTimeout(() => {
+      logAuditEvent('RUN_CALCULATION', {
+        tool: 'withdrawal-rate',
+        inputRateType,
+        retirementYears,
+        numSimulations,
+      });
+    }, 1500);
+    return () => window.clearTimeout(handle);
+  }, [sweep, canSimulate, inputRateType, retirementYears, numSimulations, logAuditEvent]);
 
   // Recompute the focused (slider) result live, with a short debounce so the
   // chart updates smoothly while the user drags.

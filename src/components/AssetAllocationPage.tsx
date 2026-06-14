@@ -17,6 +17,7 @@ import { getDemoAssetAllocationData } from '../utils/defaults';
 import { syncAssetAllocationToNetWorth } from '../utils/dataSync';
 import { useAssetPrices } from '../hooks/useAssetPrices';
 import { useExchangeRates } from '../hooks/useExchangeRates';
+import { useAuditLog } from '../contexts/AuditLogContext';
 import { MaterialIcon } from './MaterialIcon';
 import { EditableAssetClassTable } from './EditableAssetClassTable';
 import { AllocationChart } from './AllocationChart';
@@ -57,6 +58,10 @@ function calculateCashDelta(
 
 export const AssetAllocationPage: React.FC = () => {
   const { t } = useTranslation();
+  const { logAuditEvent } = useAuditLog();
+  // Per-asset debounce timers so rapid field edits coalesce into one audit
+  // entry instead of one per keystroke.
+  const assetUpdateAuditTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const defaultTargets = {
     STOCKS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 60 },
     BONDS: { targetMode: 'PERCENTAGE' as AllocationMode, targetPercent: 40 },
@@ -203,6 +208,19 @@ export const AssetAllocationPage: React.FC = () => {
       asset.id === assetId ? { ...asset, ...updates } : asset
     );
     updateAllocation(newAssets);
+
+    const target = assets.find(a => a.id === assetId);
+    const fields = Object.keys(updates).join(',');
+    const timers = assetUpdateAuditTimers.current;
+    if (timers[assetId]) clearTimeout(timers[assetId]);
+    timers[assetId] = setTimeout(() => {
+      logAuditEvent('UPDATE_ASSET', {
+        assetId,
+        assetClass: target?.assetClass ?? null,
+        fields,
+      });
+      delete timers[assetId];
+    }, 800);
   };
 
   const handleBatchUpdateAssets = (updates: Record<string, Partial<Asset>>) => {
@@ -217,6 +235,11 @@ export const AssetAllocationPage: React.FC = () => {
     if (!deletedAsset) {
       return;
     }
+
+    logAuditEvent('DELETE_ASSET', {
+      assetId,
+      assetClass: deletedAsset.assetClass,
+    });
 
     // Get other percentage-based assets in the same class
     const sameClassAssets = assets.filter(asset =>
@@ -388,6 +411,11 @@ export const AssetAllocationPage: React.FC = () => {
   };
 
   const handleAddAsset = (newAsset: Asset) => {
+    logAuditEvent('CREATE_ASSET', {
+      assetClass: newAsset.assetClass,
+      subAssetType: newAsset.subAssetType ?? null,
+    });
+
     // Check if an asset with the same ticker already exists (merge / "buy more")
     const existingAsset = newAsset.ticker
       ? assets.find(a => a.ticker.toUpperCase() === newAsset.ticker.toUpperCase() && a.assetClass === newAsset.assetClass)

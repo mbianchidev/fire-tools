@@ -11,6 +11,7 @@ instead.
 - [API & custom clients (OpenAPI)](./api-client.md)
 - [Database & schema](./database.md)
 - [Migrations & rollbacks](./migrations.md)
+- [Audit log](./audit-log.md)
 - [Logging & PII handling](./logging.md)
 - [Cutting a release](./releasing.md)
 

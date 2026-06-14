@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { loadSettings, saveSettings, DEFAULT_SETTINGS, DEFAULT_FIRE_ASSET_CLASS_INCLUSION, DEFAULT_BACKEND_SETTINGS, DEFAULT_UPDATER_SETTINGS, MIN_KEEP_BACKUPS, MAX_KEEP_BACKUPS, type UserSettings, type BackendSettings, type UpdaterSettings } from '../utils/cookieSettings';
@@ -45,6 +45,8 @@ import {
 import { API_ENDPOINTS, type ApiEndpoint } from '../utils/apiCatalog';
 import { IS_DEMO_MODE } from '../utils/demoMode';
 import { downloadLogs, logger } from '../utils/logger';
+import { useAuditLog } from '../contexts/AuditLogContext';
+import { AUDIT_ACTION_TYPES, type AuditActionType } from '../types/auditLog';
 import { AboutSection } from './AboutSection';
 import './SettingsPage.css';
 
@@ -53,12 +55,13 @@ interface SettingsPageProps {
 }
 
 // Section identifiers for collapsible state
-const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'security', 'backend', 'updater', 'advanced', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'support', 'about'] as const;
+const SETTINGS_SECTIONS = ['language', 'account', 'fire', 'display', 'privacy', 'security', 'backend', 'updater', 'advanced', 'experimental', 'notifications', 'email', 'disclaimer', 'currency', 'marketData', 'categories', 'data', 'auditLog', 'support', 'about'] as const;
 type SettingsSection = typeof SETTINGS_SECTIONS[number];
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { entries: auditEntries, logAuditEvent, clearLog: clearAuditEntries } = useAuditLog();
   const [settings, setSettings] = useState<UserSettings>(() => {
     try { return loadSettings(); } catch { return DEFAULT_SETTINGS; }
   });
@@ -112,6 +115,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
   const [apiResponse, setApiResponse] = useState<{ status: number; body: string; ms: number } | null>(null);
   const [apiBusy, setApiBusy] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // Audit log filters (privacy-first: view/filter/clear only, never auto-export)
+  const [auditActionFilter, setAuditActionFilter] = useState<AuditActionType | 'all'>('all');
+  const [auditFromDate, setAuditFromDate] = useState<string>('');
+  const [auditToDate, setAuditToDate] = useState<string>('');
+  const [expandedAuditEntries, setExpandedAuditEntries] = useState<Set<string>>(new Set());
   
   // Account section expanded by default, others collapsed
   const [collapsedSections, setCollapsedSections] = useState<Set<SettingsSection>>(
@@ -434,7 +443,48 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
     setSettings(newSettings);
     saveSettings(newSettings);
     onSettingsChange?.(newSettings);
+    logAuditEvent('UPDATE_SETTINGS', { setting: String(key) });
     showMessage('success', t('settings.messages.settingsSaved'));
+  };
+
+  // Audit log: newest-first, filtered by action type and date range.
+  const filteredAuditEntries = useMemo(() => {
+    const fromMs = auditFromDate ? new Date(auditFromDate).getTime() : null;
+    // Include the whole "to" day by adding 24h.
+    const toMs = auditToDate ? new Date(auditToDate).getTime() + 24 * 60 * 60 * 1000 : null;
+    return auditEntries
+      .filter(entry => {
+        if (auditActionFilter !== 'all' && entry.actionType !== auditActionFilter) return false;
+        const ts = new Date(entry.timestamp).getTime();
+        if (fromMs !== null && ts < fromMs) return false;
+        if (toMs !== null && ts >= toMs) return false;
+        return true;
+      })
+      .slice()
+      .reverse();
+  }, [auditEntries, auditActionFilter, auditFromDate, auditToDate]);
+
+  const toggleAuditEntry = (id: string) => {
+    setExpandedAuditEntries(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleClearAuditLog = () => {
+    if (confirm(t('auditLog.clearConfirm'))) {
+      clearAuditEntries();
+      setExpandedAuditEntries(new Set());
+      showMessage('success', t('auditLog.cleared'));
+    }
+  };
+
+  const handleResetAuditFilters = () => {
+    setAuditActionFilter('all');
+    setAuditFromDate('');
+    setAuditToDate('');
   };
 
   // Auto-updater helpers
@@ -2898,6 +2948,123 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onSettingsChange }) 
                   </a>
                 </div>
               </div>
+            </div>
+          )}
+        </section>
+
+        {/* Audit Log */}
+        <section className="settings-section collapsible-section">
+          <button
+            className="collapsible-header"
+            onClick={() => toggleSection('auditLog')}
+            aria-expanded={!collapsedSections.has('auditLog')}
+            aria-controls="audit-log-content"
+          >
+            <h2><MaterialIcon name="history" /> {t('settings.sections.auditLog')} <span className="collapse-icon-small" aria-hidden="true">{collapsedSections.has('auditLog') ? '▶' : '▼'}</span></h2>
+          </button>
+          {!collapsedSections.has('auditLog') && (
+            <div id="audit-log-content" className="collapsible-content">
+              <p className="setting-help" style={{ marginBottom: '1rem' }}>
+                <MaterialIcon name="privacy_tip" size="small" /> {t('auditLog.privacyNote')}
+              </p>
+
+              <div className="audit-log-filters" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'flex-end', marginBottom: '1rem' }}>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label htmlFor="auditActionFilter">{t('auditLog.filters.action')}</label>
+                  <select
+                    id="auditActionFilter"
+                    value={auditActionFilter}
+                    onChange={(e) => setAuditActionFilter(e.target.value as AuditActionType | 'all')}
+                  >
+                    <option value="all">{t('auditLog.filters.all')}</option>
+                    {AUDIT_ACTION_TYPES.map(action => (
+                      <option key={action} value={action}>{t(`auditLog.actions.${action}`)}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label htmlFor="auditFromDate">{t('auditLog.filters.from')}</label>
+                  <input
+                    id="auditFromDate"
+                    type="date"
+                    value={auditFromDate}
+                    onChange={(e) => setAuditFromDate(e.target.value)}
+                  />
+                </div>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label htmlFor="auditToDate">{t('auditLog.filters.to')}</label>
+                  <input
+                    id="auditToDate"
+                    type="date"
+                    value={auditToDate}
+                    onChange={(e) => setAuditToDate(e.target.value)}
+                  />
+                </div>
+                <button type="button" className="secondary-btn" onClick={handleResetAuditFilters}>
+                  {t('auditLog.filters.reset')}
+                </button>
+              </div>
+
+              <p className="setting-help" style={{ marginBottom: '0.5rem' }}>
+                {t('auditLog.count', { count: filteredAuditEntries.length })}
+              </p>
+
+              {filteredAuditEntries.length === 0 ? (
+                <p className="setting-help">{t('auditLog.empty')}</p>
+              ) : (
+                <table className="audit-log-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left' }}>{t('auditLog.columns.timestamp')}</th>
+                      <th style={{ textAlign: 'left' }}>{t('auditLog.columns.action')}</th>
+                      <th style={{ textAlign: 'left' }}>{t('auditLog.columns.details')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAuditEntries.map(entry => {
+                      const isExpanded = expandedAuditEntries.has(entry.id);
+                      const payloadKeys = Object.keys(entry.payload);
+                      return (
+                        <tr key={entry.id}>
+                          <td style={{ whiteSpace: 'nowrap', verticalAlign: 'top' }}>{new Date(entry.timestamp).toLocaleString()}</td>
+                          <td style={{ verticalAlign: 'top' }}>{t(`auditLog.actions.${entry.actionType}`)}</td>
+                          <td style={{ verticalAlign: 'top' }}>
+                            {payloadKeys.length === 0 ? (
+                              <span className="setting-help">—</span>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  className="footer-link-btn"
+                                  onClick={() => toggleAuditEntry(entry.id)}
+                                  aria-expanded={isExpanded}
+                                >
+                                  {isExpanded ? t('auditLog.hideDetails') : t('auditLog.showDetails')}
+                                </button>
+                                {isExpanded && (
+                                  <ul style={{ margin: '0.25rem 0 0', paddingLeft: '1.1rem' }}>
+                                    {payloadKeys.map(key => (
+                                      <li key={key}><strong>{key}:</strong> {String(entry.payload[key])}</li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+
+              {auditEntries.length > 0 && (
+                <div style={{ marginTop: '1rem' }}>
+                  <button type="button" className="danger-btn" onClick={handleClearAuditLog}>
+                    <MaterialIcon name="delete" /> {t('auditLog.clear')}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </section>

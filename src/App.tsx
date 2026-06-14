@@ -1,7 +1,7 @@
 import { BrowserRouter, HashRouter, Routes, Route, Link, useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 // Use HashRouter under file:// (Electron) so deep links work without a server.
 const Router = typeof window !== 'undefined' && window.location.protocol === 'file:' ? HashRouter : BrowserRouter;
-import { useState, useEffect, useMemo, createContext, useContext } from 'react';
+import { useState, useEffect, useMemo, useRef, createContext, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CalculatorInputs, CalculationResult } from './types/calculator';
 import { DEFAULT_INPUTS } from './utils/defaults';
@@ -35,6 +35,8 @@ import { NotFoundPage } from './components/NotFoundPage';
 import { QuestionnairePage } from './components/QuestionnairePage';
 import { QuestionnairePrompt } from './components/QuestionnairePrompt';
 import { PolicyModal, PolicyType } from './components/PolicyModal';
+import { AuditLogProvider } from './contexts/AuditLogContext';
+import { useAuditLog } from './contexts/AuditLogContext';
 import { serializeInputsToURL, deserializeInputsFromURL, hasURLParams } from './utils/urlParams';
 import { saveFireCalculatorInputs, loadFireCalculatorInputs, clearAllData, loadAssetAllocation } from './utils/cookieStorage';
 import { exportFireCalculatorToCSV, importFireCalculatorFromCSV } from './utils/csvExport';
@@ -151,6 +153,7 @@ function PolicyRouteRedirect({ policyType }: { policyType: PolicyType }) {
 function FIRECalculatorPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { logAuditEvent } = useAuditLog();
   
   // Initialize state from URL if parameters exist, otherwise from localStorage, then defaults
   const [inputs, setInputs] = useState<CalculatorInputs>(() => {
@@ -224,6 +227,26 @@ function FIRECalculatorPage() {
     setResult(calculationResult);
   }, [inputs, assetAllocationData]);
 
+  // Audit the FIRE calculation. The calc runs automatically on every input
+  // change, so we debounce and skip the initial (page-load) computation to
+  // avoid logging restores/keystrokes as discrete user actions.
+  const calcAuditInitialised = useRef(false);
+  useEffect(() => {
+    if (!result) return;
+    if (!calcAuditInitialised.current) {
+      calcAuditInitialised.current = true;
+      return;
+    }
+    const handle = setTimeout(() => {
+      logAuditEvent('RUN_CALCULATION', {
+        yearsToFIRE: result.yearsToFIRE,
+        fireTarget: result.fireTarget,
+        fireType: result.fireType,
+      });
+    }, 1500);
+    return () => clearTimeout(handle);
+  }, [result, logAuditEvent]);
+
   const currentYear = new Date().getFullYear();
   const currentAge = currentYear - inputs.yearOfBirth;
   
@@ -240,6 +263,7 @@ function FIRECalculatorPage() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    logAuditEvent('EXPORT_DATA', { dataset: 'fire-calculator', format: 'csv' });
   };
 
   const handleImportCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,6 +276,7 @@ function FIRECalculatorPage() {
         const csv = e.target?.result as string;
         const importedInputs = importFireCalculatorFromCSV(csv);
         setInputs(importedInputs);
+        logAuditEvent('IMPORT_DATA', { dataset: 'fire-calculator', format: 'csv' });
       } catch (error) {
         alert(`Error importing CSV: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
@@ -516,7 +541,8 @@ function App() {
 
   return (
     <Router basename={basename}>
-      <PolicyModalContext.Provider value={{ openPolicy, closePolicy }}>
+      <AuditLogProvider>
+        <PolicyModalContext.Provider value={{ openPolicy, closePolicy }}>
         <div className={isElectron ? 'app app--electron' : 'app'}>
           <NavigateBridge />
           <DemoBanner />
@@ -589,6 +615,7 @@ function App() {
           <QuestionnairePrompt />
         </div>
       </PolicyModalContext.Provider>
+      </AuditLogProvider>
     </Router>
   );
 }

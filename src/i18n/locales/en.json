@@ -173,7 +173,8 @@
       "backend": "Backend",
       "advanced": "Advanced",
       "updater": "Updater & Backups",
-      "about": "About"
+      "about": "About",
+      "auditLog": "Audit Log"
     },
     "accountName": "Account Name",
     "accountNameHelp": "This name will be displayed throughout the app",
@@ -2658,6 +2659,39 @@
     "backendUnreachable": "Backend is not reachable. The app runs in client-only mode.",
     "backendDepTag": "backend",
     "refresh": "Refresh"
+  },
+  "auditLog": {
+    "title": "Audit Log",
+    "privacyNote": "Your activity is recorded only on this device and is never sent anywhere. Use this log to review your recent actions.",
+    "empty": "No activity recorded yet.",
+    "clear": "Clear audit log",
+    "clearConfirm": "Clear the entire audit log? This cannot be undone.",
+    "cleared": "Audit log cleared.",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "count": "{{count}} entries",
+    "columns": {
+      "timestamp": "Time",
+      "action": "Action",
+      "details": "Details"
+    },
+    "filters": {
+      "action": "Action type",
+      "all": "All actions",
+      "from": "From",
+      "to": "To",
+      "reset": "Reset filters"
+    },
+    "actions": {
+      "CREATE_ASSET": "Asset created",
+      "UPDATE_ASSET": "Asset updated",
+      "DELETE_ASSET": "Asset deleted",
+      "RUN_CALCULATION": "Calculation run",
+      "UPDATE_SETTINGS": "Settings updated",
+      "IMPORT_DATA": "Data imported",
+      "EXPORT_DATA": "Data exported",
+      "CLEAR_DATA": "Data cleared"
+    }
   },
   "withdrawalRate": {
     "inputType": {

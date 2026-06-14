@@ -45,6 +45,21 @@ self-hosted builds keep them opt-in (all off until you enable them here).
   cookies in browser). The app reloads empty. There is no undo; export first
   if you might want the data back.
 
+## Audit log
+
+The **Audit log** panel records meaningful actions you take — creating,
+editing or deleting assets, running the FIRE calculation, changing a setting,
+and importing or exporting data — so you can answer *"what did I just change?"*.
+
+- **Filter** by action type and date range, and expand any row for its details.
+- **Clear audit log** empties only the log (your data is untouched).
+- It is bounded to the most recent entries and stored with the same AES-256
+  encryption as the rest of your data.
+
+The log is **private by design**: it stays on your device, records only
+non-sensitive context (never amounts, tickers or account values), and is never
+exported off device.
+
 ## Privacy
 
 - **Desktop app** — data lives in a local SQLite database under the OS

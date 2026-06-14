@@ -21,6 +21,7 @@ import {
   runPortfolioBacktest,
 } from '../utils/backtestCalculator';
 import { logger } from '../utils/logger';
+import { useAuditLog } from '../contexts/AuditLogContext';
 import { MaterialIcon } from './MaterialIcon';
 import { PrivacyBlur } from './PrivacyBlur';
 
@@ -47,6 +48,7 @@ export const BacktestSection: React.FC<BacktestSectionProps> = ({
   defaultInitialInvestment,
 }) => {
   const { t } = useTranslation();
+  const { logAuditEvent } = useAuditLog();
   const initialDefault =
     defaultInitialInvestment && defaultInitialInvestment > 0
       ? Math.round(defaultInitialInvestment)
@@ -175,6 +177,13 @@ export const BacktestSection: React.FC<BacktestSectionProps> = ({
         setBacktestResult(null);
       } else {
         setBacktestResult(result);
+        logAuditEvent('RUN_CALCULATION', {
+          tool: 'portfolio-backtest',
+          lookbackYears,
+          assetCount: eligibleAssets.length,
+          requestedTickers: uniqueTickers.length,
+          failedTickers: failedTickers.length,
+        });
       }
 
       setFetchStatus({
